@@ -1496,9 +1496,11 @@ func _input(event: InputEvent) -> void:
         elif event.keycode == KEY_E:
             if dialogue_open:
                 _advance_dialogue()
-            elif not trial_started:                _try_interact()
+            elif not trial_started:
+                _try_interact()
         elif event.keycode == KEY_F and not dialogue_open:
-            _staff_attack()        elif event.keycode == KEY_Q and not dialogue_open:
+            _staff_attack()
+        elif event.keycode == KEY_Q and not dialogue_open:
             _cast_arcane_bolt()
 
 func _physics_process(delta: float) -> void:
