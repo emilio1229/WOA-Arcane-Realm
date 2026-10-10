@@ -9,8 +9,10 @@ RUN mkdir -p build \
     && godot --headless --path . --editor --quit \
     && godot --headless --path . --export-release "Web" build/index.html
 
-# Serve the exported game as a static website.
+# Serve the exported game as a static website. Railway injects PORT at runtime;
+# the default keeps local runs and CI smoke tests on port 8080.
 FROM nginx:1.28-alpine
-COPY deploy/nginx.conf /etc/nginx/conf.d/default.conf
+ENV PORT=8080
+COPY deploy/nginx.conf /etc/nginx/templates/default.conf.template
 COPY --from=game-build /project/build/ /usr/share/nginx/html/
 EXPOSE 8080
