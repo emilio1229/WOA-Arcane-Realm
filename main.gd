@@ -70,12 +70,19 @@ var generated_landmarks: Array[Node3D] = []
 
 func _ready() -> void:
     world_seed = _read_saved_world_seed()
-    _build_world()
-    _build_player()
+
+    # Put a real UI on screen before constructing the procedural world. The
+    # world build creates hundreds of nodes and can block the first browser
+    # render; yielding here lets the start menu appear instead of a blue canvas.
     _build_ui()
-    _load_game()
     _show_menu()
     Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+    await get_tree().create_timer(0.25).timeout
+
+    _build_world()
+    _build_player()
+    _load_game()
+    _show_menu()
 
 func _process(delta: float) -> void:
     animation_clock += delta
