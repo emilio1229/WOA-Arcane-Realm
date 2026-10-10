@@ -56,3 +56,9 @@ Railway is currently hosting the public test build. Keep the current public URL 
 3. **World expansion** — additional realms, story quests, puzzles, enemies, and boss encounters.
 4. **Player experience** — settings, accessibility, responsive UI, controller support, and performance optimization.
 5. **Community launch** — Discord Activity integration and connection to WOA community features.
+
+## Procedural world
+
+The overworld now expands into a seeded 1,200 × 1,200 metre wilderness around the handcrafted starting town and Sigil Sanctuary. Explore four fixed arcane landmarks and enter **The Shifting Hollow** to generate a new winding dungeon layout. The overworld layout seed is saved with story progress. The first procedural pass focuses on exploration geometry and landmarks; biome terrain, combat/loot dungeon rooms, and chunk streaming are planned next.
+
+See [`docs/PROCEDURAL_WORLD_GENERATION.md`](docs/PROCEDURAL_WORLD_GENERATION.md) for the implementation notes and roadmap.
