@@ -1,0 +1,6 @@
+.git
+.godot
+.import
+build
+.export
+*.tmp
