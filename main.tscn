@@ -1,68 +1,6 @@
 [gd_scene format=3 uid="uid://bt0tifrgo2bxg"]
 
 [ext_resource type="Script" uid="uid://6cpk07nytb1p" path="res://main.gd" id="1_main"]
-[ext_resource type="PackedScene" uid="uid://bu2eiwivj2xql" path="res://assets/models/props/antique bookcase 3d model.glb" id="2_vivmo"]
-[ext_resource type="PackedScene" uid="uid://dup4204let7ek" path="res://assets/models/environment/ancient+ruin+stones+3d+model.glb" id="3_2cqfq"]
-[ext_resource type="PackedScene" uid="uid://dtrda60v68xht" path="res://assets/models/characters/dark armored knight 3d model.glb" id="4_yaehf"]
-[ext_resource type="PackedScene" uid="uid://p3jgvtusp47n" path="res://assets/models/characters/fantasy wizard 3d model.glb" id="5_074og"]
-[ext_resource type="PackedScene" uid="uid://bjjachc5ftdx4" path="res://assets/models/characters/wizard robe 3d model.glb" id="6_cegan"]
-[ext_resource type="PackedScene" uid="uid://crbh8q4d0e8fa" path="res://assets/models/creatures/dark+fantasy+boss+3d+model.glb" id="7_82xsv"]
-[ext_resource type="PackedScene" uid="uid://c70tm21onntn8" path="res://assets/models/creatures/stone+golem+3d+model.glb" id="8_getpj"]
-[ext_resource type="PackedScene" uid="uid://kb8d22as5w6a" path="res://assets/models/creatures/shadow+beast+3d+model.glb" id="9_ryguw"]
-[ext_resource type="PackedScene" uid="uid://dgajkyxvvpfe3" path="res://assets/models/creatures/haunted+forest+spirit+3d+model.glb" id="10_d13ii"]
-[ext_resource type="PackedScene" uid="uid://bf1kuyvyclq0t" path="res://assets/models/environment/fantasy tree 3d model.glb" id="11_1u8w0"]
-[ext_resource type="PackedScene" uid="uid://cwwrusqitbi20" path="res://assets/models/environment/gnarled tree root 3d model.glb" id="12_0odxb"]
-[ext_resource type="PackedScene" uid="uid://yoiqrrsy75k7" path="res://assets/models/environment/haunted blackwood tree 3d model.glb" id="13_lswn8"]
-[ext_resource type="PackedScene" uid="uid://cyr18pxm1ikkc" path="res://assets/models/environment/mossy rock 3d model.glb" id="14_a6jrf"]
-[ext_resource type="PackedScene" uid="uid://ofjx15ropjuo" path="res://assets/models/environment/mushroom+cluster+3d+model.glb" id="15_xuqvo"]
 
 [node name="ArcaneRealm" type="Node3D" unique_id=339899406]
 script = ExtResource("1_main")
-
-[node name="antique bookcase 3d model" parent="." unique_id=1467670717 instance=ExtResource("2_vivmo")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.27988827, 0, 0.8991122)
-
-[node name="ancient+ruin+stones+3d+model" parent="." unique_id=1921832657 instance=ExtResource("3_2cqfq")]
-transform = Transform3D(0.9983162, 0.056700293, -0.012226265, -0.056663383, 0.99838775, 0.0033478998, 0.012396383, -0.0026494898, 0.9999197, 0.80248296, 0.17086166, 0.298167)
-
-[node name="dark armored knight 3d model" parent="." unique_id=769190350 instance=ExtResource("4_yaehf")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0645851, 0, 1.5501304)
-
-[node name="fantasy wizard 3d model" parent="." unique_id=270187002 instance=ExtResource("5_074og")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0645851, 0.13186169, 2.191227)
-
-[node name="wizard robe 3d model" parent="." unique_id=1570095995 instance=ExtResource("6_cegan")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0645851, 0, 1.5501304)
-
-[node name="wizard robe 3d model2" parent="." unique_id=1504141827 instance=ExtResource("6_cegan")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.79278433, 0, 2.696041)
-
-[node name="dark+fantasy+boss+3d+model" parent="." unique_id=142423711 instance=ExtResource("7_82xsv")]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0.20148873, 0, 3.2992232)
-
-[node name="stone+golem+3d+model" parent="." unique_id=1241657731 instance=ExtResource("8_getpj")]
-transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, -3.4890096, 0, 4.3964243)
-
-[node name="shadow+beast+3d+model" parent="." unique_id=1002802378 instance=ExtResource("9_ryguw")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.296984, -1.1920929e-07, 4.68728)
-
-[node name="haunted+forest+spirit+3d+model" parent="." unique_id=971890218 instance=ExtResource("10_d13ii")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3648101, -1.1920929e-07, 4.7197833)
-
-[node name="ancient+ruin+stones+3d+model2" parent="." unique_id=1595689775 instance=ExtResource("3_2cqfq")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5940523, 1.1920929e-07, 5.2593875)
-
-[node name="fantasy tree 3d model" parent="." unique_id=1447446476 instance=ExtResource("11_1u8w0")]
-transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, -2.078735, 0, 3.1093755)
-
-[node name="gnarled tree root 3d model" parent="." unique_id=816717542 instance=ExtResource("12_0odxb")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.42470962, 0, 6.051009)
-
-[node name="haunted blackwood tree 3d model" parent="." unique_id=417202117 instance=ExtResource("13_lswn8")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0931597, 0, 5.172971)
-
-[node name="mossy rock 3d model" parent="." unique_id=1948319780 instance=ExtResource("14_a6jrf")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.153054, 0, 6.3853064)
-
-[node name="mushroom+cluster+3d+model" parent="." unique_id=744445482 instance=ExtResource("15_xuqvo")]
-transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0.8497045, 0, 5.414113)
