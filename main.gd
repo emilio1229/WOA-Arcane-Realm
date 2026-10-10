@@ -35,6 +35,9 @@ var staff_cooldown := 0.0
 var spell_cooldown := 0.0
 var trial_started := false
 var trial_complete := false
+var collected_rune_names: Array[String] = []
+var save_exists := false
+var continue_button: Button
 var jump_requested := false
 var run_speed := 7.2
 var walk_speed := 4.8
@@ -43,6 +46,7 @@ func _ready() -> void:
     _build_world()
     _build_player()
     _build_ui()
+    _load_game()
     _show_menu()
     Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
@@ -706,9 +710,9 @@ func _build_ui() -> void:
 
     menu_panel = PanelContainer.new()
     menu_panel.set_anchors_preset(Control.PRESET_CENTER)
-    menu_panel.position = Vector2(-250, -205)
-    menu_panel.size = Vector2(500, 410)
-    menu_panel.custom_minimum_size = Vector2(500, 410)
+    menu_panel.position = Vector2(-250, -235)
+    menu_panel.size = Vector2(500, 470)
+    menu_panel.custom_minimum_size = Vector2(500, 470)
     root.add_child(menu_panel)
     var menu_box := VBoxContainer.new()
     menu_box.add_theme_constant_override("separation", 14)
@@ -739,6 +743,11 @@ func _build_ui() -> void:
     start_button.custom_minimum_size.y = 48
     start_button.pressed.connect(_on_start_pressed)
     menu_box.add_child(start_button)
+    continue_button = Button.new()
+    continue_button.text = "CONTINUE JOURNEY"
+    continue_button.custom_minimum_size.y = 44
+    continue_button.pressed.connect(_on_continue_pressed)
+    menu_box.add_child(continue_button)
     var hint := Label.new()
     hint.text = "WASD / arrows move  •  Mouse look  •  Space jump  •  E speak  •  Shift run"
     hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -785,6 +794,7 @@ func _build_ui() -> void:
     dialog_box.add_child(continue_button)
     hud_panel.hide()
     dialogue_panel.hide()
+    continue_button.hide()
 
 func _show_menu() -> void:
     menu_panel.show()
@@ -796,13 +806,88 @@ func _on_start_pressed() -> void:
     player_name = name_input.text.strip_edges()
     if player_name.is_empty():
         player_name = "Apprentice"
-    status_label.text = player_name + "  |  The Sigil Sanctuary"
+    status_label.text = player_name + "  |  HP 5/5"
     objective_label.text = "Quest: Speak with Mathias"
+    _save_game()
     menu_panel.hide()
     hud_panel.show()
     started = true
     Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
     _open_dialogue("Mathias", "At last. The sanctuary has been waiting for you, " + player_name + ". I am Mathias, keeper of the first sigil. The light above us has begun to answer a call that should have remained silent.", 0)
+
+func _on_continue_pressed() -> void:
+    if not save_exists:
+        return
+    menu_panel.hide()
+    hud_panel.show()
+    started = true
+    dialogue_open = false
+    Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+    if trial_complete or quest_complete:
+        player.global_position = Vector3(0, 0.3, -15.0)
+    else:
+        player.global_position = Vector3(0, 0.2, 5.0)
+    player.velocity = Vector3.ZERO
+    status_label.text = player_name + "  |  HP " + str(player_hp) + "/5"
+
+func _load_game() -> void:
+    var path := "user://arcane_realm_save.json"
+    if not FileAccess.file_exists(path):
+        save_exists = false
+        return
+    var file := FileAccess.open(path, FileAccess.READ)
+    if file == null:
+        save_exists = false
+        return
+    var parsed = JSON.parse_string(file.get_as_text())
+    if not (parsed is Dictionary):
+        save_exists = false
+        return
+    player_name = str(parsed.get("player_name", "Apprentice"))
+    collected_rune_names.clear()
+    var saved_names = parsed.get("collected_runes", [])
+    if saved_names is Array:
+        for saved_name in saved_names:
+            collected_rune_names.append(str(saved_name))
+    collected_runes = collected_rune_names.size()
+    for shrine in rune_shrines.duplicate():
+        var rune_name := shrine.name.replace(" Sigil", "")
+        if collected_rune_names.has(rune_name):
+            rune_shrines.erase(shrine)
+            shrine.queue_free()
+    quest_complete = bool(parsed.get("quest_complete", collected_runes >= 3))
+    trial_complete = bool(parsed.get("trial_complete", false))
+    if quest_complete:
+        gate_seal.hide()
+        gate_portal.show()
+    save_exists = true
+    if is_instance_valid(status_label):
+        status_label.text = player_name + "  |  HP " + str(player_hp) + "/5"
+        if trial_complete:
+            objective_label.text = "First Trial complete: The gate is yours"
+        elif quest_complete:
+            objective_label.text = "Quest complete: Enter the awakened gate"
+        elif collected_runes > 0:
+            objective_label.text = "Quest: Recover the sigils (%d/3)" % collected_runes
+        else:
+            objective_label.text = "Quest: Speak with Mathias"
+    if is_instance_valid(continue_button):
+        continue_button.show()
+
+func _save_game() -> void:
+    var data := {
+        "player_name": player_name,
+        "collected_runes": collected_rune_names,
+        "quest_complete": quest_complete,
+        "trial_complete": trial_complete
+    }
+    var file := FileAccess.open("user://arcane_realm_save.json", FileAccess.WRITE)
+    if file != null:
+        file.store_string(JSON.stringify(data))
+        file.close()
+        save_exists = true
+        if is_instance_valid(continue_button):
+            continue_button.show()
 
 func _input(event: InputEvent) -> void:
     if not started:
@@ -941,6 +1026,7 @@ func _collect_rune(shrine: Node3D) -> void:
         _open_dialogue("Sigil Awakened", "The " + rune_name + " Sigil rises into the air and the other two answer. Light races across the sanctuary. The gate is open. Whatever waits beyond it now knows your name.", 2)
     else:
         _open_dialogue(rune_name + " Sigil", "The crystal loosens from its ancient mooring and folds into a ribbon of light. The ward recognizes your touch. " + str(3 - collected_runes) + " sigil(s) remain.", 2)
+    _save_game()
 
 func _start_first_trial() -> void:
     if trial_started or trial_complete:
@@ -1104,6 +1190,7 @@ func _defeat_guardian() -> void:
     player_hp = 5
     status_label.text = player_name + "  |  HP 5/5"
     objective_label.text = "First Trial complete: The gate is yours"
+    _save_game()
     player.global_position = Vector3(0, 0.3, -15.0)
     player.velocity = Vector3.ZERO
     _open_dialogue("Guardian Defeated", "The guardian's core fractures into harmless light. The stolen sigil-energy returns to the sanctuary, and the old gate recognizes you as its keeper. This is the first victory of many, " + player_name + ".", 3)
