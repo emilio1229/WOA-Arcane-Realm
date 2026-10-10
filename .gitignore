@@ -1,0 +1,13 @@
+# Godot-generated cache and imported artifacts
+.godot/
+.mono/
+build/
+.export/
+data_*/
+*.translation
+
+# Temporary/editor files
+.DS_Store
+Thumbs.db
+*~
+*.tmp
