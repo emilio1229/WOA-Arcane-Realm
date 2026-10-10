@@ -462,10 +462,8 @@ func _create_mathias(pos: Vector3) -> void:
     staff_light.light_energy = 0.8
     staff_light.omni_range = 4.0
     npc.add_child(staff_light)
-    # Prefer the requested Battle Mage asset; use the available armored character until it is uploaded.
-    if not _try_replace_visual_with_model(npc, "res://assets/models/characters/dark armored knight 3d model.glb", Vector3.ONE):
-        if not _try_replace_visual_with_model(npc, "res://assets/models/characters/dark armored knight 3d model.glb", Vector3.ONE):
-            _try_replace_visual_with_model(npc, "res://assets/models/characters/dark armored knight 3d model.glb", Vector3.ONE)
+    # Use the available armored character model for Mathias.
+    _try_replace_visual_with_model(npc, "res://assets/models/characters/dark armored knight 3d model.glb", Vector3.ONE)
     add_child(npc)
     interact_target = npc
 
