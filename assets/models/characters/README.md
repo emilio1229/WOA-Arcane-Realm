@@ -1,15 +1,11 @@
 # Characters
 
-Put exported character models here: player alternatives, NPCs, villagers, mages, merchants, and other humanoid characters.
+Character source models live here. Current integrations:
 
-## Suggested filenames
-- `wizard.glb`
-- `battlemage.glb`
-- `wizardrobe.glb`
-- `mathias_keeper.glb` (the current game slot expects this exact file at `assets/models/mathias_keeper.glb`, so copy it there too when ready to replace Mathias)
-- `player_apprentice.glb` (the current player slot expects this exact file at `assets/models/player_apprentice.glb`)
+- `fantasy wizard 3d model.glb` — default player appearance.
+- `wizard robe 3d model.glb` — selectable alternate appearance.
+- `dark armored knight 3d model.glb` — currently used as Mathias's visual stand-in.
 
-**Important:** the three player character models are being collected here first. They will not automatically become selectable just because they are in this folder; I will inspect them and wire up a selector once the exports are available.
+A dedicated Battle Mage/Mathias model is not currently present in this folder. Until one is added, the game uses the armored character model and keeps its procedural fallback.
 
-## Export tips
-Prefer `.glb` with materials/textures embedded. Keep feet at ground level, model centered, and use a neutral pose. For playable characters, tell me whether each model is rigged and includes animations.
+Keep character models as GLB files with their materials/textures and import metadata. New models do not become selectable automatically: wire them into the character selection and model-loading code, then test in Godot.

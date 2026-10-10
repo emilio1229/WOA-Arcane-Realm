@@ -1,7 +1,10 @@
 # Creatures
 
-Put non-player creatures and enemies here: shadow beasts, forest spirits, golems, spectral creatures, and future boss variants.
+Creature models live here:
 
-Suggested filenames: `shadow_beast.glb`, `forest_spirit.glb`, `stone_golem.glb`, `guardian_variant.glb`.
+- `shadow+beast+3d+model.glb` — used for the opening ambush enemies.
+- `dark+fantasy+boss+3d+model.glb` — used for the first trial guardian.
+- `haunted+forest+spirit+3d+model.glb` — available for future integration.
+- `stone+golem+3d+model.glb` — available for future integration.
 
-The current guardian slot expects `assets/models/sanctuary_guardian.glb` at the top level of `assets/models/`. When your chosen guardian export is ready, keep a copy at that exact path too. Other creature models are not automatically active until their behavior and scene integration are added.
+Only models explicitly referenced by `main.gd` are loaded into gameplay. Keep the procedural fallback when integrating a new model so a missing asset does not prevent the scene from opening.

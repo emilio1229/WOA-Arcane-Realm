@@ -15,7 +15,7 @@ Open the deployed game: https://woa-arcane-realm-production.up.railway.app
 - Return to the monumental gate and enter the First Trial arena.
 - Fight the Sanctuary Guardian: use **F** for close staff strikes and **Q** for ranged arcane bolts. Dodge its approach and survive to win the chapter.
 
-This is an early playable vertical slice, not the finished full game. The character and world are still procedurally assembled placeholders; proper character models, animation, sound, more levels, enemies, spells, saving, and Discord Activity integration remain planned development work.
+This is an early playable vertical slice, not the finished full game. The world is assembled procedurally and uses categorized GLB assets where they are wired into gameplay; missing or invalid models fall back to procedural visuals. Rigged animation, sound, more levels, richer progression, and Discord Activity integration remain planned development work.
 
 ## Controls
 
@@ -36,7 +36,7 @@ The game automatically saves your wizard name and major quest progress in the br
 2. Import `project.godot`.
 3. Press **F6** or **F5** to run the game.
 
-The world and its current chapter gameplay are assembled in `main.gd` using procedural Godot geometry and materials. The main scene is `main.tscn`.
+`main.tscn` contains only the game root and its script. `main.gd` builds the world and loads models at their intended locations. Source models are grouped under `assets/models/characters`, `creatures`, `environment`, `architecture`, and `props`. The generated `.godot/` cache is intentionally excluded from Git; Godot recreates it on import.
 
 ## Browser build and deployment
 

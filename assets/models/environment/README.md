@@ -1,7 +1,8 @@
 # Environment
 
-Put natural world assets here: trees, roots, rocks, mushrooms, plants, fallen logs, crystals growing from the ground, and other outdoor scenery.
+Environment models are grouped here:
 
-Suggested filenames: `haunted_tree.glb`, `blackwood_roots.glb`, `glowing_mushrooms.glb`, `ruin_rocks.glb`.
+- `haunted blackwood tree 3d model.glb` — used for the starting area's trees.
+- `fantasy tree 3d model.glb`, `gnarled tree root 3d model.glb`, `mossy rock 3d model.glb`, `mushroom+cluster+3d+model.glb`, and `ancient+ruin+stones+3d+model.glb` — available for deliberate world integration.
 
-The current haunted-tree code slot expects `assets/models/haunted_tree.glb` at the top level of `assets/models/`. Keep a copy at that exact path when we are ready to replace the procedural tree. Other models are staged here until we deliberately add them to the game.
+Models are not automatically placed just because they are present. Update the world-building code in `main.gd` when introducing an asset and keep a procedural fallback where appropriate.
