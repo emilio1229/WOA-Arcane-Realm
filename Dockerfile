@@ -5,9 +5,16 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends libfontconfig1 \
     && rm -rf /var/lib/apt/lists/*
 COPY . .
-RUN mkdir -p build \
-    && godot --headless --path . --editor --quit \
-    && godot --headless --path . --export-release "Web" build/index.html
+RUN set -eu; \
+    mkdir -p build; \
+    godot --headless --path . --editor --quit; \
+    godot --headless --path . --quit-after 5 > /tmp/godot-runtime.log 2>&1 || { cat /tmp/godot-runtime.log; exit 1; }; \
+    cat /tmp/godot-runtime.log; \
+    if grep -E 'SCRIPT ERROR:|Parse Error:|ERROR:' /tmp/godot-runtime.log; then \
+      echo 'Godot runtime smoke test reported engine or script errors.'; \
+      exit 1; \
+    fi; \
+    godot --headless --path . --export-release "Web" build/index.html
 
 # Serve the exported game as a static website. Railway injects PORT at runtime;
 # the default keeps local runs and CI smoke tests on port 8080.
