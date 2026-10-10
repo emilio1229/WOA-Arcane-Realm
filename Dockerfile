@@ -32,6 +32,9 @@ RUN set -eu; \
 # the default keeps local runs and CI smoke tests on port 8080.
 FROM nginx:1.28-alpine
 ENV PORT=8080
-COPY deploy/nginx.conf /etc/nginx/templates/default.conf.template
+COPY deploy/nginx.conf /etc/nginx/default.conf.template
 COPY --from=game-build /project/build/ /usr/share/nginx/html/
 EXPOSE 8080
+# Expand Railway's PORT explicitly before Nginx starts. Do not rely on the
+# nginx image's optional template envsubst hook to expand this variable.
+CMD ["sh", "-c", "envsubst '${PORT}' < /etc/nginx/default.conf.template > /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'" ]
