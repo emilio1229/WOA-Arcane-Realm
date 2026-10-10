@@ -1537,7 +1537,7 @@ func _interact_with_mathias() -> void:
         _open_dialogue("Mathias", "The first sigil is not a weapon. It is a promise: power must answer to purpose. Something has breached the old wards, and the sanctuary is only the first place it has touched.", 1)
     else:
         objective_label.text = "Quest: Recover the three ancient sigils"
-        _open_dialogue("Mathias", "Dawn, Dusk, and Heart. Three fragments hold the gate shut. Find their crystal shrines along the path and press E near each one to claim their sigil. Return to the arch when all three answer.", 2)
+        _open_dialogue("Mathias", "Dawn, Dusk, and Heart are the first three seals. Beyond the sanctuary, each realm has trials, guardians, riddles, and relics. The Council of Wizards, Warlocks & Witches keeps the old laws; champions earn standing through deeds, not titles alone. The Sigil Exchange, bounty ledgers, and riddle-keepers you may have heard of in the Discord are echoes of those ancient customs. Gather the three sigils and enter the First Trial so we can discover who is poisoning the wards.", 2)
 
 func _open_dialogue(who: String, words: String, step: int) -> void:
     story_step = step
