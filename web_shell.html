@@ -73,10 +73,16 @@
       const errorHelp = document.getElementById("error-help");
       let engineStarted = false;
       let hasError = false;
+      const startupErrors = [];
       function showError(message) {
         hasError = true;
         boot.classList.remove("fade-away");
-        errorBox.textContent = String(message || "Unknown startup error");
+        const detail = String(message || "Unknown startup error");
+        if (!startupErrors.includes(detail)) startupErrors.push(detail);
+        // Godot reports one error as several print-error lines. Keep the full
+        // sequence visible instead of replacing the root cause with the final
+        // "at: instantiate (...)" stack frame.
+        errorBox.textContent = startupErrors.slice(-30).join("\\n");
         errorBox.classList.add("visible");
         errorHelp.hidden = false;
         status.textContent = "The Realm could not start";
@@ -103,7 +109,9 @@
             }
             status.textContent = total > 0 ? "Loading the Realm…" : "Preparing the spellwork…";
           },
-          onPrint: text => console.log("[Godot]", text),
+          onPrint: text => {
+            console.log("[Godot]", text);
+          },
           onPrintError: text => {
             console.error("[Godot]", text);
             showError(text);
