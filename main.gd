@@ -1,6 +1,9 @@
 extends Node3D
 
-const WORLD_SIZE := 80.0
+const WORLD_SIZE := 1200.0
+const WORLD_SEED_DEFAULT := 730241
+const DUNGEON_ORIGIN := Vector3(230.0, 0.0, 0.0)
+const DUNGEON_FLOOR_SIZE := Vector2(72.0, 72.0)
 var player: CharacterBody3D
 var player_visual_root: Node3D
 var camera_pivot: Node3D
@@ -55,8 +58,18 @@ var animation_clock := 0.0
 var jump_requested := false
 var run_speed := 7.2
 var walk_speed := 4.8
+var world_seed := WORLD_SEED_DEFAULT
+var dungeon_seed := 0
+var dungeon_active := false
+var dungeon_return_position := Vector3(0.0, 0.3, 5.0)
+var dungeon_root: Node3D
+var dungeon_entrance: Node3D
+var dungeon_exit: Node3D
+var dungeon_label: Label
+var generated_landmarks: Array[Node3D] = []
 
 func _ready() -> void:
+    world_seed = _read_saved_world_seed()
     _build_world()
     _build_player()
     _build_ui()
@@ -146,6 +159,240 @@ func _build_world() -> void:
     _create_rune_shrine(Vector3(5.8, 0.0, -9.0), "Dusk", Color(0.34, 0.62, 1.0))
     _create_rune_shrine(Vector3(0.0, 0.0, -15.0), "Heart", Color(0.74, 0.35, 1.0))
     _create_gate_portal()
+    _generate_wilderness()
+    _create_dungeon_entrance()
+
+
+func _read_saved_world_seed() -> int:
+    var path := "user://arcane_realm_save.json"
+    if not FileAccess.file_exists(path):
+        return WORLD_SEED_DEFAULT
+    var file := FileAccess.open(path, FileAccess.READ)
+    if file == null:
+        return WORLD_SEED_DEFAULT
+    var parsed = JSON.parse_string(file.get_as_text())
+    if parsed is Dictionary:
+        return int(parsed.get("world_seed", WORLD_SEED_DEFAULT))
+    return WORLD_SEED_DEFAULT
+
+
+func _generate_wilderness() -> void:
+    # Handcrafted story locations stay untouched in the central 100-metre sanctuary.
+    # A stable seed means the same wilderness landmarks reappear after reloading.
+    var rng := RandomNumberGenerator.new()
+    rng.seed = world_seed
+    var tree_scene := load("res://assets/models/environment/haunted blackwood tree 3d model.glb") as PackedScene
+    var cottage_scene := load("res://assets/models/architecture/fantasy cottage 3d model.glb") as PackedScene
+    for i in range(260):
+        var x := rng.randf_range(-520.0, 520.0)
+        var z := rng.randf_range(-520.0, 520.0)
+        if Vector2(x, z).length() < 58.0:
+            continue
+        # Keep the dungeon approach clear and make a readable route from the town.
+        if Vector2(x - DUNGEON_ORIGIN.x, z - DUNGEON_ORIGIN.z).length() < 28.0:
+            continue
+        var prop := Node3D.new()
+        prop.name = "WildernessProp_%03d" % i
+        prop.position = Vector3(x, 0.0, z)
+        var roll := rng.randf()
+        if roll < 0.67 and tree_scene != null:
+            var tree := tree_scene.instantiate() as Node3D
+            tree.scale = Vector3.ONE * rng.randf_range(0.65, 1.35)
+            tree.rotation.y = rng.randf_range(0.0, TAU)
+            prop.add_child(tree)
+        elif roll < 0.84:
+            var rock := MeshInstance3D.new()
+            var mesh := SphereMesh.new()
+            mesh.radius = rng.randf_range(0.65, 1.8)
+            mesh.height = mesh.radius * rng.randf_range(0.7, 1.4)
+            rock.mesh = mesh
+            rock.position.y = mesh.radius * 0.45
+            rock.rotation = Vector3(rng.randf_range(-0.25, 0.25), rng.randf_range(0.0, TAU), rng.randf_range(-0.25, 0.25))
+            rock.material_override = _stone_material(Color(0.105, 0.085, 0.13), 0.15)
+            prop.add_child(rock)
+        else:
+            var shard := MeshInstance3D.new()
+            var shard_mesh := PrismMesh.new()
+            shard_mesh.size = Vector3(rng.randf_range(1.0, 2.4), rng.randf_range(1.8, 4.5), rng.randf_range(1.0, 2.4))
+            shard.mesh = shard_mesh
+            shard.position.y = shard_mesh.size.y * 0.5
+            shard.rotation.y = rng.randf_range(0.0, TAU)
+            shard.material_override = _stone_material(Color(0.18, 0.1, 0.23), 0.4)
+            prop.add_child(shard)
+        add_child(prop)
+    # Four distant landmarks make the world feel navigable without replacing story spaces.
+    var landmarks := [
+        {"name":"The Hollow Crown", "position":Vector3(-170,0,-135), "color":Color(0.36,0.17,0.55)},
+        {"name":"Ashen Watch", "position":Vector3(185,0,-190), "color":Color(0.7,0.25,0.18)},
+        {"name":"Moonwell", "position":Vector3(-230,0,185), "color":Color(0.2,0.45,0.8)},
+        {"name":"The Fallen Archive", "position":Vector3(325,0,225), "color":Color(0.5,0.35,0.7)}
+    ]
+    for landmark_data in landmarks:
+        var landmark := Node3D.new()
+        landmark.name = str(landmark_data.name)
+        landmark.position = landmark_data.position
+        var plinth := MeshInstance3D.new()
+        var plinth_mesh := CylinderMesh.new()
+        plinth_mesh.top_radius = 2.0
+        plinth_mesh.bottom_radius = 3.0
+        plinth_mesh.height = 1.0
+        plinth.mesh = plinth_mesh
+        plinth.position.y = 0.5
+        plinth.material_override = _stone_material(Color(0.12,0.085,0.17), 0.3)
+        landmark.add_child(plinth)
+        var crystal := MeshInstance3D.new()
+        var crystal_mesh := PrismMesh.new()
+        crystal_mesh.size = Vector3(1.2, 4.0, 1.2)
+        crystal.mesh = crystal_mesh
+        crystal.position.y = 3.0
+        crystal.material_override = _glow_material(landmark_data.color)
+        landmark.add_child(crystal)
+        var light := OmniLight3D.new()
+        light.position.y = 3.0
+        light.light_color = landmark_data.color
+        light.light_energy = 1.1
+        light.omni_range = 13.0
+        landmark.add_child(light)
+        add_child(landmark)
+        generated_landmarks.append(landmark)
+
+
+func _create_dungeon_entrance() -> void:
+    dungeon_entrance = Node3D.new()
+    dungeon_entrance.name = "The Shifting Hollow Entrance"
+    dungeon_entrance.position = DUNGEON_ORIGIN
+    var arch := MeshInstance3D.new()
+    var arch_mesh := BoxMesh.new()
+    arch_mesh.size = Vector3(5.0, 6.0, 1.0)
+    arch.mesh = arch_mesh
+    arch.position.y = 3.0
+    arch.material_override = _stone_material(Color(0.11, 0.07, 0.16), 0.25)
+    dungeon_entrance.add_child(arch)
+    var portal := MeshInstance3D.new()
+    var portal_mesh := PlaneMesh.new()
+    portal_mesh.size = Vector2(3.3, 4.6)
+    portal.mesh = portal_mesh
+    portal.position = Vector3(0.0, 2.8, -0.58)
+    portal.material_override = _glow_material(Color(0.34, 0.12, 0.72))
+    dungeon_entrance.add_child(portal)
+    var lamp := OmniLight3D.new()
+    lamp.position.y = 2.8
+    lamp.light_color = Color(0.42, 0.16, 0.9)
+    lamp.light_energy = 2.0
+    lamp.omni_range = 12.0
+    dungeon_entrance.add_child(lamp)
+    add_child(dungeon_entrance)
+
+
+func _enter_dungeon() -> void:
+    if dungeon_active:
+        return
+    dungeon_return_position = player.global_position
+    # Each new delve receives its own seed; the saved seed identifies the current delve.
+    var rng := RandomNumberGenerator.new()
+    rng.randomize()
+    dungeon_seed = int(rng.randi())
+    _save_game()
+    _build_randomized_dungeon(dungeon_seed)
+    dungeon_active = true
+    player.global_position = Vector3(0.0, 0.3, 1000.0)
+    player.velocity = Vector3.ZERO
+    objective_label.text = "The Shifting Hollow • find the violet exit"
+    _open_dialogue("The Shifting Hollow", "The passage folds behind you. Its chambers rearrange with every descent. Follow the violet lights; the exit will return you to the same wilderness path.", 2)
+
+
+func _build_randomized_dungeon(seed_value: int) -> void:
+    if dungeon_root != null and is_instance_valid(dungeon_root):
+        dungeon_root.queue_free()
+    dungeon_root = Node3D.new()
+    dungeon_root.name = "GeneratedDungeon"
+    dungeon_root.position = Vector3(0.0, 0.0, 1000.0)
+    add_child(dungeon_root)
+    var rng := RandomNumberGenerator.new()
+    rng.seed = seed_value
+    var floor_body := StaticBody3D.new()
+    var floor_mesh := MeshInstance3D.new()
+    var floor := PlaneMesh.new()
+    floor.size = DUNGEON_FLOOR_SIZE
+    floor_mesh.mesh = floor
+    floor_mesh.material_override = _stone_material(Color(0.075, 0.055, 0.1), 0.2)
+    floor_body.add_child(floor_mesh)
+    var collision := CollisionShape3D.new()
+    var shape := BoxShape3D.new()
+    shape.size = Vector3(DUNGEON_FLOOR_SIZE.x, 0.4, DUNGEON_FLOOR_SIZE.y)
+    collision.shape = shape
+    collision.position.y = -0.2
+    floor_body.add_child(collision)
+    dungeon_root.add_child(floor_body)
+    # Procedurally place 6-9 chambers along a winding corridor, with side rooms.
+    var chamber_count := rng.randi_range(6, 9)
+    for i in range(chamber_count):
+        var z := -26.0 + float(i) * 7.0
+        var x := rng.randf_range(-11.0, 11.0) if i > 0 else 0.0
+        var room := Node3D.new()
+        room.name = "Chamber_%02d" % i
+        room.position = Vector3(x, 0.0, z)
+        var marker := MeshInstance3D.new()
+        var marker_mesh := CylinderMesh.new()
+        marker_mesh.top_radius = 2.0
+        marker_mesh.bottom_radius = 3.2
+        marker_mesh.height = 0.25
+        marker.mesh = marker_mesh
+        marker.position.y = 0.13
+        marker.material_override = _stone_material(Color(0.14, 0.095, 0.2), 0.3)
+        room.add_child(marker)
+        var crystal := MeshInstance3D.new()
+        var crystal_mesh := PrismMesh.new()
+        crystal_mesh.size = Vector3(0.75, rng.randf_range(1.5, 3.0), 0.75)
+        crystal.mesh = crystal_mesh
+        crystal.position = Vector3(rng.randf_range(-2.0, 2.0), crystal_mesh.size.y * 0.5, rng.randf_range(-2.0, 2.0))
+        crystal.material_override = _glow_material([Color(0.55,0.18,0.85),Color(0.18,0.55,0.9),Color(0.9,0.3,0.48)][rng.randi_range(0,2)])
+        room.add_child(crystal)
+        var light := OmniLight3D.new()
+        light.position.y = 2.2
+        light.light_color = Color(0.42, 0.18, 0.8)
+        light.light_energy = 1.0
+        light.omni_range = 7.0
+        room.add_child(light)
+        dungeon_root.add_child(room)
+        if i > 0:
+            var wall := MeshInstance3D.new()
+            var wall_mesh := BoxMesh.new()
+            wall_mesh.size = Vector3(rng.randf_range(2.0, 5.0), rng.randf_range(2.0, 4.5), 0.8)
+            wall.mesh = wall_mesh
+            wall.position = Vector3(x + rng.randf_range(-5.0, 5.0), wall_mesh.size.y * 0.5, z - 3.0)
+            wall.material_override = _stone_material(Color(0.12, 0.075, 0.16), 0.3)
+            dungeon_root.add_child(wall)
+    dungeon_exit = Node3D.new()
+    dungeon_exit.name = "DungeonExit"
+    dungeon_exit.position = Vector3(rng.randf_range(-4.0, 4.0), 0.0, 22.0)
+    var exit_crystal := MeshInstance3D.new()
+    var exit_mesh := PrismMesh.new()
+    exit_mesh.size = Vector3(2.0, 3.5, 2.0)
+    exit_crystal.mesh = exit_mesh
+    exit_crystal.position.y = 1.8
+    exit_crystal.material_override = _glow_material(Color(0.72, 0.28, 1.0))
+    dungeon_exit.add_child(exit_crystal)
+    var exit_light := OmniLight3D.new()
+    exit_light.position.y = 2.0
+    exit_light.light_color = Color(0.72, 0.28, 1.0)
+    exit_light.light_energy = 2.0
+    exit_light.omni_range = 10.0
+    dungeon_exit.add_child(exit_light)
+    dungeon_root.add_child(dungeon_exit)
+
+
+func _leave_dungeon() -> void:
+    dungeon_active = false
+    if dungeon_root != null and is_instance_valid(dungeon_root):
+        dungeon_root.queue_free()
+    dungeon_root = null
+    dungeon_exit = null
+    player.global_position = dungeon_return_position
+    player.velocity = Vector3.ZERO
+    objective_label.text = "The wilderness remembers your path."
+    _save_game()
+    _open_dialogue("Back to the Realm", "The shifting passage settles behind you. The roads, landmarks, and sanctuary remain as you left them.", 2)
 
 func _build_starting_town() -> void:
     _add_platform(Vector3(0, -0.04, 10.0), Vector3(25.0, 0.18, 36.0), Color(0.105, 0.09, 0.13))
@@ -1137,6 +1384,8 @@ func _load_game() -> void:
     if not (parsed is Dictionary):
         save_exists = false
         return
+    world_seed = int(parsed.get("world_seed", world_seed))
+    dungeon_seed = int(parsed.get("dungeon_seed", 0))
     player_name = str(parsed.get("player_name", "Apprentice"))
     selected_character = str(parsed.get("selected_character", "Wizard"))
     if is_instance_valid(character_select): character_select.select(1 if selected_character == "Wizardrobe" else 0)
@@ -1173,6 +1422,8 @@ func _load_game() -> void:
 
 func _save_game() -> void:
     var data := {
+        "world_seed": world_seed,
+        "dungeon_seed": dungeon_seed,
         "player_name": player_name,
         "selected_character": selected_character,
         "collected_runes": collected_rune_names,
@@ -1279,6 +1530,10 @@ func _physics_process(delta: float) -> void:
         prompt_label.text = "Press E to claim the " + _nearest_rune_name() + " Sigil"
     elif gate_distance < 5.5:
         prompt_label.text = "Press E to enter the awakened gate" if quest_complete else "The gate is sealed • recover all 3 sigils"
+    elif dungeon_entrance != null and player.global_position.distance_to(dungeon_entrance.global_position) < 5.0:
+        prompt_label.text = "Press E to enter the shifting dungeon"
+    elif dungeon_active and dungeon_exit != null and player.global_position.distance_to(dungeon_exit.global_position) < 4.5:
+        prompt_label.text = "Press E to leave the dungeon"
     elif Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
         prompt_label.text = "Click the world to look around • ESC releases the cursor"
     else:
@@ -1295,6 +1550,13 @@ func _nearest_rune_name() -> String:
     return nearest_name
 
 func _try_interact() -> void:
+    if dungeon_active:
+        if dungeon_exit != null and player.global_position.distance_to(dungeon_exit.global_position) < 4.5:
+            _leave_dungeon()
+        return
+    if dungeon_entrance != null and player.global_position.distance_to(dungeon_entrance.global_position) < 5.0:
+        _enter_dungeon()
+        return
     var mathias_distance := player.global_position.distance_to(interact_target.global_position)
     var nearest_shrine: Node3D = null
     var nearest_distance := 999.0
