@@ -18,3 +18,32 @@ jobs:
 
       - name: Build Railway web image
         run: docker build --tag woa-arcane-realm-web .
+
+      - name: Smoke-test the actual web server and exported assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run --detach --name woa-web-smoke -p 8080:8080 woa-arcane-realm-web
+          trap 'docker rm --force woa-web-smoke >/dev/null 2>&1 || true' EXIT
+
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent --show-error http://127.0.0.1:8080/ --output /tmp/woa-index.html; then
+              break
+            fi
+            sleep 1
+          done
+
+          test -s /tmp/woa-index.html
+          grep -q 'WOA: Arcane Realm' /tmp/woa-index.html
+
+          mkdir -p /tmp/woa-web-assets
+          docker cp woa-web-smoke:/usr/share/nginx/html/. /tmp/woa-web-assets/
+          asset_count=0
+          while IFS= read -r -d '' asset; do
+            relative="${asset#/tmp/woa-web-assets/}"
+            curl --fail --silent --show-error "http://127.0.0.1:8080/${relative}" --output /dev/null
+            asset_count=$((asset_count + 1))
+          done < <(find /tmp/woa-web-assets -maxdepth 1 -type f \( -name '*.js' -o -name '*.wasm' -o -name '*.pck' \) -print0)
+
+          test "$asset_count" -ge 3
+          echo "Web server returned the game page and $asset_count Godot runtime assets."
