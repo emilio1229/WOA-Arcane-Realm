@@ -14,7 +14,12 @@ RUN git lfs install \
     && rm -rf /tmp/woa-lfs
 RUN set -eu; \
     mkdir -p build; \
-    godot --headless --path . --editor --quit; \
+    godot --headless --path . --editor --quit > /tmp/godot-import.log 2>&1 || { cat /tmp/godot-import.log; exit 1; }; \
+    cat /tmp/godot-import.log; \
+    if grep -E 'SCRIPT ERROR:|Parse Error:|ERROR:' /tmp/godot-import.log; then \
+      echo 'Godot asset import reported engine or asset errors.'; \
+      exit 1; \
+    fi; \
     godot --headless --path . --quit-after 5 > /tmp/godot-runtime.log 2>&1 || { cat /tmp/godot-runtime.log; exit 1; }; \
     cat /tmp/godot-runtime.log; \
     if grep -E 'SCRIPT ERROR:|Parse Error:|ERROR:' /tmp/godot-runtime.log; then \
