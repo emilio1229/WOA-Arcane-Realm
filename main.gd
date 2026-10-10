@@ -330,6 +330,7 @@ func _create_mathias(pos: Vector3) -> void:
     staff_light.light_energy = 0.8
     staff_light.omni_range = 4.0
     npc.add_child(staff_light)
+    _try_replace_visual_with_model(npc, "res://assets/models/mathias_keeper.glb", Vector3.ONE)
     add_child(npc)
     interact_target = npc
 
@@ -422,6 +423,31 @@ func _glow_material(color: Color) -> StandardMaterial3D:
     material.metallic = 0.15
     material.roughness = 0.32
     return material
+
+
+func _try_replace_visual_with_model(parent: Node3D, model_path: String, model_scale: Vector3 = Vector3.ONE, model_position: Vector3 = Vector3.ZERO) -> bool:
+    # Tripo/Blender GLB models are optional. If the file is absent or invalid,
+    # the procedural model remains visible so the browser build always works.
+    if not ResourceLoader.exists(model_path):
+        return false
+    var packed_scene := load(model_path) as PackedScene
+    if packed_scene == null:
+        push_warning("Optional model could not be loaded as a PackedScene: " + model_path)
+        return false
+    var instance := packed_scene.instantiate()
+    var model_root := instance as Node3D
+    if model_root == null:
+        instance.queue_free()
+        push_warning("Optional model root must be Node3D: " + model_path)
+        return false
+    for child in parent.get_children():
+        if child is VisualInstance3D:
+            child.visible = false
+    model_root.name = "ImportedModel"
+    model_root.position = model_position
+    model_root.scale = model_scale
+    parent.add_child(model_root)
+    return true
 
 func _create_rune_shrine(pos: Vector3, rune_title: String, rune_color: Color) -> void:
     var shrine := Node3D.new()
@@ -566,6 +592,7 @@ func _add_haunted_tree(pos: Vector3, height: float) -> void:
     crown_mat.roughness = 1.0
     crown.material_override = crown_mat
     tree.add_child(crown)
+    _try_replace_visual_with_model(tree, "res://assets/models/haunted_tree.glb", Vector3.ONE * (height / 3.0))
     add_child(tree)
 
 func _build_player() -> void:
@@ -690,6 +717,7 @@ func _build_player() -> void:
     crystal_light.light_energy = 0.6
     crystal_light.omni_range = 3.0
     player_visual_root.add_child(crystal_light)
+    _try_replace_visual_with_model(player_visual_root, "res://assets/models/player_apprentice.glb", Vector3.ONE)
 
     # Keep camera yaw independent from the character's facing direction.
     # This avoids WASD turning the camera and feeding back into movement.
@@ -1157,6 +1185,7 @@ func _create_guardian(pos: Vector3) -> void:
     eye_light.light_energy = 1.8
     eye_light.omni_range = 6.0
     guardian.add_child(eye_light)
+    _try_replace_visual_with_model(guardian, "res://assets/models/sanctuary_guardian.glb", Vector3.ONE)
     add_child(guardian)
 
 func _staff_attack() -> void:
