@@ -41,3 +41,24 @@ Stylized 3D haunted blackwood tree for a dark fantasy game environment. Twisted 
 ## How the game uses the models
 
 The current game checks these paths when creating the player, Mathias, guardian, and trees. If a matching GLB is missing or cannot be loaded, the existing procedural visuals remain as a fallback. This lets us add assets one at a time without breaking the game or its browser build.
+
+
+## Where to put your new batch of models
+
+The repository now has category folders so you can sort the models from your one big Tripo prompt:
+
+- `characters/` — wizard, battlemage, Wizardrobe, NPCs, and other people.
+- `environment/` — trees, rocks, roots, mushrooms, plants, and outdoor scenery.
+- `architecture/` — ruins, towers, walls, arches, stairs, doors, and dungeon pieces.
+- `props/` — books, chests, potions, lanterns, altars, crystals, and furniture.
+- `creatures/` — monsters, spirits, golems, and creature variants.
+- `materials-textures/` — only textures/material files exported separately from a model.
+- `animations/` — animation exports or temporary animation source files while we check rig compatibility.
+
+Each folder has its own README with more specific guidance. Git doesn't preserve empty folders, so the README files are what create and document these folders.
+
+### One important distinction
+
+These category folders are for organizing and reviewing your assets. Most new models will **not appear in the game automatically** just because they are uploaded. The current four optional model slots still expect these exact paths directly in this folder: `player_apprentice.glb`, `mathias_keeper.glb`, `sanctuary_guardian.glb`, and `haunted_tree.glb`. Once you upload the batch, I can identify which models fit those slots and integrate the others into the world deliberately.
+
+For Godot, `.glb` is the easiest option when it includes its materials and textures. Godot supports glTF 2.0 and imports it from within the project. See the [Godot 4.7 import documentation](https://docs.godotengine.org/en/4.7/tutorials/assets_pipeline/importing_3d_scenes/index.html).
