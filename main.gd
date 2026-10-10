@@ -20,6 +20,12 @@ var status_label: Label
 var dialogue_text: Label
 var dialogue_title: Label
 var interact_target: Node3D
+var rune_shrines: Array[Node3D] = []
+var collected_runes := 0
+var objective_label: Label
+var gate_seal: MeshInstance3D
+var gate_portal: MeshInstance3D
+var quest_complete := false
 var jump_requested := false
 var run_speed := 7.2
 var walk_speed := 4.8
@@ -80,6 +86,10 @@ func _build_world() -> void:
     _create_mathias(Vector3(0, 0, -5.0))
     _add_path_lights()
     _add_sanctuary_architecture()
+    _create_rune_shrine(Vector3(-5.8, 0.0, -9.0), "Dawn", Color(1.0, 0.63, 0.24))
+    _create_rune_shrine(Vector3(5.8, 0.0, -9.0), "Dusk", Color(0.34, 0.62, 1.0))
+    _create_rune_shrine(Vector3(0.0, 0.0, -15.0), "Heart", Color(0.74, 0.35, 1.0))
+    _create_gate_portal()
 
 func _add_platform(pos: Vector3, size: Vector3, color: Color) -> void:
     var body := StaticBody3D.new()
@@ -299,6 +309,87 @@ func _glow_material(color: Color) -> StandardMaterial3D:
     material.roughness = 0.32
     return material
 
+func _create_rune_shrine(pos: Vector3, rune_title: String, rune_color: Color) -> void:
+    var shrine := Node3D.new()
+    shrine.name = rune_title + " Sigil"
+    shrine.position = pos
+    var pedestal := MeshInstance3D.new()
+    var pedestal_mesh := BoxMesh.new()
+    pedestal_mesh.size = Vector3(1.45, 0.48, 1.45)
+    pedestal.mesh = pedestal_mesh
+    pedestal.position.y = 0.24
+    pedestal.material_override = _stone_material(Color(0.13, 0.10, 0.22), 0.45)
+    shrine.add_child(pedestal)
+    var upper := MeshInstance3D.new()
+    var upper_mesh := CylinderMesh.new()
+    upper_mesh.top_radius = 0.52
+    upper_mesh.bottom_radius = 0.68
+    upper_mesh.height = 0.25
+    upper.mesh = upper_mesh
+    upper.position.y = 0.57
+    upper.material_override = _stone_material(Color(0.25, 0.18, 0.37), 0.35)
+    shrine.add_child(upper)
+    var crystal := MeshInstance3D.new()
+    var crystal_mesh := PrismMesh.new()
+    crystal_mesh.size = Vector3(0.62, 1.28, 0.62)
+    crystal.mesh = crystal_mesh
+    crystal.position.y = 1.35
+    crystal.rotation_degrees = Vector3(0, 18, 8)
+    crystal.material_override = _glow_material(rune_color)
+    shrine.add_child(crystal)
+    var ring := MeshInstance3D.new()
+    var ring_mesh := TorusMesh.new()
+    ring_mesh.inner_radius = 0.48
+    ring_mesh.outer_radius = 0.55
+    ring.mesh = ring_mesh
+    ring.position.y = 1.35
+    ring.material_override = _glow_material(rune_color.lightened(0.18))
+    shrine.add_child(ring)
+    var light := OmniLight3D.new()
+    light.position.y = 1.4
+    light.light_color = rune_color
+    light.light_energy = 1.1
+    light.omni_range = 5.5
+    shrine.add_child(light)
+    var label := Label3D.new()
+    label.text = rune_title.to_upper() + " SIGIL"
+    label.position.y = 2.35
+    label.font_size = 32
+    label.pixel_size = 0.008
+    label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+    label.modulate = rune_color.lightened(0.3)
+    shrine.add_child(label)
+    add_child(shrine)
+    rune_shrines.append(shrine)
+
+func _create_gate_portal() -> void:
+    gate_seal = MeshInstance3D.new()
+    var seal_mesh := BoxMesh.new()
+    seal_mesh.size = Vector3(6.8, 5.8, 0.16)
+    gate_seal.mesh = seal_mesh
+    gate_seal.position = Vector3(0, 3.4, -19.0)
+    gate_seal.material_override = _glow_material(Color(0.16, 0.06, 0.31))
+    add_child(gate_seal)
+    gate_portal = MeshInstance3D.new()
+    var portal_mesh := SphereMesh.new()
+    portal_mesh.radius = 1.0
+    portal_mesh.height = 2.0
+    gate_portal.mesh = portal_mesh
+    gate_portal.scale = Vector3(2.35, 2.85, 0.08)
+    gate_portal.position = Vector3(0, 3.45, -19.22)
+    gate_portal.material_override = _glow_material(Color(0.2, 0.62, 1.0))
+    gate_portal.hide()
+    add_child(gate_portal)
+    var portal_ring := MeshInstance3D.new()
+    var portal_ring_mesh := TorusMesh.new()
+    portal_ring_mesh.inner_radius = 2.55
+    portal_ring_mesh.outer_radius = 2.72
+    portal_ring.mesh = portal_ring_mesh
+    portal_ring.position = Vector3(0, 3.45, -19.25)
+    portal_ring.rotation_degrees.x = 90
+    portal_ring.material_override = _glow_material(Color(0.3, 0.75, 1.0))
+    add_child(portal_ring)
+
 func _build_player() -> void:
     player = CharacterBody3D.new()
     player.name = "Player"
@@ -425,7 +516,7 @@ func _build_ui() -> void:
     hud_panel = PanelContainer.new()
     hud_panel.set_anchors_preset(Control.PRESET_TOP_LEFT)
     hud_panel.position = Vector2(20, 20)
-    hud_panel.custom_minimum_size = Vector2(300, 76)
+    hud_panel.custom_minimum_size = Vector2(360, 112)
     root.add_child(hud_panel)
     var hud_box := VBoxContainer.new()
     hud_panel.add_child(hud_box)
@@ -473,6 +564,7 @@ func _on_start_pressed() -> void:
     if player_name.is_empty():
         player_name = "Apprentice"
     status_label.text = player_name + "  |  The Sigil Sanctuary"
+    objective_label.text = "Quest: Speak with Mathias"
     menu_panel.hide()
     hud_panel.show()
     started = true
@@ -499,8 +591,8 @@ func _input(event: InputEvent) -> void:
         elif event.keycode == KEY_E:
             if dialogue_open:
                 _advance_dialogue()
-            elif player.global_position.distance_to(interact_target.global_position) < 4.5:
-                _interact_with_mathias()
+            else:
+                _try_interact()
 
 func _physics_process(delta: float) -> void:
     if not started or dialogue_open:
@@ -543,21 +635,76 @@ func _physics_process(delta: float) -> void:
     jump_requested = false
     player.move_and_slide()
 
-    var near_mathias := player.global_position.distance_to(interact_target.global_position) < 4.5
-    if near_mathias:
+    var nearest_rune_distance := 999.0
+    for shrine in rune_shrines:
+        nearest_rune_distance = min(nearest_rune_distance, player.global_position.distance_to(shrine.global_position))
+    var mathias_distance := player.global_position.distance_to(interact_target.global_position)
+    var gate_distance := player.global_position.distance_to(Vector3(0, 0, -19))
+    if mathias_distance < 4.5 and (mathias_distance <= nearest_rune_distance or story_step < 2):
         prompt_label.text = "Press E to speak with Mathias"
+    elif nearest_rune_distance < 3.6:
+        prompt_label.text = "Press E to claim the " + _nearest_rune_name() + " Sigil"
+    elif gate_distance < 5.5:
+        prompt_label.text = "Press E to enter the awakened gate" if quest_complete else "The gate is sealed • recover all 3 sigils"
     elif Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
         prompt_label.text = "Click the world to look around • ESC releases the cursor"
     else:
-        prompt_label.text = "Find Mathias near the glowing sigil • Shift to run"
+        prompt_label.text = "Recover the three sigils • Shift to run"
+
+func _nearest_rune_name() -> String:
+    var nearest_name := "Ancient"
+    var nearest_distance := 999.0
+    for shrine in rune_shrines:
+        var distance := player.global_position.distance_to(shrine.global_position)
+        if distance < nearest_distance:
+            nearest_distance = distance
+            nearest_name = shrine.name.replace(" Sigil", "")
+    return nearest_name
+
+func _try_interact() -> void:
+    var mathias_distance := player.global_position.distance_to(interact_target.global_position)
+    var nearest_shrine: Node3D = null
+    var nearest_distance := 999.0
+    for shrine in rune_shrines:
+        var distance := player.global_position.distance_to(shrine.global_position)
+        if distance < nearest_distance:
+            nearest_distance = distance
+            nearest_shrine = shrine
+    if mathias_distance < 4.5 and (mathias_distance <= nearest_distance or story_step < 2):
+        _interact_with_mathias()
+        return
+    if nearest_shrine != null and nearest_distance < 3.6:
+        _collect_rune(nearest_shrine)
+        return
+    if player.global_position.distance_to(Vector3(0, 0, -19)) < 5.5:
+        if quest_complete:
+            _open_dialogue("The Awakened Gate", "The three sigils turn as one. Beyond the threshold, a new realm breathes beneath a sky no map remembers. This sanctuary was only the beginning, " + player_name + ". Your first trial is complete — the adventure beyond the gate awaits.", 3)
+        else:
+            _open_dialogue("Sealed Gate", "Three ancient sigils anchor this ward. Dawn, Dusk, and Heart must be returned before the gate will answer.", 2)
+
+func _collect_rune(shrine: Node3D) -> void:
+    var rune_name := shrine.name.replace(" Sigil", "")
+    rune_shrines.erase(shrine)
+    shrine.queue_free()
+    collected_runes += 1
+    objective_label.text = "Quest: Recover the sigils (%d/3)" % collected_runes
+    if collected_runes >= 3:
+        quest_complete = true
+        gate_seal.hide()
+        gate_portal.show()
+        objective_label.text = "Quest complete: Enter the awakened gate"
+        _open_dialogue("Sigil Awakened", "The " + rune_name + " Sigil rises into the air and the other two answer. Light races across the sanctuary. The gate is open. Whatever waits beyond it now knows your name.", 2)
+    else:
+        _open_dialogue(rune_name + " Sigil", "The crystal loosens from its ancient mooring and folds into a ribbon of light. The ward recognizes your touch. " + str(3 - collected_runes) + " sigil(s) remain.", 2)
 
 func _interact_with_mathias() -> void:
     if story_step == 0:
-        _open_dialogue("Mathias", "The first sigil is not a weapon. It is a promise: power must answer to purpose. Something has breached the old wards, and the sanctuary is only the first place it has touched.", 1)
+        _open_dialogue("Mathias", "At last. The sanctuary has been waiting for you, " + player_name + ". I am Mathias, keeper of the first sigil. The light above us has begun to answer a call that should have remained silent.", 0)
     elif story_step == 1:
-        _open_dialogue("Mathias", "Look toward the arch beyond the central platform. The runes there have gone dark. Find the source, and do not mistake every shadow for an enemy. The realm is testing you.", 2)
+        _open_dialogue("Mathias", "The first sigil is not a weapon. It is a promise: power must answer to purpose. Something has breached the old wards, and the sanctuary is only the first place it has touched.", 1)
     else:
-        _open_dialogue("Mathias", "The path is yours now, " + player_name + ". Explore the sanctuary, practice your movement, and return when you are ready to uncover what the sigil is hiding.", 2)
+        objective_label.text = "Quest: Recover the three ancient sigils"
+        _open_dialogue("Mathias", "Dawn, Dusk, and Heart. Three fragments hold the gate shut. Find their crystal shrines along the path and press E near each one to claim their sigil. Return to the arch when all three answer.", 2)
 
 func _open_dialogue(who: String, words: String, step: int) -> void:
     story_step = step
@@ -571,8 +718,9 @@ func _advance_dialogue() -> void:
     if story_step == 0:
         _open_dialogue("Mathias", "The first sigil is not a weapon. It is a promise: power must answer to purpose. Something has breached the old wards, and the sanctuary is only the first place it has touched.", 1)
     elif story_step == 1:
-        _open_dialogue("Mathias", "Look toward the arch beyond the central platform. The runes there have gone dark. Find the source, and do not mistake every shadow for an enemy. The realm is testing you.", 2)
+        _open_dialogue("Mathias", "Dawn, Dusk, and Heart. Three fragments hold the gate shut. Find their crystal shrines along the path and press E near each one to claim its sigil. Return to the arch when all three answer.", 2)
+        objective_label.text = "Quest: Recover the three ancient sigils"
     else:
         dialogue_open = false
         dialogue_panel.hide()
-        Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+        Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
