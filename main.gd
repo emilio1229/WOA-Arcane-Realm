@@ -181,7 +181,17 @@ func _generate_wilderness() -> void:
     # A stable seed means the same wilderness landmarks reappear after reloading.
     var rng := RandomNumberGenerator.new()
     rng.seed = world_seed
-    var tree_scene := load("res://assets/models/environment/haunted blackwood tree 3d model.glb") as PackedScene
+    var tree_scene: PackedScene = null
+    var tree_model_path := "res://assets/models/environment/haunted blackwood tree 3d model.glb"
+    # Git LFS pointer files are plain text, not valid GLB resources. Check the
+    # binary header before loading so missing LFS objects use procedural trees.
+    if ResourceLoader.exists(tree_model_path):
+        var tree_file := FileAccess.open(tree_model_path, FileAccess.READ)
+        if tree_file != null:
+            var tree_header: String = tree_file.get_buffer(4).get_string_from_ascii()
+            tree_file.close()
+            if tree_header == "glTF":
+                tree_scene = load(tree_model_path) as PackedScene
     for i in range(260):
         var x := rng.randf_range(-520.0, 520.0)
         var z := rng.randf_range(-520.0, 520.0)
@@ -1113,6 +1123,9 @@ func _build_player() -> void:
 
     # Keep camera yaw independent from the character's facing direction.
     # This avoids WASD turning the camera and feeding back into movement.
+    # Add the player before reading its global transform; unattached nodes do
+    # not have a valid global transform yet.
+    add_child(player)
     camera_pivot = Node3D.new()
     camera_pivot.top_level = true
     camera_pivot.global_position = player.global_position + Vector3(0, 1.45, 0)
@@ -1122,7 +1135,6 @@ func _build_player() -> void:
     camera.rotation.x = -0.18
     camera.current = true
     camera_pivot.add_child(camera)
-    add_child(player)
 
 func _build_ui() -> void:
     ui_layer = CanvasLayer.new()
@@ -1237,6 +1249,10 @@ func _build_ui() -> void:
     prompt_label = Label.new()
     prompt_label.text = "Find Mathias near the glowing sigil."
     hud_box.add_child(prompt_label)
+    objective_label = Label.new()
+    objective_label.text = "Quest: Help Mathias survive the ambush"
+    objective_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    hud_box.add_child(objective_label)
 
     dialogue_panel = PanelContainer.new()
     dialogue_panel.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
