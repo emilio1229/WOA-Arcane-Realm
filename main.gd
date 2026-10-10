@@ -825,6 +825,7 @@ func _show_menu() -> void:
     started = false
 
 func _on_start_pressed() -> void:
+    _reset_new_game()
     player_name = name_input.text.strip_edges()
     if player_name.is_empty():
         player_name = "Apprentice"
@@ -836,6 +837,25 @@ func _on_start_pressed() -> void:
     started = true
     Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
     _open_dialogue("Mathias", "At last. The sanctuary has been waiting for you, " + player_name + ". I am Mathias, keeper of the first sigil. The light above us has begun to answer a call that should have remained silent.", 0)
+
+func _reset_new_game() -> void:
+    for shrine in rune_shrines:
+        if is_instance_valid(shrine):
+            shrine.queue_free()
+    rune_shrines.clear()
+    collected_rune_names.clear()
+    collected_runes = 0
+    quest_complete = false
+    trial_complete = false
+    trial_started = false
+    player_hp = 5
+    player.global_position = Vector3(0, 0.2, 5.0)
+    player.velocity = Vector3.ZERO
+    _create_rune_shrine(Vector3(-5.8, 0.0, -9.0), "Dawn", Color(1.0, 0.63, 0.24))
+    _create_rune_shrine(Vector3(5.8, 0.0, -9.0), "Dusk", Color(0.34, 0.62, 1.0))
+    _create_rune_shrine(Vector3(0.0, 0.0, -15.0), "Heart", Color(0.74, 0.35, 1.0))
+    gate_seal.show()
+    gate_portal.hide()
 
 func _on_continue_pressed() -> void:
     if not save_exists:
