@@ -1447,7 +1447,7 @@ func _input(event: InputEvent) -> void:
         Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
     if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and not dialogue_open:
         camera_pivot.rotate_y(-event.relative.x * mouse_sensitivity)
-        var look_y := event.relative.y * (-1.0 if invert_y else 1.0)
+        var look_y: float = event.relative.y * (-1.0 if invert_y else 1.0)
         pitch = clamp(pitch - look_y * mouse_sensitivity, -0.55, 0.28)
         camera.rotation.x = pitch
     if event is InputEventKey and event.pressed and not event.echo:
