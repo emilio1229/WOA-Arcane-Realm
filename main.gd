@@ -497,7 +497,9 @@ func _nearest_intro_enemy(max_distance: float) -> Node3D:
                 best = distance
                 nearest = enemy
     return nearest
-func _damage_intro_enemy(enemy: Node3D, damage: int) -> void:    if not is_instance_valid(enemy): return
+func _damage_intro_enemy(enemy: Node3D, damage: int) -> void:
+    if not is_instance_valid(enemy):
+        return
     var id := enemy.get_instance_id()
     var hp := int(intro_enemy_hp.get(id, 0)) - damage
     if hp <= 0:
