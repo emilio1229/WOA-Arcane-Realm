@@ -102,6 +102,7 @@ func _build_world() -> void:
     _add_glowing_orb(Vector3(0, 3.0, -7.0))
     _create_mathias(Vector3(0, 0, -5.0))
     _add_path_lights()
+    _add_haunted_trees()
     _add_sanctuary_architecture()
     _create_rune_shrine(Vector3(-5.8, 0.0, -9.0), "Dawn", Color(1.0, 0.63, 0.24))
     _create_rune_shrine(Vector3(5.8, 0.0, -9.0), "Dusk", Color(0.34, 0.62, 1.0))
@@ -406,6 +407,68 @@ func _create_gate_portal() -> void:
     portal_ring.rotation_degrees.x = 90
     portal_ring.material_override = _glow_material(Color(0.3, 0.75, 1.0))
     add_child(portal_ring)
+
+func _add_haunted_trees() -> void:
+    for i in range(7):
+        var z := 4.0 - float(i) * 5.3
+        var height := 4.6 + float(i % 3) * 0.8
+        _add_haunted_tree(Vector3(-13.0 - float(i % 2) * 2.0, 0, z), height)
+        _add_haunted_tree(Vector3(13.0 + float(i % 2) * 2.0, 0, z - 1.4), height + 0.4)
+    for side in [-1.0, 1.0]:
+        for z in [-8.0, -20.0, -30.0]:
+            var wisp := MeshInstance3D.new()
+            var wisp_mesh := SphereMesh.new()
+            wisp_mesh.radius = 0.16
+            wisp_mesh.height = 0.32
+            wisp.mesh = wisp_mesh
+            wisp.position = Vector3(side * 10.8, 1.35, z)
+            wisp.material_override = _glow_material(Color(0.38, 0.78, 0.31))
+            add_child(wisp)
+            var wisp_light := OmniLight3D.new()
+            wisp_light.position = wisp.position
+            wisp_light.light_color = Color(0.36, 0.7, 0.25)
+            wisp_light.light_energy = 0.65
+            wisp_light.omni_range = 4.5
+            add_child(wisp_light)
+
+func _add_haunted_tree(pos: Vector3, height: float) -> void:
+    var tree := Node3D.new()
+    tree.position = pos
+    var trunk := MeshInstance3D.new()
+    var trunk_mesh := CylinderMesh.new()
+    trunk_mesh.top_radius = 0.12
+    trunk_mesh.bottom_radius = 0.34
+    trunk_mesh.height = height
+    trunk.mesh = trunk_mesh
+    trunk.position.y = height * 0.5
+    trunk.rotation_degrees.z = sin(pos.z * 0.4) * 9.0
+    trunk.material_override = _stone_material(Color(0.045, 0.035, 0.055), 0.05)
+    tree.add_child(trunk)
+    for branch_index in range(3):
+        var branch := MeshInstance3D.new()
+        var branch_mesh := CylinderMesh.new()
+        branch_mesh.top_radius = 0.025
+        branch_mesh.bottom_radius = 0.12
+        branch_mesh.height = height * 0.42
+        branch.mesh = branch_mesh
+        var side := -1.0 if branch_index % 2 == 0 else 1.0
+        branch.position = Vector3(side * (0.42 + float(branch_index) * 0.12), height * (0.42 + float(branch_index) * 0.13), 0)
+        branch.rotation_degrees.z = -side * (34.0 + float(branch_index) * 12.0)
+        branch.material_override = trunk.material_override
+        tree.add_child(branch)
+    var crown := MeshInstance3D.new()
+    var crown_mesh := SphereMesh.new()
+    crown_mesh.radius = 1.0
+    crown_mesh.height = 2.0
+    crown.mesh = crown_mesh
+    crown.scale = Vector3(1.15, 1.45, 0.92)
+    crown.position = Vector3(0, height * 0.83, 0)
+    var crown_mat := StandardMaterial3D.new()
+    crown_mat.albedo_color = Color(0.025, 0.055, 0.045)
+    crown_mat.roughness = 1.0
+    crown.material_override = crown_mat
+    tree.add_child(crown)
+    add_child(tree)
 
 func _build_player() -> void:
     player = CharacterBody3D.new()
