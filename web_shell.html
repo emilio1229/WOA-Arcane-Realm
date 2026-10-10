@@ -3,44 +3,85 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#10091c">
+  <meta name="theme-color" content="#080611">
+  <meta name="description" content="Enter the Arcane Realm — a dark-fantasy chronicle of the Wizards, Warlocks & Witches.">
   <title>WOA: Arcane Realm</title>
   <style>
-    :root { color-scheme: dark; background: #10091c; color: #f0e7ff; font-family: system-ui, sans-serif; }
+    :root { color-scheme: dark; font-family: Georgia, "Times New Roman", serif; background: #080611; color: #f4eaff; }
     * { box-sizing: border-box; }
-    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #10091c; }
-    body { display: grid; place-items: center; }
-    #canvas { display: block; width: 100%; height: 100%; outline: none; background: #10091c; }
-    #boot { position: fixed; inset: 0; display: grid; place-content: center; gap: 12px; padding: 24px; text-align: center; background: #10091c; z-index: 2; }
-    #boot h1 { margin: 0; color: #dfc1ff; letter-spacing: .08em; font-size: clamp(1.2rem, 3vw, 2rem); }
-    #boot p { margin: 0; color: #c7b5da; }
-    #error { display: none; max-width: 760px; white-space: pre-wrap; overflow-wrap: anywhere; text-align: left; padding: 16px; border: 1px solid #b85bda; border-radius: 8px; background: #24132f; color: #ffe5ff; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #080611; }
+    body { position: relative; }
+    #canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; outline: none; background: #080611; }
+    #boot { position: fixed; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; z-index: 5; overflow: hidden; background: radial-gradient(ellipse at 50% 42%, rgba(78,35,111,.28), transparent 38%), radial-gradient(ellipse at 50% 115%, rgba(117,47,155,.19), transparent 52%), #080611; transition: opacity .9s ease, visibility .9s ease; }
+    #boot::before, #boot::after { content: ""; position: absolute; inset: -25%; pointer-events: none; }
+    #boot::before { opacity: .5; background: repeating-radial-gradient(ellipse at 50% 50%, transparent 0 48px, rgba(188,139,255,.055) 49px 50px, transparent 51px 96px); animation: orbit 90s linear infinite; }
+    #boot::after { background: linear-gradient(110deg, transparent 25%, rgba(202,160,255,.035) 48%, transparent 70%); transform: translateX(-100%); animation: sweep 5s ease-in-out infinite; }
+    #boot.fade-away { opacity: 0; visibility: hidden; pointer-events: none; }
+    .loader-card { position: relative; z-index: 1; width: min(620px, 94vw); padding: clamp(26px, 5vw, 54px) clamp(20px, 5vw, 52px) 30px; border: 1px solid rgba(202,158,255,.28); background: linear-gradient(145deg, rgba(25,15,40,.87), rgba(10,8,21,.88)); box-shadow: 0 0 0 6px rgba(163,105,218,.035), 0 28px 100px rgba(0,0,0,.55), inset 0 0 55px rgba(122,62,173,.08); backdrop-filter: blur(12px); }
+    .sigil { width: 112px; height: 112px; margin: 0 auto 20px; color: #d8b2ff; filter: drop-shadow(0 0 13px rgba(183,117,255,.55)); animation: sigil-breathe 3.8s ease-in-out infinite; }
+    .eyebrow { margin: 0 0 12px; color: #c7a0ee; font: 11px/1.4 system-ui, sans-serif; letter-spacing: .38em; text-transform: uppercase; }
+    h1 { margin: 0; font-size: clamp(28px, 5.5vw, 48px); font-weight: 500; letter-spacing: .075em; line-height: 1.08; text-shadow: 0 0 32px rgba(187,122,255,.2); }
+    h1 span { display: block; margin-top: 8px; color: #d0a7f6; font-size: .48em; letter-spacing: .31em; }
+    .motto { margin: 22px 0 30px; color: #b9acc9; font: 13px/1.8 system-ui, sans-serif; letter-spacing: .08em; }
+    .loading-row { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 9px; color: #d9c6eb; font: 10px/1.5 system-ui, sans-serif; letter-spacing: .17em; text-transform: uppercase; }
+    #percent { color: #cda1ff; font-variant-numeric: tabular-nums; }
+    #bar { height: 3px; width: 100%; overflow: hidden; background: #30213e; }
+    #progress { width: 0; height: 100%; background: linear-gradient(90deg, #7c42b4, #e0bdff); box-shadow: 0 0 14px #bd80f5; transition: width .18s ease-out; }
+    .ornament { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 25px; color: #78618f; font: 10px system-ui, sans-serif; letter-spacing: .23em; text-transform: uppercase; }
+    .ornament::before, .ornament::after { content: ""; width: 42px; height: 1px; background: linear-gradient(90deg, transparent, #75528e); }
+    .ornament::after { transform: scaleX(-1); }
+    #error { display: none; margin-top: 24px; padding: 15px; border: 1px solid #a957ad; background: rgba(49,17,55,.92); color: #ffe7ff; text-align: left; white-space: pre-wrap; overflow-wrap: anywhere; font: 12px/1.6 ui-monospace, monospace; }
     #error.visible { display: block; }
-    #bar { height: 4px; width: min(360px, 75vw); margin: 4px auto; background: #39254c; border-radius: 8px; overflow: hidden; }
-    #progress { height: 100%; width: 0; background: #c58cff; transition: width .15s linear; }
+    .error-help { margin: 10px 0 0; color: #d4b7df; font: 12px/1.6 system-ui, sans-serif; }
+    @keyframes orbit { to { transform: rotate(360deg); } }
+    @keyframes sweep { 0%, 100% { transform: translateX(-100%); opacity: 0; } 35%, 65% { opacity: 1; } 80% { transform: translateX(100%); opacity: 0; } }
+    @keyframes sigil-breathe { 0%, 100% { transform: scale(.97) rotate(-2deg); opacity: .82; } 50% { transform: scale(1.04) rotate(2deg); opacity: 1; } }
+    @media (max-width: 480px) { .loader-card { padding: 28px 18px 24px; } .sigil { width: 84px; height: 84px; } .motto { margin: 16px 0 24px; } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
   </style>
 </head>
 <body>
-  <div id="boot" role="status" aria-live="polite">
-    <h1>WOA: ARCANE REALM</h1>
-    <p id="status">Awakening the Realm…</p>
-    <div id="bar"><div id="progress"></div></div>
-    <pre id="error"></pre>
-  </div>
   <canvas id="canvas" tabindex="0" aria-label="WOA Arcane Realm game"></canvas>
+  <div id="boot" role="status" aria-live="polite">
+    <div class="loader-card">
+      <svg class="sigil" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+        <circle cx="60" cy="60" r="48" stroke="currentColor" stroke-opacity=".7" stroke-width="1.1"/>
+        <circle cx="60" cy="60" r="38" stroke="currentColor" stroke-opacity=".35" stroke-width=".8" stroke-dasharray="2 5"/>
+        <path d="M60 12 72 43 105 43 79 63 89 96 60 76 31 96 41 63 15 43 48 43Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+        <path d="M60 29 69 53 91 60 69 68 60 91 51 68 29 60 51 53Z" stroke="#e5c9ff" stroke-width="1.2"/>
+        <circle cx="60" cy="60" r="7" fill="#d6a8ff" fill-opacity=".85"/>
+        <path d="M60 3V17M60 103V117M3 60H17M103 60H117" stroke="currentColor" stroke-width="1.5"/>
+      </svg>
+      <p class="eyebrow">The Wizards of Ark present</p>
+      <h1>ARCANE REALM<span>CHRONICLES OF THE HOLLOW CROWN</span></h1>
+      <p class="motto">Wizards, Warlocks &amp; Witches<br>Every Sigil remembers. Every choice leaves a mark.</p>
+      <div class="loading-row"><span id="status">Awakening the Realm…</span><span id="percent">0%</span></div>
+      <div id="bar"><div id="progress"></div></div>
+      <div class="ornament">Preparing your chronicle</div>
+      <pre id="error"></pre>
+      <p id="error-help" class="error-help" hidden>The Realm could not finish starting. Keep this message and share it so the fault can be traced.</p>
+    </div>
+  </div>
   <script src="$GODOT_URL"></script>
   <script>
     (() => {
       const boot = document.getElementById("boot");
       const status = document.getElementById("status");
       const progress = document.getElementById("progress");
+      const percent = document.getElementById("percent");
       const errorBox = document.getElementById("error");
-      let started = false;
+      const errorHelp = document.getElementById("error-help");
+      let engineStarted = false;
+      let hasError = false;
       function showError(message) {
+        hasError = true;
+        boot.classList.remove("fade-away");
         errorBox.textContent = String(message || "Unknown startup error");
         errorBox.classList.add("visible");
-        status.textContent = "The Realm could not start.";
+        errorHelp.hidden = false;
+        status.textContent = "The Realm could not start";
         progress.style.width = "100%";
+        percent.textContent = "!";
       }
       window.addEventListener("error", event => {
         showError(event.message || event.error || "A browser error occurred while the game was running.");
@@ -55,10 +96,12 @@
           canvas: document.getElementById("canvas"),
           canvasResizePolicy: 2,
           onProgress: (current, total) => {
-            if (total > 0) progress.style.width = Math.min(100, current / total * 100) + "%";
-            status.textContent = total > 0
-              ? "Loading the Realm… " + Math.floor(current / total * 100) + "%"
-              : "Loading the Realm…";
+            if (total > 0) {
+              const value = Math.min(100, Math.floor(current / total * 100));
+              progress.style.width = value + "%";
+              percent.textContent = value + "%";
+            }
+            status.textContent = total > 0 ? "Loading the Realm…" : "Preparing the spellwork…";
           },
           onPrint: text => console.log("[Godot]", text),
           onPrintError: text => {
@@ -66,19 +109,18 @@
             showError(text);
           }
         }).then(() => {
-          started = true;
-          status.textContent = "The engine started. Waiting for the Realm scene…";
+          engineStarted = true;
+          status.textContent = "The chronicle is opening…";
           progress.style.width = "100%";
+          percent.textContent = "100%";
           document.getElementById("canvas").focus();
           window.setTimeout(() => {
-            if (!errorBox.classList.contains("visible")) boot.style.display = "none";
-          }, 1200);
-          window.setTimeout(() => {
-            if (boot.style.display !== "none" && !errorBox.classList.contains("visible")) {
-              showError("Godot's web engine started, but no scene output was confirmed. This is a game startup/rendering issue, not a loading-bar issue. Please share this screen and the browser Console errors.");
-            }
-          }, 10000);
+            if (!hasError) boot.classList.add("fade-away");
+          }, 1800);
         }).catch(error => showError(error && (error.stack || error.message) || error));
+        window.setTimeout(() => {
+          if (!engineStarted && !hasError) showError("The game engine has not finished starting after 20 seconds. Check the browser Console for the first red error; this usually points to a runtime or WebGL problem.");
+        }, 20000);
       } catch (error) {
         showError(error && (error.stack || error.message) || error);
       }
