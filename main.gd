@@ -91,8 +91,11 @@ func _unhandled_input(event: InputEvent) -> void:
     if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT and not dialogue_open:
         Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
     elif event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and not dialogue_open:
-        yaw -= event.relative.x * 0.0025
-        pitch = clampf(pitch - event.relative.y * 0.0018, -0.42, 0.28)
+        # Use screen_relative so mouse-look sensitivity stays consistent in the browser at different sizes.
+        yaw -= event.screen_relative.x * 0.0022
+        pitch = clampf(pitch - event.screen_relative.y * 0.0016, -0.48, 0.32)
+        if player != null:
+            player.rotation.y = yaw
         if camera_pivot != null:
             camera_pivot.rotation.x = pitch
     elif event is InputEventKey and event.pressed and not event.echo:
@@ -365,9 +368,9 @@ func _enter_game(show_intro: bool) -> void:
     _build_player()
     _refresh_objective()
     if show_intro:
-        _show_dialogue("CHAPTER I • THE AWAKENING", "Cold stone presses against your palm. Rain whispers over broken rooftops, and violet light pulses behind your closed eyes. You wake in the square of Gloamwick with one name clear in your mind: " + player_name + ". Your robes are torn, your memory is full of gaps, and a strange Sigil glows beneath your hand. Ahead, a battle mage named Mathias is holding a failing ward against three riftbound shades. He sees you stir. “You're awake! Good. I am Mathias, sworn to the Council of Wizards, Warlocks & Witches. If you can stand, we may yet keep this village from falling.”", "Rise and face the riftbound")
+        _show_dialogue("A VOICE BETWEEN THE TREES", "“Awaken, " + player_name + "… Do not fear the dark. It has not found you by accident. You lie beneath the black boughs of Gloamwood, far from any road you remember. The forest has taken your tracks, the night has swallowed the trail, and your mount is nowhere in sight. You carry little but a fading mark of magic and the will to keep moving. Listen. Beyond the mist, someone is fighting—and if the last ward falls, this forest will wake hungry. Follow the violet lights. They will lead you to the truth.”", "Awaken • Follow the violet lights through the forest")
     else:
-        _show_dialogue("WELCOME BACK, " + player_name.to_upper(), "Your Chronicle is intact. Mathias still watches the failing ward-stones, and the path ahead remains yours to choose.", "Return to the Realm")
+        _show_dialogue("THE FOREST REMEMBERS", "Your Chronicle stirs again. The voice is quieter now, but the violet lights still lead through the trees toward the broken ward—and the battle beyond the mist.", "Continue toward the distant clash")
 
 func _build_world() -> void:
     for child in get_children():
@@ -401,29 +404,41 @@ func _build_world() -> void:
     sun.shadow_enabled = true
     add_child(sun)
 
-    _add_box("Gloamwick Ground", Vector3(0, -0.5, 0), Vector3(120, 1, 120), Color(0.09, 0.075, 0.12), true)
-    _add_box("Town Square", Vector3(0, 0.02, 0), Vector3(18, 0.12, 22), Color(0.18, 0.15, 0.22), false)
-    _build_house(Vector3(-12, 0, -2), Color(0.18, 0.09, 0.21))
-    _build_house(Vector3(12, 0, -4), Color(0.13, 0.12, 0.2))
-    _build_house(Vector3(-12, 0, 13), Color(0.16, 0.08, 0.17))
-    _build_tree(Vector3(-20, 0, -14), 5.0)
-    _build_tree(Vector3(19, 0, -17), 6.0)
-    _build_tree(Vector3(-22, 0, 18), 5.5)
-    _build_tree(Vector3(23, 0, 17), 4.5)
-    _add_box("Old Wardstone", Vector3(0, 1.0, -15), Vector3(1.0, 2.0, 1.0), Color(0.28, 0.15, 0.42), false)
-    _add_box("Sanctuary Gate", Vector3(0, 3.0, -31), Vector3(10, 6, 0.8), Color(0.12, 0.075, 0.19), false)
-    sanctuary_gate = _make_sigil(Vector3(0, 2.4, -30.45), Color(0.38, 0.12, 0.75), 2.1)
+    _add_box("Gloamwood Floor", Vector3(0, -0.5, -20), Vector3(100, 1, 150), Color(0.035, 0.045, 0.045), true)
+    _add_box("Mossy Trail", Vector3(0, -0.02, -20), Vector3(5.5, 0.12, 112), Color(0.09, 0.075, 0.085), false)
+    # Dense, staggered trunks frame a winding forest path without blocking the playable trail.
+    for i in range(18):
+        var z := 12.0 - float(i) * 4.8
+        var side_offset := 7.2 + float((i * 7) % 5) * 1.4
+        _build_tree(Vector3(-side_offset, 0, z), 5.0 + float(i % 4) * 0.9)
+        _build_tree(Vector3(side_offset + 1.0, 0, z - 2.2), 5.8 + float((i + 2) % 4) * 0.8)
+    # Fallen timber, standing stones and luminous spores establish a readable trail.
+    _add_box("Fallen Blackwood", Vector3(-4.9, 0.55, -8.5), Vector3(3.7, 0.45, 0.55), Color(0.055, 0.03, 0.04), false).rotation.z = -0.22
+    _add_box("Mossy Standing Stone", Vector3(4.5, 1.0, -18), Vector3(0.85, 2.0, 0.8), Color(0.11, 0.075, 0.15), false)
+    _add_box("Broken Wardstone", Vector3(-2.8, 0.75, -28), Vector3(0.65, 1.5, 0.65), Color(0.18, 0.09, 0.28), false)
+    _add_box("Sanctuary Gate", Vector3(0, 3.0, -62), Vector3(10, 6, 0.8), Color(0.12, 0.075, 0.19), false)
+    sanctuary_gate = _make_sigil(Vector3(0, 2.4, -61.45), Color(0.38, 0.12, 0.75), 2.1)
     sanctuary_gate.name = "Sigil Sanctuary Gate"
     add_child(sanctuary_gate)
 
-    mathias = _build_person("Mathias", Vector3(0, 0, -5.5), Color(0.16, 0.11, 0.28), Color(0.8, 0.72, 0.92), true)
+    # Violet wisps act as subtle wayfinding lights from the waking place to the clearing.
+    for i in range(9):
+        var wisp_z := -3.0 - float(i) * 4.0
+        var wisp_x := -1.4 if i % 2 == 0 else 1.35
+        var wisp := _make_sigil(Vector3(wisp_x, 0.8 + float(i % 3) * 0.35, wisp_z), Color(0.52, 0.27, 0.92), 0.22)
+        wisp.name = "Violet Forest Wisp " + str(i + 1)
+        add_child(wisp)
+
+    # The forest opens into a ward-clearing where Mathias is already holding the line.
+    _add_box("Battle Clearing", Vector3(0, -0.02, -39), Vector3(22, 0.14, 19), Color(0.075, 0.06, 0.085), false)
+    mathias = _build_person("Mathias", Vector3(0, 0, -35), Color(0.16, 0.11, 0.28), Color(0.8, 0.72, 0.92), true)
     for i in range(3):
         var x := -3.2 + float(i) * 3.2
-        var enemy := _build_person("Riftbound " + str(i + 1), Vector3(x, 0, -9.0), Color(0.035, 0.02, 0.07), Color(0.56, 0.18, 0.75), false)
+        var enemy := _build_person("Riftbound " + str(i + 1), Vector3(x, 0, -40.5), Color(0.035, 0.02, 0.07), Color(0.56, 0.18, 0.75), false)
         enemy_nodes.append(enemy)
         enemy_hp[enemy.get_instance_id()] = 1
 
-    var sigil_positions := [Vector3(-8.0, 0.0, -18.0), Vector3(8.0, 0.0, -18.0), Vector3(0.0, 0.0, -24.0)]
+    var sigil_positions := [Vector3(-8.0, 0.0, -48.0), Vector3(8.0, 0.0, -48.0), Vector3(0.0, 0.0, -54.0)]
     var sigil_names := ["Dawn", "Dusk", "Heart"]
     var sigil_colors := [Color(0.98, 0.66, 0.24), Color(0.52, 0.35, 0.95), Color(0.28, 0.85, 0.72)]
     for i in range(3):
@@ -437,7 +452,7 @@ func _build_world() -> void:
 func _build_player() -> void:
     player = CharacterBody3D.new()
     player.name = "PlayerWizard"
-    player.position = Vector3(0, 0, 7.5)
+    player.position = Vector3(0, 0, 12.0)
     player.floor_snap_length = 0.35
     var collision := CollisionShape3D.new()
     var capsule := CapsuleShape3D.new()
@@ -472,22 +487,47 @@ func _build_house(pos: Vector3, color: Color) -> void:
 func _build_tree(pos: Vector3, height: float) -> void:
     var trunk := MeshInstance3D.new()
     var trunk_mesh := CylinderMesh.new()
-    trunk_mesh.top_radius = 0.25
-    trunk_mesh.bottom_radius = 0.48
+    trunk_mesh.top_radius = 0.18
+    trunk_mesh.bottom_radius = 0.42
     trunk_mesh.height = height
     trunk.mesh = trunk_mesh
     trunk.position = pos + Vector3(0, height * 0.5, 0)
-    trunk.material_override = _material(Color(0.09, 0.045, 0.07))
+    trunk.material_override = _material(Color(0.065, 0.032, 0.04))
     add_child(trunk)
-    var crown := MeshInstance3D.new()
-    var crown_mesh := SphereMesh.new()
-    crown_mesh.radius = 1.8
-    crown_mesh.height = 3.6
-    crown.mesh = crown_mesh
-    crown.position = pos + Vector3(0, height + 0.9, 0)
-    crown.scale = Vector3(1.0, 1.35, 0.9)
-    crown.material_override = _material(Color(0.035, 0.06, 0.055))
-    add_child(crown)
+
+    # Angular boughs break up the old lollipop-tree silhouette.
+    for branch_index in range(3):
+        var branch := MeshInstance3D.new()
+        var branch_mesh := CylinderMesh.new()
+        branch_mesh.top_radius = 0.055
+        branch_mesh.bottom_radius = 0.13
+        branch_mesh.height = 2.1
+        branch.mesh = branch_mesh
+        branch.position = pos + Vector3(0, height * (0.52 + float(branch_index) * 0.12), 0)
+        branch.rotation_degrees = Vector3(0, float(branch_index) * 67.0, -42.0 + float(branch_index) * 19.0)
+        branch.material_override = _material(Color(0.055, 0.027, 0.04))
+        add_child(branch)
+
+    for canopy_index in range(4):
+        var crown := MeshInstance3D.new()
+        var crown_mesh := SphereMesh.new()
+        crown_mesh.radius = 1.35 if canopy_index == 0 else 1.05
+        crown_mesh.height = crown_mesh.radius * 1.9
+        crown.mesh = crown_mesh
+        crown.position = pos + Vector3(
+            sin(float(canopy_index) * 1.8) * 0.95,
+            height + 0.2 + float(canopy_index % 2) * 0.9,
+            cos(float(canopy_index) * 1.7) * 0.8
+        )
+        crown.scale = Vector3(1.0, 1.25, 0.9)
+        crown.material_override = _material(Color(0.022 + float(canopy_index) * 0.004, 0.045, 0.038))
+        add_child(crown)
+
+    # Tiny bioluminescent mushrooms and spores give the ground depth cues.
+    for spore_index in range(2):
+        var spore := _make_sphere(pos + Vector3(-0.42 + float(spore_index) * 0.84, 0.16, 0.25), 0.09, Color(0.36, 0.13, 0.62))
+        spore.scale = Vector3(1.0, 0.65, 1.0)
+        add_child(spore)
 
 func _build_person(person_name: String, pos: Vector3, robe_color: Color, glow_color: Color, is_mage: bool) -> Node3D:
     var person := Node3D.new()
