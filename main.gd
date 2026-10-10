@@ -463,9 +463,9 @@ func _create_mathias(pos: Vector3) -> void:
     staff_light.omni_range = 4.0
     npc.add_child(staff_light)
     # Prefer the requested Battle Mage asset; use the available armored character until it is uploaded.
-    if not _try_replace_visual_with_model(npc, "res://assets/models/characters/battle mage 3d model.glb", Vector3.ONE):
+    if not _try_replace_visual_with_model(npc, "res://assets/models/characters/dark armored knight 3d model.glb", Vector3.ONE):
         if not _try_replace_visual_with_model(npc, "res://assets/models/characters/dark armored knight 3d model.glb", Vector3.ONE):
-            _try_replace_visual_with_model(npc, "res://assets/models/mathias_keeper.glb", Vector3.ONE)
+            _try_replace_visual_with_model(npc, "res://assets/models/characters/dark armored knight 3d model.glb", Vector3.ONE)
     add_child(npc)
     interact_target = npc
 
@@ -727,7 +727,7 @@ func _add_haunted_tree(pos: Vector3, height: float) -> void:
     crown_mat.roughness = 1.0
     crown.material_override = crown_mat
     tree.add_child(crown)
-    _try_replace_visual_with_model(tree, "res://assets/models/haunted_tree.glb", Vector3.ONE * (height / 3.0))
+    _try_replace_visual_with_model(tree, "res://assets/models/environment/haunted blackwood tree 3d model.glb", Vector3.ONE * (height / 3.0))
     add_child(tree)
 
 func _build_player() -> void:
@@ -1407,7 +1407,7 @@ func _create_guardian(pos: Vector3) -> void:
     eye_light.light_energy = 1.8
     eye_light.omni_range = 6.0
     guardian.add_child(eye_light)
-    _try_replace_visual_with_model(guardian, "res://assets/models/sanctuary_guardian.glb", Vector3.ONE)
+    _try_replace_visual_with_model(guardian, "res://assets/models/creatures/dark+fantasy+boss+3d+model.glb", Vector3.ONE)
     add_child(guardian)
 
 func _staff_attack() -> void:
