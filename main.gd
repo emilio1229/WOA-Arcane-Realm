@@ -191,17 +191,36 @@ func _create_mathias(pos: Vector3) -> void:
     var npc := Node3D.new()
     npc.name = "Mathias"
     npc.position = pos
+
     var robe := MeshInstance3D.new()
-    var robe_mesh := CapsuleMesh.new()
-    robe_mesh.radius = 0.48
-    robe_mesh.height = 1.7
+    var robe_mesh := CylinderMesh.new()
+    robe_mesh.top_radius = 0.22
+    robe_mesh.bottom_radius = 0.56
+    robe_mesh.height = 1.8
     robe.mesh = robe_mesh
-    robe.position.y = 0.9
-    var robe_mat := StandardMaterial3D.new()
-    robe_mat.albedo_color = Color(0.15, 0.12, 0.29)
-    robe_mat.metallic = 0.18
+    robe.position.y = 0.92
+    var robe_mat := _stone_material(Color(0.12, 0.075, 0.23), 0.24)
+    robe_mat.roughness = 0.76
     robe.material_override = robe_mat
     npc.add_child(robe)
+
+    var mantle := MeshInstance3D.new()
+    var mantle_mesh := BoxMesh.new()
+    mantle_mesh.size = Vector3(0.8, 0.82, 0.13)
+    mantle.mesh = mantle_mesh
+    mantle.position = Vector3(0, 1.15, 0.32)
+    mantle.material_override = _stone_material(Color(0.075, 0.05, 0.12), 0.12)
+    npc.add_child(mantle)
+
+    var robe_trim := MeshInstance3D.new()
+    var trim_mesh := TorusMesh.new()
+    trim_mesh.inner_radius = 0.47
+    trim_mesh.outer_radius = 0.51
+    robe_trim.mesh = trim_mesh
+    robe_trim.position.y = 0.38
+    robe_trim.material_override = _glow_material(Color(0.69, 0.44, 0.95))
+    npc.add_child(robe_trim)
+
     var head := MeshInstance3D.new()
     var head_mesh := SphereMesh.new()
     head_mesh.radius = 0.29
@@ -212,31 +231,78 @@ func _create_mathias(pos: Vector3) -> void:
     head_mat.albedo_color = Color(0.75, 0.58, 0.43)
     head.material_override = head_mat
     npc.add_child(head)
+
+    var beard := MeshInstance3D.new()
+    var beard_mesh := CylinderMesh.new()
+    beard_mesh.top_radius = 0.035
+    beard_mesh.bottom_radius = 0.16
+    beard_mesh.height = 0.42
+    beard.mesh = beard_mesh
+    beard.position = Vector3(0, 1.68, -0.16)
+    var beard_mat := StandardMaterial3D.new()
+    beard_mat.albedo_color = Color(0.67, 0.65, 0.76)
+    beard_mat.roughness = 0.95
+    beard.material_override = beard_mat
+    npc.add_child(beard)
+
+    var hat_brim := MeshInstance3D.new()
+    var brim_mesh := CylinderMesh.new()
+    brim_mesh.top_radius = 0.43
+    brim_mesh.bottom_radius = 0.48
+    brim_mesh.height = 0.11
+    hat_brim.mesh = brim_mesh
+    hat_brim.position.y = 2.22
+    hat_brim.material_override = _stone_material(Color(0.18, 0.09, 0.29), 0.18)
+    npc.add_child(hat_brim)
+
     var hat := MeshInstance3D.new()
     var hat_mesh := CylinderMesh.new()
     hat_mesh.top_radius = 0.02
-    hat_mesh.bottom_radius = 0.45
-    hat_mesh.height = 0.75
+    hat_mesh.bottom_radius = 0.39
+    hat_mesh.height = 0.76
     hat.mesh = hat_mesh
-    hat.position.y = 2.42
-    var hat_mat := StandardMaterial3D.new()
-    hat_mat.albedo_color = Color(0.32, 0.12, 0.48)
-    hat.material_override = hat_mat
+    hat.position.y = 2.58
+    hat.rotation_degrees.z = -9.0
+    hat.material_override = _stone_material(Color(0.27, 0.105, 0.42), 0.18)
     npc.add_child(hat)
+
+    var hat_band := MeshInstance3D.new()
+    var band_mesh := TorusMesh.new()
+    band_mesh.inner_radius = 0.36
+    band_mesh.outer_radius = 0.39
+    hat_band.mesh = band_mesh
+    hat_band.position.y = 2.31
+    hat_band.material_override = _glow_material(Color(0.83, 0.61, 0.25))
+    npc.add_child(hat_band)
+
     var staff := MeshInstance3D.new()
     var staff_mesh := CylinderMesh.new()
-    staff_mesh.top_radius = 0.045
+    staff_mesh.top_radius = 0.035
     staff_mesh.bottom_radius = 0.06
     staff_mesh.height = 2.0
     staff.mesh = staff_mesh
     staff.position = Vector3(0.7, 1.0, 0)
     staff.rotation_degrees.z = -8
-    var staff_mat := StandardMaterial3D.new()
-    staff_mat.albedo_color = Color(0.42, 0.24, 0.15)
-    staff.material_override = staff_mat
+    staff.material_override = _stone_material(Color(0.42, 0.24, 0.15), 0.08)
     npc.add_child(staff)
+
+    var staff_crystal := MeshInstance3D.new()
+    var crystal_mesh := PrismMesh.new()
+    crystal_mesh.size = Vector3(0.28, 0.46, 0.28)
+    staff_crystal.mesh = crystal_mesh
+    staff_crystal.position = Vector3(0.78, 2.05, 0)
+    staff_crystal.material_override = _glow_material(Color(0.69, 0.4, 1.0))
+    npc.add_child(staff_crystal)
+
+    var staff_light := OmniLight3D.new()
+    staff_light.position = Vector3(0.78, 2.05, 0)
+    staff_light.light_color = Color(0.58, 0.3, 1.0)
+    staff_light.light_energy = 0.8
+    staff_light.omni_range = 4.0
+    npc.add_child(staff_light)
     add_child(npc)
     interact_target = npc
+
 
 func _add_path_lights() -> void:
     for z in range(2, 23, 4):
