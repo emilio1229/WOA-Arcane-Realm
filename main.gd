@@ -681,11 +681,14 @@ func _build_player() -> void:
     crystal_light.omni_range = 3.0
     player.add_child(crystal_light)
 
+    # Keep camera yaw independent from the character's facing direction.
+    # This avoids WASD turning the camera and feeding back into movement.
     camera_pivot = Node3D.new()
-    camera_pivot.position.y = 1.45
-    player.add_child(camera_pivot)
+    camera_pivot.top_level = true
+    camera_pivot.global_position = player.global_position + Vector3(0, 1.45, 0)
+    add_child(camera_pivot)
     camera = Camera3D.new()
-    camera.position = Vector3(0, 1.2, 5.4)
+    camera.position = Vector3(0, 0.2, 5.4)
     camera.rotation.x = -0.18
     camera.current = true
     camera_pivot.add_child(camera)
@@ -959,6 +962,8 @@ func _input(event: InputEvent) -> void:
             _cast_arcane_bolt()
 
 func _physics_process(delta: float) -> void:
+    if player != null and camera_pivot != null:
+        camera_pivot.global_position = player.global_position + Vector3(0, 1.45, 0)
     if not started or dialogue_open:
         player.velocity.x = move_toward(player.velocity.x, 0.0, 22.0 * delta)
         player.velocity.z = move_toward(player.velocity.z, 0.0, 22.0 * delta)
