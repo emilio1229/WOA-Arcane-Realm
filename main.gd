@@ -38,6 +38,9 @@ var trial_complete := false
 var collected_rune_names: Array[String] = []
 var save_exists := false
 var continue_button: Button
+var animated_crystals: Array[MeshInstance3D] = []
+var crystal_home_y: Dictionary = {}
+var animation_clock := 0.0
 var jump_requested := false
 var run_speed := 7.2
 var walk_speed := 4.8
@@ -49,6 +52,19 @@ func _ready() -> void:
     _load_game()
     _show_menu()
     Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+
+func _process(delta: float) -> void:
+    animation_clock += delta
+    for i in range(animated_crystals.size() - 1, -1, -1):
+        var crystal := animated_crystals[i]
+        if not is_instance_valid(crystal):
+            animated_crystals.remove_at(i)
+            continue
+        crystal.rotate_y(delta * 0.7)
+        var home_y := float(crystal_home_y.get(crystal.get_instance_id(), crystal.position.y))
+        crystal.position.y = home_y + sin(animation_clock * 2.1 + float(i) * 0.8) * 0.065
+    if guardian != null and is_instance_valid(guardian):
+        guardian.position.y = 0.3 + sin(animation_clock * 2.4) * 0.045
 
 func _build_world() -> void:
     var env := WorldEnvironment.new()
@@ -297,6 +313,8 @@ func _create_mathias(pos: Vector3) -> void:
     staff_crystal.position = Vector3(0.78, 2.05, 0)
     staff_crystal.material_override = _glow_material(Color(0.69, 0.4, 1.0))
     npc.add_child(staff_crystal)
+    animated_crystals.append(staff_crystal)
+    crystal_home_y[staff_crystal.get_instance_id()] = staff_crystal.position.y
 
     var staff_light := OmniLight3D.new()
     staff_light.position = Vector3(0.78, 2.05, 0)
@@ -425,6 +443,8 @@ func _create_rune_shrine(pos: Vector3, rune_title: String, rune_color: Color) ->
     crystal.rotation_degrees = Vector3(0, 18, 8)
     crystal.material_override = _glow_material(rune_color)
     shrine.add_child(crystal)
+    animated_crystals.append(crystal)
+    crystal_home_y[crystal.get_instance_id()] = crystal.position.y
     var ring := MeshInstance3D.new()
     var ring_mesh := TorusMesh.new()
     ring_mesh.inner_radius = 0.48
@@ -651,6 +671,8 @@ func _build_player() -> void:
     staff_crystal.rotation_degrees.z = 18.0
     staff_crystal.material_override = _glow_material(Color(0.63, 0.29, 1.0))
     player.add_child(staff_crystal)
+    animated_crystals.append(staff_crystal)
+    crystal_home_y[staff_crystal.get_instance_id()] = staff_crystal.position.y
 
     var crystal_light := OmniLight3D.new()
     crystal_light.position = Vector3(0.77, 1.92, -0.05)
@@ -1073,6 +1095,8 @@ func _create_guardian(pos: Vector3) -> void:
     chest.position = Vector3(0, 1.55, -0.55)
     chest.material_override = _glow_material(Color(0.8, 0.12, 0.36))
     guardian.add_child(chest)
+    animated_crystals.append(chest)
+    crystal_home_y[chest.get_instance_id()] = chest.position.y
     var head := MeshInstance3D.new()
     var head_mesh := SphereMesh.new()
     head_mesh.radius = 0.48
