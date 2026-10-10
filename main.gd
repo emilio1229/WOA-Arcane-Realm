@@ -593,7 +593,7 @@ func _build_player() -> void:
     var robe_mat := _stone_material(Color(0.19, 0.105, 0.34), 0.22)
     robe_mat.roughness = 0.72
     robe.material_override = robe_mat
-    player.add_child(robe)
+    player_visual_root.add_child(robe)
 
     var robe_trim := MeshInstance3D.new()
     var trim_mesh := TorusMesh.new()
@@ -602,7 +602,7 @@ func _build_player() -> void:
     robe_trim.mesh = trim_mesh
     robe_trim.position.y = 0.37
     robe_trim.material_override = _glow_material(Color(0.67, 0.39, 0.95))
-    player.add_child(robe_trim)
+    player_visual_root.add_child(robe_trim)
 
     var mantle := MeshInstance3D.new()
     var mantle_mesh := BoxMesh.new()
@@ -610,7 +610,7 @@ func _build_player() -> void:
     mantle.mesh = mantle_mesh
     mantle.position = Vector3(0, 1.18, 0.31)
     mantle.material_override = _stone_material(Color(0.10, 0.07, 0.18), 0.12)
-    player.add_child(mantle)
+    player_visual_root.add_child(mantle)
 
     var belt := MeshInstance3D.new()
     var belt_mesh := TorusMesh.new()
@@ -619,7 +619,7 @@ func _build_player() -> void:
     belt.mesh = belt_mesh
     belt.position.y = 0.96
     belt.material_override = _glow_material(Color(0.83, 0.58, 0.22))
-    player.add_child(belt)
+    player_visual_root.add_child(belt)
 
     var head := MeshInstance3D.new()
     var head_shape := SphereMesh.new()
@@ -630,7 +630,7 @@ func _build_player() -> void:
     var head_mat := StandardMaterial3D.new()
     head_mat.albedo_color = Color(0.72, 0.55, 0.43)
     head.material_override = head_mat
-    player.add_child(head)
+    player_visual_root.add_child(head)
 
     var hat_brim := MeshInstance3D.new()
     var brim_mesh := CylinderMesh.new()
@@ -640,7 +640,7 @@ func _build_player() -> void:
     hat_brim.mesh = brim_mesh
     hat_brim.position.y = 1.99
     hat_brim.material_override = _stone_material(Color(0.13, 0.07, 0.22), 0.18)
-    player.add_child(hat_brim)
+    player_visual_root.add_child(hat_brim)
 
     var hat := MeshInstance3D.new()
     var hat_mesh := CylinderMesh.new()
@@ -651,7 +651,7 @@ func _build_player() -> void:
     hat.position.y = 2.38
     hat.rotation_degrees.z = -7.0
     hat.material_override = _stone_material(Color(0.24, 0.12, 0.39), 0.16)
-    player.add_child(hat)
+    player_visual_root.add_child(hat)
 
     var hat_band := MeshInstance3D.new()
     var band_mesh := TorusMesh.new()
@@ -660,7 +660,7 @@ func _build_player() -> void:
     hat_band.mesh = band_mesh
     hat_band.position.y = 2.08
     hat_band.material_override = _glow_material(Color(0.86, 0.62, 0.24))
-    player.add_child(hat_band)
+    player_visual_root.add_child(hat_band)
 
     var staff := MeshInstance3D.new()
     var staff_mesh := CylinderMesh.new()
@@ -671,7 +671,7 @@ func _build_player() -> void:
     staff.position = Vector3(0.65, 0.9, -0.05)
     staff.rotation_degrees.z = -7.0
     staff.material_override = _stone_material(Color(0.34, 0.19, 0.12), 0.12)
-    player.add_child(staff)
+    player_visual_root.add_child(staff)
 
     var staff_crystal := MeshInstance3D.new()
     var crystal_mesh := PrismMesh.new()
@@ -680,7 +680,7 @@ func _build_player() -> void:
     staff_crystal.position = Vector3(0.77, 1.92, -0.05)
     staff_crystal.rotation_degrees.z = 18.0
     staff_crystal.material_override = _glow_material(Color(0.63, 0.29, 1.0))
-    player.add_child(staff_crystal)
+    player_visual_root.add_child(staff_crystal)
     animated_crystals.append(staff_crystal)
     crystal_home_y[staff_crystal.get_instance_id()] = staff_crystal.position.y
 
@@ -689,7 +689,7 @@ func _build_player() -> void:
     crystal_light.light_color = Color(0.54, 0.25, 1.0)
     crystal_light.light_energy = 0.6
     crystal_light.omni_range = 3.0
-    player.add_child(crystal_light)
+    player_visual_root.add_child(crystal_light)
 
     # Keep camera yaw independent from the character's facing direction.
     # This avoids WASD turning the camera and feeding back into movement.
