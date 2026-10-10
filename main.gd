@@ -809,6 +809,19 @@ func _try_replace_visual_with_model(parent: Node3D, model_path: String, model_sc
     # the procedural model remains visible so the browser build always works.
     if not ResourceLoader.exists(model_path):
         return false
+
+    # Some repository assets may be Git LFS pointer text rather than actual GLB
+    # binaries (for example, when LFS objects were not included in a checkout).
+    # Validate the GLB magic header before asking Godot to load it, preventing
+    # noisy engine errors and allowing the procedural fallback to remain visible.
+    var model_file := FileAccess.open(model_path, FileAccess.READ)
+    if model_file == null:
+        return false
+    var glb_header: String = model_file.get_buffer(4).get_string_from_ascii()
+    model_file.close()
+    if glb_header != "glTF":
+        return false
+
     var packed_scene := load(model_path) as PackedScene
     if packed_scene == null:
         push_warning("Optional model could not be loaded as a PackedScene: " + model_path)
