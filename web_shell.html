@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#10091c">
+  <title>WOA: Arcane Realm</title>
+  <style>
+    :root { color-scheme: dark; background: #10091c; color: #f0e7ff; font-family: system-ui, sans-serif; }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #10091c; }
+    body { display: grid; place-items: center; }
+    #canvas { display: block; width: 100%; height: 100%; outline: none; background: #10091c; }
+    #boot { position: fixed; inset: 0; display: grid; place-content: center; gap: 12px; padding: 24px; text-align: center; background: #10091c; z-index: 2; }
+    #boot h1 { margin: 0; color: #dfc1ff; letter-spacing: .08em; font-size: clamp(1.2rem, 3vw, 2rem); }
+    #boot p { margin: 0; color: #c7b5da; }
+    #error { display: none; max-width: 760px; white-space: pre-wrap; overflow-wrap: anywhere; text-align: left; padding: 16px; border: 1px solid #b85bda; border-radius: 8px; background: #24132f; color: #ffe5ff; }
+    #error.visible { display: block; }
+    #bar { height: 4px; width: min(360px, 75vw); margin: 4px auto; background: #39254c; border-radius: 8px; overflow: hidden; }
+    #progress { height: 100%; width: 0; background: #c58cff; transition: width .15s linear; }
+  </style>
+</head>
+<body>
+  <div id="boot" role="status" aria-live="polite">
+    <h1>WOA: ARCANE REALM</h1>
+    <p id="status">Awakening the Realm…</p>
+    <div id="bar"><div id="progress"></div></div>
+    <pre id="error"></pre>
+  </div>
+  <canvas id="canvas" tabindex="0" aria-label="WOA Arcane Realm game"></canvas>
+  <script src="$GODOT_URL"></script>
+  <script>
+    (() => {
+      const boot = document.getElementById("boot");
+      const status = document.getElementById("status");
+      const progress = document.getElementById("progress");
+      const errorBox = document.getElementById("error");
+      let started = false;
+      function showError(message) {
+        errorBox.textContent = String(message || "Unknown startup error");
+        errorBox.classList.add("visible");
+        status.textContent = "The Realm could not start.";
+        progress.style.width = "100%";
+      }
+      window.addEventListener("error", event => {
+        if (!started) showError(event.message || event.error || "A browser error prevented the game from starting.");
+      });
+      window.addEventListener("unhandledrejection", event => {
+        if (!started) showError(event.reason && (event.reason.stack || event.reason.message) || event.reason || "A startup promise failed.");
+      });
+      try {
+        if (typeof Engine === "undefined") throw new Error("Godot engine script did not load. Check the exported JavaScript file and server response.");
+        const engine = new Engine($GODOT_CONFIG);
+        engine.startGame({
+          canvas: document.getElementById("canvas"),
+          canvasResizePolicy: 2,
+          onProgress: (current, total) => {
+            if (total > 0) progress.style.width = Math.min(100, current / total * 100) + "%";
+            status.textContent = total > 0
+              ? "Loading the Realm… " + Math.floor(current / total * 100) + "%"
+              : "Loading the Realm…";
+          },
+          onPrint: text => console.log("[Godot]", text),
+          onPrintError: text => {
+            console.error("[Godot]", text);
+            if (!started) showError(text);
+          }
+        }).then(() => {
+          started = true;
+          boot.style.display = "none";
+          document.getElementById("canvas").focus();
+        }).catch(error => showError(error && (error.stack || error.message) || error));
+      } catch (error) {
+        showError(error && (error.stack || error.message) || error);
+      }
+    })();
+  </script>
+</body>
+</html>
