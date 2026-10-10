@@ -404,10 +404,7 @@ func _physics_process(delta: float) -> void:
                 player.velocity.y -= 20.0 * delta
             player.move_and_slide()
         return
-    var input_vector := Vector2(
-        Input.get_action_strength("move_right") - Input.get_action_strength("move_left"),
-        Input.get_action_strength("move_back") - Input.get_action_strength("move_forward")
-    )
+    var input_vector := Vector2.ZERO
     if Input.is_key_pressed(KEY_W): input_vector.y = -1.0
     if Input.is_key_pressed(KEY_S): input_vector.y = 1.0
     if Input.is_key_pressed(KEY_A): input_vector.x = -1.0
