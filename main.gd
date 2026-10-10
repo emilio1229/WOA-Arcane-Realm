@@ -117,82 +117,152 @@ func _build_ui() -> void:
     backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
     menu_root.add_child(backdrop)
 
-    var center := CenterContainer.new()
-    center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-    menu_root.add_child(center)
+    var margin := MarginContainer.new()
+    margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+    margin.add_theme_constant_override("margin_left", 42)
+    margin.add_theme_constant_override("margin_right", 42)
+    margin.add_theme_constant_override("margin_top", 30)
+    margin.add_theme_constant_override("margin_bottom", 30)
+    menu_root.add_child(margin)
 
-    var panel := PanelContainer.new()
-    panel.custom_minimum_size = Vector2(540.0, 0.0)
-    panel.add_theme_stylebox_override("panel", _panel_style(Color(0.07, 0.035, 0.12, 0.98), Color(0.58, 0.32, 0.92)))
-    center.add_child(panel)
+    var columns := HBoxContainer.new()
+    columns.add_theme_constant_override("separation", 42)
+    margin.add_child(columns)
 
-    var layout := VBoxContainer.new()
-    layout.add_theme_constant_override("separation", 13)
-    panel.add_child(layout)
+    var story_side := VBoxContainer.new()
+    story_side.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    story_side.size_flags_vertical = Control.SIZE_EXPAND_FILL
+    story_side.alignment = BoxContainer.ALIGNMENT_CENTER
+    story_side.add_theme_constant_override("separation", 18)
+    columns.add_child(story_side)
+
+    var sigil_mark := Label.new()
+    sigil_mark.text = "✧"
+    sigil_mark.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+    sigil_mark.add_theme_font_size_override("font_size", 58)
+    sigil_mark.add_theme_color_override("font_color", Color(0.79, 0.55, 1.0))
+    story_side.add_child(sigil_mark)
+
+    var overline := Label.new()
+    overline.text = "THE WIZARDS OF ARK PRESENT"
+    overline.add_theme_font_size_override("font_size", 12)
+    overline.add_theme_color_override("font_color", Color(0.75, 0.56, 0.92))
+    story_side.add_child(overline)
 
     var title := Label.new()
-    title.text = "WOA: ARCANE REALM"
-    title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    title.add_theme_font_size_override("font_size", 34)
-    title.add_theme_color_override("font_color", Color(0.91, 0.78, 1.0))
-    layout.add_child(title)
+    title.text = "ARCANE\nREALM"
+    title.add_theme_font_size_override("font_size", 68)
+    title.add_theme_color_override("font_color", Color(0.94, 0.84, 1.0))
+    title.add_theme_constant_override("line_spacing", -10)
+    story_side.add_child(title)
 
     var subtitle := Label.new()
-    subtitle.text = "Wizards, Warlocks & Witches"
-    subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    subtitle.add_theme_font_size_override("font_size", 16)
-    subtitle.add_theme_color_override("font_color", Color(0.77, 0.65, 0.9))
-    layout.add_child(subtitle)
+    subtitle.text = "CHRONICLES OF THE HOLLOW CROWN"
+    subtitle.add_theme_font_size_override("font_size", 13)
+    subtitle.add_theme_color_override("font_color", Color(0.82, 0.62, 1.0))
+    story_side.add_child(subtitle)
+
+    var divider := ColorRect.new()
+    divider.custom_minimum_size = Vector2(120, 2)
+    divider.color = Color(0.54, 0.3, 0.76, 0.9)
+    story_side.add_child(divider)
+
+    var lore := Label.new()
+    lore.text = "The wards are failing. Old Sigils stir beneath forgotten stone. Somewhere beyond Gloamwick, a crown erased from history is beginning to remember its name."
+    lore.custom_minimum_size = Vector2(300, 0)
+    lore.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+    lore.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    lore.add_theme_font_size_override("font_size", 19)
+    lore.add_theme_color_override("font_color", Color(0.81, 0.76, 0.88))
+    story_side.add_child(lore)
+
+    var chapter := Label.new()
+    chapter.text = "CHAPTER I   /   GLOAMWICK"
+    chapter.add_theme_font_size_override("font_size", 12)
+    chapter.add_theme_color_override("font_color", Color(0.64, 0.54, 0.75))
+    story_side.add_child(chapter)
+
+    var form_wrap := CenterContainer.new()
+    form_wrap.custom_minimum_size = Vector2(410, 0)
+    columns.add_child(form_wrap)
+
+    var panel := PanelContainer.new()
+    panel.custom_minimum_size = Vector2(390, 0)
+    panel.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+    panel.add_theme_stylebox_override("panel", _panel_style(Color(0.055, 0.032, 0.09, 0.97), Color(0.48, 0.29, 0.67)))
+    form_wrap.add_child(panel)
+
+    var layout := VBoxContainer.new()
+    layout.add_theme_constant_override("separation", 12)
+    panel.add_child(layout)
+
+    var menu_heading := Label.new()
+    menu_heading.text = "ENTER THE REALM"
+    menu_heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    menu_heading.add_theme_font_size_override("font_size", 23)
+    menu_heading.add_theme_color_override("font_color", Color(0.93, 0.83, 1.0))
+    layout.add_child(menu_heading)
+
+    var menu_note := Label.new()
+    menu_note.text = "Your chronicle begins when you awaken."
+    menu_note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    menu_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    menu_note.add_theme_font_size_override("font_size", 13)
+    menu_note.add_theme_color_override("font_color", Color(0.72, 0.64, 0.81))
+    layout.add_child(menu_note)
 
     layout.add_child(HSeparator.new())
 
-    var intro := Label.new()
-    intro.text = "A living chapter of the Realm. Your deeds become history; every Sigil remembers."
-    intro.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-    intro.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    intro.add_theme_color_override("font_color", Color(0.83, 0.8, 0.9))
-    layout.add_child(intro)
-
     var name_label := Label.new()
-    name_label.text = "YOUR WIZARD'S NAME"
-    name_label.add_theme_font_size_override("font_size", 13)
+    name_label.text = "WIZARD NAME"
+    name_label.add_theme_font_size_override("font_size", 12)
+    name_label.add_theme_color_override("font_color", Color(0.81, 0.69, 0.94))
     layout.add_child(name_label)
 
     name_input = LineEdit.new()
-    name_input.placeholder_text = "Enter your name..."
+    name_input.placeholder_text = "What shall the Realm call you?"
     name_input.text = player_name if player_name != "Apprentice" else ""
-    name_input.custom_minimum_size = Vector2(0, 42)
+    name_input.custom_minimum_size = Vector2(0, 44)
     name_input.max_length = 24
-    name_input.add_theme_font_size_override("font_size", 17)
+    name_input.add_theme_font_size_override("font_size", 16)
+    name_input.add_theme_stylebox_override("normal", _panel_style(Color(0.025, 0.018, 0.045), Color(0.31, 0.22, 0.4)))
     layout.add_child(name_input)
 
     var path_label := Label.new()
     path_label.text = "CHOOSE YOUR ARCANE PATH"
-    path_label.add_theme_font_size_override("font_size", 13)
+    path_label.add_theme_font_size_override("font_size", 12)
+    path_label.add_theme_color_override("font_color", Color(0.81, 0.69, 0.94))
     layout.add_child(path_label)
 
     path_select = OptionButton.new()
-    path_select.custom_minimum_size = Vector2(0, 42)
+    path_select.custom_minimum_size = Vector2(0, 44)
     for path_name in PATHS:
         path_select.add_item(path_name)
     path_select.select(5)
-    path_select.add_theme_font_size_override("font_size", 16)
+    path_select.add_theme_font_size_override("font_size", 15)
     layout.add_child(path_select)
 
-    var begin_button := _make_button("BEGIN YOUR JOURNEY", Color(0.36, 0.15, 0.58))
+    var path_note := Label.new()
+    path_note.text = "Your path shapes your legend. Your choices shape the Realm."
+    path_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    path_note.add_theme_font_size_override("font_size", 12)
+    path_note.add_theme_color_override("font_color", Color(0.66, 0.59, 0.75))
+    layout.add_child(path_note)
+
+    var begin_button := _make_button("✦   BEGIN YOUR JOURNEY", Color(0.34, 0.15, 0.52))
     begin_button.pressed.connect(_start_new_game)
     layout.add_child(begin_button)
 
-    continue_button = _make_button("CONTINUE JOURNEY", Color(0.19, 0.12, 0.32))
+    continue_button = _make_button("CONTINUE CHRONICLE", Color(0.16, 0.105, 0.25))
     continue_button.pressed.connect(_continue_game)
     layout.add_child(continue_button)
 
     var controls := Label.new()
-    controls.text = "WASD / arrows: move   •   Space: jump   •   Shift: run\nE: interact   •   Q: arcane pulse   •   Esc: release mouse"
+    controls.text = "WASD Move  •  Space Jump  •  Shift Run\nE Interact  •  Q Arcane Pulse  •  Esc Release Mouse"
     controls.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     controls.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-    controls.add_theme_font_size_override("font_size", 12)
-    controls.add_theme_color_override("font_color", Color(0.68, 0.63, 0.75))
+    controls.add_theme_font_size_override("font_size", 11)
+    controls.add_theme_color_override("font_color", Color(0.59, 0.53, 0.68))
     layout.add_child(controls)
 
     hud_root = Control.new()
@@ -295,7 +365,7 @@ func _enter_game(show_intro: bool) -> void:
     _build_player()
     _refresh_objective()
     if show_intro:
-        _show_dialogue("CHAPTER I • GLOAMWICK", "The violet sky above Gloamwick flickers like a dying candle. Three riftbound shapes have broken through the old ward and cornered Mathias, Battle Mage of the Council of Wizards, Warlocks & Witches. He raises a trembling hand as the ward-stones crack. “Apprentice! If you can hear me, help me drive them back. The Council's seals are failing—and something beneath the Realm has begun to wake.”", "Face the riftbound")
+        _show_dialogue("CHAPTER I • THE AWAKENING", "Cold stone presses against your palm. Rain whispers over broken rooftops, and violet light pulses behind your closed eyes. You wake in the square of Gloamwick with one name clear in your mind: " + player_name + ". Your robes are torn, your memory is full of gaps, and a strange Sigil glows beneath your hand. Ahead, a battle mage named Mathias is holding a failing ward against three riftbound shades. He sees you stir. “You're awake! Good. I am Mathias, sworn to the Council of Wizards, Warlocks & Witches. If you can stand, we may yet keep this village from falling.”", "Rise and face the riftbound")
     else:
         _show_dialogue("WELCOME BACK, " + player_name.to_upper(), "Your Chronicle is intact. Mathias still watches the failing ward-stones, and the path ahead remains yours to choose.", "Return to the Realm")
 
