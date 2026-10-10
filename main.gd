@@ -498,47 +498,130 @@ func _build_person(person_name: String, pos: Vector3, robe_color: Color, glow_co
     return person
 
 func _add_person_visual(parent: Node3D, robe_color: Color, face_color: Color, is_mage: bool) -> void:
+    # Layered silhouette: broad hem, fitted torso, sleeves, sash and a compact hat.
+    # Keeping the character built from low-poly meshes avoids missing external model imports.
     var robe := MeshInstance3D.new()
     var robe_mesh := CylinderMesh.new()
-    robe_mesh.top_radius = 0.22
-    robe_mesh.bottom_radius = 0.52
-    robe_mesh.height = 1.15
+    robe_mesh.top_radius = 0.27
+    robe_mesh.bottom_radius = 0.55
+    robe_mesh.height = 1.12
     robe.mesh = robe_mesh
-    robe.position.y = 0.72
+    robe.position = Vector3(0, 0.66, 0)
     robe.material_override = _material(robe_color)
     parent.add_child(robe)
 
+    var torso := MeshInstance3D.new()
+    var torso_mesh := CapsuleMesh.new()
+    torso_mesh.radius = 0.27
+    torso_mesh.height = 0.82
+    torso.mesh = torso_mesh
+    torso.position = Vector3(0, 1.12, 0)
+    torso.material_override = _material(robe_color.lightened(0.08))
+    parent.add_child(torso)
+
+    var cape := MeshInstance3D.new()
+    var cape_mesh := SphereMesh.new()
+    cape_mesh.radius = 0.43
+    cape_mesh.height = 1.2
+    cape.mesh = cape_mesh
+    cape.position = Vector3(0, 0.96, 0.18)
+    cape.scale = Vector3(1.0, 1.0, 0.34)
+    cape.material_override = _material(robe_color.darkened(0.32))
+    parent.add_child(cape)
+
+    for side in [-1.0, 1.0]:
+        var sleeve := MeshInstance3D.new()
+        var sleeve_mesh := CylinderMesh.new()
+        sleeve_mesh.top_radius = 0.105
+        sleeve_mesh.bottom_radius = 0.14
+        sleeve_mesh.height = 0.72
+        sleeve.mesh = sleeve_mesh
+        sleeve.position = Vector3(side * 0.37, 1.02, -0.005)
+        sleeve.rotation.z = side * -0.22
+        sleeve.material_override = _material(robe_color.darkened(0.08))
+        parent.add_child(sleeve)
+
+        var hand := _make_sphere(Vector3(side * 0.43, 0.65, -0.035), 0.105, Color(0.52, 0.36, 0.31) if is_mage else robe_color.darkened(0.45))
+        hand.scale = Vector3(0.82, 1.0, 0.82)
+        parent.add_child(hand)
+
+        var boot := MeshInstance3D.new()
+        var boot_mesh := SphereMesh.new()
+        boot_mesh.radius = 0.17
+        boot_mesh.height = 0.25
+        boot.mesh = boot_mesh
+        boot.position = Vector3(side * 0.19, 0.12, -0.055)
+        boot.scale = Vector3(1.0, 0.72, 1.25)
+        boot.material_override = _material(Color(0.055, 0.035, 0.075))
+        parent.add_child(boot)
+
+    var sash := MeshInstance3D.new()
+    var sash_mesh := TorusMesh.new()
+    sash_mesh.inner_radius = 0.265
+    sash_mesh.outer_radius = 0.315
+    sash.mesh = sash_mesh
+    sash.position.y = 0.79
+    sash.material_override = _material(Color(0.68, 0.43, 0.2) if is_mage else Color(0.19, 0.14, 0.24))
+    parent.add_child(sash)
+
     var face := MeshInstance3D.new()
     var face_mesh := SphereMesh.new()
-    face_mesh.radius = 0.29
-    face_mesh.height = 0.58
+    face_mesh.radius = 0.235
+    face_mesh.height = 0.47
     face.mesh = face_mesh
-    face.position.y = 1.48
-    face.material_override = _material(Color(0.58, 0.42, 0.38) if is_mage else Color(0.07, 0.035, 0.12))
+    face.position = Vector3(0, 1.57, -0.045)
+    face.material_override = _material(Color(0.58, 0.42, 0.38) if is_mage else Color(0.055, 0.028, 0.085))
     parent.add_child(face)
 
-    var hood := MeshInstance3D.new()
-    var hood_mesh := SphereMesh.new()
-    hood_mesh.radius = 0.37
-    hood_mesh.height = 0.5
-    hood.mesh = hood_mesh
-    hood.position.y = 1.63
-    hood.material_override = _material(robe_color.darkened(0.25))
-    parent.add_child(hood)
-
     if is_mage:
+        # A smaller brim and tapered crown read as a hat instead of a floating cone.
+        var brim := MeshInstance3D.new()
+        var brim_mesh := CylinderMesh.new()
+        brim_mesh.top_radius = 0.31
+        brim_mesh.bottom_radius = 0.34
+        brim_mesh.height = 0.075
+        brim.mesh = brim_mesh
+        brim.position.y = 1.82
+        brim.material_override = _material(robe_color.darkened(0.1))
+        parent.add_child(brim)
+
         var hat := MeshInstance3D.new()
         var hat_mesh := CylinderMesh.new()
-        hat_mesh.top_radius = 0.02
-        hat_mesh.bottom_radius = 0.34
-        hat_mesh.height = 0.6
+        hat_mesh.top_radius = 0.035
+        hat_mesh.bottom_radius = 0.245
+        hat_mesh.height = 0.52
         hat.mesh = hat_mesh
-        hat.position.y = 2.03
-        hat.material_override = _material(robe_color)
+        hat.position.y = 2.105
+        hat.rotation.z = -0.08
+        hat.material_override = _material(robe_color.darkened(0.12))
         parent.add_child(hat)
+
+        var hat_band := MeshInstance3D.new()
+        var band_mesh := TorusMesh.new()
+        band_mesh.inner_radius = 0.222
+        band_mesh.outer_radius = 0.245
+        hat_band.mesh = band_mesh
+        hat_band.position.y = 1.91
+        hat_band.material_override = _material(face_color, true)
+        parent.add_child(hat_band)
     else:
-        parent.add_child(_make_sphere(Vector3(-0.11, 1.5, -0.245), 0.055, face_color))
-        parent.add_child(_make_sphere(Vector3(0.11, 1.5, -0.245), 0.055, face_color))
+        # Mathias' shadowed hood and bright eyes give him a distinct battle-mage shape.
+        var hood := MeshInstance3D.new()
+        var hood_mesh := SphereMesh.new()
+        hood_mesh.radius = 0.29
+        hood_mesh.height = 0.42
+        hood.mesh = hood_mesh
+        hood.position = Vector3(0, 1.68, 0.035)
+        hood.scale = Vector3(1.0, 0.9, 0.9)
+        hood.material_override = _material(robe_color.darkened(0.2))
+        parent.add_child(hood)
+        parent.add_child(_make_sphere(Vector3(-0.09, 1.57, -0.238), 0.035, face_color))
+        parent.add_child(_make_sphere(Vector3(0.09, 1.57, -0.238), 0.035, face_color))
+
+    # The chest sigil is a small focal point rather than a large floating ornament.
+    var pendant := _make_sphere(Vector3(0, 1.25, -0.285), 0.07, face_color)
+    pendant.scale = Vector3(0.72, 1.0, 0.5)
+    parent.add_child(pendant)
 
 func _make_sigil(pos: Vector3, color: Color, size: float) -> Node3D:
     var root := Node3D.new()
