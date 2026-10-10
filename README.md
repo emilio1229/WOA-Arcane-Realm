@@ -8,7 +8,7 @@ Open the deployed game: https://woa-arcane-realm-production.up.railway.app
 
 ## Chapter One: The Sigil Sanctuary
 
-- Create your wizard by entering a name on the title screen.
+- Create your wizard by entering a name on the title screen, then use **Continue Journey** to resume saved sigil and trial progress.
 - Meet Mathias, keeper of the first sigil, and learn why the sanctuary wards are failing.
 - Explore the sanctuary and recover the three ancient crystals: **Dawn**, **Dusk**, and **Heart**.
 - Watch the ward change when all three sigils are recovered.
@@ -27,6 +27,8 @@ This is an early playable vertical slice, not the finished full game. The charac
 - **F** — staff strike during the guardian trial (close range)
 - **Q** — cast an arcane bolt during the guardian trial (ranged)
 - **Esc** — release the cursor
+
+The game automatically saves your wizard name and major quest progress in the browser. Browser storage settings or clearing site data can affect local saves.
 
 ## Project structure and local development
 
