@@ -497,8 +497,7 @@ func _nearest_intro_enemy(max_distance: float) -> Node3D:
                 best = distance
                 nearest = enemy
     return nearest
-func _damage_intro_enemy(enemy: Node3D, damage: int) -> void:
-    if not is_instance_valid(enemy): return
+func _damage_intro_enemy(enemy: Node3D, damage: int) -> void:    if not is_instance_valid(enemy): return
     var id := enemy.get_instance_id()
     var hp := int(intro_enemy_hp.get(id, 0)) - damage
     if hp <= 0:
@@ -996,9 +995,9 @@ func _add_haunted_tree(pos: Vector3, height: float) -> void:
     crown.scale = Vector3(1.15, 1.45, 0.92)
     crown.position = Vector3(0, height * 0.83, 0)
     var crown_mat := StandardMaterial3D.new()
-    crown_mat.albedo_color = Color(0.025, 0.055, 0.045)    crown_mat.roughness = 1.0
-    crown.material_override = crown_mat
-    tree.add_child(crown)
+    crown_mat.albedo_color = Color(0.025, 0.055, 0.045)
+    crown_mat.roughness = 1.0
+    crown.material_override = crown_mat    tree.add_child(crown)
     _try_replace_visual_with_model(tree, "res://assets/models/environment/haunted blackwood tree 3d model.glb", Vector3.ONE * (height / 3.0))
     add_child(tree)
 
@@ -1497,8 +1496,7 @@ func _input(event: InputEvent) -> void:
                 _advance_dialogue()
             elif not trial_started:                _try_interact()
         elif event.keycode == KEY_F and not dialogue_open:
-            _staff_attack()
-        elif event.keycode == KEY_Q and not dialogue_open:
+            _staff_attack()        elif event.keycode == KEY_Q and not dialogue_open:
             _cast_arcane_bolt()
 
 func _physics_process(delta: float) -> void:
