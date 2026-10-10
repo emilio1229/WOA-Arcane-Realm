@@ -1128,8 +1128,9 @@ func _build_player() -> void:
     add_child(player)
     camera_pivot = Node3D.new()
     camera_pivot.top_level = true
-    camera_pivot.global_position = player.global_position + Vector3(0, 1.45, 0)
     add_child(camera_pivot)
+    # Set the global transform only after the pivot enters the scene tree.
+    camera_pivot.global_position = player.global_position + Vector3(0, 1.45, 0)
     camera = Camera3D.new()
     camera.position = Vector3(0, 0.2, 5.4)
     camera.rotation.x = -0.18
