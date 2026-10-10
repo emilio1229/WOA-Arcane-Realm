@@ -1,6 +1,9 @@
 # Build the Godot project into a browser-playable WebAssembly/WebGL game.
 FROM barichello/godot-ci:4.7.2 AS game-build
 WORKDIR /project
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libfontconfig1 \
+    && rm -rf /var/lib/apt/lists/*
 COPY . .
 RUN mkdir -p build \
     && godot --headless --path . --editor --quit \
