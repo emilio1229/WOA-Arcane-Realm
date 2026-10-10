@@ -26,6 +26,15 @@ var objective_label: Label
 var gate_seal: MeshInstance3D
 var gate_portal: MeshInstance3D
 var quest_complete := false
+var guardian: Node3D
+var guardian_hp := 8
+var guardian_max_hp := 8
+var guardian_attack_timer := 0.0
+var player_hp := 5
+var staff_cooldown := 0.0
+var spell_cooldown := 0.0
+var trial_started := false
+var trial_complete := false
 var jump_requested := false
 var run_speed := 7.2
 var walk_speed := 4.8
@@ -591,8 +600,12 @@ func _input(event: InputEvent) -> void:
         elif event.keycode == KEY_E:
             if dialogue_open:
                 _advance_dialogue()
-            else:
+            elif not trial_started:
                 _try_interact()
+        elif event.keycode == KEY_F and not dialogue_open:
+            _staff_attack()
+        elif event.keycode == KEY_Q and not dialogue_open:
+            _cast_arcane_bolt()
 
 func _physics_process(delta: float) -> void:
     if not started or dialogue_open:
@@ -634,6 +647,12 @@ func _physics_process(delta: float) -> void:
         player.velocity.y = 7.0
     jump_requested = false
     player.move_and_slide()
+    staff_cooldown = maxf(0.0, staff_cooldown - delta)
+    spell_cooldown = maxf(0.0, spell_cooldown - delta)
+    if trial_started:
+        _update_guardian(delta)
+        prompt_label.text = "F: staff strike  •  Q: arcane bolt  •  keep moving!"
+        return
 
     var nearest_rune_distance := 999.0
     for shrine in rune_shrines:
@@ -677,8 +696,10 @@ func _try_interact() -> void:
         _collect_rune(nearest_shrine)
         return
     if player.global_position.distance_to(Vector3(0, 0, -19)) < 5.5:
-        if quest_complete:
-            _open_dialogue("The Awakened Gate", "The three sigils turn as one. Beyond the threshold, a new realm breathes beneath a sky no map remembers. This sanctuary was only the beginning, " + player_name + ". Your first trial is complete — the adventure beyond the gate awaits.", 3)
+        if quest_complete and not trial_complete:
+            _start_first_trial()
+        elif trial_complete:
+            _open_dialogue("The Awakened Gate", "The first guardian has fallen, and the sanctuary wards burn bright once more. Beyond this threshold lie deeper ruins, forgotten forests, and the mysteries of the Arcane Realm. Your journey has only begun.", 3)
         else:
             _open_dialogue("Sealed Gate", "Three ancient sigils anchor this ward. Dawn, Dusk, and Heart must be returned before the gate will answer.", 2)
 
@@ -696,6 +717,172 @@ func _collect_rune(shrine: Node3D) -> void:
         _open_dialogue("Sigil Awakened", "The " + rune_name + " Sigil rises into the air and the other two answer. Light races across the sanctuary. The gate is open. Whatever waits beyond it now knows your name.", 2)
     else:
         _open_dialogue(rune_name + " Sigil", "The crystal loosens from its ancient mooring and folds into a ribbon of light. The ward recognizes your touch. " + str(3 - collected_runes) + " sigil(s) remain.", 2)
+
+func _start_first_trial() -> void:
+    if trial_started or trial_complete:
+        return
+    trial_started = true
+    _add_platform(Vector3(0, 0.05, -32), Vector3(22, 0.4, 22), Color(0.105, 0.085, 0.16))
+    for i in range(8):
+        var angle := TAU * float(i) / 8.0
+        var rune := MeshInstance3D.new()
+        var rune_mesh := BoxMesh.new()
+        rune_mesh.size = Vector3(0.9, 0.045, 0.09)
+        rune.mesh = rune_mesh
+        rune.position = Vector3(cos(angle) * 7.2, 0.29, -32.0 + sin(angle) * 7.2)
+        rune.rotation.y = -angle
+        rune.material_override = _glow_material(Color(0.48, 0.18, 0.78))
+        add_child(rune)
+    player.global_position = Vector3(0, 0.3, -24.0)
+    player.velocity = Vector3.ZERO
+    guardian_hp = guardian_max_hp
+    player_hp = 5
+    guardian_attack_timer = 1.0
+    _create_guardian(Vector3(0, 0.3, -36.0))
+    status_label.text = player_name + "  |  HP " + str(player_hp) + "/5"
+    objective_label.text = "First Trial: Defeat the sanctuary guardian"
+    _open_dialogue("The First Trial", "The gate folds shut behind you. From the heart of the arena, a guardian rises in blackened armor, its core burning with stolen sigil-light. Strike with F when close. Cast an arcane bolt with Q from a distance. Keep moving — the guardian will not wait.", 2)
+
+func _create_guardian(pos: Vector3) -> void:
+    guardian = Node3D.new()
+    guardian.name = "Sanctuary Guardian"
+    guardian.position = pos
+    var shadow_body := MeshInstance3D.new()
+    var body_mesh := CapsuleMesh.new()
+    body_mesh.radius = 0.72
+    body_mesh.height = 2.6
+    shadow_body.mesh = body_mesh
+    shadow_body.position.y = 1.3
+    shadow_body.material_override = _stone_material(Color(0.105, 0.075, 0.14), 0.72)
+    guardian.add_child(shadow_body)
+    var chest := MeshInstance3D.new()
+    var chest_mesh := SphereMesh.new()
+    chest_mesh.radius = 0.42
+    chest_mesh.height = 0.84
+    chest.mesh = chest_mesh
+    chest.position = Vector3(0, 1.55, -0.55)
+    chest.material_override = _glow_material(Color(0.8, 0.12, 0.36))
+    guardian.add_child(chest)
+    var head := MeshInstance3D.new()
+    var head_mesh := SphereMesh.new()
+    head_mesh.radius = 0.48
+    head_mesh.height = 0.96
+    head.mesh = head_mesh
+    head.position.y = 2.55
+    head.material_override = _stone_material(Color(0.17, 0.11, 0.21), 0.55)
+    guardian.add_child(head)
+    for side in [-1.0, 1.0]:
+        var horn := MeshInstance3D.new()
+        var horn_mesh := CylinderMesh.new()
+        horn_mesh.top_radius = 0.015
+        horn_mesh.bottom_radius = 0.22
+        horn_mesh.height = 0.85
+        horn.mesh = horn_mesh
+        horn.position = Vector3(side * 0.38, 3.05, 0)
+        horn.rotation_degrees.z = -side * 32.0
+        horn.material_override = _stone_material(Color(0.38, 0.28, 0.42), 0.25)
+        guardian.add_child(horn)
+    var eye_light := OmniLight3D.new()
+    eye_light.position = Vector3(0, 2.4, -0.4)
+    eye_light.light_color = Color(0.95, 0.08, 0.3)
+    eye_light.light_energy = 1.8
+    eye_light.omni_range = 6.0
+    guardian.add_child(eye_light)
+    add_child(guardian)
+
+func _staff_attack() -> void:
+    if not trial_started or guardian == null or staff_cooldown > 0.0:
+        return
+    if player.global_position.distance_to(guardian.global_position) > 3.2:
+        prompt_label.text = "Move closer for a staff strike!"
+        return
+    staff_cooldown = 0.48
+    guardian_hp -= 1
+    _show_guardian_hit(Color(0.88, 0.5, 1.0))
+    objective_label.text = "Guardian: %d/%d HP  •  Your HP: %d/5" % [maxi(0, guardian_hp), guardian_max_hp, player_hp]
+    if guardian_hp <= 0:
+        _defeat_guardian()
+
+func _cast_arcane_bolt() -> void:
+    if not trial_started or guardian == null or spell_cooldown > 0.0:
+        return
+    if player.global_position.distance_to(guardian.global_position) > 16.0:
+        prompt_label.text = "The guardian is beyond your spell's reach."
+        return
+    spell_cooldown = 0.85
+    var bolt := MeshInstance3D.new()
+    var bolt_mesh := SphereMesh.new()
+    bolt_mesh.radius = 0.22
+    bolt_mesh.height = 0.44
+    bolt.mesh = bolt_mesh
+    bolt.position = player.global_position + Vector3(0, 1.35, 0)
+    bolt.material_override = _glow_material(Color(0.36, 0.72, 1.0))
+    add_child(bolt)
+    var tween := create_tween()
+    tween.tween_property(bolt, "global_position", guardian.global_position + Vector3(0, 1.4, 0), 0.2)
+    tween.finished.connect(func(): bolt.queue_free())
+    guardian_hp -= 2
+    _show_guardian_hit(Color(0.35, 0.72, 1.0))
+    objective_label.text = "Guardian: %d/%d HP  •  Your HP: %d/5" % [maxi(0, guardian_hp), guardian_max_hp, player_hp]
+    if guardian_hp <= 0:
+        _defeat_guardian()
+
+func _show_guardian_hit(hit_color: Color) -> void:
+    if guardian == null:
+        return
+    var flash := MeshInstance3D.new()
+    var flash_mesh := SphereMesh.new()
+    flash_mesh.radius = 0.75
+    flash_mesh.height = 1.5
+    flash.mesh = flash_mesh
+    flash.position = Vector3(0, 1.5, 0)
+    flash.material_override = _glow_material(hit_color)
+    guardian.add_child(flash)
+    get_tree().create_timer(0.12).timeout.connect(func():
+        if is_instance_valid(flash):
+            flash.queue_free()
+    )
+
+func _update_guardian(delta: float) -> void:
+    if guardian == null or not is_instance_valid(guardian):
+        return
+    guardian_attack_timer -= delta
+    var to_player := player.global_position - guardian.global_position
+    to_player.y = 0.0
+    var distance := to_player.length()
+    if distance > 1.9:
+        var step := to_player.normalized() * 2.0 * delta
+        guardian.position += step
+        guardian.look_at(Vector3(player.global_position.x, guardian.global_position.y, player.global_position.z), Vector3.UP)
+    elif guardian_attack_timer <= 0.0:
+        player_hp -= 1
+        guardian_attack_timer = 1.25
+        status_label.text = player_name + "  |  HP " + str(maxi(0, player_hp)) + "/5"
+        objective_label.text = "Guardian: %d/%d HP  •  Your HP: %d/5" % [guardian_hp, guardian_max_hp, maxi(0, player_hp)]
+        _show_guardian_hit(Color(1.0, 0.12, 0.24))
+        if player_hp <= 0:
+            trial_started = false
+            guardian.queue_free()
+            guardian = null
+            player.global_position = Vector3(0, 0.3, -15.0)
+            player.velocity = Vector3.ZERO
+            player_hp = 5
+            status_label.text = player_name + "  |  HP 5/5"
+            objective_label.text = "Trial failed. The gate will let you try again."
+            _open_dialogue("The Trial Ends", "The guardian's strike drives you back through the ward. The sigils preserve your life, but the trial remains. Catch your breath and return to the gate when you are ready.", 2)
+
+func _defeat_guardian() -> void:
+    trial_started = false
+    trial_complete = true
+    if guardian != null:
+        guardian.queue_free()
+        guardian = null
+    player_hp = 5
+    status_label.text = player_name + "  |  HP 5/5"
+    objective_label.text = "First Trial complete: The gate is yours"
+    player.global_position = Vector3(0, 0.3, -15.0)
+    player.velocity = Vector3.ZERO
+    _open_dialogue("Guardian Defeated", "The guardian's core fractures into harmless light. The stolen sigil-energy returns to the sanctuary, and the old gate recognizes you as its keeper. This is the first victory of many, " + player_name + ".", 3)
 
 func _interact_with_mathias() -> void:
     if story_step == 0:
