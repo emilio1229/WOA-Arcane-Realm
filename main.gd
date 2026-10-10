@@ -182,7 +182,6 @@ func _generate_wilderness() -> void:
     var rng := RandomNumberGenerator.new()
     rng.seed = world_seed
     var tree_scene := load("res://assets/models/environment/haunted blackwood tree 3d model.glb") as PackedScene
-    var cottage_scene := load("res://assets/models/architecture/fantasy cottage 3d model.glb") as PackedScene
     for i in range(260):
         var x := rng.randf_range(-520.0, 520.0)
         var z := rng.randf_range(-520.0, 520.0)
