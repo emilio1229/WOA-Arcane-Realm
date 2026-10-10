@@ -20,6 +20,9 @@ var status_label: Label
 var dialogue_text: Label
 var dialogue_title: Label
 var interact_target: Node3D
+var jump_requested := false
+var run_speed := 7.2
+var walk_speed := 4.8
 
 func _ready() -> void:
     _build_world()
@@ -76,6 +79,7 @@ func _build_world() -> void:
     _add_glowing_orb(Vector3(0, 3.0, -7.0))
     _create_mathias(Vector3(0, 0, -5.0))
     _add_path_lights()
+    _add_sanctuary_architecture()
 
 func _add_platform(pos: Vector3, size: Vector3, color: Color) -> void:
     var body := StaticBody3D.new()
@@ -227,6 +231,74 @@ func _add_path_lights() -> void:
             stone.material_override = mat
             add_child(stone)
 
+func _add_sanctuary_architecture() -> void:
+    _add_platform(Vector3(0, 0.0, -19.0), Vector3(12.0, 0.5, 2.0), Color(0.12, 0.10, 0.20))
+    for side in [-1.0, 1.0]:
+        var pier := MeshInstance3D.new()
+        var pier_mesh := BoxMesh.new()
+        pier_mesh.size = Vector3(1.15, 7.0, 1.0)
+        pier.mesh = pier_mesh
+        pier.position = Vector3(side * 4.3, 3.5, -19.0)
+        var pier_mat := _stone_material(Color(0.19, 0.16, 0.29), 0.35)
+        pier.material_override = pier_mat
+        add_child(pier)
+        var cap := MeshInstance3D.new()
+        var cap_mesh := BoxMesh.new()
+        cap_mesh.size = Vector3(1.6, 0.3, 1.35)
+        cap.mesh = cap_mesh
+        cap.position = Vector3(side * 4.3, 7.05, -19.0)
+        cap.material_override = _glow_material(Color(0.65, 0.25, 1.0))
+        add_child(cap)
+    var lintel := MeshInstance3D.new()
+    var lintel_mesh := BoxMesh.new()
+    lintel_mesh.size = Vector3(9.4, 0.9, 1.0)
+    lintel.mesh = lintel_mesh
+    lintel.position = Vector3(0, 7.1, -19.0)
+    lintel.material_override = _stone_material(Color(0.24, 0.19, 0.35), 0.35)
+    add_child(lintel)
+    for ring_index in range(3):
+        var ring := MeshInstance3D.new()
+        var ring_mesh := TorusMesh.new()
+        ring_mesh.inner_radius = 2.1 + float(ring_index) * 0.45
+        ring_mesh.outer_radius = ring_mesh.inner_radius + 0.055
+        ring.mesh = ring_mesh
+        ring.position = Vector3(0, 0.23 + float(ring_index) * 0.012, 0)
+        ring.material_override = _glow_material(Color(0.52 + float(ring_index) * 0.08, 0.18, 0.95))
+        add_child(ring)
+    for z in range(0, 4):
+        for side in [-1.0, 1.0]:
+            var crystal := MeshInstance3D.new()
+            var crystal_mesh := PrismMesh.new()
+            crystal_mesh.size = Vector3(0.65, 1.35, 0.65)
+            crystal.mesh = crystal_mesh
+            crystal.position = Vector3(side * 5.2, 0.85, -5.0 - float(z) * 4.0)
+            crystal.rotation_degrees = Vector3(0, float(z) * 17.0, 12.0 * side)
+            crystal.material_override = _glow_material(Color(0.35, 0.12, 0.85))
+            add_child(crystal)
+            var crystal_light := OmniLight3D.new()
+            crystal_light.position = crystal.position
+            crystal_light.light_color = Color(0.48, 0.18, 0.95)
+            crystal_light.light_energy = 0.8
+            crystal_light.omni_range = 4.5
+            add_child(crystal_light)
+
+func _stone_material(color: Color, metallic_value: float) -> StandardMaterial3D:
+    var material := StandardMaterial3D.new()
+    material.albedo_color = color
+    material.metallic = metallic_value
+    material.roughness = 0.58
+    return material
+
+func _glow_material(color: Color) -> StandardMaterial3D:
+    var material := StandardMaterial3D.new()
+    material.albedo_color = color
+    material.emission_enabled = true
+    material.emission = color
+    material.emission_energy_multiplier = 1.6
+    material.metallic = 0.15
+    material.roughness = 0.32
+    return material
+
 func _build_player() -> void:
     player = CharacterBody3D.new()
     player.name = "Player"
@@ -274,6 +346,38 @@ func _build_ui() -> void:
     add_child(ui_layer)
     var root := Control.new()
     root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+    var ui_theme := Theme.new()
+    ui_theme.set_color("font_color", "Label", Color(0.91, 0.87, 1.0))
+    ui_theme.set_color("font_color", "Button", Color(0.97, 0.92, 1.0))
+    ui_theme.set_color("font_hover_color", "Button", Color(1.0, 0.84, 0.65))
+    ui_theme.set_font_size("font_size", "Button", 16)
+    var panel_style := StyleBoxFlat.new()
+    panel_style.bg_color = Color(0.055, 0.035, 0.105, 0.94)
+    panel_style.border_color = Color(0.52, 0.27, 0.82, 0.95)
+    panel_style.set_border_width_all(2)
+    panel_style.set_corner_radius_all(12)
+    panel_style.content_margin_left = 22
+    panel_style.content_margin_right = 22
+    panel_style.content_margin_top = 18
+    panel_style.content_margin_bottom = 18
+    ui_theme.set_stylebox("panel", "PanelContainer", panel_style)
+    var button_style := StyleBoxFlat.new()
+    button_style.bg_color = Color(0.24, 0.10, 0.42, 1.0)
+    button_style.border_color = Color(0.68, 0.38, 0.95, 1.0)
+    button_style.set_border_width_all(1)
+    button_style.set_corner_radius_all(8)
+    button_style.content_margin_left = 12
+    button_style.content_margin_right = 12
+    button_style.content_margin_top = 8
+    button_style.content_margin_bottom = 8
+    ui_theme.set_stylebox("normal", "Button", button_style)
+    var button_hover := button_style.duplicate() as StyleBoxFlat
+    button_hover.bg_color = Color(0.36, 0.15, 0.56, 1.0)
+    ui_theme.set_stylebox("hover", "Button", button_hover)
+    var button_pressed := button_style.duplicate() as StyleBoxFlat
+    button_pressed.bg_color = Color(0.15, 0.07, 0.29, 1.0)
+    ui_theme.set_stylebox("pressed", "Button", button_pressed)
+    root.theme = ui_theme
     ui_layer.add_child(root)
 
     menu_panel = PanelContainer.new()
@@ -312,7 +416,7 @@ func _build_ui() -> void:
     start_button.pressed.connect(_on_start_pressed)
     menu_box.add_child(start_button)
     var hint := Label.new()
-    hint.text = "WASD move  •  Mouse look  •  Space jump  •  E interact"
+    hint.text = "WASD / arrows move  •  Mouse look  •  Space jump  •  E speak  •  Shift run"
     hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     hint.add_theme_font_size_override("font_size", 12)
@@ -372,66 +476,80 @@ func _on_start_pressed() -> void:
     menu_panel.hide()
     hud_panel.show()
     started = true
-    Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+    Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
     _open_dialogue("Mathias", "At last. The sanctuary has been waiting for you, " + player_name + ". I am Mathias, keeper of the first sigil. The light above us has begun to answer a call that should have remained silent.", 0)
 
 func _input(event: InputEvent) -> void:
     if not started:
-        if event is InputEventKey and event.pressed and event.keycode == KEY_ENTER:
+        if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ENTER:
             _on_start_pressed()
         return
     if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT and not dialogue_open:
+        # Web browsers only allow pointer lock in direct response to a click.
         Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
     if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and not dialogue_open:
         camera_pivot.rotate_y(-event.relative.x * mouse_sensitivity)
-        pitch = clamp(pitch - event.relative.y * mouse_sensitivity, -0.72, 0.25)
+        pitch = clamp(pitch - event.relative.y * mouse_sensitivity, -0.55, 0.28)
         camera.rotation.x = pitch
     if event is InputEventKey and event.pressed and not event.echo:
         if event.keycode == KEY_ESCAPE:
             Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+        elif event.keycode == KEY_SPACE:
+            jump_requested = true
         elif event.keycode == KEY_E:
             if dialogue_open:
                 _advance_dialogue()
-            elif player.global_position.distance_to(interact_target.global_position) < 4.0:
+            elif player.global_position.distance_to(interact_target.global_position) < 4.5:
                 _interact_with_mathias()
 
 func _physics_process(delta: float) -> void:
     if not started or dialogue_open:
-        if player:
-            player.velocity.x = move_toward(player.velocity.x, 0.0, 18.0 * delta)
-            player.velocity.z = move_toward(player.velocity.z, 0.0, 18.0 * delta)
-            if not player.is_on_floor():
-                player.velocity.y -= 20.0 * delta
-            player.move_and_slide()
+        player.velocity.x = move_toward(player.velocity.x, 0.0, 22.0 * delta)
+        player.velocity.z = move_toward(player.velocity.z, 0.0, 22.0 * delta)
+        if not player.is_on_floor():
+            player.velocity.y -= 22.0 * delta
+        player.move_and_slide()
+        jump_requested = false
         return
+
     var input_vector := Vector2.ZERO
-    if Input.is_key_pressed(KEY_W): input_vector.y = -1.0
-    if Input.is_key_pressed(KEY_S): input_vector.y = 1.0
-    if Input.is_key_pressed(KEY_A): input_vector.x = -1.0
-    if Input.is_key_pressed(KEY_D): input_vector.x = 1.0
+    if Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_UP): input_vector.y -= 1.0
+    if Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN): input_vector.y += 1.0
+    if Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT): input_vector.x -= 1.0
+    if Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT): input_vector.x += 1.0
     input_vector = input_vector.normalized()
-    var direction := (camera_pivot.global_basis * Vector3(input_vector.x, 0, input_vector.y)).normalized()
-    direction.y = 0
-    direction = direction.normalized()
-    var speed := 5.2
+
+    var forward := -camera_pivot.global_basis.z
+    forward.y = 0.0
+    forward = forward.normalized()
+    var right := camera_pivot.global_basis.x
+    right.y = 0.0
+    right = right.normalized()
+    var direction := (right * input_vector.x + forward * -input_vector.y).normalized()
+    var speed := run_speed if Input.is_key_pressed(KEY_SHIFT) else walk_speed
+
     if direction.length() > 0.01:
         player.velocity.x = direction.x * speed
         player.velocity.z = direction.z * speed
-        var look_direction := Vector3(direction.x, 0, direction.z)
-        player.rotation.y = lerp_angle(player.rotation.y, atan2(-look_direction.x, -look_direction.z), delta * 10.0)
+        player.rotation.y = lerp_angle(player.rotation.y, atan2(-direction.x, -direction.z), min(1.0, delta * 12.0))
     else:
-        player.velocity.x = move_toward(player.velocity.x, 0.0, 18.0 * delta)
-        player.velocity.z = move_toward(player.velocity.z, 0.0, 18.0 * delta)
+        player.velocity.x = move_toward(player.velocity.x, 0.0, 24.0 * delta)
+        player.velocity.z = move_toward(player.velocity.z, 0.0, 24.0 * delta)
+
     if not player.is_on_floor():
-        player.velocity.y -= 20.0 * delta
-    elif Input.is_key_pressed(KEY_SPACE):
-        player.velocity.y = 7.2
+        player.velocity.y -= 22.0 * delta
+    elif jump_requested:
+        player.velocity.y = 7.0
+    jump_requested = false
     player.move_and_slide()
-    var near_mathias := player.global_position.distance_to(interact_target.global_position) < 4.0
+
+    var near_mathias := player.global_position.distance_to(interact_target.global_position) < 4.5
     if near_mathias:
         prompt_label.text = "Press E to speak with Mathias"
+    elif Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
+        prompt_label.text = "Click the world to look around • ESC releases the cursor"
     else:
-        prompt_label.text = "Find Mathias near the glowing sigil."
+        prompt_label.text = "Find Mathias near the glowing sigil • Shift to run"
 
 func _interact_with_mathias() -> void:
     if story_step == 0:
