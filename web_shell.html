@@ -43,10 +43,10 @@
         progress.style.width = "100%";
       }
       window.addEventListener("error", event => {
-        if (!started) showError(event.message || event.error || "A browser error prevented the game from starting.");
+        showError(event.message || event.error || "A browser error occurred while the game was running.");
       });
       window.addEventListener("unhandledrejection", event => {
-        if (!started) showError(event.reason && (event.reason.stack || event.reason.message) || event.reason || "A startup promise failed.");
+        showError(event.reason && (event.reason.stack || event.reason.message) || event.reason || "A game promise failed.");
       });
       try {
         if (typeof Engine === "undefined") throw new Error("Godot engine script did not load. Check the exported JavaScript file and server response.");
@@ -63,12 +63,21 @@
           onPrint: text => console.log("[Godot]", text),
           onPrintError: text => {
             console.error("[Godot]", text);
-            if (!started) showError(text);
+            showError(text);
           }
         }).then(() => {
           started = true;
-          boot.style.display = "none";
+          status.textContent = "The engine started. Waiting for the Realm scene…";
+          progress.style.width = "100%";
           document.getElementById("canvas").focus();
+          window.setTimeout(() => {
+            if (!errorBox.classList.contains("visible")) boot.style.display = "none";
+          }, 1200);
+          window.setTimeout(() => {
+            if (boot.style.display !== "none" && !errorBox.classList.contains("visible")) {
+              showError("Godot's web engine started, but no scene output was confirmed. This is a game startup/rendering issue, not a loading-bar issue. Please share this screen and the browser Console errors.");
+            }
+          }, 10000);
         }).catch(error => showError(error && (error.stack || error.message) || error));
       } catch (error) {
         showError(error && (error.stack || error.message) || error);
