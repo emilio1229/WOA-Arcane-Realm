@@ -2,9 +2,16 @@
 FROM barichello/godot-ci:4.7.2 AS game-build
 WORKDIR /project
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends libfontconfig1 \
+    && apt-get install -y --no-install-recommends libfontconfig1 git git-lfs ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 COPY . .
+# Railway's source archive contains Git LFS pointer files, not the model binaries.
+# Fetch the real assets from the public repository before Godot imports them.
+RUN git lfs install \
+    && git clone --depth 1 https://github.com/emilio1229/WOA-Arcane-Realm.git /tmp/woa-lfs \
+    && git -C /tmp/woa-lfs lfs pull \
+    && cp -a /tmp/woa-lfs/assets/. /project/assets/ \
+    && rm -rf /tmp/woa-lfs
 RUN set -eu; \
     mkdir -p build; \
     godot --headless --path . --editor --quit; \
