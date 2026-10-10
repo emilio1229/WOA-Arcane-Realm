@@ -2,6 +2,7 @@ extends Node3D
 
 const WORLD_SIZE := 80.0
 var player: CharacterBody3D
+var player_visual_root: Node3D
 var camera_pivot: Node3D
 var camera: Camera3D
 var ui_layer: CanvasLayer
@@ -65,6 +66,12 @@ func _process(delta: float) -> void:
         crystal.position.y = home_y + sin(animation_clock * 2.1 + float(i) * 0.8) * 0.065
     if guardian != null and is_instance_valid(guardian):
         guardian.position.y = 0.3 + sin(animation_clock * 2.4) * 0.045
+    if player_visual_root != null and is_instance_valid(player_visual_root):
+        var moving := Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_UP) or Input.is_key_pressed(KEY_DOWN) or Input.is_key_pressed(KEY_LEFT) or Input.is_key_pressed(KEY_RIGHT)
+        var bob_speed := 10.0 if moving and started and not dialogue_open else 1.8
+        var bob_amount := 0.035 if moving and started and not dialogue_open else 0.012
+        player_visual_root.position.y = sin(animation_clock * bob_speed) * bob_amount
+        player_visual_root.rotation.z = deg_to_rad(sin(animation_clock * 6.5) * 1.5) if moving and started and not dialogue_open else 0.0
 
 func _build_world() -> void:
     var env := WorldEnvironment.new()
@@ -211,6 +218,7 @@ func _create_mathias(pos: Vector3) -> void:
     var npc := Node3D.new()
     npc.name = "Mathias"
     npc.position = pos
+    npc.rotation.y = PI
 
     var robe := MeshInstance3D.new()
     var robe_mesh := CylinderMesh.new()
@@ -571,6 +579,8 @@ func _build_player() -> void:
     collision.shape = capsule
     collision.position.y = 0.9
     player.add_child(collision)
+    player_visual_root = Node3D.new()
+    player.add_child(player_visual_root)
 
     # Layered apprentice robes instead of the original plain capsule placeholder.
     var robe := MeshInstance3D.new()
