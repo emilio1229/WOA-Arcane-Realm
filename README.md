@@ -12,7 +12,8 @@ Open the deployed game: https://woa-arcane-realm-production.up.railway.app
 - Meet Mathias, keeper of the first sigil, and learn why the sanctuary wards are failing.
 - Explore the sanctuary and recover the three ancient crystals: **Dawn**, **Dusk**, and **Heart**.
 - Watch the ward change when all three sigils are recovered.
-- Return to the monumental gate and interact with it to complete the opening trial.
+- Return to the monumental gate and enter the First Trial arena.
+- Fight the Sanctuary Guardian: use **F** for close staff strikes and **Q** for ranged arcane bolts. Dodge its approach and survive to win the chapter.
 
 This is an early playable vertical slice, not the finished full game. The character and world are still procedurally assembled placeholders; proper character models, animation, sound, more levels, enemies, spells, saving, and Discord Activity integration remain planned development work.
 
@@ -23,6 +24,8 @@ This is an early playable vertical slice, not the finished full game. The charac
 - **Space** — jump
 - **Shift** — run
 - **E** — talk, collect a sigil, or interact with the gate
+- **F** — staff strike during the guardian trial (close range)
+- **Q** — cast an arcane bolt during the guardian trial (ranged)
 - **Esc** — release the cursor
 
 ## Project structure and local development
@@ -46,7 +49,7 @@ Railway is currently hosting the public test build. Keep the current public URL 
 
 ## Roadmap
 
-1. **Opening chapter** — movement, Mathias dialogue, three collectible sigils, gate activation.
+1. **Opening chapter** — movement, Mathias dialogue, three collectible sigils, gate activation, and the first guardian boss fight.
 2. **Core adventure systems** — real character model and animations, camera polish, sound, spell casting, inventory, and save data.
 3. **World expansion** — additional realms, story quests, puzzles, enemies, and boss encounters.
 4. **Player experience** — settings, accessibility, responsive UI, controller support, and performance optimization.
