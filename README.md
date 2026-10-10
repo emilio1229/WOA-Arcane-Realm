@@ -1,54 +1,53 @@
 # WOA: Arcane Realm
 
-A Godot 4 third-person fantasy adventure prototype for The Wizards of Ark, being prepared for browser play on the WOA website and as a Discord Activity.
+A browser-playable third-person fantasy adventure set in The Wizards of Ark universe. The current build is the opening playable chapter, **The Sigil Sanctuary**. The game is built in Godot 4 and served as a web export through Railway.
 
-## Play and develop locally
+## Play
 
-1. Clone this repository with GitHub Desktop.
-2. In Godot 4.7.2, choose **Import** and select `project.godot`.
-3. Press **F6** or **F5** to run the game.
+Open the deployed game: https://woa-arcane-realm-production.up.railway.app
 
-## Current playable foundation
+## Chapter One: The Sigil Sanctuary
 
-- Start screen and wizard name entry
-- Procedurally built purple-lit sanctuary, pillars, and glowing sigil
-- Third-person WASD movement, mouse camera, and jumping
-- Mathias NPC with a multi-step opening conversation
-- Basic objective prompt and story progression
+- Create your wizard by entering a name on the title screen.
+- Meet Mathias, keeper of the first sigil, and learn why the sanctuary wards are failing.
+- Explore the sanctuary and recover the three ancient crystals: **Dawn**, **Dusk**, and **Heart**.
+- Watch the ward change when all three sigils are recovered.
+- Return to the monumental gate and interact with it to complete the opening trial.
+
+This is an early playable vertical slice, not the finished full game. The character and world are still procedurally assembled placeholders; proper character models, animation, sound, more levels, enemies, spells, saving, and Discord Activity integration remain planned development work.
 
 ## Controls
 
-- **WASD** — move
-- **Mouse** — look around
+- **WASD / Arrow keys** — move
+- **Mouse** — look around (click the game to capture the cursor)
 - **Space** — jump
-- **E** — speak to Mathias / continue dialogue
-- **Esc** — release mouse capture
+- **Shift** — run
+- **E** — talk, collect a sigil, or interact with the gate
+- **Esc** — release the cursor
 
-## Browser build
+## Project structure and local development
 
-This repository includes a Godot **Web** export preset and a Dockerfile intended for Railway:
+1. Open Godot 4.7.2.
+2. Import `project.godot`.
+3. Press **F6** or **F5** to run the game.
 
-- `export_presets.cfg` — Web export preset targeting `build/index.html`
-- `Dockerfile` — exports the game, then serves the exported files with Nginx
-- `deploy/nginx.conf` — serves WebAssembly with the correct MIME type
-- `.github/workflows/web-build.yml` — builds the Docker image on pushes and pull requests
+The world and its current chapter gameplay are assembled in `main.gd` using procedural Godot geometry and materials. The main scene is `main.tscn`.
 
-The web export uses Godot's Compatibility renderer and disables web thread support for simpler hosting. Godot Web exports require WebAssembly and WebGL 2.0 support in the player's browser.
+## Browser build and deployment
 
-## Railway deployment
+- `export_presets.cfg` — Godot Web export preset targeting `build/index.html`
+- `Dockerfile` — exports the game and serves the result with Nginx
+- `deploy/nginx.conf` — web server configuration, including WebAssembly MIME support
+- `.github/workflows/web-build.yml` — validates the container build on pushes and pull requests
 
-1. In Railway, create a new project/service from this GitHub repository.
-2. Set the service builder to **Dockerfile** and use the repository-root `Dockerfile`.
-3. Deploy and wait for the build to complete.
-4. Generate a Railway public domain and test the game there before changing DNS.
-5. After the Railway URL works, add `play.thewizardofark.com` as a custom domain in Railway and follow the DNS record instructions shown by Railway in Cloudflare.
+The web export uses Godot's Compatibility renderer and disables web thread support for simpler hosting. Players need a modern browser with WebAssembly and WebGL 2.0 support.
 
-Do not change the main website's DNS records when adding the game subdomain. Only add the exact record Railway instructs you to create.
+Railway is currently hosting the public test build. Keep the current public URL working while improving the game; only configure the custom domain after the current build is verified.
 
-## Discord
+## Roadmap
 
-The browser version is the foundation for a Discord Activity. Discord app configuration and Embedded App SDK integration are separate steps to complete after the hosted browser build is working.
-
-## Important status note
-
-The deployment files are committed, but the image has not yet been verified by a successful remote build and the game has not yet been tested in a browser. Confirm the Railway build and test the generated game before sharing it with players.
+1. **Opening chapter** — movement, Mathias dialogue, three collectible sigils, gate activation.
+2. **Core adventure systems** — real character model and animations, camera polish, sound, spell casting, inventory, and save data.
+3. **World expansion** — additional realms, story quests, puzzles, enemies, and boss encounters.
+4. **Player experience** — settings, accessibility, responsive UI, controller support, and performance optimization.
+5. **Community launch** — Discord Activity integration and connection to WOA community features.
