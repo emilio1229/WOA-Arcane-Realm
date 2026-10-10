@@ -51,7 +51,15 @@ func _build_world() -> void:
     var environment := Environment.new()
     environment.background_mode = Environment.BG_SKY
     environment.sky = Sky.new()
-    environment.sky.sky_material = ProceduralSkyMaterial.new()
+    var sky_material := ProceduralSkyMaterial.new()
+    sky_material.sky_top_color = Color(0.018, 0.012, 0.052)
+    sky_material.sky_horizon_color = Color(0.12, 0.055, 0.19)
+    sky_material.ground_bottom_color = Color(0.018, 0.015, 0.03)
+    sky_material.ground_horizon_color = Color(0.075, 0.045, 0.11)
+    environment.sky.sky_material = sky_material
+    environment.fog_enabled = true
+    environment.fog_light_color = Color(0.12, 0.075, 0.19)
+    environment.fog_density = 0.006
     environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
     environment.ambient_light_color = Color(0.48, 0.43, 0.62)
     environment.ambient_light_energy = 0.7
@@ -410,27 +418,114 @@ func _build_player() -> void:
     collision.shape = capsule
     collision.position.y = 0.9
     player.add_child(collision)
-    var body_mesh := MeshInstance3D.new()
-    var body_shape := CapsuleMesh.new()
-    body_shape.radius = 0.38
-    body_shape.height = 1.8
-    body_mesh.mesh = body_shape
-    body_mesh.position.y = 0.9
-    var body_mat := StandardMaterial3D.new()
-    body_mat.albedo_color = Color(0.18, 0.35, 0.62)
-    body_mat.metallic = 0.2
-    body_mesh.material_override = body_mat
-    player.add_child(body_mesh)
+
+    # Layered apprentice robes instead of the original plain capsule placeholder.
+    var robe := MeshInstance3D.new()
+    var robe_mesh := CylinderMesh.new()
+    robe_mesh.top_radius = 0.24
+    robe_mesh.bottom_radius = 0.58
+    robe_mesh.height = 1.42
+    robe.mesh = robe_mesh
+    robe.position.y = 0.78
+    var robe_mat := _stone_material(Color(0.19, 0.105, 0.34), 0.22)
+    robe_mat.roughness = 0.72
+    robe.material_override = robe_mat
+    player.add_child(robe)
+
+    var robe_trim := MeshInstance3D.new()
+    var trim_mesh := TorusMesh.new()
+    trim_mesh.inner_radius = 0.47
+    trim_mesh.outer_radius = 0.51
+    robe_trim.mesh = trim_mesh
+    robe_trim.position.y = 0.37
+    robe_trim.material_override = _glow_material(Color(0.67, 0.39, 0.95))
+    player.add_child(robe_trim)
+
+    var mantle := MeshInstance3D.new()
+    var mantle_mesh := BoxMesh.new()
+    mantle_mesh.size = Vector3(0.78, 0.9, 0.12)
+    mantle.mesh = mantle_mesh
+    mantle.position = Vector3(0, 1.18, 0.31)
+    mantle.material_override = _stone_material(Color(0.10, 0.07, 0.18), 0.12)
+    player.add_child(mantle)
+
+    var belt := MeshInstance3D.new()
+    var belt_mesh := TorusMesh.new()
+    belt_mesh.inner_radius = 0.31
+    belt_mesh.outer_radius = 0.35
+    belt.mesh = belt_mesh
+    belt.position.y = 0.96
+    belt.material_override = _glow_material(Color(0.83, 0.58, 0.22))
+    player.add_child(belt)
+
     var head := MeshInstance3D.new()
     var head_shape := SphereMesh.new()
     head_shape.radius = 0.25
     head_shape.height = 0.5
     head.mesh = head_shape
-    head.position.y = 1.95
+    head.position.y = 1.73
     var head_mat := StandardMaterial3D.new()
     head_mat.albedo_color = Color(0.72, 0.55, 0.43)
     head.material_override = head_mat
     player.add_child(head)
+
+    var hat_brim := MeshInstance3D.new()
+    var brim_mesh := CylinderMesh.new()
+    brim_mesh.top_radius = 0.38
+    brim_mesh.bottom_radius = 0.42
+    brim_mesh.height = 0.1
+    hat_brim.mesh = brim_mesh
+    hat_brim.position.y = 1.99
+    hat_brim.material_override = _stone_material(Color(0.13, 0.07, 0.22), 0.18)
+    player.add_child(hat_brim)
+
+    var hat := MeshInstance3D.new()
+    var hat_mesh := CylinderMesh.new()
+    hat_mesh.top_radius = 0.015
+    hat_mesh.bottom_radius = 0.32
+    hat_mesh.height = 0.72
+    hat.mesh = hat_mesh
+    hat.position.y = 2.38
+    hat.rotation_degrees.z = -7.0
+    hat.material_override = _stone_material(Color(0.24, 0.12, 0.39), 0.16)
+    player.add_child(hat)
+
+    var hat_band := MeshInstance3D.new()
+    var band_mesh := TorusMesh.new()
+    band_mesh.inner_radius = 0.29
+    band_mesh.outer_radius = 0.32
+    hat_band.mesh = band_mesh
+    hat_band.position.y = 2.08
+    hat_band.material_override = _glow_material(Color(0.86, 0.62, 0.24))
+    player.add_child(hat_band)
+
+    var staff := MeshInstance3D.new()
+    var staff_mesh := CylinderMesh.new()
+    staff_mesh.top_radius = 0.035
+    staff_mesh.bottom_radius = 0.055
+    staff_mesh.height = 1.9
+    staff.mesh = staff_mesh
+    staff.position = Vector3(0.65, 0.9, -0.05)
+    staff.rotation_degrees.z = -7.0
+    staff.material_override = _stone_material(Color(0.34, 0.19, 0.12), 0.12)
+    player.add_child(staff)
+
+    var staff_crystal := MeshInstance3D.new()
+    var crystal_mesh := PrismMesh.new()
+    crystal_mesh.size = Vector3(0.3, 0.48, 0.3)
+    staff_crystal.mesh = crystal_mesh
+    staff_crystal.position = Vector3(0.77, 1.92, -0.05)
+    staff_crystal.rotation_degrees.z = 18.0
+    staff_crystal.material_override = _glow_material(Color(0.63, 0.29, 1.0))
+    player.add_child(staff_crystal)
+
+    var crystal_light := OmniLight3D.new()
+    crystal_light.position = Vector3(0.77, 1.92, -0.05)
+    crystal_light.light_color = Color(0.54, 0.25, 1.0)
+    crystal_light.light_energy = 0.6
+    crystal_light.omni_range = 3.0
+    player.add_child(crystal_light)
+
     camera_pivot = Node3D.new()
     camera_pivot.position.y = 1.45
     player.add_child(camera_pivot)
