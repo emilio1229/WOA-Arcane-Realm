@@ -1150,7 +1150,7 @@ func _load_game() -> void:
             collected_rune_names.append(str(saved_name))
     collected_runes = collected_rune_names.size()
     for shrine in rune_shrines.duplicate():
-        var rune_name := shrine.name.replace(" Sigil", "")
+        var rune_name: String = str(shrine.name).replace(" Sigil", "")
         if collected_rune_names.has(rune_name):
             rune_shrines.erase(shrine)
             shrine.queue_free()
@@ -1320,7 +1320,7 @@ func _try_interact() -> void:
             _open_dialogue("Sealed Gate", "Three ancient sigils anchor this ward. Dawn, Dusk, and Heart must be returned before the gate will answer.", 2)
 
 func _collect_rune(shrine: Node3D) -> void:
-    var rune_name := shrine.name.replace(" Sigil", "")
+    var rune_name: String = str(shrine.name).replace(" Sigil", "")
     rune_shrines.erase(shrine)
     shrine.queue_free()
     collected_runes += 1
