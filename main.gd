@@ -311,9 +311,9 @@ func _build_randomized_dungeon(seed_value: int) -> void:
     rng.seed = seed_value
     var floor_body := StaticBody3D.new()
     var floor_mesh := MeshInstance3D.new()
-    var floor := PlaneMesh.new()
-    floor.size = DUNGEON_FLOOR_SIZE
-    floor_mesh.mesh = floor
+    var floor_plane := PlaneMesh.new()
+    floor_plane.size = DUNGEON_FLOOR_SIZE
+    floor_mesh.mesh = floor_plane
     floor_mesh.material_override = _stone_material(Color(0.075, 0.055, 0.1), 0.2)
     floor_body.add_child(floor_mesh)
     var collision := CollisionShape3D.new()
@@ -1243,10 +1243,10 @@ func _build_ui() -> void:
     dialogue_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     dialogue_text.custom_minimum_size.y = 75
     dialog_box.add_child(dialogue_text)
-    var continue_button := Button.new()
-    continue_button.text = "Continue  [E]"
-    continue_button.pressed.connect(_advance_dialogue)
-    dialog_box.add_child(continue_button)
+    var dialogue_continue_button := Button.new()
+    dialogue_continue_button.text = "Continue  [E]"
+    dialogue_continue_button.pressed.connect(_advance_dialogue)
+    dialog_box.add_child(dialogue_continue_button)
     settings_panel = PanelContainer.new()
     settings_panel.set_anchors_preset(Control.PRESET_CENTER)
     settings_panel.position = Vector2(-220, -150)
