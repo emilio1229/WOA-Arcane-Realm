@@ -39,6 +39,16 @@ var trial_complete := false
 var collected_rune_names: Array[String] = []
 var save_exists := false
 var continue_button: Button
+var character_select: OptionButton
+var settings_panel: PanelContainer
+var mouse_sensitivity_slider: HSlider
+var invert_y := false
+var selected_character := "Wizard"
+var intro_battle_active := false
+var intro_battle_finished := false
+var intro_enemies: Array[Node3D] = []
+var intro_enemy_hp: Dictionary = {}
+var intro_enemy_attack_timer := 1.0
 var animated_crystals: Array[MeshInstance3D] = []
 var crystal_home_y: Dictionary = {}
 var animation_clock := 0.0
@@ -127,7 +137,8 @@ func _build_world() -> void:
     _add_pillar(Vector3(-5, 0, -12), 6.0)
     _add_pillar(Vector3(5, 0, -12), 6.0)
     _add_glowing_orb(Vector3(0, 3.0, -7.0))
-    _create_mathias(Vector3(0, 0, -5.0))
+    _build_starting_town()
+    _create_mathias(Vector3(0, 0, -3.0))
     _add_path_lights()
     _add_haunted_trees()
     _add_sanctuary_architecture()
@@ -135,6 +146,127 @@ func _build_world() -> void:
     _create_rune_shrine(Vector3(5.8, 0.0, -9.0), "Dusk", Color(0.34, 0.62, 1.0))
     _create_rune_shrine(Vector3(0.0, 0.0, -15.0), "Heart", Color(0.74, 0.35, 1.0))
     _create_gate_portal()
+
+func _build_starting_town() -> void:
+    _add_platform(Vector3(0, -0.04, 10.0), Vector3(25.0, 0.18, 36.0), Color(0.105, 0.09, 0.13))
+    for side in [-1.0, 1.0]:
+        for i in range(3):
+            var building := Node3D.new()
+            building.position = Vector3(side * (7.2 + float(i % 2) * 1.2), 0.0, 18.0 - float(i) * 7.0)
+            if not _try_replace_visual_with_model(building, "res://assets/models/architecture/fantasy cottage 3d model.glb", Vector3(1.1, 1.1, 1.1)):
+                var walls := MeshInstance3D.new()
+                var wall_mesh := BoxMesh.new()
+                wall_mesh.size = Vector3(4.0, 3.2, 4.0)
+                walls.mesh = wall_mesh
+                walls.position.y = 1.6
+                walls.material_override = _stone_material(Color(0.18, 0.14, 0.2), 0.12)
+                building.add_child(walls)
+                var roof := MeshInstance3D.new()
+                var roof_mesh := PrismMesh.new()
+                roof_mesh.size = Vector3(4.8, 2.0, 4.8)
+                roof.mesh = roof_mesh
+                roof.position.y = 4.0
+                roof.material_override = _stone_material(Color(0.12, 0.075, 0.16), 0.1)
+                building.add_child(roof)
+            add_child(building)
+            var lamp := OmniLight3D.new()
+            lamp.position = building.position + Vector3(-side, 1.8, -2.1)
+            lamp.light_color = Color(0.95, 0.45, 0.19)
+            lamp.light_energy = 0.7
+            lamp.omni_range = 4.5
+            add_child(lamp)
+    for i in range(5):
+        var tree := Node3D.new()
+        tree.position = Vector3(-11.0 + float(i) * 5.5, 0.0, 26.0)
+        if not _try_replace_visual_with_model(tree, "res://assets/models/environment/haunted blackwood tree 3d model.glb", Vector3.ONE):
+            var trunk := MeshInstance3D.new()
+            var trunk_mesh := CylinderMesh.new()
+            trunk_mesh.top_radius = 0.25
+            trunk_mesh.bottom_radius = 0.6
+            trunk_mesh.height = 5.0
+            trunk.mesh = trunk_mesh
+            trunk.position.y = 2.5
+            trunk.material_override = _stone_material(Color(0.13, 0.105, 0.14), 0.1)
+            tree.add_child(trunk)
+        add_child(tree)
+
+func _spawn_intro_enemies() -> void:
+    for enemy in intro_enemies:
+        if is_instance_valid(enemy): enemy.queue_free()
+    intro_enemies.clear()
+    intro_enemy_hp.clear()
+    var positions := [Vector3(-2.1, 0.0, -1.5), Vector3(2.2, 0.0, -2.0), Vector3(0.0, 0.0, 1.0)]
+    var names := ["Riftbound Raider", "Sigil-Thief", "Veil Stalker"]
+    for i in range(positions.size()):
+        var enemy := Node3D.new()
+        enemy.name = names[i]
+        enemy.position = positions[i]
+        var body := MeshInstance3D.new()
+        var mesh := CapsuleMesh.new()
+        mesh.radius = 0.42
+        mesh.height = 1.9
+        body.mesh = mesh
+        body.position.y = 0.95
+        body.material_override = _stone_material(Color(0.11, 0.07, 0.16), 0.6)
+        enemy.add_child(body)
+        var core := MeshInstance3D.new()
+        var core_mesh := SphereMesh.new()
+        core_mesh.radius = 0.22
+        core_mesh.height = 0.44
+        core.mesh = core_mesh
+        core.position = Vector3(0, 1.2, -0.38)
+        core.material_override = _glow_material(Color(0.82, 0.12, 0.34))
+        enemy.add_child(core)
+        _try_replace_visual_with_model(enemy, "res://assets/models/creatures/shadow+beast+3d+model.glb", Vector3(0.85, 0.85, 0.85))
+        add_child(enemy)
+        intro_enemies.append(enemy)
+        intro_enemy_hp[enemy.get_instance_id()] = 3
+    intro_battle_active = true
+    objective_label.text = "Quest: Help Mathias survive the ambush (%d attackers)" % intro_enemies.size()
+
+func _nearest_intro_enemy(max_distance: float) -> Node3D:
+    var nearest: Node3D = null
+    var best := max_distance
+    for enemy in intro_enemies:
+        if is_instance_valid(enemy):
+            var distance := player.global_position.distance_to(enemy.global_position)
+            if distance < best:
+                best = distance
+                nearest = enemy
+    return nearest
+
+func _damage_intro_enemy(enemy: Node3D, damage: int) -> void:
+    if not is_instance_valid(enemy): return
+    var id := enemy.get_instance_id()
+    var hp := int(intro_enemy_hp.get(id, 0)) - damage
+    if hp <= 0:
+        intro_enemy_hp.erase(id)
+        intro_enemies.erase(enemy)
+        enemy.queue_free()
+        if intro_enemies.is_empty():
+            intro_battle_active = false
+            intro_battle_finished = true
+            objective_label.text = "Quest: Speak with Mathias"
+            prompt_label.text = "The attackers are defeated. Press E near Mathias."
+            _open_dialogue("Mathias", "By the old stars—you held them off! Come closer, apprentice. What I tell you next will change the way you see this Realm.", 0)
+    else:
+        intro_enemy_hp[id] = hp
+
+func _update_intro_battle(delta: float) -> void:
+    intro_enemy_attack_timer -= delta
+    for enemy in intro_enemies:
+        if not is_instance_valid(enemy): continue
+        var toward := player.global_position - enemy.global_position
+        toward.y = 0.0
+        if toward.length() > 1.8:
+            enemy.position += toward.normalized() * 1.05 * delta
+            enemy.look_at(Vector3(player.global_position.x, enemy.global_position.y, player.global_position.z), Vector3.UP)
+    if intro_enemy_attack_timer <= 0.0 and not intro_enemies.is_empty():
+        intro_enemy_attack_timer = 1.4
+        if _nearest_intro_enemy(2.2) != null:
+            player_hp = maxi(1, player_hp - 1)
+            status_label.text = player_name + "  |  HP " + str(player_hp) + "/5"
+            prompt_label.text = "An attacker struck! Keep moving and fight back."
 
 func _add_platform(pos: Vector3, size: Vector3, color: Color) -> void:
     var body := StaticBody3D.new()
@@ -330,7 +462,10 @@ func _create_mathias(pos: Vector3) -> void:
     staff_light.light_energy = 0.8
     staff_light.omni_range = 4.0
     npc.add_child(staff_light)
-    _try_replace_visual_with_model(npc, "res://assets/models/mathias_keeper.glb", Vector3.ONE)
+    # Prefer the requested Battle Mage asset; use the available armored character until it is uploaded.
+    if not _try_replace_visual_with_model(npc, "res://assets/models/characters/battle mage 3d model.glb", Vector3.ONE):
+        if not _try_replace_visual_with_model(npc, "res://assets/models/characters/dark armored knight 3d model.glb", Vector3.ONE):
+            _try_replace_visual_with_model(npc, "res://assets/models/mathias_keeper.glb", Vector3.ONE)
     add_child(npc)
     interact_target = npc
 
@@ -598,7 +733,7 @@ func _add_haunted_tree(pos: Vector3, height: float) -> void:
 func _build_player() -> void:
     player = CharacterBody3D.new()
     player.name = "Player"
-    player.position = Vector3(0, 0.2, 5.0)
+    player.position = Vector3(0, 0.2, 22.0)
     var collision := CollisionShape3D.new()
     var capsule := CapsuleShape3D.new()
     capsule.radius = 0.38
@@ -717,7 +852,7 @@ func _build_player() -> void:
     crystal_light.light_energy = 0.6
     crystal_light.omni_range = 3.0
     player_visual_root.add_child(crystal_light)
-    _try_replace_visual_with_model(player_visual_root, "res://assets/models/player_apprentice.glb", Vector3.ONE)
+    _apply_selected_character_model()
 
     # Keep camera yaw independent from the character's facing direction.
     # This avoids WASD turning the camera and feeding back into movement.
@@ -773,26 +908,26 @@ func _build_ui() -> void:
 
     menu_panel = PanelContainer.new()
     menu_panel.set_anchors_preset(Control.PRESET_CENTER)
-    menu_panel.position = Vector2(-250, -235)
-    menu_panel.size = Vector2(500, 470)
-    menu_panel.custom_minimum_size = Vector2(500, 470)
+    menu_panel.position = Vector2(-300, -300)
+    menu_panel.size = Vector2(600, 600)
+    menu_panel.custom_minimum_size = Vector2(600, 600)
     root.add_child(menu_panel)
     var menu_box := VBoxContainer.new()
     menu_box.add_theme_constant_override("separation", 14)
     menu_panel.add_child(menu_box)
     var title := Label.new()
-    title.text = "WOA: ARCANE REALM"
+    title.text = "THE WIZARDS OF ARK"
     title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     title.add_theme_font_size_override("font_size", 30)
     title.add_theme_color_override("font_color", Color(0.82, 0.63, 1.0))
     menu_box.add_child(title)
     var subtitle := Label.new()
-    subtitle.text = "THE SIGIL AWAKENS"
+    subtitle.text = "A DARK FANTASY SAGA  •  THE SIGIL AWAKENS"
     subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     subtitle.add_theme_font_size_override("font_size", 15)
     menu_box.add_child(subtitle)
     var intro := Label.new()
-    intro.text = "A forgotten sanctuary stirs beneath a violet sky.\nYour story begins with a name."
+    intro.text = "The old wards are failing. The Council is silent.\nCreate your wizard and enter the living legend of the Arcane Realm."
     intro.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     intro.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     menu_box.add_child(intro)
@@ -801,6 +936,19 @@ func _build_ui() -> void:
     name_input.text = ""
     name_input.custom_minimum_size.y = 42
     menu_box.add_child(name_input)
+    var character_label := Label.new()
+    character_label.text = "CHOOSE YOUR WIZARD"
+    character_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    menu_box.add_child(character_label)
+    character_select = OptionButton.new()
+    character_select.add_item("Wizard — Arcane Apprentice", 0)
+    character_select.add_item("Wizardrobe — Veiled Wanderer", 1)
+    character_select.item_selected.connect(_on_character_selected)
+    menu_box.add_child(character_select)
+    var settings_button := Button.new()
+    settings_button.text = "SETTINGS ⚙"
+    settings_button.pressed.connect(_toggle_settings)
+    menu_box.add_child(settings_button)
     var start_button := Button.new()
     start_button.text = "BEGIN YOUR STORY"
     start_button.custom_minimum_size.y = 48
@@ -812,7 +960,7 @@ func _build_ui() -> void:
     continue_button.pressed.connect(_on_continue_pressed)
     menu_box.add_child(continue_button)
     var hint := Label.new()
-    hint.text = "WASD / arrows move  •  Mouse look  •  Space jump  •  E speak  •  Shift run"
+    hint.text = "WASD move  •  Mouse look  •  Space jump  •  E interact  •  F / Q combat"
     hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     hint.add_theme_font_size_override("font_size", 12)
@@ -855,15 +1003,70 @@ func _build_ui() -> void:
     continue_button.text = "Continue  [E]"
     continue_button.pressed.connect(_advance_dialogue)
     dialog_box.add_child(continue_button)
+    settings_panel = PanelContainer.new()
+    settings_panel.set_anchors_preset(Control.PRESET_CENTER)
+    settings_panel.position = Vector2(-220, -150)
+    settings_panel.size = Vector2(440, 300)
+    settings_panel.custom_minimum_size = Vector2(440, 300)
+    root.add_child(settings_panel)
+    var settings_box := VBoxContainer.new()
+    settings_box.add_theme_constant_override("separation", 12)
+    settings_panel.add_child(settings_box)
+    var settings_title := Label.new()
+    settings_title.text = "REALM SETTINGS"
+    settings_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    settings_title.add_theme_font_size_override("font_size", 23)
+    settings_box.add_child(settings_title)
+    var sens_label := Label.new()
+    sens_label.text = "Mouse look sensitivity"
+    settings_box.add_child(sens_label)
+    mouse_sensitivity_slider = HSlider.new()
+    mouse_sensitivity_slider.min_value = 0.001
+    mouse_sensitivity_slider.max_value = 0.006
+    mouse_sensitivity_slider.step = 0.0005
+    mouse_sensitivity_slider.value = mouse_sensitivity
+    mouse_sensitivity_slider.value_changed.connect(func(value: float): mouse_sensitivity = value)
+    settings_box.add_child(mouse_sensitivity_slider)
+    var invert_toggle := CheckButton.new()
+    invert_toggle.text = "Invert vertical camera"
+    invert_toggle.toggled.connect(func(enabled: bool): invert_y = enabled)
+    settings_box.add_child(invert_toggle)
+    var settings_close := Button.new()
+    settings_close.text = "BACK TO CHARACTER CREATION"
+    settings_close.pressed.connect(_toggle_settings)
+    settings_box.add_child(settings_close)
+    settings_panel.hide()
     hud_panel.hide()
     dialogue_panel.hide()
     continue_button.hide()
 
 func _show_menu() -> void:
     menu_panel.show()
+    settings_panel.hide()
     hud_panel.hide()
     dialogue_panel.hide()
     started = false
+
+func _on_character_selected(index: int) -> void:
+    selected_character = "Wizardrobe" if index == 1 else "Wizard"
+    _apply_selected_character_model()
+
+func _apply_selected_character_model() -> void:
+    if player_visual_root == null: return
+    for child in player_visual_root.get_children():
+        if child is VisualInstance3D: child.visible = true
+        elif child is Node3D and child.name == "ImportedModel": child.queue_free()
+    var model_path := "res://assets/models/characters/fantasy wizard 3d model.glb"
+    if selected_character == "Wizardrobe": model_path = "res://assets/models/characters/wizard robe 3d model.glb"
+    _try_replace_visual_with_model(player_visual_root, model_path, Vector3.ONE)
+
+func _toggle_settings() -> void:
+    if settings_panel.visible:
+        settings_panel.hide()
+        menu_panel.show()
+    else:
+        menu_panel.hide()
+        settings_panel.show()
 
 func _on_start_pressed() -> void:
     _reset_new_game()
@@ -871,13 +1074,17 @@ func _on_start_pressed() -> void:
     if player_name.is_empty():
         player_name = "Apprentice"
     status_label.text = player_name + "  |  HP 5/5"
-    objective_label.text = "Quest: Speak with Mathias"
+    objective_label.text = "Quest: Help Mathias survive the ambush"
     _save_game()
     menu_panel.hide()
+    settings_panel.hide()
     hud_panel.show()
     started = true
+    intro_battle_active = true
+    intro_battle_finished = false
+    _spawn_intro_enemies()
     Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-    _open_dialogue("Mathias", "At last. The sanctuary has been waiting for you, " + player_name + ". I am Mathias, keeper of the first sigil. The light above us has begun to answer a call that should have remained silent.", 0)
+    prompt_label.text = "Mathias is under attack! Use F nearby or Q from range."
 
 func _reset_new_game() -> void:
     for shrine in rune_shrines:
@@ -890,8 +1097,14 @@ func _reset_new_game() -> void:
     trial_complete = false
     trial_started = false
     player_hp = 5
-    player.global_position = Vector3(0, 0.2, 5.0)
+    player.global_position = Vector3(0, 0.2, 22.0)
     player.velocity = Vector3.ZERO
+    intro_battle_active = false
+    intro_battle_finished = false
+    for enemy in intro_enemies:
+        if is_instance_valid(enemy): enemy.queue_free()
+    intro_enemies.clear()
+    intro_enemy_hp.clear()
     _create_rune_shrine(Vector3(-5.8, 0.0, -9.0), "Dawn", Color(1.0, 0.63, 0.24))
     _create_rune_shrine(Vector3(5.8, 0.0, -9.0), "Dusk", Color(0.34, 0.62, 1.0))
     _create_rune_shrine(Vector3(0.0, 0.0, -15.0), "Heart", Color(0.74, 0.35, 1.0))
@@ -927,6 +1140,9 @@ func _load_game() -> void:
         save_exists = false
         return
     player_name = str(parsed.get("player_name", "Apprentice"))
+    selected_character = str(parsed.get("selected_character", "Wizard"))
+    if is_instance_valid(character_select): character_select.select(1 if selected_character == "Wizardrobe" else 0)
+    _apply_selected_character_model()
     collected_rune_names.clear()
     var saved_names = parsed.get("collected_runes", [])
     if saved_names is Array:
@@ -960,6 +1176,7 @@ func _load_game() -> void:
 func _save_game() -> void:
     var data := {
         "player_name": player_name,
+        "selected_character": selected_character,
         "collected_runes": collected_rune_names,
         "quest_complete": quest_complete,
         "trial_complete": trial_complete
@@ -982,7 +1199,8 @@ func _input(event: InputEvent) -> void:
         Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
     if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and not dialogue_open:
         camera_pivot.rotate_y(-event.relative.x * mouse_sensitivity)
-        pitch = clamp(pitch - event.relative.y * mouse_sensitivity, -0.55, 0.28)
+        var look_y := event.relative.y * (-1.0 if invert_y else 1.0)
+        pitch = clamp(pitch - look_y * mouse_sensitivity, -0.55, 0.28)
         camera.rotation.x = pitch
     if event is InputEventKey and event.pressed and not event.echo:
         if event.keycode == KEY_ESCAPE:
@@ -1043,6 +1261,10 @@ func _physics_process(delta: float) -> void:
     player.move_and_slide()
     staff_cooldown = maxf(0.0, staff_cooldown - delta)
     spell_cooldown = maxf(0.0, spell_cooldown - delta)
+    if intro_battle_active:
+        _update_intro_battle(delta)
+        prompt_label.text = "AMBUSH: F staff strike  •  Q arcane bolt  •  defeat the attackers"
+        return
     if trial_started:
         _update_guardian(delta)
         prompt_label.text = "F: staff strike  •  Q: arcane bolt  •  keep moving!"
@@ -1053,7 +1275,7 @@ func _physics_process(delta: float) -> void:
         nearest_rune_distance = min(nearest_rune_distance, player.global_position.distance_to(shrine.global_position))
     var mathias_distance := player.global_position.distance_to(interact_target.global_position)
     var gate_distance := player.global_position.distance_to(Vector3(0, 0, -19))
-    if mathias_distance < 4.5 and (mathias_distance <= nearest_rune_distance or story_step < 2):
+    if intro_battle_finished and mathias_distance < 4.5 and (mathias_distance <= nearest_rune_distance or story_step < 2):
         prompt_label.text = "Press E to speak with Mathias"
     elif nearest_rune_distance < 3.6:
         prompt_label.text = "Press E to claim the " + _nearest_rune_name() + " Sigil"
@@ -1083,7 +1305,7 @@ func _try_interact() -> void:
         if distance < nearest_distance:
             nearest_distance = distance
             nearest_shrine = shrine
-    if mathias_distance < 4.5 and (mathias_distance <= nearest_distance or story_step < 2):
+    if intro_battle_finished and mathias_distance < 4.5 and (mathias_distance <= nearest_distance or story_step < 2):
         _interact_with_mathias()
         return
     if nearest_shrine != null and nearest_distance < 3.6:
@@ -1189,8 +1411,16 @@ func _create_guardian(pos: Vector3) -> void:
     add_child(guardian)
 
 func _staff_attack() -> void:
-    if not trial_started or guardian == null or staff_cooldown > 0.0:
+    if staff_cooldown > 0.0: return
+    if intro_battle_active:
+        var target := _nearest_intro_enemy(3.2)
+        if target == null:
+            prompt_label.text = "Move closer to an attacker for a staff strike."
+            return
+        staff_cooldown = 0.48
+        _damage_intro_enemy(target, 1)
         return
+    if not trial_started or guardian == null: return
     if player.global_position.distance_to(guardian.global_position) > 3.2:
         prompt_label.text = "Move closer for a staff strike!"
         return
@@ -1201,13 +1431,7 @@ func _staff_attack() -> void:
     if guardian_hp <= 0:
         _defeat_guardian()
 
-func _cast_arcane_bolt() -> void:
-    if not trial_started or guardian == null or spell_cooldown > 0.0:
-        return
-    if player.global_position.distance_to(guardian.global_position) > 16.0:
-        prompt_label.text = "The guardian is beyond your spell's reach."
-        return
-    spell_cooldown = 0.85
+func _launch_bolt_at(target: Node3D) -> void:
     var bolt := MeshInstance3D.new()
     var bolt_mesh := SphereMesh.new()
     bolt_mesh.radius = 0.22
@@ -1217,8 +1441,28 @@ func _cast_arcane_bolt() -> void:
     bolt.material_override = _glow_material(Color(0.36, 0.72, 1.0))
     add_child(bolt)
     var tween := create_tween()
-    tween.tween_property(bolt, "global_position", guardian.global_position + Vector3(0, 1.4, 0), 0.2)
-    tween.finished.connect(func(): bolt.queue_free())
+    tween.tween_property(bolt, "global_position", target.global_position + Vector3(0, 1.0, 0), 0.2)
+    tween.finished.connect(func():
+        if is_instance_valid(bolt): bolt.queue_free()
+    )
+
+func _cast_arcane_bolt() -> void:
+    if spell_cooldown > 0.0: return
+    if intro_battle_active:
+        var target := _nearest_intro_enemy(16.0)
+        if target == null:
+            prompt_label.text = "No attacker is within arcane-bolt range."
+            return
+        spell_cooldown = 0.85
+        _launch_bolt_at(target)
+        _damage_intro_enemy(target, 2)
+        return
+    if not trial_started or guardian == null: return
+    if player.global_position.distance_to(guardian.global_position) > 16.0:
+        prompt_label.text = "The guardian is beyond your spell's reach."
+        return
+    spell_cooldown = 0.85
+    _launch_bolt_at(guardian)
     guardian_hp -= 2
     _show_guardian_hit(Color(0.35, 0.72, 1.0))
     objective_label.text = "Guardian: %d/%d HP  •  Your HP: %d/5" % [maxi(0, guardian_hp), guardian_max_hp, player_hp]
@@ -1284,8 +1528,11 @@ func _defeat_guardian() -> void:
     _open_dialogue("Guardian Defeated", "The guardian's core fractures into harmless light. The stolen sigil-energy returns to the sanctuary, and the old gate recognizes you as its keeper. This is the first victory of many, " + player_name + ".", 3)
 
 func _interact_with_mathias() -> void:
-    if story_step == 0:
-        _open_dialogue("Mathias", "At last. The sanctuary has been waiting for you, " + player_name + ". I am Mathias, keeper of the first sigil. The light above us has begun to answer a call that should have remained silent.", 0)
+    if not intro_battle_finished:
+        _open_dialogue("Mathias", "Help me hold the line! Those riftbound things are tearing at the ward-stones!", 0)
+        return
+    if story_step <= 0:
+        _open_dialogue("Mathias", "You came back for a stranger. That tells me more than a test of magic could. I am Mathias, Battle Mage sworn to the Council of Wizards, Warlocks & Witches. The town ward-stones bear the same blight that has been gnawing at our realms.", 0)
     elif story_step == 1:
         _open_dialogue("Mathias", "The first sigil is not a weapon. It is a promise: power must answer to purpose. Something has breached the old wards, and the sanctuary is only the first place it has touched.", 1)
     else:
@@ -1302,7 +1549,7 @@ func _open_dialogue(who: String, words: String, step: int) -> void:
 
 func _advance_dialogue() -> void:
     if story_step == 0:
-        _open_dialogue("Mathias", "The first sigil is not a weapon. It is a promise: power must answer to purpose. Something has breached the old wards, and the sanctuary is only the first place it has touched.", 1)
+        _open_dialogue("Mathias", "The Realm is held together by more than stone and spell. The Council records our oaths; the Trials test our choices; and ancient riddles preserve truths too dangerous to write plainly. Even the Sigil Exchange began as a way to reward those who helped keep the realms alive. Now every seal is dimming at once.", 1)
     elif story_step == 1:
         _open_dialogue("Mathias", "Dawn, Dusk, and Heart. Three fragments hold the gate shut. Find their crystal shrines along the path and press E near each one to claim its sigil. Return to the arch when all three answer.", 2)
         objective_label.text = "Quest: Recover the three ancient sigils"
