@@ -497,7 +497,6 @@ func _nearest_intro_enemy(max_distance: float) -> Node3D:
                 best = distance
                 nearest = enemy
     return nearest
-
 func _damage_intro_enemy(enemy: Node3D, damage: int) -> void:
     if not is_instance_valid(enemy): return
     var id := enemy.get_instance_id()
@@ -997,8 +996,7 @@ func _add_haunted_tree(pos: Vector3, height: float) -> void:
     crown.scale = Vector3(1.15, 1.45, 0.92)
     crown.position = Vector3(0, height * 0.83, 0)
     var crown_mat := StandardMaterial3D.new()
-    crown_mat.albedo_color = Color(0.025, 0.055, 0.045)
-    crown_mat.roughness = 1.0
+    crown_mat.albedo_color = Color(0.025, 0.055, 0.045)    crown_mat.roughness = 1.0
     crown.material_override = crown_mat
     tree.add_child(crown)
     _try_replace_visual_with_model(tree, "res://assets/models/environment/haunted blackwood tree 3d model.glb", Vector3.ONE * (height / 3.0))
@@ -1497,15 +1495,18 @@ func _input(event: InputEvent) -> void:
         elif event.keycode == KEY_E:
             if dialogue_open:
                 _advance_dialogue()
-            elif not trial_started:
-                _try_interact()
+            elif not trial_started:                _try_interact()
         elif event.keycode == KEY_F and not dialogue_open:
             _staff_attack()
         elif event.keycode == KEY_Q and not dialogue_open:
             _cast_arcane_bolt()
 
 func _physics_process(delta: float) -> void:
-    if player != null and camera_pivot != null:
+    # Scene physics may tick before player construction finishes.
+    if player == null:
+        jump_requested = false
+        return
+    if camera_pivot != null:
         camera_pivot.global_position = player.global_position + Vector3(0, 1.45, 0)
     if not started or dialogue_open:
         player.velocity.x = move_toward(player.velocity.x, 0.0, 22.0 * delta)
