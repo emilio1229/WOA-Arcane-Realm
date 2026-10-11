@@ -542,15 +542,6 @@ func _build_house(pos: Vector3, color: Color) -> void:
     _add_box("House Door", pos + Vector3(0, 0.9, -2.55), Vector3(1.0, 1.8, 0.12), Color(0.08, 0.035, 0.08), false)
 
 func _build_tree(pos: Vector3, height: float) -> void:
-    var imported_tree := _instantiate_model("tree")
-    if imported_tree != null:
-        imported_tree.name = "Tripo Forest Tree"
-        imported_tree.position = pos
-        var target_height := maxf(height, 1.0)
-        imported_tree.scale = Vector3.ONE * (target_height / 5.0)
-        add_child(imported_tree)
-        return
-
     var trunk := MeshInstance3D.new()
     var trunk_mesh := CylinderMesh.new()
     trunk_mesh.top_radius = 0.18
