@@ -4,10 +4,21 @@
 The Discord Arcane Realm is the community's mythic record of the wider world: sigils are earned through deeds, riddles guard old knowledge, and the Council maintains the balance between realms. The game turns that record into a living dark-fantasy adventure.
 
 ## Opening chapter: Gloamwick
-The apprentice arrives in a small town under a violet, failing sky. Three riftbound attackers are assaulting Mathias, a Battle Mage of the Council of Wizards, Warlocks & Witches. Helping him is the player's first meaningful choice and the first proof that they belong in the Realm.
+The apprentice awakens beneath the black boughs of Gloamwood, guided by violet wisps toward a battle in a ruined ward-clearing. The player's chosen arcane path is reflected in the first sign of magic they notice: ember-warmth, frost-runes, living roots, storm-static, rift-shadow, or a ring of ancient sigils.
 
-## Mathias and the first mystery
-Mathias explains that the ward-stones have been corrupted across the realms. The Council's records, old riddles, realm trials, relics, and bounty ledgers all point to a coordinated threat. He guides the apprentice toward the Sigil Sanctuary and its three seals: Dawn, Dusk, and Heart.
+Three Riftbound attackers are assaulting Mathias, a Battle Mage of the Council of Wizards, Warlocks & Witches. The first task is to protect Mathias, then decide how to answer his guarded question. The player can show compassion, demand the truth, or prioritize the failing ward. These responses change Mathias' immediate reaction and are recorded in the Chronicle.
+
+## Mathias, the Warden, and the three vows
+Mathias explains that the ward-stones are being corrupted from within. He asks the apprentice to seek the Whispering Warden before touching the three Sigils. The Warden offers three questions: what Dawn asks of the bearer, what was erased from the vows, or whether Mathias can be trusted. The answer is recorded and shapes what the apprentice learns.
+
+The first quest has a deliberate order:
+1. Defeat the three Riftbound and speak with Mathias.
+2. Choose a response that establishes the apprentice's initial stance toward the Council's Battle Mage.
+3. Find the Whispering Warden beside the broken ward and choose which truth to ask for.
+4. Recover Dawn, Dusk, and Heart. Dawn remembers the courage to begin, Dusk holds the fear the Realm buried, and Heart preserves names the Council chose to forget.
+5. Return to the sanctuary threshold as the three vows resonate and reveal a missing piece in the Council's history.
+
+The Warden's warning foreshadows a fourth thing removed from the telling without naming the Hollow Crown too early. Mathias is not automatically a villain; his guardedness comes from fear that the Council's own history may be compromised.
 
 ## How the Discord bot's lore becomes game lore
 - **Council panel and High Wizards:** the Council is the in-world keeper of realm law, history, and major decisions.
