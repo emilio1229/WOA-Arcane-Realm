@@ -36,6 +36,9 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force -Path build/windows | Out-Null
           godot --headless --path . --export-release "Windows Desktop" build/windows/WOA-Arcane-Realm.exe
+          if (!(Test-Path "build/windows/WOA-Arcane-Realm.exe")) {
+            throw "Godot did not create build/windows/WOA-Arcane-Realm.exe"
+          }
 
       - name: Upload Windows build
         uses: actions/upload-artifact@v4
@@ -62,6 +65,8 @@ jobs:
 
       - name: Install Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: ''
 
       - name: Install Android SDK packages
         run: sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
@@ -92,6 +97,7 @@ jobs:
         run: |
           mkdir -p build/android
           godot --headless --path . --export-debug "Android" build/android/WOA-Arcane-Realm.apk
+          test -s build/android/WOA-Arcane-Realm.apk
 
       - name: Upload Android APK
         uses: actions/upload-artifact@v4
