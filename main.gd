@@ -376,6 +376,12 @@ func _enter_game(show_intro: bool) -> void:
         _show_dialogue("THE FOREST REMEMBERS", "Your Chronicle stirs again. The voice is quieter now, but the violet lights still lead through the trees toward the broken ward—and the battle beyond the mist.", "Continue toward the distant clash")
 
 func _build_world() -> void:
+    # Rebuilds can happen when loading a saved Chronicle; clear references to the old world first.
+    sigil_nodes.clear()
+    enemy_nodes.clear()
+    enemy_hp.clear()
+    mathias = null
+    sanctuary_gate = null
     for child in get_children():
         if child == ui_layer:
             continue
@@ -423,6 +429,12 @@ func _build_world() -> void:
     sanctuary_gate = _make_sigil(Vector3(0, 2.4, -61.45), Color(0.38, 0.12, 0.75), 2.1)
     sanctuary_gate.name = "Sigil Sanctuary Gate"
     add_child(sanctuary_gate)
+
+    # Imported Tripo landmarks make the opening path feel connected to the wider Realm.
+    # Procedural scenery remains in place if any optional model cannot be imported.
+    _add_imported_landmark("ruins", "Ancient Ruin Sentinel", Vector3(-6.8, 0.0, -31.0), 0.65)
+    _add_imported_landmark("tower", "The Distant Wizard Tower", Vector3(14.0, 0.0, -65.0), 0.55)
+    _add_imported_landmark("spirit", "The Whispering Warden", Vector3(7.5, 0.0, -28.0), 0.55)
 
     # Violet wisps act as subtle wayfinding lights from the waking place to the clearing.
     for i in range(9):
@@ -486,6 +498,16 @@ func _build_player() -> void:
     game_camera.fov = 72.0
     camera_pivot.add_child(game_camera)
     camera_pivot.rotation.x = pitch
+
+func _add_imported_landmark(role: String, landmark_name: String, pos: Vector3, model_scale: float) -> void:
+    var model := _instantiate_model(role)
+    if model == null:
+        return
+    model.name = landmark_name
+    model.position = pos
+    model.scale = Vector3.ONE * model_scale
+    _play_model_idle(model)
+    add_child(model)
 
 func _build_house(pos: Vector3, color: Color) -> void:
     _add_box("Gloamwick House", pos + Vector3(0, 1.6, 0), Vector3(6, 3.2, 5), color, true)
@@ -575,24 +597,42 @@ func _instantiate_model(role: String) -> Node3D:
 func _get_model_scene(role: String) -> PackedScene:
     if not _model_scene_cache.has(role):
         _build_model_file_index()
-        var keywords: Array[String] = []
+        # Prefer exact, intentional assignments before trying generic filename keywords.
+        # This prevents "wizard" from accidentally selecting the tower for the player.
+        var preferred_names: Array[String] = []
         match role:
             "player":
-                keywords = ["player", "wizard", "mage", "hero", "character"]
+                preferred_names = ["fantasy_wizard_3d_model", "wizard_robe_3d_model", "player_wizard", "wizard", "mage", "hero", "character"]
             "mathias":
-                keywords = ["mathias"]
+                preferred_names = ["wizard_robe_3d_model", "battle_mage", "mathias", "fantasy_wizard_3d_model"]
             "riftbound":
-                keywords = ["riftbound", "shade", "enemy", "creature"]
+                preferred_names = ["shadow_beast_3d_model", "haunted_forest_spirit_3d_model", "dark_fantasy_boss_3d_model", "riftbound", "shade", "enemy", "creature"]
             "tree":
-                keywords = ["tree", "blackwood", "forest"]
+                preferred_names = ["forest_tree", "blackwood", "tree"]
+            "ruins":
+                preferred_names = ["ancient_ruin_stones_3d_model", "ancient_ruin", "ruin"]
+            "tower":
+                preferred_names = ["wizard_tower_3d_model", "wizard_tower", "tower"]
+            "spirit":
+                preferred_names = ["haunted_forest_spirit_3d_model", "forest_spirit", "spirit"]
+            "guardian":
+                preferred_names = ["dark_fantasy_boss_3d_model", "guardian", "boss"]
+
         var selected_path := ""
-        for keyword in keywords:
-            for file_key in _model_file_index.keys():
-                if str(file_key).contains(keyword):
-                    selected_path = str(_model_file_index[file_key])
-                    break
-            if not selected_path.is_empty():
+        for candidate in preferred_names:
+            if _model_file_index.has(candidate):
+                selected_path = str(_model_file_index[candidate])
                 break
+
+        if selected_path.is_empty():
+            for candidate in preferred_names:
+                for file_key in _model_file_index.keys():
+                    if str(file_key).contains(candidate):
+                        selected_path = str(_model_file_index[file_key])
+                        break
+                if not selected_path.is_empty():
+                    break
+
         if selected_path.is_empty():
             _model_scene_cache[role] = null
         else:
