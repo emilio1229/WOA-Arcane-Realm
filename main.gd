@@ -584,7 +584,7 @@ func _build_gloamwick_town() -> void:
 	for lamp_index in range(8):
 		var lamp_z := -80.0 - float(lamp_index) * 8.0
 		for side in [-1.0, 1.0]:
-			var lamp_x := side * (6.0 if lamp_index < 5 else 8.0)
+			var lamp_x: float = float(side) * (6.0 if lamp_index < 5 else 8.0)
 			_add_box("Gloamwick Lamp Post", Vector3(lamp_x, 1.65, lamp_z), Vector3(0.16, 3.3, 0.16), Color(0.055, 0.035, 0.065), false)
 			var lantern := _make_sigil(Vector3(lamp_x, 3.25, lamp_z), Color(0.98, 0.58, 0.24), 0.2)
 			lantern.name = "Gloamwick Lantern"
