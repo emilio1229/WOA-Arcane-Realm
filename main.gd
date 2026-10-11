@@ -871,7 +871,8 @@ func _advance_dialogue() -> void:
 	if story_stage == 1 and collected_sigils >= 3:
 		story_stage = 2
 		_save_game()
-		_show_dialogue("THE SANCTUARY OPENS", "The three sigils circle the gate and settle into its stonework. The violet sky clears for a heartbeat. Mathias lowers his voice: “The Realm's Archivists speak of a page that never was, an Archive Wisp, and a crown erased from every record. If this corruption reaches that secret, Gloamwick is only the beginning.” The trail leads beyond this valley—and into the Saga of the Hollow Crown.", "Enter the Sigil Sanctuary")
+		var revelation := "Mathias admits that he feared the Council would repeat its oldest mistake." if trust_mathias else "Mathias sees that you still doubt him. He gives you one truth anyway: the Council erased a name to keep the Hollow Crown from claiming it."
+		_show_dialogue("THE SANCTUARY OPENS", "The three sigils circle the gate and settle into its stonework. The violet sky clears for a heartbeat. " + revelation + " The Realm's Archivists speak of a page that never was, an Archive Wisp, and a crown erased from every record. If this corruption reaches that secret, Gloamwick is only the beginning. The trail leads beyond this valley—and into the Saga of the Hollow Crown.", "Enter the Sigil Sanctuary")
 		return
 	if story_stage >= 2:
 		_show_dialogue("CHAPTER I COMPLETE", "Your Chronicle now carries the first record of the failing wards. The Council's saga continues beyond Gloamwick: forbidden pages, familiars born from memory, rival paths, ancient relics, and the Hollow Crown. Future chapters will build on this journey.", "Return to the Realm")
