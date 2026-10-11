@@ -969,7 +969,7 @@ func _cast_arcane_pulse() -> void:
 	if player_path == "Storm Herald" and not enemy_nodes.is_empty():
 		for chained_target in enemy_nodes.duplicate():
 			if is_instance_valid(chained_target) and player.global_position.distance_to(chained_target.global_position) <= 8.0:
-				var chained_id := chained_target.get_instance_id()
+				var chained_id: int = chained_target.get_instance_id()
 				var chained_hp := int(enemy_hp.get(chained_id, 2)) - 1
 				if chained_hp <= 0:
 					enemy_nodes.erase(chained_target)
