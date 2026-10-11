@@ -390,6 +390,12 @@ func _path_intro() -> String:
 func _show_menu() -> void:
     menu_root.visible = true
     hud_root.visible = false
+    if has_save:
+        name_input.text = player_name
+        var saved_path_index := PATHS.find(player_path)
+        if saved_path_index >= 0:
+            path_select.select(saved_path_index)
+            _update_path_note(saved_path_index)
     if continue_button != null:
         continue_button.disabled = not has_save
     Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -974,11 +980,13 @@ func _show_dialogue(title_text: String, body_text: String, hint_text: String) ->
     for child in dialogue_choices_box.get_children():
         child.queue_free()
     dialogue_continue_button.visible = true
+    dialogue_panel.anchor_top = 0.68
     dialogue_panel.visible = true
     Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 func _show_dialogue_choices(title_text: String, body_text: String, hint_text: String, context: String, choices: Array[Dictionary]) -> void:
     _show_dialogue(title_text, body_text, hint_text)
+    dialogue_panel.anchor_top = 0.54
     pending_choice_context = context
     dialogue_choices_box.visible = true
     dialogue_continue_button.visible = false
@@ -995,39 +1003,39 @@ func _choose_dialogue(choice_id: String) -> void:
     if pending_choice_context == "mathias":
         mathias_stance = choice_id
         story_stage = max(story_stage, 1)
-        var response := ""
+        var mathias_response := ""
         match choice_id:
             "compassion":
-                response = "Mathias studies you, then gives a tired nod. “Good. Power is easy to admire. The choice to stand beside someone when the cost is unknown—that tells me more.” He gestures toward the broken ward. “The Warden nearby remembers the old vows. Hear its warning before you touch the three Sigils.”"
+                mathias_response = "Mathias studies you, then gives a tired nod. “Good. Power is easy to admire. The choice to stand beside someone when the cost is unknown—that tells me more.” He gestures toward the broken ward. “The Warden nearby remembers the old vows. Hear its warning before you touch the three Sigils.”"
             "suspicion":
-                response = "Mathias' jaw tightens. “Fair. I have withheld too much, and I won't ask you to trust a stranger. The Warden beside the broken ward remembers what my Council records do not. Question it—and question me again when you return.”"
+                mathias_response = "Mathias' jaw tightens. “Fair. I have withheld too much, and I won't ask you to trust a stranger. The Warden beside the broken ward remembers what my Council records do not. Question it—and question me again when you return.”"
             "duty":
-                response = "Mathias turns back to the wounded ward. “Then we understand each other. Keep people alive first; explanations can follow. The Warden nearby remembers the vows behind the seals. Speak with it, then recover Dawn, Dusk, and Heart.”"
+                mathias_response = "Mathias turns back to the wounded ward. “Then we understand each other. Keep people alive first; explanations can follow. The Warden nearby remembers the vows behind the seals. Speak with it, then recover Dawn, Dusk, and Heart.”"
             _:
-                response = "Mathias points toward the broken ward and the waiting Sigils."
+                mathias_response = "Mathias points toward the broken ward and the waiting Sigils."
         _save_game()
         _refresh_objective()
-        _show_dialogue("MATHIAS • THE FIRST VOW", response + " Dawn, Dusk, and Heart are not trophies. Each holds one part of the promise that keeps this valley whole.", "Quest updated • Seek the Whispering Warden")
+        _show_dialogue("MATHIAS • THE FIRST VOW", mathias_response + " Dawn, Dusk, and Heart are not trophies. Each holds one part of the promise that keeps this valley whole.", "Quest updated • Seek the Whispering Warden")
     elif pending_choice_context == "warden":
         warden_response = choice_id
         warden_consulted = true
-        var response := ""
+        var warden_answer_text := ""
         match choice_id:
             "dawn":
-                response = "“Dawn is not hope,” the Warden whispers. “It is the courage to begin after hope has failed. Find it where the first light touches broken stone.” A pale root curls toward the sanctuary trail."
+                warden_answer_text = "“Dawn is not hope,” the Warden whispers. “It is the courage to begin after hope has failed. Find it where the first light touches broken stone.” A pale root curls toward the sanctuary trail."
             "fourth":
-                response = "The Warden's light dims. “Three vows were spoken. A fourth was cut from the telling—not broken, not kept, but removed. Ask who benefits when a name cannot be remembered.”"
+                warden_answer_text = "The Warden's light dims. “Three vows were spoken. A fourth was cut from the telling—not broken, not kept, but removed. Ask who benefits when a name cannot be remembered.”"
             "mathias":
-                response = "“Trust is a bridge, not a blindfold,” says the Warden. “Let Mathias guide your steps, but let the stones judge his words. The Sigils remember what even loyal hearts forget.”"
+                warden_answer_text = "“Trust is a bridge, not a blindfold,” says the Warden. “Let Mathias guide your steps, but let the stones judge his words. The Sigils remember what even loyal hearts forget.”"
             _:
-                response = "“Listen to the old stones. They will remember for you.”"
+                warden_answer_text = "“Listen to the old stones. They will remember for you.”"
         _save_game()
         _refresh_objective()
-        _show_dialogue("THE WARDEN'S ANSWER", response + " “Now you may approach the three Sigils. Dawn, Dusk, and Heart must be gathered together—or the gate will remain a wound pretending to be a door.”", "Quest updated • Recover the three Sigils")
+        _show_dialogue("THE WARDEN'S ANSWER", warden_answer_text + " “Now you may approach the three Sigils. Dawn, Dusk, and Heart must be gathered together—or the gate will remain a wound pretending to be a door.”", "Quest updated • Recover the three Sigils")
     pending_choice_context = ""
 
 func _advance_dialogue() -> void:
-    if not dialogue_open:
+    if not dialogue_open or dialogue_choices_box.visible:
         return
     dialogue_panel.visible = false
     dialogue_open = false
