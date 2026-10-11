@@ -13,6 +13,12 @@ COPY . .
 # pointer file (including textures) before import so Godot doesn't try to decode it.
 RUN find . -type f -not -path './.git/*' -exec sh -c 'for f do if head -c 64 "$f" | grep -q "version https://git-lfs.github.com/spec/v1"; then echo "Removing unresolved Git LFS pointer: $f"; rm -f "$f"; fi; done' sh {} +
 
+# Some exported OBJ material libraries still point at the six shared trim textures
+# even when those texture files were Git LFS placeholders and have been removed.
+# Strip only those missing texture-map directives so the OBJ materials remain usable
+# with their authored diffuse colors instead of failing resource loading at startup.
+RUN find . -type f -name '*.mtl' -exec sed -i -E '/^[[:space:]]*map_(Kd|Bump|Ka|Ks)[[:space:]]+T_Trim_(Metal|Furniture|Cloth)_(BaseColor|Normal)\.png[[:space:]]*$/d' {} +
+
 RUN mkdir -p build
 RUN set +e; godot --headless --path . --editor --quit > /tmp/godot-import.log 2>&1; result=$?; cat /tmp/godot-import.log; if [ "$result" -ne 0 ]; then echo "GODOT_IMPORT_FAILED exit=$result"; exit "$result"; fi
 RUN if grep -E 'SCRIPT ERROR:|Parse Error:' /tmp/godot-import.log; then echo 'Godot asset import reported a script parse/runtime error.'; exit 1; fi
