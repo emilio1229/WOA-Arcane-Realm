@@ -40,6 +40,9 @@ var sanctuary_gate: Node3D
 var last_message := ""
 var save_data := ConfigFile.new()
 var has_save := false
+var _model_scene_cache: Dictionary = {}
+var _model_file_index: Dictionary = {}
+var _model_index_ready := false
 
 func _ready() -> void:
     _build_ui()
@@ -465,7 +468,12 @@ func _build_player() -> void:
     player_visual = Node3D.new()
     player_visual.name = "WizardVisual"
     player.add_child(player_visual)
-    _add_person_visual(player_visual, Color(0.22, 0.12, 0.42), Color(0.83, 0.75, 0.96), true)
+    var player_model := _instantiate_model("player")
+    if player_model != null:
+        player_visual.add_child(player_model)
+        _play_model_idle(player_model)
+    else:
+        _add_person_visual(player_visual, Color(0.22, 0.12, 0.42), Color(0.83, 0.75, 0.96), true)
     add_child(player)
 
     camera_pivot = Node3D.new()
@@ -485,6 +493,15 @@ func _build_house(pos: Vector3, color: Color) -> void:
     _add_box("House Door", pos + Vector3(0, 0.9, -2.55), Vector3(1.0, 1.8, 0.12), Color(0.08, 0.035, 0.08), false)
 
 func _build_tree(pos: Vector3, height: float) -> void:
+    var imported_tree := _instantiate_model("tree")
+    if imported_tree != null:
+        imported_tree.name = "Tripo Forest Tree"
+        imported_tree.position = pos
+        var target_height := maxf(height, 1.0)
+        imported_tree.scale = Vector3.ONE * (target_height / 5.0)
+        add_child(imported_tree)
+        return
+
     var trunk := MeshInstance3D.new()
     var trunk_mesh := CylinderMesh.new()
     trunk_mesh.top_radius = 0.18
@@ -533,9 +550,95 @@ func _build_person(person_name: String, pos: Vector3, robe_color: Color, glow_co
     var person := Node3D.new()
     person.name = person_name
     person.position = pos
-    _add_person_visual(person, robe_color, glow_color, is_mage)
+    var role := "mathias" if person_name.to_lower().contains("mathias") else ("riftbound" if person_name.to_lower().contains("riftbound") else "player")
+    var imported_model := _instantiate_model(role)
+    if imported_model != null:
+        person.add_child(imported_model)
+        _play_model_idle(imported_model)
+    else:
+        _add_person_visual(person, robe_color, glow_color, is_mage)
     add_child(person)
     return person
+
+# Put Tripo exports anywhere under res://; filename keywords determine their world role.
+# Examples: player_wizard.glb, mathias.glb, riftbound_shade.glb, forest_tree.glb.
+func _instantiate_model(role: String) -> Node3D:
+    var scene := _get_model_scene(role)
+    if scene == null:
+        return null
+    var instance := scene.instantiate()
+    if instance is Node3D:
+        return instance as Node3D
+    instance.free()
+    return null
+
+func _get_model_scene(role: String) -> PackedScene:
+    if not _model_scene_cache.has(role):
+        _build_model_file_index()
+        var keywords: Array[String] = []
+        match role:
+            "player":
+                keywords = ["player", "wizard", "mage", "hero", "character"]
+            "mathias":
+                keywords = ["mathias"]
+            "riftbound":
+                keywords = ["riftbound", "shade", "enemy", "creature"]
+            "tree":
+                keywords = ["tree", "blackwood", "forest"]
+        var selected_path := ""
+        for keyword in keywords:
+            for file_key in _model_file_index.keys():
+                if str(file_key).contains(keyword):
+                    selected_path = str(_model_file_index[file_key])
+                    break
+            if not selected_path.is_empty():
+                break
+        if selected_path.is_empty():
+            _model_scene_cache[role] = null
+        else:
+            _model_scene_cache[role] = load(selected_path) as PackedScene
+    return _model_scene_cache[role] as PackedScene
+
+func _build_model_file_index() -> void:
+    if _model_index_ready:
+        return
+    _model_index_ready = true
+    _scan_model_directory("res://")
+
+func _scan_model_directory(directory_path: String) -> void:
+    var directory := DirAccess.open(directory_path)
+    if directory == null:
+        return
+    directory.list_dir_begin()
+    var entry := directory.get_next()
+    while not entry.is_empty():
+        if entry.begins_with("."):
+            entry = directory.get_next()
+            continue
+        var full_path := directory_path.path_join(entry)
+        if directory.current_is_dir():
+            if entry != "addons" and entry != "web" and entry != "export":
+                _scan_model_directory(full_path)
+        else:
+            var extension := entry.get_extension().to_lower()
+            if extension in ["glb", "gltf", "fbx"]:
+                _model_file_index[entry.get_basename().to_lower()] = full_path
+        entry = directory.get_next()
+    directory.list_dir_end()
+
+func _play_model_idle(root: Node) -> void:
+    if root is AnimationPlayer:
+        var animation_player := root as AnimationPlayer
+        var names := animation_player.get_animation_list()
+        for candidate in ["idle", "idle_loop", "breathing", "stand", "standing"]:
+            for animation_name in names:
+                if str(animation_name).to_lower().contains(candidate):
+                    animation_player.play(animation_name)
+                    return
+        if not names.is_empty():
+            animation_player.play(names[0])
+    for child in root.get_children():
+        _play_model_idle(child)
 
 func _add_person_visual(parent: Node3D, robe_color: Color, face_color: Color, is_mage: bool) -> void:
     # Layered silhouette: broad hem, fitted torso, sleeves, sash and a compact hat.
