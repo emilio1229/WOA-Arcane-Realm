@@ -1,9 +1,6 @@
 [gd_scene format=3 uid="uid://bt0tifrgo2bxg"]
 
 [ext_resource type="Script" uid="uid://6cpk07nytb1p" path="res://main.gd" id="1_main"]
-[ext_resource type="PackedScene" uid="uid://br8kwfoju5f1o" path="res://TripoModels/haunted_forest_spirit_3d_model/haunted_forest_spirit_3d_model.fbx" id="2_0xm2m"]
 
 [node name="ArcaneRealm" type="Node3D" unique_id=339899406]
 script = ExtResource("1_main")
-
-[node name="haunted_forest_spirit_3d_model" parent="." unique_id=683298629 instance=ExtResource("2_0xm2m")]
