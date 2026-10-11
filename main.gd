@@ -36,6 +36,7 @@ var sigil_nodes: Array[Node3D] = []
 var enemy_nodes: Array[Node3D] = []
 var enemy_hp: Dictionary = {}
 var mathias: Node3D
+var whispering_warden: Node3D
 var sanctuary_gate: Node3D
 var last_message := ""
 var save_data := ConfigFile.new()
@@ -381,6 +382,7 @@ func _build_world() -> void:
     enemy_nodes.clear()
     enemy_hp.clear()
     mathias = null
+    whispering_warden = null
     sanctuary_gate = null
     for child in get_children():
         if child == ui_layer:
@@ -434,7 +436,7 @@ func _build_world() -> void:
     # Procedural scenery remains in place if any optional model cannot be imported.
     _add_imported_landmark("ruins", "Ancient Ruin Sentinel", Vector3(-6.8, 0.0, -31.0), 0.65)
     _add_imported_landmark("tower", "The Distant Wizard Tower", Vector3(14.0, 0.0, -65.0), 0.55)
-    _add_imported_landmark("spirit", "The Whispering Warden", Vector3(7.5, 0.0, -28.0), 0.55)
+    whispering_warden = _add_imported_landmark("spirit", "The Whispering Warden", Vector3(7.5, 0.0, -28.0), 0.55)
 
     # Violet wisps act as subtle wayfinding lights from the waking place to the clearing.
     for i in range(9):
@@ -499,15 +501,16 @@ func _build_player() -> void:
     camera_pivot.add_child(game_camera)
     camera_pivot.rotation.x = pitch
 
-func _add_imported_landmark(role: String, landmark_name: String, pos: Vector3, model_scale: float) -> void:
+func _add_imported_landmark(role: String, landmark_name: String, pos: Vector3, model_scale: float) -> Node3D:
     var model := _instantiate_model(role)
     if model == null:
-        return
+        return null
     model.name = landmark_name
     model.position = pos
     model.scale = Vector3.ONE * model_scale
     _play_model_idle(model)
     add_child(model)
+    return model
 
 func _build_house(pos: Vector3, color: Color) -> void:
     _add_box("Gloamwick House", pos + Vector3(0, 1.6, 0), Vector3(6, 3.2, 5), color, true)
@@ -924,7 +927,7 @@ func _advance_dialogue() -> void:
     dialogue_panel.visible = false
     dialogue_open = false
     Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-    if story_stage == 0 and enemy_nodes.is_empty():
+    if story_stage == 0 and enemy_nodes.is_empty() and dialogue_title.text == "MATHIAS • BATTLE MAGE":
         story_stage = 1
         _save_game()
         _show_dialogue("MATHIAS • THE FAILING WARDS", "“You held the line, " + player_name + ". These were not ordinary shades. The ward-stones across the realms are being corrupted from the inside. The Council's old riddles, relic records, and bounty ledgers all point toward the same wound.” Mathias looks toward the sealed sanctuary. “Recover the Dawn, Dusk, and Heart Sigils. Then we can ask the Codex what the Council has forgotten.”", "Find the three Sigils")
@@ -955,6 +958,10 @@ func _interact() -> void:
 
     if story_stage == 0 and _distance_to(mathias) < 4.0:
         _show_dialogue("MATHIAS • BATTLE MAGE", "“The first wave is gone, but the ward is still bleeding light. I have served the Council for decades, and I have never seen a seal answer to something outside the Realm. Gather the three Sigils. Dawn, Dusk, Heart—remember their names. They are not keys alone; they are promises the Council made.”", "Continue")
+        return
+
+    if whispering_warden != null and _distance_to(whispering_warden) < 3.8:
+        _show_dialogue("THE WHISPERING WARDEN", "A figure of root-dark wood and pale, wandering light turns its face toward you. “Do not mistake the ward for a wall, little spark. It is a promise made visible. Dawn remembers what the Realm hoped for. Dusk remembers what it feared. Heart remembers the names the Council chose to bury.” The Warden's voice thins into the trees. “When Mathias speaks of three Sigils, listen for the fourth thing he cannot yet name: the hand that broke them.”", "The Warden's warning settles into your Chronicle")
         return
 
     if story_stage <= 1:
