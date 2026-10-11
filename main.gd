@@ -6,7 +6,7 @@ const WALK_SPEED := 5.2
 const RUN_SPEED := 8.0
 const JUMP_VELOCITY := 6.8
 const GRAVITY := 18.0
-const PATHS := ["Wizard"]
+const PATHS := ["Ember Mage", "Frostweaver", "Verdant Warden", "Storm Herald", "Voidcaller", "Sigilbinder"]
 
 var player: CharacterBody3D
 var camera_pivot: Node3D
@@ -19,20 +19,13 @@ var dialogue_panel: PanelContainer
 var dialogue_title: Label
 var dialogue_body: Label
 var dialogue_hint: Label
-var dialogue_choices_box: VBoxContainer
-var dialogue_continue_button: Button
-var path_note_label: Label
-var pending_choice_context := ""
-var mathias_stance := "unspoken"
-var warden_response := "unasked"
-var warden_consulted := false
-var collected_sigil_names: Array[String] = []
 var objective_label: Label
 var status_label: Label
 var name_input: LineEdit
+var path_select: OptionButton
 var continue_button: Button
 var player_name := "Apprentice"
-var player_path := "Wizard"
+var player_path := "Sigilbinder"
 var yaw := 0.0
 var pitch := -0.16
 var started := false
@@ -42,1421 +35,886 @@ var collected_sigils := 0
 var sigil_nodes: Array[Node3D] = []
 var enemy_nodes: Array[Node3D] = []
 var enemy_hp: Dictionary = {}
-var quest_npcs: Array[Node3D] = []
-var treasure_nodes: Array[Node3D] = []
-var collected_treasures: Array[String] = []
-var side_quest_progress: Dictionary = {"lanterns": 0, "relics": 0}
-var side_quest_complete: Dictionary = {"lanterns": false, "relics": false}
-var boss_defeated := false
-var boss_active := false
-var active_boss: Node3D
-var player_animation_state := ""
 var mathias: Node3D
-var whispering_warden: Node3D
 var sanctuary_gate: Node3D
 var last_message := ""
 var save_data := ConfigFile.new()
 var has_save := false
-var _model_scene_cache: Dictionary = {}
-var _model_file_index: Dictionary = {}
-var _model_index_ready := false
-var audio_music: AudioStreamPlayer
-var audio_ready := false
-const AUDIO_RATE := 11025
 
 func _ready() -> void:
-    _build_ui()
-    _setup_audio()
-    _load_save()
-    _show_menu()
-    Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	_build_ui()
+	_load_save()
+	_show_menu()
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 func _physics_process(delta: float) -> void:
-    if not started or player == null or dialogue_open:
-        if player != null:
-            player.velocity.x = move_toward(player.velocity.x, 0.0, 22.0 * delta)
-            player.velocity.z = move_toward(player.velocity.z, 0.0, 22.0 * delta)
-            if not player.is_on_floor():
-                player.velocity.y -= GRAVITY * delta
-            player.move_and_slide()
-        return
+	if not started or player == null or dialogue_open:
+		if player != null:
+			player.velocity.x = move_toward(player.velocity.x, 0.0, 22.0 * delta)
+			player.velocity.z = move_toward(player.velocity.z, 0.0, 22.0 * delta)
+			if not player.is_on_floor():
+				player.velocity.y -= GRAVITY * delta
+			player.move_and_slide()
+		return
 
-    if not player.is_on_floor():
-        player.velocity.y -= GRAVITY * delta
-    elif Input.is_key_pressed(KEY_SPACE):
-        player.velocity.y = JUMP_VELOCITY
+	if not player.is_on_floor():
+		player.velocity.y -= GRAVITY * delta
+	elif Input.is_key_pressed(KEY_SPACE):
+		player.velocity.y = JUMP_VELOCITY
 
-    var input_vector := Vector2.ZERO
-    if Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT):
-        input_vector.x -= 1.0
-    if Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT):
-        input_vector.x += 1.0
-    if Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_UP):
-        input_vector.y -= 1.0
-    if Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN):
-        input_vector.y += 1.0
+	var input_vector := Vector2.ZERO
+	if Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT):
+		input_vector.x -= 1.0
+	if Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT):
+		input_vector.x += 1.0
+	if Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_UP):
+		input_vector.y -= 1.0
+	if Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN):
+		input_vector.y += 1.0
 
-    var direction := Vector3(input_vector.x, 0.0, input_vector.y)
-    if direction.length_squared() > 0.0:
-        direction = direction.normalized().rotated(Vector3.UP, yaw)
-        var speed := RUN_SPEED if Input.is_key_pressed(KEY_SHIFT) else WALK_SPEED
-        player.velocity.x = direction.x * speed
-        player.velocity.z = direction.z * speed
-        player.rotation.y = yaw
-    else:
-        player.velocity.x = move_toward(player.velocity.x, 0.0, 24.0 * delta)
-        player.velocity.z = move_toward(player.velocity.z, 0.0, 24.0 * delta)
-    player.move_and_slide()
-    var moving_now := input_vector.length_squared() > 0.0
-    var next_animation := ""
-    if moving_now:
-        next_animation = "run" if Input.is_key_pressed(KEY_SHIFT) else "walk"
-    else:
-        next_animation = "idle"
-    if next_animation != player_animation_state:
-        player_animation_state = next_animation
-        _play_model_animation(player_visual, [next_animation, "walking" if next_animation == "walk" else next_animation, "running" if next_animation == "run" else next_animation])
-    _refresh_objective()
+	var direction := Vector3(input_vector.x, 0.0, input_vector.y)
+	if direction.length_squared() > 0.0:
+		direction = direction.normalized().rotated(Vector3.UP, yaw)
+		var speed := RUN_SPEED if Input.is_key_pressed(KEY_SHIFT) else WALK_SPEED
+		player.velocity.x = direction.x * speed
+		player.velocity.z = direction.z * speed
+		player.rotation.y = yaw
+	else:
+		player.velocity.x = move_toward(player.velocity.x, 0.0, 24.0 * delta)
+		player.velocity.z = move_toward(player.velocity.z, 0.0, 24.0 * delta)
+	player.move_and_slide()
+	_refresh_objective()
 
-func _input(event: InputEvent) -> void:
-    if not started:
-        return
-    # Handle mouse capture early: browser exports can otherwise let UI/unhandled-input
-    # routing swallow the first click, leaving the camera locked facing forward.
-    if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT and not dialogue_open:
-        Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-    elif event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and not dialogue_open:
-        yaw -= event.screen_relative.x * 0.0035
-        pitch = clampf(pitch - event.screen_relative.y * 0.0025, -0.62, 0.42)
-        if player != null:
-            player.rotation.y = yaw
-        if camera_pivot != null:
-            camera_pivot.rotation.x = pitch
-    elif event is InputEventKey and event.pressed and not event.echo:
-        if event.keycode == KEY_ESCAPE:
-            Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-        elif event.keycode == KEY_TAB:
-            Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED else Input.MOUSE_MODE_CAPTURED
-        elif event.keycode == KEY_E:
-            _interact()
-        elif event.keycode == KEY_Q:
-            _cast_arcane_pulse()
+func _unhandled_input(event: InputEvent) -> void:
+	if not started:
+		return
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT and not dialogue_open:
+		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	elif event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and not dialogue_open:
+		# Use screen_relative so mouse-look sensitivity stays consistent in the browser at different sizes.
+		yaw -= event.screen_relative.x * 0.0022
+		pitch = clampf(pitch - event.screen_relative.y * 0.0016, -0.48, 0.32)
+		if player != null:
+			player.rotation.y = yaw
+		if camera_pivot != null:
+			camera_pivot.rotation.x = pitch
+	elif event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_ESCAPE:
+			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+		elif event.keycode == KEY_E:
+			_interact()
+		elif event.keycode == KEY_Q:
+			_cast_arcane_pulse()
 
 func _build_ui() -> void:
-    ui_layer = CanvasLayer.new()
-    ui_layer.layer = 10
-    add_child(ui_layer)
+	ui_layer = CanvasLayer.new()
+	ui_layer.layer = 10
+	add_child(ui_layer)
 
-    menu_root = Control.new()
-    menu_root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-    ui_layer.add_child(menu_root)
+	menu_root = Control.new()
+	menu_root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	ui_layer.add_child(menu_root)
 
-    var backdrop := ColorRect.new()
-    backdrop.color = Color(0.025, 0.012, 0.055, 0.96)
-    backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-    menu_root.add_child(backdrop)
+	var backdrop := ColorRect.new()
+	backdrop.color = Color(0.025, 0.012, 0.055, 0.96)
+	backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	menu_root.add_child(backdrop)
 
-    var margin := MarginContainer.new()
-    margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-    margin.add_theme_constant_override("margin_left", 42)
-    margin.add_theme_constant_override("margin_right", 42)
-    margin.add_theme_constant_override("margin_top", 30)
-    margin.add_theme_constant_override("margin_bottom", 30)
-    menu_root.add_child(margin)
+	var margin := MarginContainer.new()
+	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	margin.add_theme_constant_override("margin_left", 42)
+	margin.add_theme_constant_override("margin_right", 42)
+	margin.add_theme_constant_override("margin_top", 30)
+	margin.add_theme_constant_override("margin_bottom", 30)
+	menu_root.add_child(margin)
 
-    var columns := HBoxContainer.new()
-    columns.add_theme_constant_override("separation", 42)
-    margin.add_child(columns)
+	var columns := HBoxContainer.new()
+	columns.add_theme_constant_override("separation", 42)
+	margin.add_child(columns)
 
-    var story_side := VBoxContainer.new()
-    story_side.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-    story_side.size_flags_vertical = Control.SIZE_EXPAND_FILL
-    story_side.alignment = BoxContainer.ALIGNMENT_CENTER
-    story_side.add_theme_constant_override("separation", 18)
-    columns.add_child(story_side)
+	var story_side := VBoxContainer.new()
+	story_side.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	story_side.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	story_side.alignment = BoxContainer.ALIGNMENT_CENTER
+	story_side.add_theme_constant_override("separation", 18)
+	columns.add_child(story_side)
 
-    var sigil_mark := Label.new()
-    sigil_mark.text = "✧"
-    sigil_mark.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-    sigil_mark.add_theme_font_size_override("font_size", 58)
-    sigil_mark.add_theme_color_override("font_color", Color(0.79, 0.55, 1.0))
-    story_side.add_child(sigil_mark)
+	var sigil_mark := Label.new()
+	sigil_mark.text = "✧"
+	sigil_mark.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	sigil_mark.add_theme_font_size_override("font_size", 58)
+	sigil_mark.add_theme_color_override("font_color", Color(0.79, 0.55, 1.0))
+	story_side.add_child(sigil_mark)
 
-    var overline := Label.new()
-    overline.text = "THE WIZARDS OF ARK PRESENT"
-    overline.add_theme_font_size_override("font_size", 12)
-    overline.add_theme_color_override("font_color", Color(0.75, 0.56, 0.92))
-    story_side.add_child(overline)
+	var overline := Label.new()
+	overline.text = "THE WIZARDS OF ARK PRESENT"
+	overline.add_theme_font_size_override("font_size", 12)
+	overline.add_theme_color_override("font_color", Color(0.75, 0.56, 0.92))
+	story_side.add_child(overline)
 
-    var title := Label.new()
-    title.text = "ARCANE\nREALM"
-    title.add_theme_font_size_override("font_size", 68)
-    title.add_theme_color_override("font_color", Color(0.94, 0.84, 1.0))
-    title.add_theme_constant_override("line_spacing", -10)
-    story_side.add_child(title)
+	var title := Label.new()
+	title.text = "ARCANE\nREALM"
+	title.add_theme_font_size_override("font_size", 68)
+	title.add_theme_color_override("font_color", Color(0.94, 0.84, 1.0))
+	title.add_theme_constant_override("line_spacing", -10)
+	story_side.add_child(title)
 
-    var subtitle := Label.new()
-    subtitle.text = "CHRONICLES OF THE HOLLOW CROWN"
-    subtitle.add_theme_font_size_override("font_size", 13)
-    subtitle.add_theme_color_override("font_color", Color(0.82, 0.62, 1.0))
-    story_side.add_child(subtitle)
+	var subtitle := Label.new()
+	subtitle.text = "CHRONICLES OF THE HOLLOW CROWN"
+	subtitle.add_theme_font_size_override("font_size", 13)
+	subtitle.add_theme_color_override("font_color", Color(0.82, 0.62, 1.0))
+	story_side.add_child(subtitle)
 
-    var divider := ColorRect.new()
-    divider.custom_minimum_size = Vector2(120, 2)
-    divider.color = Color(0.54, 0.3, 0.76, 0.9)
-    story_side.add_child(divider)
+	var divider := ColorRect.new()
+	divider.custom_minimum_size = Vector2(120, 2)
+	divider.color = Color(0.54, 0.3, 0.76, 0.9)
+	story_side.add_child(divider)
 
-    var lore := Label.new()
-    lore.text = "The wards are failing. Old Sigils stir beneath forgotten stone. Somewhere beyond Gloamwick, a crown erased from history is beginning to remember its name."
-    lore.custom_minimum_size = Vector2(300, 0)
-    lore.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-    lore.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-    lore.add_theme_font_size_override("font_size", 19)
-    lore.add_theme_color_override("font_color", Color(0.81, 0.76, 0.88))
-    story_side.add_child(lore)
+	var lore := Label.new()
+	lore.text = "The wards are failing. Old Sigils stir beneath forgotten stone. Somewhere beyond Gloamwick, a crown erased from history is beginning to remember its name."
+	lore.custom_minimum_size = Vector2(300, 0)
+	lore.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	lore.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	lore.add_theme_font_size_override("font_size", 19)
+	lore.add_theme_color_override("font_color", Color(0.81, 0.76, 0.88))
+	story_side.add_child(lore)
 
-    var chapter := Label.new()
-    chapter.text = "CHAPTER I   /   GLOAMWICK"
-    chapter.add_theme_font_size_override("font_size", 12)
-    chapter.add_theme_color_override("font_color", Color(0.64, 0.54, 0.75))
-    story_side.add_child(chapter)
+	var chapter := Label.new()
+	chapter.text = "CHAPTER I   /   GLOAMWICK"
+	chapter.add_theme_font_size_override("font_size", 12)
+	chapter.add_theme_color_override("font_color", Color(0.64, 0.54, 0.75))
+	story_side.add_child(chapter)
 
-    var form_wrap := CenterContainer.new()
-    form_wrap.custom_minimum_size = Vector2(410, 0)
-    columns.add_child(form_wrap)
+	var form_wrap := CenterContainer.new()
+	form_wrap.custom_minimum_size = Vector2(410, 0)
+	columns.add_child(form_wrap)
 
-    var panel := PanelContainer.new()
-    panel.custom_minimum_size = Vector2(390, 0)
-    panel.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-    panel.add_theme_stylebox_override("panel", _panel_style(Color(0.055, 0.032, 0.09, 0.97), Color(0.48, 0.29, 0.67)))
-    form_wrap.add_child(panel)
+	var panel := PanelContainer.new()
+	panel.custom_minimum_size = Vector2(390, 0)
+	panel.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	panel.add_theme_stylebox_override("panel", _panel_style(Color(0.055, 0.032, 0.09, 0.97), Color(0.48, 0.29, 0.67)))
+	form_wrap.add_child(panel)
 
-    var layout := VBoxContainer.new()
-    layout.add_theme_constant_override("separation", 12)
-    panel.add_child(layout)
+	var layout := VBoxContainer.new()
+	layout.add_theme_constant_override("separation", 12)
+	panel.add_child(layout)
 
-    var menu_heading := Label.new()
-    menu_heading.text = "ENTER THE REALM"
-    menu_heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    menu_heading.add_theme_font_size_override("font_size", 23)
-    menu_heading.add_theme_color_override("font_color", Color(0.93, 0.83, 1.0))
-    layout.add_child(menu_heading)
+	var menu_heading := Label.new()
+	menu_heading.text = "ENTER THE REALM"
+	menu_heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	menu_heading.add_theme_font_size_override("font_size", 23)
+	menu_heading.add_theme_color_override("font_color", Color(0.93, 0.83, 1.0))
+	layout.add_child(menu_heading)
 
-    var menu_note := Label.new()
-    menu_note.text = "Your chronicle begins when you awaken."
-    menu_note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    menu_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-    menu_note.add_theme_font_size_override("font_size", 13)
-    menu_note.add_theme_color_override("font_color", Color(0.72, 0.64, 0.81))
-    layout.add_child(menu_note)
+	var menu_note := Label.new()
+	menu_note.text = "Your chronicle begins when you awaken."
+	menu_note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	menu_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	menu_note.add_theme_font_size_override("font_size", 13)
+	menu_note.add_theme_color_override("font_color", Color(0.72, 0.64, 0.81))
+	layout.add_child(menu_note)
 
-    layout.add_child(HSeparator.new())
+	layout.add_child(HSeparator.new())
 
-    var name_label := Label.new()
-    name_label.text = "WIZARD NAME"
-    name_label.add_theme_font_size_override("font_size", 12)
-    name_label.add_theme_color_override("font_color", Color(0.81, 0.69, 0.94))
-    layout.add_child(name_label)
+	var name_label := Label.new()
+	name_label.text = "WIZARD NAME"
+	name_label.add_theme_font_size_override("font_size", 12)
+	name_label.add_theme_color_override("font_color", Color(0.81, 0.69, 0.94))
+	layout.add_child(name_label)
 
-    name_input = LineEdit.new()
-    name_input.placeholder_text = "What shall the Realm call you?"
-    name_input.text = player_name if player_name != "Apprentice" else ""
-    name_input.custom_minimum_size = Vector2(0, 44)
-    name_input.max_length = 24
-    name_input.add_theme_font_size_override("font_size", 16)
-    name_input.add_theme_stylebox_override("normal", _panel_style(Color(0.025, 0.018, 0.045), Color(0.31, 0.22, 0.4)))
-    layout.add_child(name_input)
+	name_input = LineEdit.new()
+	name_input.placeholder_text = "What shall the Realm call you?"
+	name_input.text = player_name if player_name != "Apprentice" else ""
+	name_input.custom_minimum_size = Vector2(0, 44)
+	name_input.max_length = 24
+	name_input.add_theme_font_size_override("font_size", 16)
+	name_input.add_theme_stylebox_override("normal", _panel_style(Color(0.025, 0.018, 0.045), Color(0.31, 0.22, 0.4)))
+	layout.add_child(name_input)
 
-    var path_label := Label.new()
-    path_label.text = "YOUR PATH"
-    path_label.add_theme_font_size_override("font_size", 12)
-    path_label.add_theme_color_override("font_color", Color(0.81, 0.69, 0.94))
-    layout.add_child(path_label)
+	var path_label := Label.new()
+	path_label.text = "CHOOSE YOUR ARCANE PATH"
+	path_label.add_theme_font_size_override("font_size", 12)
+	path_label.add_theme_color_override("font_color", Color(0.81, 0.69, 0.94))
+	layout.add_child(path_label)
 
-    path_note_label = Label.new()
-    path_note_label.text = "WIZARD • Arcane apprentice\nA classic wizard, guided by curiosity and the old magic of the Sigils."
-    path_note_label.custom_minimum_size = Vector2(0, 54)
-    path_note_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-    path_note_label.add_theme_font_size_override("font_size", 14)
-    path_note_label.add_theme_color_override("font_color", Color(0.87, 0.78, 0.96))
-    layout.add_child(path_note_label)
+	path_select = OptionButton.new()
+	path_select.custom_minimum_size = Vector2(0, 44)
+	for path_name in PATHS:
+		path_select.add_item(path_name)
+	path_select.select(5)
+	path_select.add_theme_font_size_override("font_size", 15)
+	layout.add_child(path_select)
 
-    var begin_button := _make_button("✦   BEGIN YOUR JOURNEY", Color(0.34, 0.15, 0.52))
-    begin_button.pressed.connect(_start_new_game)
-    layout.add_child(begin_button)
+	var path_note := Label.new()
+	path_note.text = "Your path shapes your legend. Your choices shape the Realm."
+	path_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	path_note.add_theme_font_size_override("font_size", 12)
+	path_note.add_theme_color_override("font_color", Color(0.66, 0.59, 0.75))
+	layout.add_child(path_note)
 
-    continue_button = _make_button("CONTINUE CHRONICLE", Color(0.16, 0.105, 0.25))
-    continue_button.pressed.connect(_continue_game)
-    layout.add_child(continue_button)
+	var begin_button := _make_button("✦   BEGIN YOUR JOURNEY", Color(0.34, 0.15, 0.52))
+	begin_button.pressed.connect(_start_new_game)
+	layout.add_child(begin_button)
 
-    var controls := Label.new()
-    controls.text = "WASD Move  •  Space Jump  •  Shift Run\nE Interact  •  Q Arcane Pulse  •  Esc Release Mouse"
-    controls.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    controls.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-    controls.add_theme_font_size_override("font_size", 11)
-    controls.add_theme_color_override("font_color", Color(0.59, 0.53, 0.68))
-    layout.add_child(controls)
+	continue_button = _make_button("CONTINUE CHRONICLE", Color(0.16, 0.105, 0.25))
+	continue_button.pressed.connect(_continue_game)
+	layout.add_child(continue_button)
 
-    hud_root = Control.new()
-    hud_root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-    hud_root.visible = false
-    ui_layer.add_child(hud_root)
+	var controls := Label.new()
+	controls.text = "WASD Move  •  Space Jump  •  Shift Run\nE Interact  •  Q Arcane Pulse  •  Esc Release Mouse"
+	controls.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	controls.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	controls.add_theme_font_size_override("font_size", 11)
+	controls.add_theme_color_override("font_color", Color(0.59, 0.53, 0.68))
+	layout.add_child(controls)
 
-    var objective_panel := PanelContainer.new()
-    objective_panel.position = Vector2(20, 18)
-    objective_panel.custom_minimum_size = Vector2(390, 68)
-    objective_panel.add_theme_stylebox_override("panel", _panel_style(Color(0.035, 0.02, 0.07, 0.88), Color(0.38, 0.22, 0.57)))
-    hud_root.add_child(objective_panel)
+	hud_root = Control.new()
+	hud_root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	hud_root.visible = false
+	ui_layer.add_child(hud_root)
 
-    var objective_box := VBoxContainer.new()
-    objective_box.add_theme_constant_override("separation", 4)
-    objective_panel.add_child(objective_box)
+	var objective_panel := PanelContainer.new()
+	objective_panel.position = Vector2(20, 18)
+	objective_panel.custom_minimum_size = Vector2(390, 68)
+	objective_panel.add_theme_stylebox_override("panel", _panel_style(Color(0.035, 0.02, 0.07, 0.88), Color(0.38, 0.22, 0.57)))
+	hud_root.add_child(objective_panel)
 
-    var objective_heading := Label.new()
-    objective_heading.text = "CURRENT CHRONICLE"
-    objective_heading.add_theme_font_size_override("font_size", 11)
-    objective_heading.add_theme_color_override("font_color", Color(0.73, 0.55, 0.9))
-    objective_box.add_child(objective_heading)
+	var objective_box := VBoxContainer.new()
+	objective_box.add_theme_constant_override("separation", 4)
+	objective_panel.add_child(objective_box)
 
-    objective_label = Label.new()
-    objective_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-    objective_label.add_theme_font_size_override("font_size", 15)
-    objective_box.add_child(objective_label)
+	var objective_heading := Label.new()
+	objective_heading.text = "CURRENT CHRONICLE"
+	objective_heading.add_theme_font_size_override("font_size", 11)
+	objective_heading.add_theme_color_override("font_color", Color(0.73, 0.55, 0.9))
+	objective_box.add_child(objective_heading)
 
-    status_label = Label.new()
-    status_label.position = Vector2(20, 100)
-    status_label.custom_minimum_size = Vector2(480, 34)
-    status_label.add_theme_font_size_override("font_size", 14)
-    status_label.add_theme_color_override("font_color", Color(0.95, 0.83, 1.0))
-    hud_root.add_child(status_label)
+	objective_label = Label.new()
+	objective_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	objective_label.add_theme_font_size_override("font_size", 15)
+	objective_box.add_child(objective_label)
 
-    dialogue_panel = PanelContainer.new()
-    dialogue_panel.anchor_left = 0.08
-    dialogue_panel.anchor_right = 0.92
-    dialogue_panel.anchor_top = 0.68
-    dialogue_panel.anchor_bottom = 0.96
-    dialogue_panel.add_theme_stylebox_override("panel", _panel_style(Color(0.035, 0.018, 0.07, 0.97), Color(0.65, 0.38, 0.88)))
-    dialogue_panel.visible = false
-    hud_root.add_child(dialogue_panel)
+	status_label = Label.new()
+	status_label.position = Vector2(20, 100)
+	status_label.custom_minimum_size = Vector2(480, 34)
+	status_label.add_theme_font_size_override("font_size", 14)
+	status_label.add_theme_color_override("font_color", Color(0.95, 0.83, 1.0))
+	hud_root.add_child(status_label)
 
-    var dialogue_layout := VBoxContainer.new()
-    dialogue_layout.add_theme_constant_override("separation", 8)
-    dialogue_panel.add_child(dialogue_layout)
+	dialogue_panel = PanelContainer.new()
+	dialogue_panel.anchor_left = 0.08
+	dialogue_panel.anchor_right = 0.92
+	dialogue_panel.anchor_top = 0.68
+	dialogue_panel.anchor_bottom = 0.96
+	dialogue_panel.add_theme_stylebox_override("panel", _panel_style(Color(0.035, 0.018, 0.07, 0.97), Color(0.65, 0.38, 0.88)))
+	dialogue_panel.visible = false
+	hud_root.add_child(dialogue_panel)
 
-    dialogue_title = Label.new()
-    dialogue_title.add_theme_font_size_override("font_size", 21)
-    dialogue_title.add_theme_color_override("font_color", Color(0.91, 0.78, 1.0))
-    dialogue_layout.add_child(dialogue_title)
+	var dialogue_layout := VBoxContainer.new()
+	dialogue_layout.add_theme_constant_override("separation", 8)
+	dialogue_panel.add_child(dialogue_layout)
 
-    dialogue_body = Label.new()
-    dialogue_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-    dialogue_body.size_flags_vertical = Control.SIZE_EXPAND_FILL
-    dialogue_body.add_theme_font_size_override("font_size", 15)
-    dialogue_layout.add_child(dialogue_body)
+	dialogue_title = Label.new()
+	dialogue_title.add_theme_font_size_override("font_size", 21)
+	dialogue_title.add_theme_color_override("font_color", Color(0.91, 0.78, 1.0))
+	dialogue_layout.add_child(dialogue_title)
 
-    dialogue_choices_box = VBoxContainer.new()
-    dialogue_choices_box.add_theme_constant_override("separation", 6)
-    dialogue_choices_box.visible = false
-    dialogue_layout.add_child(dialogue_choices_box)
+	dialogue_body = Label.new()
+	dialogue_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	dialogue_body.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	dialogue_body.add_theme_font_size_override("font_size", 15)
+	dialogue_layout.add_child(dialogue_body)
 
-    dialogue_hint = Label.new()
-    dialogue_hint.text = "Press E or select Continue"
-    dialogue_hint.add_theme_font_size_override("font_size", 12)
-    dialogue_hint.add_theme_color_override("font_color", Color(0.72, 0.65, 0.8))
-    dialogue_layout.add_child(dialogue_hint)
+	dialogue_hint = Label.new()
+	dialogue_hint.text = "Press E or select Continue"
+	dialogue_hint.add_theme_font_size_override("font_size", 12)
+	dialogue_hint.add_theme_color_override("font_color", Color(0.72, 0.65, 0.8))
+	dialogue_layout.add_child(dialogue_hint)
 
-    dialogue_continue_button = _make_button("CONTINUE", Color(0.31, 0.13, 0.48))
-    dialogue_continue_button.pressed.connect(_advance_dialogue)
-    dialogue_layout.add_child(dialogue_continue_button)
-
-func _path_intro() -> String:
-    return "Your wizard's fingers glow with a faint violet rune. The old magic recognizes you, though the Realm has forgotten your name."
+	var dialogue_button := _make_button("CONTINUE", Color(0.31, 0.13, 0.48))
+	dialogue_button.pressed.connect(_advance_dialogue)
+	dialogue_layout.add_child(dialogue_button)
 
 func _show_menu() -> void:
-    menu_root.visible = true
-    hud_root.visible = false
-    if has_save:
-        name_input.text = player_name
-        player_path = "Wizard"
-    if continue_button != null:
-        continue_button.disabled = not has_save
-    Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	menu_root.visible = true
+	hud_root.visible = false
+	if continue_button != null:
+		continue_button.disabled = not has_save
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 func _start_new_game() -> void:
-    var entered_name := name_input.text.strip_edges()
-    player_name = entered_name if entered_name != "" else "Apprentice"
-    player_path = "Wizard"
-    story_stage = 0
-    collected_sigils = 0
-    collected_sigil_names.clear()
-    mathias_stance = "unspoken"
-    warden_response = "unasked"
-    warden_consulted = false
-    collected_treasures.clear()
-    side_quest_progress = {"lanterns": 0, "relics": 0}
-    side_quest_complete = {"lanterns": false, "relics": false}
-    boss_defeated = false
-    boss_active = false
-    active_boss = null
-    _save_game()
-    _enter_game(true)
+	var entered_name := name_input.text.strip_edges()
+	player_name = entered_name if entered_name != "" else "Apprentice"
+	player_path = PATHS[path_select.selected] if path_select.selected >= 0 else "Sigilbinder"
+	story_stage = 0
+	collected_sigils = 0
+	_save_game()
+	_enter_game(true)
 
 func _continue_game() -> void:
-    if not has_save:
-        return
-    player_name = str(save_data.get_value("player", "name", "Apprentice"))
-    player_path = "Wizard"
-    story_stage = int(save_data.get_value("progress", "stage", 0))
-    collected_sigils = int(save_data.get_value("progress", "sigils", 0))
-    _enter_game(false)
+	if not has_save:
+		return
+	player_name = str(save_data.get_value("player", "name", "Apprentice"))
+	player_path = str(save_data.get_value("player", "path", "Sigilbinder"))
+	story_stage = int(save_data.get_value("progress", "stage", 0))
+	collected_sigils = int(save_data.get_value("progress", "sigils", 0))
+	_enter_game(false)
 
 func _enter_game(show_intro: bool) -> void:
-    _start_ambient_audio()
-    menu_root.visible = false
-    hud_root.visible = true
-    started = true
-    _build_world()
-    _build_player()
-    _refresh_objective()
-    if show_intro:
-        _show_dialogue("A VOICE BETWEEN THE TREES", "“Awaken, " + player_name + "… " + _path_intro() + " You lie beneath the black boughs of Gloamwood, close enough to hear a battle beyond the trees. A robed wizard is holding the clearing, and strange creatures are closing in. Follow the violet lights. Help him, and you may learn why the forest has called you here.”", "Awaken • Follow the violet lights toward Mathias")
-    else:
-        _show_dialogue("THE FOREST REMEMBERS", "Your Chronicle stirs again. The voice is quieter now, but the violet lights still lead through the trees toward the broken ward—and the battle beyond the mist.", "Continue toward the distant clash")
+	menu_root.visible = false
+	hud_root.visible = true
+	started = true
+	_build_world()
+	_build_player()
+	_refresh_objective()
+	if show_intro:
+		_show_dialogue("A VOICE BETWEEN THE TREES", "“Awaken, " + player_name + "… Do not fear the dark. It has not found you by accident. You lie beneath the black boughs of Gloamwood, far from any road you remember. The forest has taken your tracks, the night has swallowed the trail, and your mount is nowhere in sight. You carry little but a fading mark of magic and the will to keep moving. Listen. Beyond the mist, someone is fighting—and if the last ward falls, this forest will wake hungry. Follow the violet lights. They will lead you to the truth.”", "Awaken • Follow the violet lights through the forest")
+	else:
+		_show_dialogue("THE FOREST REMEMBERS", "Your Chronicle stirs again. The voice is quieter now, but the violet lights still lead through the trees toward the broken ward—and the battle beyond the mist.", "Continue toward the distant clash")
 
 func _build_world() -> void:
-    # Rebuilds can happen when loading a saved Chronicle; clear references to the old world first.
-    sigil_nodes.clear()
-    enemy_nodes.clear()
-    enemy_hp.clear()
-    quest_npcs.clear()
-    treasure_nodes.clear()
-    active_boss = null
-    boss_active = false
-    mathias = null
-    whispering_warden = null
-    sanctuary_gate = null
-    for child in get_children():
-        if child == ui_layer:
-            continue
-        child.queue_free()
+	for child in get_children():
+		if child == ui_layer:
+			continue
+		child.queue_free()
 
-    var environment_node := WorldEnvironment.new()
-    var environment := Environment.new()
-    environment.background_mode = Environment.BG_SKY
-    var sky := Sky.new()
-    var sky_material := ProceduralSkyMaterial.new()
-    sky_material.sky_top_color = Color(0.018, 0.008, 0.045)
-    sky_material.sky_horizon_color = Color(0.16, 0.055, 0.23)
-    sky_material.ground_bottom_color = Color(0.018, 0.012, 0.03)
-    sky_material.ground_horizon_color = Color(0.07, 0.035, 0.095)
-    sky.sky_material = sky_material
-    environment.sky = sky
-    environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-    environment.ambient_light_color = Color(0.55, 0.44, 0.7)
-    environment.ambient_light_energy = 0.8
-    environment.fog_enabled = true
-    environment.fog_light_color = Color(0.12, 0.055, 0.17)
-    environment.fog_density = 0.009
-    environment_node.environment = environment
-    add_child(environment_node)
+	var environment_node := WorldEnvironment.new()
+	var environment := Environment.new()
+	environment.background_mode = Environment.BG_SKY
+	var sky := Sky.new()
+	var sky_material := ProceduralSkyMaterial.new()
+	sky_material.sky_top_color = Color(0.018, 0.008, 0.045)
+	sky_material.sky_horizon_color = Color(0.16, 0.055, 0.23)
+	sky_material.ground_bottom_color = Color(0.018, 0.012, 0.03)
+	sky_material.ground_horizon_color = Color(0.07, 0.035, 0.095)
+	sky.sky_material = sky_material
+	environment.sky = sky
+	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	environment.ambient_light_color = Color(0.55, 0.44, 0.7)
+	environment.ambient_light_energy = 0.8
+	environment.fog_enabled = true
+	environment.fog_light_color = Color(0.12, 0.055, 0.17)
+	environment.fog_density = 0.009
+	environment_node.environment = environment
+	add_child(environment_node)
 
-    var sun := DirectionalLight3D.new()
-    sun.rotation_degrees = Vector3(-52, -28, 0)
-    sun.light_energy = 1.2
-    sun.shadow_enabled = true
-    add_child(sun)
+	var sun := DirectionalLight3D.new()
+	sun.rotation_degrees = Vector3(-52, -28, 0)
+	sun.light_energy = 1.2
+	sun.shadow_enabled = true
+	add_child(sun)
 
-    _add_box("Gloamwood Floor", Vector3(0, -0.5, -20), Vector3(100, 1, 150), Color(0.035, 0.045, 0.045), true)
-    _add_box("Mossy Trail", Vector3(0, -0.02, -20), Vector3(5.5, 0.12, 112), Color(0.09, 0.075, 0.085), false)
-    # Dense, staggered trunks frame a winding forest path without blocking the playable trail.
-    for i in range(18):
-        var z := 12.0 - float(i) * 4.8
-        var side_offset := 7.2 + float((i * 7) % 5) * 1.4
-        _build_tree(Vector3(-side_offset, 0, z), 5.0 + float(i % 4) * 0.9)
-        _build_tree(Vector3(side_offset + 1.0, 0, z - 2.2), 5.8 + float((i + 2) % 4) * 0.8)
-    # Fallen timber, standing stones and luminous spores establish a readable trail.
-    _add_box("Fallen Blackwood", Vector3(-4.9, 0.55, -8.5), Vector3(3.7, 0.45, 0.55), Color(0.055, 0.03, 0.04), false).rotation.z = -0.22
-    _add_box("Mossy Standing Stone", Vector3(4.5, 1.0, -18), Vector3(0.85, 2.0, 0.8), Color(0.11, 0.075, 0.15), false)
-    _add_box("Broken Wardstone", Vector3(-2.8, 0.75, -28), Vector3(0.65, 1.5, 0.65), Color(0.18, 0.09, 0.28), false)
-    _add_box("Sanctuary Gate", Vector3(0, 3.0, -62), Vector3(10, 6, 0.8), Color(0.12, 0.075, 0.19), false)
-    # Original low-poly assets authored for this game: imported OBJ meshes, not placeholder primitives.
-    _add_obj_prop("res://Assets/Models/ancient_tree.obj", "The Old Crown Tree", Vector3(-10.5, 0, -24.0), Vector3(2.5, 3.1, 2.5))
-    _add_obj_prop("res://Assets/Models/ancient_tree.obj", "The Split Crown Tree", Vector3(11.0, 0, -37.0), Vector3(2.0, 2.7, 2.0))
-    _add_obj_prop("res://Assets/Models/rune_shrine.obj", "Forgotten Rune Shrine", Vector3(4.5, 0, -27.0), Vector3(1.25, 1.5, 1.25))
-    _add_obj_prop("res://Assets/Models/rune_shrine.obj", "Sanctuary Waystone", Vector3(-5.4, 0, -56.0), Vector3(1.1, 1.35, 1.1))
-    _add_obj_prop("res://Assets/Models/relic_chest.obj", "Old Archive Chest", Vector3(9.0, 0, -18.5), Vector3(1.1, 1.1, 1.1))
-    _add_obj_prop("res://Assets/Models/relic_chest.obj", "Buried Relic Chest", Vector3(-10.0, 0, -43.5), Vector3(0.95, 0.95, 0.95))
-    sanctuary_gate = _make_sigil(Vector3(0, 2.4, -61.45), Color(0.38, 0.12, 0.75), 2.1)
-    sanctuary_gate.name = "Sigil Sanctuary Gate"
-    add_child(sanctuary_gate)
+	_add_box("Gloamwood Floor", Vector3(0, -0.5, -20), Vector3(100, 1, 150), Color(0.035, 0.045, 0.045), true)
+	_add_box("Mossy Trail", Vector3(0, -0.02, -20), Vector3(5.5, 0.12, 112), Color(0.09, 0.075, 0.085), false)
+	# Dense, staggered trunks frame a winding forest path without blocking the playable trail.
+	for i in range(18):
+		var z := 12.0 - float(i) * 4.8
+		var side_offset := 7.2 + float((i * 7) % 5) * 1.4
+		_build_tree(Vector3(-side_offset, 0, z), 5.0 + float(i % 4) * 0.9)
+		_build_tree(Vector3(side_offset + 1.0, 0, z - 2.2), 5.8 + float((i + 2) % 4) * 0.8)
+	# Fallen timber, standing stones and luminous spores establish a readable trail.
+	_add_box("Fallen Blackwood", Vector3(-4.9, 0.55, -8.5), Vector3(3.7, 0.45, 0.55), Color(0.055, 0.03, 0.04), false).rotation.z = -0.22
+	_add_box("Mossy Standing Stone", Vector3(4.5, 1.0, -18), Vector3(0.85, 2.0, 0.8), Color(0.11, 0.075, 0.15), false)
+	_add_box("Broken Wardstone", Vector3(-2.8, 0.75, -28), Vector3(0.65, 1.5, 0.65), Color(0.18, 0.09, 0.28), false)
+	_add_box("Sanctuary Gate", Vector3(0, 3.0, -62), Vector3(10, 6, 0.8), Color(0.12, 0.075, 0.19), false)
+	sanctuary_gate = _make_sigil(Vector3(0, 2.4, -61.45), Color(0.38, 0.12, 0.75), 2.1)
+	sanctuary_gate.name = "Sigil Sanctuary Gate"
+	add_child(sanctuary_gate)
 
-    # Imported Tripo landmarks make the opening path feel connected to the wider Realm.
-    # Procedural scenery remains in place if any optional model cannot be imported.
-    _add_imported_landmark("ruins", "Ancient Ruin Sentinel", Vector3(-6.8, 0.0, -31.0), 0.65)
-    _add_imported_landmark("tower", "The Council Castle", Vector3(20.0, 0.0, -80.0), 1.1)
-    whispering_warden = _add_imported_landmark("spirit", "The Whispering Warden", Vector3(7.5, 0.0, -28.0), 0.55)
-    if whispering_warden == null:
-        whispering_warden = _make_sigil(Vector3(7.5, 1.2, -28.0), Color(0.68, 0.88, 0.76), 0.9)
-        whispering_warden.name = "The Whispering Warden"
-        add_child(whispering_warden)
+	# Violet wisps act as subtle wayfinding lights from the waking place to the clearing.
+	for i in range(9):
+		var wisp_z := -3.0 - float(i) * 4.0
+		var wisp_x := -1.4 if i % 2 == 0 else 1.35
+		var wisp := _make_sigil(Vector3(wisp_x, 0.8 + float(i % 3) * 0.35, wisp_z), Color(0.52, 0.27, 0.92), 0.22)
+		wisp.name = "Violet Forest Wisp " + str(i + 1)
+		add_child(wisp)
 
-    # Violet wisps act as subtle wayfinding lights from the waking place to the clearing.
-    for i in range(9):
-        var wisp_z := -3.0 - float(i) * 4.0
-        var wisp_x := -1.4 if i % 2 == 0 else 1.35
-        var wisp := _make_sigil(Vector3(wisp_x, 0.8 + float(i % 3) * 0.35, wisp_z), Color(0.52, 0.27, 0.92), 0.22)
-        wisp.name = "Violet Forest Wisp " + str(i + 1)
-        add_child(wisp)
+	# The forest opens into a ward-clearing where Mathias is already holding the line.
+	_add_box("Battle Clearing", Vector3(0, -0.02, -39), Vector3(22, 0.14, 19), Color(0.075, 0.06, 0.085), false)
+	mathias = _build_person("Mathias", Vector3(0, 0, -35), Color(0.16, 0.11, 0.28), Color(0.8, 0.72, 0.92), true)
+	for i in range(3):
+		var x := -3.2 + float(i) * 3.2
+		var enemy := _build_person("Riftbound " + str(i + 1), Vector3(x, 0, -40.5), Color(0.035, 0.02, 0.07), Color(0.56, 0.18, 0.75), false)
+		enemy_nodes.append(enemy)
+		enemy_hp[enemy.get_instance_id()] = 1
 
-    # The forest opens into a ward-clearing where Mathias is already holding the line.
-    _add_box("Battle Clearing", Vector3(0, -0.02, -39), Vector3(22, 0.14, 19), Color(0.075, 0.06, 0.085), false)
-    mathias = _build_person("Mathias", Vector3(0, 0, -35), Color(0.16, 0.11, 0.28), Color(0.8, 0.72, 0.92), true)
-    if story_stage == 0:
-        var encounter_names := ["Forest Monster", "Shadow Beast 1", "Shadow Beast 2"]
-        for i in range(encounter_names.size()):
-            var x := -3.2 + float(i) * 3.2
-            var enemy := _build_person(encounter_names[i], Vector3(x, 0, -40.5), Color(0.035, 0.02, 0.07), Color(0.56, 0.18, 0.75), false)
-            enemy_nodes.append(enemy)
-            enemy_hp[enemy.get_instance_id()] = 1
-
-    var sigil_positions := [Vector3(-8.0, 0.0, -48.0), Vector3(8.0, 0.0, -48.0), Vector3(0.0, 0.0, -54.0)]
-    var sigil_names := ["Dawn", "Dusk", "Heart"]
-    var sigil_colors := [Color(0.98, 0.66, 0.24), Color(0.52, 0.35, 0.95), Color(0.28, 0.85, 0.72)]
-    for i in range(3):
-        var shrine := _make_sigil(sigil_positions[i] + Vector3(0, 1.1, 0), sigil_colors[i], 0.75)
-        shrine.name = sigil_names[i] + " Sigil"
-        shrine.set_meta("sigil_name", sigil_names[i])
-        shrine.visible = not collected_sigil_names.has(sigil_names[i])
-        sigil_nodes.append(shrine)
-        add_child(shrine)
-
-    _build_side_quests()
-
-
-func _build_side_quests() -> void:
-    quest_npcs.clear()
-    treasure_nodes.clear()
-
-    # All quest-giver and boss characters use imported Tripo FBX scenes.
-    var archivist := _build_person("Archivist Elowen", Vector3(5.8, 0, -12.0), Color(0.18, 0.1, 0.3), Color(0.72, 0.52, 1.0), true)
-    archivist.set_meta("quest_id", "lanterns")
-    quest_npcs.append(archivist)
-    var keeper := _build_person("Keeper of Ash", Vector3(-7.0, 0, -51.5), Color(0.18, 0.1, 0.3), Color(1.0, 0.56, 0.25), true)
-    keeper.set_meta("quest_id", "relics")
-    quest_npcs.append(keeper)
-
-    var treasure_data: Array[Dictionary] = [
-        {"id": "lantern_1", "quest": "lanterns", "pos": Vector3(-5.4, 0.9, -7.5), "color": Color(0.68, 0.42, 1.0), "name": "Lantern Shard I"},
-        {"id": "lantern_2", "quest": "lanterns", "pos": Vector3(5.2, 0.9, -21.5), "color": Color(0.68, 0.42, 1.0), "name": "Lantern Shard II"},
-        {"id": "lantern_3", "quest": "lanterns", "pos": Vector3(-6.5, 0.9, -33.5), "color": Color(0.68, 0.42, 1.0), "name": "Lantern Shard III"},
-        {"id": "relic_1", "quest": "relics", "pos": Vector3(8.5, 0.9, -36.0), "color": Color(1.0, 0.56, 0.25), "name": "Ashen Relic I"},
-        {"id": "relic_2", "quest": "relics", "pos": Vector3(-9.0, 0.9, -45.0), "color": Color(1.0, 0.56, 0.25), "name": "Ashen Relic II"}
-    ]
-    for item in treasure_data:
-        var item_id := str(item["id"])
-        if collected_treasures.has(item_id):
-            continue
-        var treasure := _make_sigil(item["pos"], item["color"], 0.42)
-        treasure.name = str(item["name"])
-        treasure.set_meta("treasure_id", item_id)
-        treasure.set_meta("quest_id", str(item["quest"]))
-        add_child(treasure)
-        _add_world_label(treasure, str(item["name"]), 0.9, item["color"])
-        treasure_nodes.append(treasure)
-
-func _add_world_label(parent: Node3D, label_text: String, height: float, label_color: Color) -> void:
-    var label := Label3D.new()
-    label.text = label_text
-    label.position = Vector3(0, height, 0)
-    label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-    label.font_size = 30
-    label.pixel_size = 0.008
-    label.modulate = label_color
-    label.outline_size = 6
-    label.outline_modulate = Color(0.025, 0.01, 0.045, 0.95)
-    parent.add_child(label)
-
-func _interact_with_quest_npc(npc: Node3D) -> void:
-    var quest_id := str(npc.get_meta("quest_id", ""))
-    if quest_id == "lanterns":
-        if bool(side_quest_complete.get("lanterns", false)):
-            _show_dialogue("ARCHIVIST ELOWEN", "“The lanterns are whole again. Gloamwood will remember the road even when the stars forget it.” She gives you a small silver seal from the old archive.", "Side quest complete")
-        elif not collected_treasures.has("lantern_1") or not collected_treasures.has("lantern_2") or not collected_treasures.has("lantern_3"):
-            _show_dialogue("ARCHIVIST ELOWEN • LOST LANTERNS", "“The trail-lanterns were shattered when the ward failed. Find all three violet shards scattered through Gloamwood and bring their light back to me. Without them, the old paths will vanish into the mist.”", "Side quest • Find 3 Lantern Shards")
-        else:
-            side_quest_complete["lanterns"] = true
-            side_quest_progress["lanterns"] = 3
-            _save_game()
-            _show_dialogue("ARCHIVIST ELOWEN • QUEST COMPLETE", "Elowen joins the three shards in her palm. Their light becomes a tiny lantern, steady and warm. “You have restored one of the roads the Council forgot. Keep this blessing: the Realm now knows your name.”", "Reward earned • Lantern blessing")
-    elif quest_id == "relics":
-        if bool(side_quest_complete.get("relics", false)):
-            _show_dialogue("KEEPER OF ASH", "“The relics are accounted for. Their old fire is quiet now, and the debt is paid.”", "Side quest complete")
-        elif not collected_treasures.has("relic_1") or not collected_treasures.has("relic_2"):
-            _show_dialogue("KEEPER OF ASH • THE UNPAID DEBT", "“Two ash relics were lost when the sanctuary sealed itself. Find them near the ward-clearing and return here. Touch nothing else that glows; the old vaults are fond of tricks.”", "Side quest • Recover 2 Ashen Relics")
-        else:
-            side_quest_complete["relics"] = true
-            side_quest_progress["relics"] = 2
-            _save_game()
-            _show_dialogue("KEEPER OF ASH • QUEST COMPLETE", "The Keeper presses two blackened relics together. A clean flame burns between them. “The debt is paid. May your next enemy learn the difference between a spark and a wildfire.”", "Reward earned • Ash relic blessing")
-    _refresh_objective()
-
-func _collect_treasure(treasure: Node3D) -> void:
-    var item_id := str(treasure.get_meta("treasure_id", ""))
-    var quest_id := str(treasure.get_meta("quest_id", ""))
-    if item_id.is_empty() or collected_treasures.has(item_id):
-        return
-    collected_treasures.append(item_id)
-    _play_sound_effect("pickup")
-    if quest_id == "lanterns":
-        side_quest_progress["lanterns"] = int(side_quest_progress.get("lanterns", 0)) + 1
-    elif quest_id == "relics":
-        side_quest_progress["relics"] = int(side_quest_progress.get("relics", 0)) + 1
-    treasure_nodes.erase(treasure)
-    treasure.queue_free()
-    _save_game()
-    var display_name := item_id.replace("_", " ").capitalize()
-    _set_status("Recovered " + display_name + " • Lanterns " + str(side_quest_progress.get("lanterns", 0)) + "/3 • Relics " + str(side_quest_progress.get("relics", 0)) + "/2")
-    _refresh_objective()
-
-func _start_final_boss() -> void:
-    if boss_active or boss_defeated:
-        return
-    boss_active = true
-    _play_sound_effect("boss")
-    var boss := _instantiate_model("guardian")
-    if boss == null:
-        boss_active = false
-        _set_status("The Hollow Warden model failed to import. Check the dark_fantasy_boss FBX import before starting the trial.")
-        return
-    boss.name = "The Hollow Warden"
-    boss.position = Vector3(0, 0, -67.0)
-    boss.scale = Vector3.ONE * 1.45
-    add_child(boss)
-    active_boss = boss
-    enemy_nodes.append(boss)
-    enemy_hp[boss.get_instance_id()] = 8
-    _play_model_idle(boss)
-    _set_status("BOSS TRIAL • The Hollow Warden awakens! Land 8 Arcane Pulses with Q.")
-    _show_dialogue("THE HOLLOW WARDEN", "A plated figure steps out of the gate's violet seam, carrying the broken crest of a forgotten Council. The Hollow Warden is no mere shade; its armor is bound to the seal itself. Keep your distance, aim with the mouse, and strike with Q. It will take several pulses to break the binding.", "Boss encounter • 8 hits required")
+	var sigil_positions := [Vector3(-8.0, 0.0, -48.0), Vector3(8.0, 0.0, -48.0), Vector3(0.0, 0.0, -54.0)]
+	var sigil_names := ["Dawn", "Dusk", "Heart"]
+	var sigil_colors := [Color(0.98, 0.66, 0.24), Color(0.52, 0.35, 0.95), Color(0.28, 0.85, 0.72)]
+	for i in range(3):
+		var shrine := _make_sigil(sigil_positions[i] + Vector3(0, 1.1, 0), sigil_colors[i], 0.75)
+		shrine.name = sigil_names[i] + " Sigil"
+		shrine.set_meta("sigil_name", sigil_names[i])
+		shrine.visible = i >= collected_sigils
+		sigil_nodes.append(shrine)
+		add_child(shrine)
 
 func _build_player() -> void:
-    player = CharacterBody3D.new()
-    player.name = "PlayerWizard"
-    player.position = Vector3(0, 0, -24.0)
-    player.floor_snap_length = 0.35
-    var collision := CollisionShape3D.new()
-    var capsule := CapsuleShape3D.new()
-    capsule.radius = 0.38
-    capsule.height = 1.85
-    collision.shape = capsule
-    collision.position.y = 0.93
-    player.add_child(collision)
+	player = CharacterBody3D.new()
+	player.name = "PlayerWizard"
+	player.position = Vector3(0, 0, 12.0)
+	player.floor_snap_length = 0.35
+	var collision := CollisionShape3D.new()
+	var capsule := CapsuleShape3D.new()
+	capsule.radius = 0.38
+	capsule.height = 1.85
+	collision.shape = capsule
+	collision.position.y = 0.93
+	player.add_child(collision)
 
-    player_visual = Node3D.new()
-    player_visual.name = "WizardVisual"
-    player.add_child(player_visual)
-    var player_model := _instantiate_model("player")
-    if player_model != null:
-        player_visual.add_child(player_model)
-        _play_model_idle(player_model)
-    else:
-        push_error("The playable wizard FBX failed to load. Check the fantasy_wizard_3d_model import. Primitive placeholder characters are disabled.")
-    add_child(player)
+	player_visual = Node3D.new()
+	player_visual.name = "WizardVisual"
+	player.add_child(player_visual)
+	_add_person_visual(player_visual, Color(0.22, 0.12, 0.42), Color(0.83, 0.75, 0.96), true)
+	add_child(player)
 
-    camera_pivot = Node3D.new()
-    camera_pivot.position = Vector3(0, 1.5, 0)
-    player.add_child(camera_pivot)
-    game_camera = Camera3D.new()
-    game_camera.position = Vector3(0, 2.4, 7.0)
-    game_camera.rotation.x = 0.19
-    game_camera.current = true
-    game_camera.fov = 72.0
-    camera_pivot.add_child(game_camera)
-    camera_pivot.rotation.x = pitch
-
-func _setup_audio() -> void:
-    # Original synthesized ambience and one-shot effects keep the build self-contained.
-    # Browsers may block playback until the player clicks Begin; ambient audio starts there.
-    audio_music = AudioStreamPlayer.new()
-    audio_music.name = "Original Gloamwood Ambience"
-    audio_music.bus = "Master"
-    audio_music.volume_db = -23.0
-    audio_music.stream = _synthesize_sound("ambience", 6.0, true)
-    ui_layer.add_child(audio_music)
-    audio_ready = true
-
-func _start_ambient_audio() -> void:
-    if not audio_ready or audio_music == null:
-        return
-    if not audio_music.playing:
-        audio_music.play()
-
-func _play_sound_effect(kind: String) -> void:
-    if not audio_ready:
-        return
-    var player_audio := AudioStreamPlayer.new()
-    player_audio.name = "SFX_" + kind
-    player_audio.volume_db = -10.0 if kind != "ambience" else -20.0
-    player_audio.stream = _synthesize_sound(kind, 0.52, false)
-    ui_layer.add_child(player_audio)
-    player_audio.finished.connect(player_audio.queue_free)
-    player_audio.play()
-
-func _synthesize_sound(kind: String, duration: float, looping: bool) -> AudioStreamWAV:
-    # A tiny original software synthesizer: soft drones, glassy pickup chimes and a layered spell whoosh.
-    # Kept at 11.025 kHz to avoid excessive GDScript CPU cost in browser builds.
-    var sample_count := maxi(1, int(AUDIO_RATE * duration))
-    var raw := PackedByteArray()
-    raw.resize(sample_count * 2)
-    var base_frequency := 110.0
-    match kind:
-        "spell":
-            base_frequency = 185.0
-        "pickup":
-            base_frequency = 660.0
-        "boss":
-            base_frequency = 73.0
-        "dialogue":
-            base_frequency = 330.0
-        "ambience":
-            base_frequency = 82.4
-        _:
-            base_frequency = 220.0
-    for i in range(sample_count):
-        var t := float(i) / float(AUDIO_RATE)
-        var envelope := 1.0
-        if not looping:
-            envelope = minf(1.0, t * 22.0) * minf(1.0, maxf(0.0, duration - t) * 5.0)
-        var sample := sin(TAU * base_frequency * t)
-        if kind == "spell":
-            sample = sample * 0.45 + sin(TAU * (base_frequency * 2.03) * t) * 0.3 + sin(TAU * (base_frequency * 0.48) * t) * 0.25
-            sample *= 0.72 + 0.28 * sin(TAU * 7.0 * t)
-        elif kind == "pickup":
-            sample = sin(TAU * base_frequency * t) * 0.55 + sin(TAU * base_frequency * 1.5 * t) * 0.3 + sin(TAU * base_frequency * 2.0 * t) * 0.15
-        elif kind == "boss":
-            sample = sin(TAU * base_frequency * t) * 0.65 + sin(TAU * base_frequency * 1.51 * t) * 0.25 + sin(TAU * 37.0 * t) * 0.1
-            sample *= 0.65 + 0.35 * sin(TAU * 1.3 * t)
-        elif kind == "ambience":
-            sample = sin(TAU * base_frequency * t) * 0.28 + sin(TAU * (base_frequency * 1.5) * t) * 0.13 + sin(TAU * (base_frequency * 2.01) * t) * 0.08
-            sample *= 0.8 + 0.2 * sin(TAU * 0.17 * t)
-        else:
-            sample = sin(TAU * base_frequency * t) * 0.65 + sin(TAU * base_frequency * 2.0 * t) * 0.2
-        var pcm := clampf(sample * envelope * 0.42, -1.0, 1.0)
-        raw.encode_s16(i * 2, int(pcm * 32767.0))
-    var stream := AudioStreamWAV.new()
-    stream.format = AudioStreamWAV.FORMAT_16_BITS
-    stream.mix_rate = AUDIO_RATE
-    stream.stereo = false
-    stream.data = raw
-    if looping:
-        stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
-        stream.loop_begin = 0
-        stream.loop_end = sample_count
-    return stream
-
-func _add_obj_prop(resource_path: String, object_name: String, world_position: Vector3, object_scale: Vector3) -> Node3D:
-    var imported_mesh := load(resource_path) as Mesh
-    if imported_mesh == null:
-        push_warning("Original OBJ asset could not be imported: " + resource_path)
-        return null
-    var prop := MeshInstance3D.new()
-    prop.name = object_name
-    prop.mesh = imported_mesh
-    prop.position = world_position
-    prop.scale = object_scale
-    prop.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
-    add_child(prop)
-    return prop
-
-func _add_imported_landmark(role: String, landmark_name: String, pos: Vector3, model_scale: float) -> Node3D:
-    var model := _instantiate_model(role)
-    if model == null:
-        return null
-    model.name = landmark_name
-    model.position = pos
-    model.scale = Vector3.ONE * model_scale
-    _play_model_idle(model)
-    add_child(model)
-    return model
+	camera_pivot = Node3D.new()
+	camera_pivot.position = Vector3(0, 1.5, 0)
+	player.add_child(camera_pivot)
+	game_camera = Camera3D.new()
+	game_camera.position = Vector3(0, 2.4, 7.0)
+	game_camera.rotation.x = 0.19
+	game_camera.current = true
+	game_camera.fov = 72.0
+	camera_pivot.add_child(game_camera)
+	camera_pivot.rotation.x = pitch
 
 func _build_house(pos: Vector3, color: Color) -> void:
-    _add_box("Gloamwick House", pos + Vector3(0, 1.6, 0), Vector3(6, 3.2, 5), color, true)
-    _add_box("House Roof", pos + Vector3(0, 3.55, 0), Vector3(6.8, 0.55, 5.8), Color(0.07, 0.035, 0.09), false)
-    _add_box("House Door", pos + Vector3(0, 0.9, -2.55), Vector3(1.0, 1.8, 0.12), Color(0.08, 0.035, 0.08), false)
+	_add_box("Gloamwick House", pos + Vector3(0, 1.6, 0), Vector3(6, 3.2, 5), color, true)
+	_add_box("House Roof", pos + Vector3(0, 3.55, 0), Vector3(6.8, 0.55, 5.8), Color(0.07, 0.035, 0.09), false)
+	_add_box("House Door", pos + Vector3(0, 0.9, -2.55), Vector3(1.0, 1.8, 0.12), Color(0.08, 0.035, 0.08), false)
 
 func _build_tree(pos: Vector3, height: float) -> void:
-    var trunk := MeshInstance3D.new()
-    var trunk_mesh := CylinderMesh.new()
-    trunk_mesh.top_radius = 0.18
-    trunk_mesh.bottom_radius = 0.42
-    trunk_mesh.height = height
-    trunk.mesh = trunk_mesh
-    trunk.position = pos + Vector3(0, height * 0.5, 0)
-    trunk.material_override = _material(Color(0.065, 0.032, 0.04))
-    add_child(trunk)
+	var trunk := MeshInstance3D.new()
+	var trunk_mesh := CylinderMesh.new()
+	trunk_mesh.top_radius = 0.18
+	trunk_mesh.bottom_radius = 0.42
+	trunk_mesh.height = height
+	trunk.mesh = trunk_mesh
+	trunk.position = pos + Vector3(0, height * 0.5, 0)
+	trunk.material_override = _material(Color(0.065, 0.032, 0.04))
+	add_child(trunk)
 
-    # Angular boughs break up the old lollipop-tree silhouette.
-    for branch_index in range(3):
-        var branch := MeshInstance3D.new()
-        var branch_mesh := CylinderMesh.new()
-        branch_mesh.top_radius = 0.055
-        branch_mesh.bottom_radius = 0.13
-        branch_mesh.height = 2.1
-        branch.mesh = branch_mesh
-        branch.position = pos + Vector3(0, height * (0.52 + float(branch_index) * 0.12), 0)
-        branch.rotation_degrees = Vector3(0, float(branch_index) * 67.0, -42.0 + float(branch_index) * 19.0)
-        branch.material_override = _material(Color(0.055, 0.027, 0.04))
-        add_child(branch)
+	# Angular boughs break up the old lollipop-tree silhouette.
+	for branch_index in range(3):
+		var branch := MeshInstance3D.new()
+		var branch_mesh := CylinderMesh.new()
+		branch_mesh.top_radius = 0.055
+		branch_mesh.bottom_radius = 0.13
+		branch_mesh.height = 2.1
+		branch.mesh = branch_mesh
+		branch.position = pos + Vector3(0, height * (0.52 + float(branch_index) * 0.12), 0)
+		branch.rotation_degrees = Vector3(0, float(branch_index) * 67.0, -42.0 + float(branch_index) * 19.0)
+		branch.material_override = _material(Color(0.055, 0.027, 0.04))
+		add_child(branch)
 
-    for canopy_index in range(4):
-        var crown := MeshInstance3D.new()
-        var crown_mesh := SphereMesh.new()
-        crown_mesh.radius = 1.35 if canopy_index == 0 else 1.05
-        crown_mesh.height = crown_mesh.radius * 1.9
-        crown.mesh = crown_mesh
-        crown.position = pos + Vector3(
-            sin(float(canopy_index) * 1.8) * 0.95,
-            height + 0.2 + float(canopy_index % 2) * 0.9,
-            cos(float(canopy_index) * 1.7) * 0.8
-        )
-        crown.scale = Vector3(1.0, 1.25, 0.9)
-        crown.material_override = _material(Color(0.022 + float(canopy_index) * 0.004, 0.045, 0.038))
-        add_child(crown)
+	for canopy_index in range(4):
+		var crown := MeshInstance3D.new()
+		var crown_mesh := SphereMesh.new()
+		crown_mesh.radius = 1.35 if canopy_index == 0 else 1.05
+		crown_mesh.height = crown_mesh.radius * 1.9
+		crown.mesh = crown_mesh
+		crown.position = pos + Vector3(
+			sin(float(canopy_index) * 1.8) * 0.95,
+			height + 0.2 + float(canopy_index % 2) * 0.9,
+			cos(float(canopy_index) * 1.7) * 0.8
+		)
+		crown.scale = Vector3(1.0, 1.25, 0.9)
+		crown.material_override = _material(Color(0.022 + float(canopy_index) * 0.004, 0.045, 0.038))
+		add_child(crown)
 
-    # Tiny bioluminescent mushrooms and spores give the ground depth cues.
-    for spore_index in range(2):
-        var spore := _make_sphere(pos + Vector3(-0.42 + float(spore_index) * 0.84, 0.16, 0.25), 0.09, Color(0.36, 0.13, 0.62))
-        spore.scale = Vector3(1.0, 0.65, 1.0)
-        add_child(spore)
+	# Tiny bioluminescent mushrooms and spores give the ground depth cues.
+	for spore_index in range(2):
+		var spore := _make_sphere(pos + Vector3(-0.42 + float(spore_index) * 0.84, 0.16, 0.25), 0.09, Color(0.36, 0.13, 0.62))
+		spore.scale = Vector3(1.0, 0.65, 1.0)
+		add_child(spore)
 
 func _build_person(person_name: String, pos: Vector3, robe_color: Color, glow_color: Color, is_mage: bool) -> Node3D:
-    var person := Node3D.new()
-    person.name = person_name
-    person.position = pos
-    var lower_name := person_name.to_lower()
-    var role := "mathias" if lower_name.contains("mathias") or lower_name.contains("archivist") or lower_name.contains("keeper") else ("guardian" if lower_name.contains("hollow warden") else ("forest_monster" if lower_name.contains("forest monster") else ("riftbound" if lower_name.contains("shadow beast") or lower_name.contains("riftbound") else "player")))
-    var imported_model := _instantiate_model(role)
-    if imported_model != null:
-        person.add_child(imported_model)
-        _play_model_idle(imported_model)
-    else:
-        push_error("Required character model failed to load for: " + person_name + ". Check the FBX import errors; no primitive character substitute was created.")
-    add_child(person)
-    if imported_model != null and (person_name == "Archivist Elowen" or person_name == "Keeper of Ash"):
-        _add_world_label(person, person_name, 2.8, Color(0.86, 0.7, 1.0))
-    return person
-
-# Put Tripo exports anywhere under res://; filename keywords determine their world role.
-# Examples: player_wizard.glb, mathias.glb, riftbound_shade.glb, forest_tree.glb.
-func _instantiate_model(role: String) -> Node3D:
-    var scene := _get_model_scene(role)
-    if scene == null:
-        return null
-    var instance := scene.instantiate()
-    if instance is Node3D:
-        return instance as Node3D
-    instance.free()
-    return null
-
-func _get_model_scene(role: String) -> PackedScene:
-    if _model_scene_cache.has(role):
-        return _model_scene_cache[role] as PackedScene
-
-    # Use explicit resource paths instead of scanning res:// at runtime. Exported Godot
-    # web builds do not reliably expose packaged assets to DirAccess scans, and resources
-    # discovered only by a scan can be omitted from the export. Literal load paths are
-    # discoverable by Godot's export pipeline and load only when that character is needed.
-    var scene: PackedScene = null
-    match role:
-        "player":
-            scene = load("res://TripoModels/fantasy_wizard_3d_model/fantasy_wizard_3d_model.fbx") as PackedScene
-            if scene == null:
-                scene = load("res://TripoModels/wizard_robe_3d_model/wizard_robe_3d_model.fbx") as PackedScene
-        "mathias":
-            scene = load("res://TripoModels/wizard_robe_3d_model/wizard_robe_3d_model.fbx") as PackedScene
-        "riftbound":
-            scene = load("res://TripoModels/shadow_beast_3d_model/shadow_beast_3d_model.fbx") as PackedScene
-            if scene == null:
-                scene = load("res://TripoModels/dark_fantasy_boss_3d_model/dark_fantasy_boss_3d_model.fbx") as PackedScene
-        "forest_monster", "spirit":
-            scene = load("res://TripoModels/haunted_forest_spirit_3d_model/haunted_forest_spirit_3d_model.fbx") as PackedScene
-        "ruins":
-            scene = load("res://TripoModels/ancient_ruin_stones_3d_model/ancient_ruin_stones_3d_model.fbx") as PackedScene
-        "tower":
-            scene = load("res://TripoModels/wizard_tower_3d_model/wizard_tower_3d_model.fbx") as PackedScene
-        "guardian":
-            scene = load("res://TripoModels/dark_fantasy_boss_3d_model/dark_fantasy_boss_3d_model.fbx") as PackedScene
-
-    _model_scene_cache[role] = scene
-    if scene == null:
-        push_warning("No imported model resource could be loaded for role: " + role)
-    return scene
-
-func _build_model_file_index() -> void:
-    if _model_index_ready:
-        return
-    _model_index_ready = true
-    _scan_model_directory("res://")
-
-func _scan_model_directory(directory_path: String) -> void:
-    var directory := DirAccess.open(directory_path)
-    if directory == null:
-        return
-    directory.list_dir_begin()
-    var entry := directory.get_next()
-    while not entry.is_empty():
-        if entry.begins_with("."):
-            entry = directory.get_next()
-            continue
-        var full_path := directory_path.path_join(entry)
-        if directory.current_is_dir():
-            if entry != "addons" and entry != "web" and entry != "export":
-                _scan_model_directory(full_path)
-        else:
-            var extension := entry.get_extension().to_lower()
-            if extension in ["glb", "gltf", "fbx"]:
-                _model_file_index[entry.get_basename().to_lower()] = full_path
-        entry = directory.get_next()
-    directory.list_dir_end()
-
-func _play_model_animation(root: Node, candidates: Array[String]) -> void:
-    if root == null or not is_instance_valid(root):
-        return
-    if root is AnimationPlayer:
-        var animation_player := root as AnimationPlayer
-        var names := animation_player.get_animation_list()
-        for candidate in candidates:
-            for animation_name in names:
-                if str(animation_name).to_lower().contains(candidate.to_lower()):
-                    if animation_player.current_animation != animation_name:
-                        animation_player.play(animation_name)
-                    return
-    for child in root.get_children():
-        _play_model_animation(child, candidates)
-
-func _play_model_idle(root: Node) -> void:
-    if root is AnimationPlayer:
-        var animation_player := root as AnimationPlayer
-        var names := animation_player.get_animation_list()
-        for candidate in ["idle", "idle_loop", "breathing", "stand", "standing"]:
-            for animation_name in names:
-                if str(animation_name).to_lower().contains(candidate):
-                    animation_player.play(animation_name)
-                    return
-        if not names.is_empty():
-            animation_player.play(names[0])
-    for child in root.get_children():
-        _play_model_idle(child)
+	var person := Node3D.new()
+	person.name = person_name
+	person.position = pos
+	_add_person_visual(person, robe_color, glow_color, is_mage)
+	add_child(person)
+	return person
 
 func _add_person_visual(parent: Node3D, robe_color: Color, face_color: Color, is_mage: bool) -> void:
-    # Layered silhouette: broad hem, fitted torso, sleeves, sash and a compact hat.
-    # Keeping the character built from low-poly meshes avoids missing external model imports.
-    var robe := MeshInstance3D.new()
-    var robe_mesh := CylinderMesh.new()
-    robe_mesh.top_radius = 0.27
-    robe_mesh.bottom_radius = 0.55
-    robe_mesh.height = 1.12
-    robe.mesh = robe_mesh
-    robe.position = Vector3(0, 0.66, 0)
-    robe.material_override = _material(robe_color)
-    parent.add_child(robe)
+	# Layered silhouette: broad hem, fitted torso, sleeves, sash and a compact hat.
+	# Keeping the character built from low-poly meshes avoids missing external model imports.
+	var robe := MeshInstance3D.new()
+	var robe_mesh := CylinderMesh.new()
+	robe_mesh.top_radius = 0.27
+	robe_mesh.bottom_radius = 0.55
+	robe_mesh.height = 1.12
+	robe.mesh = robe_mesh
+	robe.position = Vector3(0, 0.66, 0)
+	robe.material_override = _material(robe_color)
+	parent.add_child(robe)
 
-    var torso := MeshInstance3D.new()
-    var torso_mesh := CapsuleMesh.new()
-    torso_mesh.radius = 0.27
-    torso_mesh.height = 0.82
-    torso.mesh = torso_mesh
-    torso.position = Vector3(0, 1.12, 0)
-    torso.material_override = _material(robe_color.lightened(0.08))
-    parent.add_child(torso)
+	var torso := MeshInstance3D.new()
+	var torso_mesh := CapsuleMesh.new()
+	torso_mesh.radius = 0.27
+	torso_mesh.height = 0.82
+	torso.mesh = torso_mesh
+	torso.position = Vector3(0, 1.12, 0)
+	torso.material_override = _material(robe_color.lightened(0.08))
+	parent.add_child(torso)
 
-    var cape := MeshInstance3D.new()
-    var cape_mesh := SphereMesh.new()
-    cape_mesh.radius = 0.43
-    cape_mesh.height = 1.2
-    cape.mesh = cape_mesh
-    cape.position = Vector3(0, 0.96, 0.18)
-    cape.scale = Vector3(1.0, 1.0, 0.34)
-    cape.material_override = _material(robe_color.darkened(0.32))
-    parent.add_child(cape)
+	var cape := MeshInstance3D.new()
+	var cape_mesh := SphereMesh.new()
+	cape_mesh.radius = 0.43
+	cape_mesh.height = 1.2
+	cape.mesh = cape_mesh
+	cape.position = Vector3(0, 0.96, 0.18)
+	cape.scale = Vector3(1.0, 1.0, 0.34)
+	cape.material_override = _material(robe_color.darkened(0.32))
+	parent.add_child(cape)
 
-    for side in [-1.0, 1.0]:
-        var sleeve := MeshInstance3D.new()
-        var sleeve_mesh := CylinderMesh.new()
-        sleeve_mesh.top_radius = 0.105
-        sleeve_mesh.bottom_radius = 0.14
-        sleeve_mesh.height = 0.72
-        sleeve.mesh = sleeve_mesh
-        sleeve.position = Vector3(side * 0.37, 1.02, -0.005)
-        sleeve.rotation.z = side * -0.22
-        sleeve.material_override = _material(robe_color.darkened(0.08))
-        parent.add_child(sleeve)
+	for side in [-1.0, 1.0]:
+		var sleeve := MeshInstance3D.new()
+		var sleeve_mesh := CylinderMesh.new()
+		sleeve_mesh.top_radius = 0.105
+		sleeve_mesh.bottom_radius = 0.14
+		sleeve_mesh.height = 0.72
+		sleeve.mesh = sleeve_mesh
+		sleeve.position = Vector3(side * 0.37, 1.02, -0.005)
+		sleeve.rotation.z = side * -0.22
+		sleeve.material_override = _material(robe_color.darkened(0.08))
+		parent.add_child(sleeve)
 
-        var hand := _make_sphere(Vector3(side * 0.43, 0.65, -0.035), 0.105, Color(0.52, 0.36, 0.31) if is_mage else robe_color.darkened(0.45))
-        hand.scale = Vector3(0.82, 1.0, 0.82)
-        parent.add_child(hand)
+		var hand := _make_sphere(Vector3(side * 0.43, 0.65, -0.035), 0.105, Color(0.52, 0.36, 0.31) if is_mage else robe_color.darkened(0.45))
+		hand.scale = Vector3(0.82, 1.0, 0.82)
+		parent.add_child(hand)
 
-        var boot := MeshInstance3D.new()
-        var boot_mesh := SphereMesh.new()
-        boot_mesh.radius = 0.17
-        boot_mesh.height = 0.25
-        boot.mesh = boot_mesh
-        boot.position = Vector3(side * 0.19, 0.12, -0.055)
-        boot.scale = Vector3(1.0, 0.72, 1.25)
-        boot.material_override = _material(Color(0.055, 0.035, 0.075))
-        parent.add_child(boot)
+		var boot := MeshInstance3D.new()
+		var boot_mesh := SphereMesh.new()
+		boot_mesh.radius = 0.17
+		boot_mesh.height = 0.25
+		boot.mesh = boot_mesh
+		boot.position = Vector3(side * 0.19, 0.12, -0.055)
+		boot.scale = Vector3(1.0, 0.72, 1.25)
+		boot.material_override = _material(Color(0.055, 0.035, 0.075))
+		parent.add_child(boot)
 
-    var sash := MeshInstance3D.new()
-    var sash_mesh := TorusMesh.new()
-    sash_mesh.inner_radius = 0.265
-    sash_mesh.outer_radius = 0.315
-    sash.mesh = sash_mesh
-    sash.position.y = 0.79
-    sash.material_override = _material(Color(0.68, 0.43, 0.2) if is_mage else Color(0.19, 0.14, 0.24))
-    parent.add_child(sash)
+	var sash := MeshInstance3D.new()
+	var sash_mesh := TorusMesh.new()
+	sash_mesh.inner_radius = 0.265
+	sash_mesh.outer_radius = 0.315
+	sash.mesh = sash_mesh
+	sash.position.y = 0.79
+	sash.material_override = _material(Color(0.68, 0.43, 0.2) if is_mage else Color(0.19, 0.14, 0.24))
+	parent.add_child(sash)
 
-    var face := MeshInstance3D.new()
-    var face_mesh := SphereMesh.new()
-    face_mesh.radius = 0.235
-    face_mesh.height = 0.47
-    face.mesh = face_mesh
-    face.position = Vector3(0, 1.57, -0.045)
-    face.material_override = _material(Color(0.58, 0.42, 0.38) if is_mage else Color(0.055, 0.028, 0.085))
-    parent.add_child(face)
+	var face := MeshInstance3D.new()
+	var face_mesh := SphereMesh.new()
+	face_mesh.radius = 0.235
+	face_mesh.height = 0.47
+	face.mesh = face_mesh
+	face.position = Vector3(0, 1.57, -0.045)
+	face.material_override = _material(Color(0.58, 0.42, 0.38) if is_mage else Color(0.055, 0.028, 0.085))
+	parent.add_child(face)
 
-    if is_mage:
-        # A smaller brim and tapered crown read as a hat instead of a floating cone.
-        var brim := MeshInstance3D.new()
-        var brim_mesh := CylinderMesh.new()
-        brim_mesh.top_radius = 0.31
-        brim_mesh.bottom_radius = 0.34
-        brim_mesh.height = 0.075
-        brim.mesh = brim_mesh
-        brim.position.y = 1.82
-        brim.material_override = _material(robe_color.darkened(0.1))
-        parent.add_child(brim)
+	if is_mage:
+		# A smaller brim and tapered crown read as a hat instead of a floating cone.
+		var brim := MeshInstance3D.new()
+		var brim_mesh := CylinderMesh.new()
+		brim_mesh.top_radius = 0.31
+		brim_mesh.bottom_radius = 0.34
+		brim_mesh.height = 0.075
+		brim.mesh = brim_mesh
+		brim.position.y = 1.82
+		brim.material_override = _material(robe_color.darkened(0.1))
+		parent.add_child(brim)
 
-        var hat := MeshInstance3D.new()
-        var hat_mesh := CylinderMesh.new()
-        hat_mesh.top_radius = 0.035
-        hat_mesh.bottom_radius = 0.245
-        hat_mesh.height = 0.52
-        hat.mesh = hat_mesh
-        hat.position.y = 2.105
-        hat.rotation.z = -0.08
-        hat.material_override = _material(robe_color.darkened(0.12))
-        parent.add_child(hat)
+		var hat := MeshInstance3D.new()
+		var hat_mesh := CylinderMesh.new()
+		hat_mesh.top_radius = 0.035
+		hat_mesh.bottom_radius = 0.245
+		hat_mesh.height = 0.52
+		hat.mesh = hat_mesh
+		hat.position.y = 2.105
+		hat.rotation.z = -0.08
+		hat.material_override = _material(robe_color.darkened(0.12))
+		parent.add_child(hat)
 
-        var hat_band := MeshInstance3D.new()
-        var band_mesh := TorusMesh.new()
-        band_mesh.inner_radius = 0.222
-        band_mesh.outer_radius = 0.245
-        hat_band.mesh = band_mesh
-        hat_band.position.y = 1.91
-        hat_band.material_override = _material(face_color, true)
-        parent.add_child(hat_band)
-    else:
-        # Mathias' shadowed hood and bright eyes give him a distinct battle-mage shape.
-        var hood := MeshInstance3D.new()
-        var hood_mesh := SphereMesh.new()
-        hood_mesh.radius = 0.29
-        hood_mesh.height = 0.42
-        hood.mesh = hood_mesh
-        hood.position = Vector3(0, 1.68, 0.035)
-        hood.scale = Vector3(1.0, 0.9, 0.9)
-        hood.material_override = _material(robe_color.darkened(0.2))
-        parent.add_child(hood)
-        parent.add_child(_make_sphere(Vector3(-0.09, 1.57, -0.238), 0.035, face_color))
-        parent.add_child(_make_sphere(Vector3(0.09, 1.57, -0.238), 0.035, face_color))
+		var hat_band := MeshInstance3D.new()
+		var band_mesh := TorusMesh.new()
+		band_mesh.inner_radius = 0.222
+		band_mesh.outer_radius = 0.245
+		hat_band.mesh = band_mesh
+		hat_band.position.y = 1.91
+		hat_band.material_override = _material(face_color, true)
+		parent.add_child(hat_band)
+	else:
+		# Mathias' shadowed hood and bright eyes give him a distinct battle-mage shape.
+		var hood := MeshInstance3D.new()
+		var hood_mesh := SphereMesh.new()
+		hood_mesh.radius = 0.29
+		hood_mesh.height = 0.42
+		hood.mesh = hood_mesh
+		hood.position = Vector3(0, 1.68, 0.035)
+		hood.scale = Vector3(1.0, 0.9, 0.9)
+		hood.material_override = _material(robe_color.darkened(0.2))
+		parent.add_child(hood)
+		parent.add_child(_make_sphere(Vector3(-0.09, 1.57, -0.238), 0.035, face_color))
+		parent.add_child(_make_sphere(Vector3(0.09, 1.57, -0.238), 0.035, face_color))
 
-    # The chest sigil is a small focal point rather than a large floating ornament.
-    var pendant := _make_sphere(Vector3(0, 1.25, -0.285), 0.07, face_color)
-    pendant.scale = Vector3(0.72, 1.0, 0.5)
-    parent.add_child(pendant)
+	# The chest sigil is a small focal point rather than a large floating ornament.
+	var pendant := _make_sphere(Vector3(0, 1.25, -0.285), 0.07, face_color)
+	pendant.scale = Vector3(0.72, 1.0, 0.5)
+	parent.add_child(pendant)
 
 func _make_sigil(pos: Vector3, color: Color, size: float) -> Node3D:
-    var root := Node3D.new()
-    root.position = pos
-    var ring := MeshInstance3D.new()
-    var ring_mesh := TorusMesh.new()
-    ring_mesh.inner_radius = size * 0.68
-    ring_mesh.outer_radius = size
-    ring.mesh = ring_mesh
-    ring.rotation.x = PI * 0.5
-    ring.material_override = _material(color, true)
-    root.add_child(ring)
-    var crystal := MeshInstance3D.new()
-    var crystal_mesh := PrismMesh.new()
-    crystal_mesh.size = Vector3(size * 0.6, size * 1.25, size * 0.6)
-    crystal.mesh = crystal_mesh
-    crystal.material_override = _material(color, true)
-    root.add_child(crystal)
-    var light := OmniLight3D.new()
-    light.light_color = color
-    light.light_energy = 1.2
-    light.omni_range = size * 5.0
-    root.add_child(light)
-    return root
+	var root := Node3D.new()
+	root.position = pos
+	var ring := MeshInstance3D.new()
+	var ring_mesh := TorusMesh.new()
+	ring_mesh.inner_radius = size * 0.68
+	ring_mesh.outer_radius = size
+	ring.mesh = ring_mesh
+	ring.rotation.x = PI * 0.5
+	ring.material_override = _material(color, true)
+	root.add_child(ring)
+	var crystal := MeshInstance3D.new()
+	var crystal_mesh := PrismMesh.new()
+	crystal_mesh.size = Vector3(size * 0.6, size * 1.25, size * 0.6)
+	crystal.mesh = crystal_mesh
+	crystal.material_override = _material(color, true)
+	root.add_child(crystal)
+	var light := OmniLight3D.new()
+	light.light_color = color
+	light.light_energy = 1.2
+	light.omni_range = size * 5.0
+	root.add_child(light)
+	return root
 
 func _add_box(object_name: String, pos: Vector3, size: Vector3, color: Color, collision: bool) -> Node3D:
-    var root: Node3D
-    if collision:
-        root = StaticBody3D.new()
-        var shape_node := CollisionShape3D.new()
-        var shape := BoxShape3D.new()
-        shape.size = size
-        shape_node.shape = shape
-        root.add_child(shape_node)
-    else:
-        root = Node3D.new()
-    root.name = object_name
-    root.position = pos
-    var mesh_node := MeshInstance3D.new()
-    var mesh := BoxMesh.new()
-    mesh.size = size
-    mesh_node.mesh = mesh
-    mesh_node.material_override = _material(color)
-    root.add_child(mesh_node)
-    add_child(root)
-    return root
+	var root: Node3D
+	if collision:
+		root = StaticBody3D.new()
+		var shape_node := CollisionShape3D.new()
+		var shape := BoxShape3D.new()
+		shape.size = size
+		shape_node.shape = shape
+		root.add_child(shape_node)
+	else:
+		root = Node3D.new()
+	root.name = object_name
+	root.position = pos
+	var mesh_node := MeshInstance3D.new()
+	var mesh := BoxMesh.new()
+	mesh.size = size
+	mesh_node.mesh = mesh
+	mesh_node.material_override = _material(color)
+	root.add_child(mesh_node)
+	add_child(root)
+	return root
 
 func _make_sphere(pos: Vector3, radius: float, color: Color) -> MeshInstance3D:
-    var node := MeshInstance3D.new()
-    var mesh := SphereMesh.new()
-    mesh.radius = radius
-    mesh.height = radius * 2.0
-    node.mesh = mesh
-    node.position = pos
-    node.material_override = _material(color, true)
-    return node
+	var node := MeshInstance3D.new()
+	var mesh := SphereMesh.new()
+	mesh.radius = radius
+	mesh.height = radius * 2.0
+	node.mesh = mesh
+	node.position = pos
+	node.material_override = _material(color, true)
+	return node
 
 func _material(color: Color, glow: bool = false) -> StandardMaterial3D:
-    var material := StandardMaterial3D.new()
-    material.albedo_color = color
-    material.roughness = 0.72
-    if glow:
-        material.emission_enabled = true
-        material.emission = color
-        material.emission_energy_multiplier = 1.4
-    return material
+	var material := StandardMaterial3D.new()
+	material.albedo_color = color
+	material.roughness = 0.72
+	if glow:
+		material.emission_enabled = true
+		material.emission = color
+		material.emission_energy_multiplier = 1.4
+	return material
 
 func _make_button(label_text: String, color: Color) -> Button:
-    var button := Button.new()
-    button.text = label_text
-    button.custom_minimum_size = Vector2(0, 44)
-    button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-    button.add_theme_font_size_override("font_size", 16)
-    button.add_theme_color_override("font_color", Color(0.96, 0.91, 1.0))
-    var normal := StyleBoxFlat.new()
-    normal.bg_color = color
-    normal.corner_radius_top_left = 7
-    normal.corner_radius_top_right = 7
-    normal.corner_radius_bottom_left = 7
-    normal.corner_radius_bottom_right = 7
-    normal.content_margin_left = 12
-    normal.content_margin_right = 12
-    normal.content_margin_top = 8
-    normal.content_margin_bottom = 8
-    button.add_theme_stylebox_override("normal", normal)
-    var hover := normal.duplicate() as StyleBoxFlat
-    hover.bg_color = color.lightened(0.16)
-    button.add_theme_stylebox_override("hover", hover)
-    var pressed := normal.duplicate() as StyleBoxFlat
-    pressed.bg_color = color.darkened(0.15)
-    button.add_theme_stylebox_override("pressed", pressed)
-    return button
+	var button := Button.new()
+	button.text = label_text
+	button.custom_minimum_size = Vector2(0, 44)
+	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	button.add_theme_font_size_override("font_size", 16)
+	button.add_theme_color_override("font_color", Color(0.96, 0.91, 1.0))
+	var normal := StyleBoxFlat.new()
+	normal.bg_color = color
+	normal.corner_radius_top_left = 7
+	normal.corner_radius_top_right = 7
+	normal.corner_radius_bottom_left = 7
+	normal.corner_radius_bottom_right = 7
+	normal.content_margin_left = 12
+	normal.content_margin_right = 12
+	normal.content_margin_top = 8
+	normal.content_margin_bottom = 8
+	button.add_theme_stylebox_override("normal", normal)
+	var hover := normal.duplicate() as StyleBoxFlat
+	hover.bg_color = color.lightened(0.16)
+	button.add_theme_stylebox_override("hover", hover)
+	var pressed := normal.duplicate() as StyleBoxFlat
+	pressed.bg_color = color.darkened(0.15)
+	button.add_theme_stylebox_override("pressed", pressed)
+	return button
 
 func _panel_style(bg: Color, border: Color) -> StyleBoxFlat:
-    var style := StyleBoxFlat.new()
-    style.bg_color = bg
-    style.border_color = border
-    style.set_border_width_all(1)
-    style.set_corner_radius_all(10)
-    style.content_margin_left = 18
-    style.content_margin_right = 18
-    style.content_margin_top = 16
-    style.content_margin_bottom = 16
-    return style
+	var style := StyleBoxFlat.new()
+	style.bg_color = bg
+	style.border_color = border
+	style.set_border_width_all(1)
+	style.set_corner_radius_all(10)
+	style.content_margin_left = 18
+	style.content_margin_right = 18
+	style.content_margin_top = 16
+	style.content_margin_bottom = 16
+	return style
 
 func _show_dialogue(title_text: String, body_text: String, hint_text: String) -> void:
-    dialogue_open = true
-    dialogue_title.text = title_text
-    dialogue_body.text = body_text
-    dialogue_hint.text = hint_text
-    dialogue_choices_box.visible = false
-    for child in dialogue_choices_box.get_children():
-        child.queue_free()
-    dialogue_continue_button.visible = true
-    dialogue_panel.anchor_top = 0.68
-    dialogue_panel.visible = true
-    Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-
-func _show_dialogue_choices(title_text: String, body_text: String, hint_text: String, context: String, choices: Array[Dictionary]) -> void:
-    _show_dialogue(title_text, body_text, hint_text)
-    dialogue_panel.anchor_top = 0.54
-    pending_choice_context = context
-    dialogue_choices_box.visible = true
-    dialogue_continue_button.visible = false
-    for choice in choices:
-        var choice_button := _make_button(str(choice.get("label", "Choose")), Color(0.22, 0.12, 0.34))
-        choice_button.custom_minimum_size.y = 38
-        choice_button.add_theme_font_size_override("font_size", 14)
-        choice_button.pressed.connect(_choose_dialogue.bind(str(choice.get("id", ""))))
-        dialogue_choices_box.add_child(choice_button)
-
-func _choose_dialogue(choice_id: String) -> void:
-    if not dialogue_open:
-        return
-    if pending_choice_context == "mathias":
-        mathias_stance = choice_id
-        story_stage = max(story_stage, 1)
-        var mathias_response := ""
-        match choice_id:
-            "compassion":
-                mathias_response = "Mathias studies you, then gives a tired nod. “Good. Power is easy to admire. The choice to stand beside someone when the cost is unknown—that tells me more.” He gestures toward the broken ward. “The Warden nearby remembers the old vows. Hear its warning before you touch the three Sigils.”"
-            "suspicion":
-                mathias_response = "Mathias' jaw tightens. “Fair. I have withheld too much, and I won't ask you to trust a stranger. The Warden beside the broken ward remembers what my Council records do not. Question it—and question me again when you return.”"
-            "duty":
-                mathias_response = "Mathias turns back to the wounded ward. “Then we understand each other. Keep people alive first; explanations can follow. The Warden nearby remembers the vows behind the seals. Speak with it, then recover Dawn, Dusk, and Heart.”"
-            _:
-                mathias_response = "Mathias points toward the broken ward and the waiting Sigils."
-        _save_game()
-        _refresh_objective()
-        _show_dialogue("MATHIAS • THE FIRST VOW", mathias_response + " Dawn, Dusk, and Heart are not trophies. Each holds one part of the promise that keeps this valley whole.", "Quest updated • Seek the Whispering Warden")
-    elif pending_choice_context == "warden":
-        warden_response = choice_id
-        warden_consulted = true
-        var warden_answer_text := ""
-        match choice_id:
-            "dawn":
-                warden_answer_text = "“Dawn is not hope,” the Warden whispers. “It is the courage to begin after hope has failed. Find it where the first light touches broken stone.” A pale root curls toward the sanctuary trail."
-            "fourth":
-                warden_answer_text = "The Warden's light dims. “Three vows were spoken. A fourth was cut from the telling—not broken, not kept, but removed. Ask who benefits when a name cannot be remembered.”"
-            "mathias":
-                warden_answer_text = "“Trust is a bridge, not a blindfold,” says the Warden. “Let Mathias guide your steps, but let the stones judge his words. The Sigils remember what even loyal hearts forget.”"
-            _:
-                warden_answer_text = "“Listen to the old stones. They will remember for you.”"
-        _save_game()
-        _refresh_objective()
-        _show_dialogue("THE WARDEN'S ANSWER", warden_answer_text + " “Now you may approach the three Sigils. Dawn, Dusk, and Heart must be gathered together—or the gate will remain a wound pretending to be a door.”", "Quest updated • Recover the three Sigils")
-    pending_choice_context = ""
+	dialogue_open = true
+	dialogue_title.text = title_text
+	dialogue_body.text = body_text
+	dialogue_hint.text = hint_text
+	dialogue_panel.visible = true
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 func _advance_dialogue() -> void:
-    if not dialogue_open or dialogue_choices_box.visible:
-        return
-    dialogue_panel.visible = false
-    dialogue_open = false
-    Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-    if dialogue_title.text == "A VOICE BETWEEN THE TREES":
-        _show_dialogue("FIRST LESSON • ARCANE PULSE", "Mathias is surrounded. Move with WASD or the arrow keys, turn with the mouse, and move closer to the creatures. Press Q to cast Arcane Pulse at the nearest target. Each creature in this first lesson needs one pulse. If you get lost, follow the violet wisps. Press E when you reach Mathias after the clearing is safe.", "Tutorial • Move, aim, and cast Q to help Mathias")
-        return
-    if story_stage == 0 and enemy_nodes.is_empty() and dialogue_title.text == "MATHIAS • BATTLE MAGE":
-        story_stage = 1
-        _save_game()
-        _show_dialogue("MATHIAS • THE FAILING WARDS", "“You held the line, " + player_name + ". These were not ordinary shades. The ward-stones across the realms are being corrupted from the inside. The Council's old riddles, relic records, and bounty ledgers all point toward the same wound.” Mathias looks toward the sealed sanctuary. “Recover the Dawn, Dusk, and Heart Sigils. Then we can ask the Codex what the Council has forgotten.”", "Find the three Sigils")
-        return
-    if story_stage == 1 and collected_sigils >= 3:
-        story_stage = 2
-        _save_game()
-        _show_dialogue("THE SANCTUARY OPENS", "The three sigils circle the gate and settle into its stonework. The violet sky clears for a heartbeat. Mathias lowers his voice: “The Realm's Archivists speak of a page that never was, an Archive Wisp, and a crown erased from every record. If this corruption reaches that secret, Gloamwick is only the beginning.” The trail leads beyond this valley—and into the Saga of the Hollow Crown.", "Enter the Sigil Sanctuary")
-        return
-    if story_stage >= 2:
-        _show_dialogue("CHAPTER I COMPLETE", "Your Chronicle now carries the first record of the failing wards. The Council's saga continues beyond Gloamwick: forbidden pages, familiars born from memory, rival paths, ancient relics, and the Hollow Crown. Future chapters will build on this journey.", "Return to the Realm")
-        return
-    _refresh_objective()
+	if not dialogue_open:
+		return
+	dialogue_panel.visible = false
+	dialogue_open = false
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	if story_stage == 0 and enemy_nodes.is_empty():
+		story_stage = 1
+		_save_game()
+		_show_dialogue("MATHIAS • THE FAILING WARDS", "“You held the line, " + player_name + ". These were not ordinary shades. The ward-stones across the realms are being corrupted from the inside. The Council's old riddles, relic records, and bounty ledgers all point toward the same wound.” Mathias looks toward the sealed sanctuary. “Recover the Dawn, Dusk, and Heart Sigils. Then we can ask the Codex what the Council has forgotten.”", "Find the three Sigils")
+		return
+	if story_stage == 1 and collected_sigils >= 3:
+		story_stage = 2
+		_save_game()
+		_show_dialogue("THE SANCTUARY OPENS", "The three sigils circle the gate and settle into its stonework. The violet sky clears for a heartbeat. Mathias lowers his voice: “The Realm's Archivists speak of a page that never was, an Archive Wisp, and a crown erased from every record. If this corruption reaches that secret, Gloamwick is only the beginning.” The trail leads beyond this valley—and into the Saga of the Hollow Crown.", "Enter the Sigil Sanctuary")
+		return
+	if story_stage >= 2:
+		_show_dialogue("CHAPTER I COMPLETE", "Your Chronicle now carries the first record of the failing wards. The Council's saga continues beyond Gloamwick: forbidden pages, familiars born from memory, rival paths, ancient relics, and the Hollow Crown. Future chapters will build on this journey.", "Return to the Realm")
+		return
+	_refresh_objective()
 
 func _interact() -> void:
-    if dialogue_open:
-        _advance_dialogue()
-        return
-    if player == null:
-        return
-    if not enemy_nodes.is_empty():
-        var nearest_enemy := _nearest_node(enemy_nodes)
-        if nearest_enemy != null and player.global_position.distance_to(nearest_enemy.global_position) < 16.0:
-            _set_status("The creatures block your way. Move closer, then press Q to cast Arcane Pulse.")
-        else:
-            _set_status("The square is dangerous. Find Mathias near the broken ward.")
-        return
+	if dialogue_open:
+		_advance_dialogue()
+		return
+	if player == null:
+		return
+	if not enemy_nodes.is_empty():
+		var nearest_enemy := _nearest_node(enemy_nodes)
+		if nearest_enemy != null and player.global_position.distance_to(nearest_enemy.global_position) < 16.0:
+			_set_status("The riftbound block your way. Press Q to cast an Arcane Pulse.")
+		else:
+			_set_status("The square is dangerous. Find Mathias near the broken ward.")
+		return
 
-    if story_stage == 0 and _distance_to(mathias) < 4.0:
-        _show_dialogue_choices("MATHIAS • BATTLE MAGE", "The last riftbound shade dissolves into violet sparks. The robed mage lowers his staff, revealing the silver Council sigil at his collar. “Mathias. Field mage of the Council. You have my thanks, " + player_name + "—though thanks are a poor shield against what is coming. You could have fled. You didn't. Before I ask you to risk more, tell me what brought you here.”", "Your answer will shape Mathias’ trust", "mathias", [
-            {"id": "compassion", "label": "“No one should have to face that alone.”"},
-            {"id": "suspicion", "label": "“You are hiding something. Start explaining.”"},
-            {"id": "duty", "label": "“The ward was failing. That was reason enough.”"}
-        ])
-        return
+	if story_stage == 0 and _distance_to(mathias) < 4.0:
+		_show_dialogue("MATHIAS • BATTLE MAGE", "“The first wave is gone, but the ward is still bleeding light. I have served the Council for decades, and I have never seen a seal answer to something outside the Realm. Gather the three Sigils. Dawn, Dusk, Heart—remember their names. They are not keys alone; they are promises the Council made.”", "Continue")
+		return
 
-    if whispering_warden != null and _distance_to(whispering_warden) < 3.8:
-        _show_dialogue_choices("THE WHISPERING WARDEN", "The Warden's bark shifts like a face seen through rain. “Mathias knows the names of the three vows. I remember the silence around them. Ask, little spark—but choose what you wish to carry away.”", "Your question will be recorded in the Chronicle", "warden", [
-            {"id": "dawn", "label": "“What does Dawn truly ask of me?”"},
-            {"id": "fourth", "label": "“Tell me about the thing erased from the vows.”"},
-            {"id": "mathias", "label": "“Can Mathias be trusted?”"}
-        ])
-        return
+	if story_stage <= 1:
+		var nearest_sigil := _nearest_node(sigil_nodes)
+		if nearest_sigil != null and _distance_to(nearest_sigil) < 3.2:
+			var sigil_name := str(nearest_sigil.get_meta("sigil_name", "Unknown"))
+			nearest_sigil.visible = false
+			sigil_nodes.erase(nearest_sigil)
+			collected_sigils += 1
+			_set_status(sigil_name + " Sigil recovered • " + str(collected_sigils) + "/3")
+			_save_game()
+			_refresh_objective()
+			if collected_sigils >= 3:
+				_show_dialogue("THE THREEFOLD SEAL", "Dawn warms the stone. Dusk turns the air to violet glass. Heart hums like a memory shared by strangers. The three powers recognize one another, and the sanctuary gate begins to open.", "Continue")
+			return
 
-    if story_stage <= 1:
-        var nearest_sigil := _nearest_node(sigil_nodes)
-        if nearest_sigil != null and _distance_to(nearest_sigil) < 3.2:
-            if not warden_consulted:
-                _set_status("The Sigils remain veiled. Seek the Whispering Warden beside the broken ward first.")
-                return
-            var sigil_name := str(nearest_sigil.get_meta("sigil_name", "Unknown"))
-            _play_sound_effect("pickup")
-            nearest_sigil.visible = false
-            sigil_nodes.erase(nearest_sigil)
-            if not collected_sigil_names.has(sigil_name):
-                collected_sigil_names.append(sigil_name)
-            collected_sigils = collected_sigil_names.size()
-            _set_status(sigil_name + " Sigil recovered • " + str(collected_sigils) + "/3")
-            _save_game()
-            _refresh_objective()
-            if collected_sigils >= 3:
-                _show_dialogue("THE THREEFOLD SEAL", "Dawn warms the stone. Dusk turns the air to violet glass. Heart hums like a memory shared by strangers. The three powers recognize one another, and the sanctuary gate begins to open.", "Continue")
-            return
+	if story_stage >= 2 and _distance_to(sanctuary_gate) < 6.0:
+		_show_dialogue("BEYOND GLOAMWICK", "The sanctuary's threshold leads into a wider Realm: wild places shaped by old magic, shifting hollows, sealed archives, and trials recorded by the Council. The road ahead is open. Your story is only beginning.", "Continue")
+		return
 
-    for npc in quest_npcs:
-        if npc != null and is_instance_valid(npc) and _distance_to(npc) < 4.0:
-            _interact_with_quest_npc(npc)
-            return
-
-    var nearest_treasure := _nearest_node(treasure_nodes)
-    if nearest_treasure != null and _distance_to(nearest_treasure) < 3.0:
-        _collect_treasure(nearest_treasure)
-        return
-
-    if story_stage >= 2 and _distance_to(sanctuary_gate) < 6.0:
-        if not boss_defeated:
-            if not boss_active:
-                _start_final_boss()
-            else:
-                _set_status("The Hollow Warden is still bound to the gate. Cast Arcane Pulse with Q.")
-        else:
-            _show_dialogue("BEYOND GLOAMWICK", "The Hollow Warden's crown fractures into violet dust. Beyond the gate, the old road descends toward the sealed archives. Your Chronicle records the first victory against the Hollow Crown's servants; the wider Realm is now open to future chapters.", "Chapter I complete • Continue")
-        return
-
-    if _distance_to(mathias) < 4.0:
-        _show_dialogue("MATHIAS", "“The Sigils remember more than we do. Let the Codex guide your next step.”", "Continue")
-        return
-    _set_status("Nothing answers here. Move closer to Mathias, a Sigil, or the sanctuary gate.")
+	if _distance_to(mathias) < 4.0:
+		_show_dialogue("MATHIAS", "“The Sigils remember more than we do. Let the Codex guide your next step.”", "Continue")
+		return
+	_set_status("Nothing answers here. Move closer to Mathias, a Sigil, or the sanctuary gate.")
 
 func _cast_arcane_pulse() -> void:
-    if dialogue_open or enemy_nodes.is_empty():
-        return
-    var target := _nearest_node(enemy_nodes)
-    if target == null:
-        return
-    if player.global_position.distance_to(target.global_position) > 18.0:
-        _set_status("Too far away. Move closer to the creature, then try Q again.")
-        return
-    _play_sound_effect("spell")
-    var id := target.get_instance_id()
-    var remaining := int(enemy_hp.get(id, 1)) - 1
-    if remaining <= 0:
-        enemy_nodes.erase(target)
-        enemy_hp.erase(id)
-        target.queue_free()
-        if target == active_boss:
-            boss_active = false
-            boss_defeated = true
-            story_stage = 3
-            _set_status("THE HOLLOW WARDEN FALLS • Chapter I boss defeated! The gate is yours.")
-            _save_game()
-            _refresh_objective()
-            _show_dialogue("THE HOLLOW WARDEN • DEFEATED", "The Warden's armor splits with a sound like a bell beneath deep water. A violet crown tumbles across the stone and dissolves into sparks. Mathias lowers his staff: “You have broken the seal's guardian. Beyond this gate are the lost archives, the old vault roads, and the truth the Council buried.”", "Continue")
-        else:
-            _set_status("Arcane Pulse disperses the creature. " + str(enemy_nodes.size()) + " remain.")
-            if enemy_nodes.is_empty():
-                _set_status("The clearing is safe. Find Mathias and press E to speak with him.")
-                _save_game()
-    else:
-        enemy_hp[id] = remaining
-        _set_status("The shade recoils from the pulse.")
-    _refresh_objective()
+	if dialogue_open or enemy_nodes.is_empty():
+		return
+	var target := _nearest_node(enemy_nodes)
+	if target == null:
+		return
+	if player.global_position.distance_to(target.global_position) > 18.0:
+		_set_status("Too far away. Move closer to the riftbound.")
+		return
+	var id := target.get_instance_id()
+	var remaining := int(enemy_hp.get(id, 1)) - 1
+	if remaining <= 0:
+		enemy_nodes.erase(target)
+		enemy_hp.erase(id)
+		target.queue_free()
+		_set_status("Arcane Pulse disperses a riftbound shade. " + str(enemy_nodes.size()) + " remain.")
+		if enemy_nodes.is_empty():
+			_set_status("The last shade dissolves. Mathias is safe—speak with him using E.")
+			_save_game()
+	else:
+		enemy_hp[id] = remaining
+		_set_status("The shade recoils from the pulse.")
+	_refresh_objective()
 
 func _nearest_node(nodes: Array[Node3D]) -> Node3D:
-    var nearest: Node3D
-    var nearest_distance := INF
-    for node in nodes:
-        if not is_instance_valid(node):
-            continue
-        var distance := player.global_position.distance_to(node.global_position)
-        if distance < nearest_distance:
-            nearest = node
-            nearest_distance = distance
-    return nearest
+	var nearest: Node3D
+	var nearest_distance := INF
+	for node in nodes:
+		if not is_instance_valid(node):
+			continue
+		var distance := player.global_position.distance_to(node.global_position)
+		if distance < nearest_distance:
+			nearest = node
+			nearest_distance = distance
+	return nearest
 
 func _distance_to(node: Node3D) -> float:
-    if node == null or not is_instance_valid(node) or player == null:
-        return INF
-    return player.global_position.distance_to(node.global_position)
+	if node == null or not is_instance_valid(node) or player == null:
+		return INF
+	return player.global_position.distance_to(node.global_position)
 
 func _refresh_objective() -> void:
-    if objective_label == null:
-        return
-    if not enemy_nodes.is_empty():
-        objective_label.text = "TUTORIAL • Help Mathias: move closer and press Q to cast Arcane Pulse (" + str(enemy_nodes.size()) + " remain)."
-    elif story_stage == 0:
-        objective_label.text = "Speak with Mathias near the broken ward. Press E."
-    elif story_stage == 1 and not warden_consulted:
-        objective_label.text = "Speak with the Whispering Warden by the broken ward. Learn why the three Sigils must be gathered."
-    elif story_stage == 1 and collected_sigils < 3:
-        objective_label.text = "Recover the Dawn, Dusk, and Heart Sigils (" + str(collected_sigils) + "/3). Press E near a Sigil."
-    elif story_stage == 1:
-        objective_label.text = "Return to Mathias and learn what the three Sigils have awakened."
-    elif story_stage == 2 and not boss_defeated:
-        objective_label.text = "FINAL TRIAL • Approach the Sanctuary Gate and press E to challenge the Hollow Warden."
-    else:
-        objective_label.text = "Chapter I complete • Side quests: Lanterns " + str(side_quest_progress.get("lanterns", 0)) + "/3, Relics " + str(side_quest_progress.get("relics", 0)) + "/2."
-    if status_label != null and status_label.text == "":
-        status_label.text = player_name + " • " + player_path + " • " + str(collected_sigils) + " Sigils"
+	if objective_label == null:
+		return
+	if not enemy_nodes.is_empty():
+		objective_label.text = "Protect Mathias: repel the riftbound with Q (" + str(enemy_nodes.size()) + " remain)."
+	elif story_stage == 0:
+		objective_label.text = "Speak with Mathias near the broken ward. Press E."
+	elif story_stage == 1 and collected_sigils < 3:
+		objective_label.text = "Recover the Dawn, Dusk, and Heart Sigils (" + str(collected_sigils) + "/3). Press E near a Sigil."
+	elif story_stage == 1:
+		objective_label.text = "Return to Mathias and learn what the three Sigils have awakened."
+	else:
+		objective_label.text = "Chapter I complete • The Saga of the Hollow Crown awaits beyond the sanctuary."
+	if status_label != null and status_label.text == "":
+		status_label.text = player_name + " • " + player_path + " • " + str(collected_sigils) + " Sigils"
 
 func _set_status(message: String) -> void:
-    last_message = message
-    if status_label != null:
-        status_label.text = message
+	last_message = message
+	if status_label != null:
+		status_label.text = message
 
 func _load_save() -> void:
-    var err := save_data.load(SAVE_PATH)
-    has_save = err == OK
-    if has_save:
-        player_name = str(save_data.get_value("player", "name", "Apprentice"))
-        player_path = "Wizard"
-        story_stage = int(save_data.get_value("progress", "stage", 0))
-        collected_sigils = int(save_data.get_value("progress", "sigils", 0))
-        collected_sigil_names.clear()
-        var saved_names = save_data.get_value("progress", "sigil_names", [])
-        for saved_name in saved_names:
-            collected_sigil_names.append(str(saved_name))
-        if collected_sigil_names.is_empty() and collected_sigils > 0:
-            var legacy_names := ["Dawn", "Dusk", "Heart"]
-            for legacy_index in range(mini(collected_sigils, legacy_names.size())):
-                collected_sigil_names.append(legacy_names[legacy_index])
-        mathias_stance = str(save_data.get_value("story", "mathias_stance", "unspoken"))
-        warden_response = str(save_data.get_value("story", "warden_response", "unasked"))
-        warden_consulted = bool(save_data.get_value("story", "warden_consulted", false))
-        collected_treasures.clear()
-        for treasure_name in save_data.get_value("side_quests", "collected_treasures", []):
-            collected_treasures.append(str(treasure_name))
-        side_quest_progress = save_data.get_value("side_quests", "progress", {"lanterns": 0, "relics": 0})
-        side_quest_complete = save_data.get_value("side_quests", "complete", {"lanterns": false, "relics": false})
-        boss_defeated = bool(save_data.get_value("boss", "hollow_warden_defeated", false))
+	var err := save_data.load(SAVE_PATH)
+	has_save = err == OK
+	if has_save:
+		player_name = str(save_data.get_value("player", "name", "Apprentice"))
+		player_path = str(save_data.get_value("player", "path", "Sigilbinder"))
+		story_stage = int(save_data.get_value("progress", "stage", 0))
+		collected_sigils = int(save_data.get_value("progress", "sigils", 0))
 
 func _save_game() -> void:
-    save_data.set_value("player", "name", player_name)
-    save_data.set_value("player", "path", player_path)
-    save_data.set_value("progress", "stage", story_stage)
-    save_data.set_value("progress", "sigils", collected_sigils)
-    save_data.set_value("progress", "sigil_names", collected_sigil_names)
-    save_data.set_value("story", "mathias_stance", mathias_stance)
-    save_data.set_value("story", "warden_response", warden_response)
-    save_data.set_value("story", "warden_consulted", warden_consulted)
-    save_data.set_value("side_quests", "collected_treasures", collected_treasures)
-    save_data.set_value("side_quests", "progress", side_quest_progress)
-    save_data.set_value("side_quests", "complete", side_quest_complete)
-    save_data.set_value("boss", "hollow_warden_defeated", boss_defeated)
-    save_data.set_value("world", "seed", WORLD_SEED)
-    var err := save_data.save(SAVE_PATH)
-    has_save = err == OK
-    if continue_button != null:
-        continue_button.disabled = not has_save
+	save_data.set_value("player", "name", player_name)
+	save_data.set_value("player", "path", player_path)
+	save_data.set_value("progress", "stage", story_stage)
+	save_data.set_value("progress", "sigils", collected_sigils)
+	save_data.set_value("world", "seed", WORLD_SEED)
+	var err := save_data.save(SAVE_PATH)
+	has_save = err == OK
+	if continue_button != null:
+		continue_button.disabled = not has_save

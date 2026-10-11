@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://dbwxtj0db20p"
+path="res://.godot/imported/Roof_Wooden_2x1_Center.obj-3774aa1b4f21e4c54a81e37bae2f1ced.mesh"
+
+[deps]
+
+files=["res://.godot/imported/Roof_Wooden_2x1_Center.obj-3774aa1b4f21e4c54a81e37bae2f1ced.mesh"]
+
+source_file="res://OBJ/Roof_Wooden_2x1_Center.obj"
+dest_files=["res://.godot/imported/Roof_Wooden_2x1_Center.obj-3774aa1b4f21e4c54a81e37bae2f1ced.mesh", "res://.godot/imported/Roof_Wooden_2x1_Center.obj-3774aa1b4f21e4c54a81e37bae2f1ced.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://d15jt2y73bkix"
+path="res://.godot/imported/Crate_Wooden.obj-5f939c5557cf3e39d189e78ddc8f4d0d.mesh"
+
+[deps]
+
+files=["res://.godot/imported/Crate_Wooden.obj-5f939c5557cf3e39d189e78ddc8f4d0d.mesh"]
+
+source_file="res://Exports/OBJ/Crate_Wooden.obj"
+dest_files=["res://.godot/imported/Crate_Wooden.obj-5f939c5557cf3e39d189e78ddc8f4d0d.mesh", "res://.godot/imported/Crate_Wooden.obj-5f939c5557cf3e39d189e78ddc8f4d0d.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false
