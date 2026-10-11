@@ -3,20 +3,23 @@
 ## The premise
 The Discord Arcane Realm is the community's mythic record of the wider world: sigils are earned through deeds, riddles guard old knowledge, and the Council maintains the balance between realms. The game turns that record into a living dark-fantasy adventure.
 
-## Opening chapter: Gloamwick
-The apprentice awakens beneath the black boughs of Gloamwood, guided by violet wisps toward a battle in a ruined ward-clearing. The player's chosen arcane path is reflected in the first sign of magic they notice: ember-warmth, frost-runes, living roots, storm-static, rift-shadow, or a ring of ancient sigils.
+## Opening chapter: Gloamwood
+For the first playable slice, the apprentice has one fixed path: **Wizard**. The player enters a name, then wakes beneath the black boughs of Gloamwood with a violet rune glowing faintly on their hand. A battle is already underway in a nearby clearing. The player sees Mathias in his wizard robes holding the line against a Forest Monster and two Shadow Beasts.
 
-Three Riftbound attackers are assaulting Mathias, a Battle Mage of the Council of Wizards, Warlocks & Witches. The first task is to protect Mathias, then decide how to answer his guarded question. The player can show compassion, demand the truth, or prioritize the failing ward. These responses change Mathias' immediate reaction and are recorded in the Chronicle.
+The first minutes are also the combat tutorial. The opening voice sets the mood, then a short lesson teaches movement (WASD or arrow keys), mouse look, and the Arcane Pulse ability (Q). The player moves closer to the creatures, uses Arcane Pulse to clear the encounter, and approaches Mathias with E when the clearing is safe. Each enemy is deliberately simple in this first lesson so new players can learn the controls before later encounters become more complex.
+
+The forest trail is framed by violet wisps and old ward-stones. Far beyond the trees, the Council Castle rises as a visible destination and reminder that this clearing is only the edge of a much larger Realm.
 
 ## Mathias, the Warden, and the three vows
-Mathias explains that the ward-stones are being corrupted from within. He asks the apprentice to seek the Whispering Warden before touching the three Sigils. The Warden offers three questions: what Dawn asks of the bearer, what was erased from the vows, or whether Mathias can be trusted. The answer is recorded and shapes what the apprentice learns.
+Mathias introduces himself as a field mage of the Council of Wizards, Warlocks & Witches. He explains that the ward-stones are being corrupted from within, then asks the apprentice to seek the Whispering Warden before touching the three Sigils. The Warden offers three questions: what Dawn asks of the bearer, what was erased from the vows, or whether Mathias can be trusted. The answer is recorded in the Chronicle.
 
 The first quest has a deliberate order:
-1. Defeat the three Riftbound and speak with Mathias.
-2. Choose a response that establishes the apprentice's initial stance toward the Council's Battle Mage.
-3. Find the Whispering Warden beside the broken ward and choose which truth to ask for.
-4. Recover Dawn, Dusk, and Heart. Dawn remembers the courage to begin, Dusk holds the fear the Realm buried, and Heart preserves names the Council chose to forget.
-5. Return to the sanctuary threshold as the three vows resonate and reveal a missing piece in the Council's history.
+1. Wake in Gloamwood and learn the movement and Arcane Pulse controls.
+2. Clear the Forest Monster and two Shadow Beasts from the ward-clearing.
+3. Speak with Mathias and choose a response: compassion, suspicion, or duty.
+4. Find the Whispering Warden beside the broken ward and choose which truth to ask for.
+5. Recover Dawn, Dusk, and Heart. Dawn remembers the courage to begin, Dusk holds the fear the Realm buried, and Heart preserves names the Council chose to forget.
+6. Return to the sanctuary threshold as the three vows resonate and reveal a missing piece in the Council's history.
 
 The Warden's warning foreshadows a fourth thing removed from the telling without naming the Hollow Crown too early. Mathias is not automatically a villain; his guardedness comes from fear that the Council's own history may be compromised.
 
@@ -32,7 +35,7 @@ The Warden's warning foreshadows a fourth thing removed from the telling without
 ## Core cast and character voices
 
 ### The Apprentice — the player character
-The player chooses a name and one of six arcane paths: Ember Mage, Frostweaver, Verdant Warden, Storm Herald, Voidcaller, or Sigilbinder. They begin with incomplete memories and a faint magical mark. Their voice and personality should remain player-defined; dialogue offers mystery and meaningful choices without forcing a fixed identity.
+The player chooses a name and begins as a Wizard, represented by the fantasy wizard model. They awaken with incomplete memories and a faint violet rune. The player’s voice and personality remain player-defined; dialogue offers mystery and meaningful choices without forcing a fixed identity.
 
 ### Mathias, Battle Mage of the Council
 Mathias is a veteran field-mage: practical, watchful, and quietly protective. He speaks in short, deliberate observations rather than grand speeches. He has spent decades maintaining the Council's wards and is unsettled by a corruption that seems to come from beyond the known realms. He knows the three seals, but not who has begun to unmake them. His defining flaw is that he withholds details until he believes an apprentice is ready—which can make him seem evasive.
@@ -49,10 +52,11 @@ The long mystery behind the opening chapter. The Crown is not introduced as a si
 ## Character model roles
 - **Player Wizard:** `TripoModels/fantasy_wizard_3d_model/fantasy_wizard_3d_model.fbx` is the preferred player model; `wizard_robe_3d_model` is the fallback.
 - **Mathias / Battle Mage:** `TripoModels/wizard_robe_3d_model/wizard_robe_3d_model.fbx` gives Mathias a distinct robed silhouette until a dedicated Battle Mage model is added.
-- **Riftbound attackers:** `TripoModels/shadow_beast_3d_model/shadow_beast_3d_model.fbx` is the preferred corrupted creature model.
+- **Forest Monster:** `TripoModels/haunted_forest_spirit_3d_model/haunted_forest_spirit_3d_model.fbx` appears in the first combat lesson as the forest's corrupted spirit.
+- **Shadow Beasts:** `TripoModels/shadow_beast_3d_model/shadow_beast_3d_model.fbx` supplies two rift-touched creatures for the first combat lesson.
 - **Whispering Warden:** `TripoModels/haunted_forest_spirit_3d_model/haunted_forest_spirit_3d_model.fbx` appears beside the broken ward and can be approached for its first cryptic warning.
 - **Ancient Ruin Sentinel:** `TripoModels/ancient_ruin_stones_3d_model/ancient_ruin_stones_3d_model.fbx` establishes an old ward-marker along the trail.
-- **Distant Wizard Tower:** `TripoModels/wizard_tower_3d_model/wizard_tower_3d_model.fbx` gives the sanctuary approach a visible landmark.
+- **Council Castle:** `TripoModels/wizard_tower_3d_model/wizard_tower_3d_model.fbx` is placed beyond the forest as the first visible destination landmark.
 - **Future Trial Guardian:** `TripoModels/dark_fantasy_boss_3d_model/dark_fantasy_boss_3d_model.fbx` is reserved for the First Trial once that encounter is fully wired into gameplay.
 
 ## Opening controls
