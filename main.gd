@@ -35,6 +35,8 @@ var started := false
 var dialogue_open := false
 var story_stage := 0
 var collected_sigils := 0
+var collected_sigil_names: Array[String] = []
+var battle_cleared := false
 var lore_discovered := false
 var trust_mathias := true
 var sigil_nodes: Array[Node3D] = []
@@ -379,6 +381,10 @@ func _start_new_game() -> void:
 	player_path = PATHS[path_select.selected] if path_select.selected >= 0 else "Sigilbinder"
 	story_stage = 0
 	collected_sigils = 0
+	collected_sigil_names.clear()
+	battle_cleared = false
+	lore_discovered = false
+	trust_mathias = true
 	_save_game()
 	_enter_game(true)
 
@@ -477,11 +483,12 @@ func _build_world() -> void:
 	# The forest opens into a ward-clearing where Mathias is already holding the line.
 	_add_box("Battle Clearing", Vector3(0, -0.02, -39), Vector3(22, 0.14, 19), Color(0.075, 0.06, 0.085), false)
 	mathias = _build_person("Mathias", Vector3(0, 0, -35), Color(0.16, 0.11, 0.28), Color(0.8, 0.72, 0.92), true)
-	for i in range(3):
-		var x := -3.2 + float(i) * 3.2
-		var enemy := _build_person("Riftbound " + str(i + 1), Vector3(x, 0, -40.5), Color(0.035, 0.02, 0.07), Color(0.56, 0.18, 0.75), false)
-		enemy_nodes.append(enemy)
-		enemy_hp[enemy.get_instance_id()] = 2
+	if not battle_cleared:
+		for i in range(3):
+			var x := -3.2 + float(i) * 3.2
+			var enemy := _build_person("Riftbound " + str(i + 1), Vector3(x, 0, -40.5), Color(0.035, 0.02, 0.07), Color(0.56, 0.18, 0.75), false)
+			enemy_nodes.append(enemy)
+			enemy_hp[enemy.get_instance_id()] = 2
 
 	var sigil_positions := [Vector3(-8.0, 0.0, -48.0), Vector3(8.0, 0.0, -48.0), Vector3(0.0, 0.0, -54.0)]
 	var sigil_names := ["Dawn", "Dusk", "Heart"]
@@ -490,7 +497,7 @@ func _build_world() -> void:
 		var shrine := _make_sigil(sigil_positions[i] + Vector3(0, 1.1, 0), sigil_colors[i], 0.75)
 		shrine.name = sigil_names[i] + " Sigil"
 		shrine.set_meta("sigil_name", sigil_names[i])
-		shrine.visible = i >= collected_sigils
+		shrine.visible = not collected_sigil_names.has(sigil_names[i])
 		sigil_nodes.append(shrine)
 		add_child(shrine)
 
@@ -904,7 +911,9 @@ func _interact() -> void:
 			var sigil_name := str(nearest_sigil.get_meta("sigil_name", "Unknown"))
 			nearest_sigil.visible = false
 			sigil_nodes.erase(nearest_sigil)
-			collected_sigils += 1
+			if not collected_sigil_names.has(sigil_name):
+				collected_sigil_names.append(sigil_name)
+			collected_sigils = collected_sigil_names.size()
 			_set_status(sigil_name + " Sigil recovered • " + str(collected_sigils) + "/3")
 			_save_game()
 			_refresh_objective()
@@ -949,6 +958,7 @@ func _cast_arcane_pulse() -> void:
 		target.queue_free()
 		_set_status(str(spell_names.get(player_path, "Arcane Pulse")) + " disperses a riftbound shade. " + str(enemy_nodes.size()) + " remain.")
 		if enemy_nodes.is_empty():
+			battle_cleared = true
 			_set_status("The last shade dissolves. Mathias is safe—speak with him using E.")
 			_save_game()
 	else:
@@ -1013,6 +1023,17 @@ func _load_save() -> void:
 	has_save = err == OK
 	if has_save:
 		lore_discovered = bool(save_data.get_value("progress", "lore_discovered", false))
+		battle_cleared = bool(save_data.get_value("progress", "battle_cleared", false))
+		var saved_sigils = save_data.get_value("progress", "sigil_names", PackedStringArray())
+		collected_sigil_names.clear()
+		for saved_sigil in saved_sigils:
+			collected_sigil_names.append(str(saved_sigil))
+		if collected_sigil_names.is_empty() and int(save_data.get_value("progress", "sigils", 0)) > 0:
+			var old_count := int(save_data.get_value("progress", "sigils", 0))
+			var old_order := ["Dawn", "Dusk", "Heart"]
+			for old_index in range(mini(old_count, old_order.size())):
+				collected_sigil_names.append(old_order[old_index])
+		collected_sigils = collected_sigil_names.size()
 		trust_mathias = bool(save_data.get_value("story", "trust_mathias", true))
 		player_name = str(save_data.get_value("player", "name", "Apprentice"))
 		player_path = str(save_data.get_value("player", "path", "Sigilbinder"))
@@ -1023,7 +1044,9 @@ func _save_game() -> void:
 	save_data.set_value("player", "name", player_name)
 	save_data.set_value("player", "path", player_path)
 	save_data.set_value("progress", "stage", story_stage)
-	save_data.set_value("progress", "sigils", collected_sigils)
+	save_data.set_value("progress", "sigils", collected_sigil_names.size())
+	save_data.set_value("progress", "sigil_names", PackedStringArray(collected_sigil_names))
+	save_data.set_value("progress", "battle_cleared", battle_cleared)
 	save_data.set_value("progress", "lore_discovered", lore_discovered)
 	save_data.set_value("story", "trust_mathias", trust_mathias)
 	save_data.set_value("world", "seed", WORLD_SEED)
