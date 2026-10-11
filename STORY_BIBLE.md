@@ -65,5 +65,5 @@ The long mystery behind the opening chapter. The Crown is not introduced as a si
 - Space: jump
 - Shift: run
 - E: interact and advance dialogue
-- F: close-range staff strike
-- Q: ranged arcane bolt
+- Q: cast Arcane Pulse at the nearest creature (first-combat tutorial)
+
