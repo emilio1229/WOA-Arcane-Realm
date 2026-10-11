@@ -417,6 +417,10 @@ func _build_world() -> void:
     sigil_nodes.clear()
     enemy_nodes.clear()
     enemy_hp.clear()
+    quest_npcs.clear()
+    treasure_nodes.clear()
+    active_boss = null
+    boss_active = false
     mathias = null
     whispering_warden = null
     sanctuary_gate = null
@@ -539,7 +543,20 @@ func _build_side_quests() -> void:
         treasure.set_meta("treasure_id", item_id)
         treasure.set_meta("quest_id", str(item["quest"]))
         add_child(treasure)
+        _add_world_label(treasure, str(item["name"]), 0.9, item["color"])
         treasure_nodes.append(treasure)
+
+func _add_world_label(parent: Node3D, label_text: String, height: float, label_color: Color) -> void:
+    var label := Label3D.new()
+    label.text = label_text
+    label.position = Vector3(0, height, 0)
+    label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+    label.font_size = 30
+    label.pixel_size = 0.008
+    label.modulate = label_color
+    label.outline_size = 6
+    label.outline_modulate = Color(0.025, 0.01, 0.045, 0.95)
+    parent.add_child(label)
 
 func _interact_with_quest_npc(npc: Node3D) -> void:
     var quest_id := str(npc.get_meta("quest_id", ""))
@@ -623,7 +640,7 @@ func _build_player() -> void:
         player_visual.add_child(player_model)
         _play_model_idle(player_model)
     else:
-        _add_person_visual(player_visual, Color(0.22, 0.12, 0.42), Color(0.83, 0.75, 0.96), true)
+        push_error("The playable wizard FBX failed to load. Check the fantasy_wizard_3d_model import. Primitive placeholder characters are disabled.")
     add_child(player)
 
     camera_pivot = Node3D.new()
@@ -711,6 +728,8 @@ func _build_person(person_name: String, pos: Vector3, robe_color: Color, glow_co
     else:
         push_error("Required character model failed to load for: " + person_name + ". Check the FBX import errors; no primitive character substitute was created.")
     add_child(person)
+    if imported_model != null and (person_name == "Archivist Elowen" or person_name == "Keeper of Ash"):
+        _add_world_label(person, person_name, 2.8, Color(0.86, 0.7, 1.0))
     return person
 
 # Put Tripo exports anywhere under res://; filename keywords determine their world role.
