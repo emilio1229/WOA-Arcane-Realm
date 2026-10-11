@@ -414,9 +414,9 @@ func _enter_game(show_intro: bool) -> void:
 	_build_player()
 	_refresh_objective()
 	if show_intro:
-		_show_dialogue("A VOICE BETWEEN THE TREES", "“Awaken, " + player_name + "… Do not fear the dark. It has not found you by accident. You lie beneath the black boughs of Gloamwood, far from any road you remember. The forest has taken your tracks, the night has swallowed the trail, and your mount is nowhere in sight. You carry little but a fading mark of magic and the will to keep moving. Listen. Beyond the mist, someone is fighting—and if the last ward falls, this forest will wake hungry. Follow the violet lights. They will lead you to the truth.”", "Awaken • Follow the violet lights through the forest")
+		_show_dialogue("THE BELLS OF GLOAMWICK", "“Awaken, " + player_name + "… You have reached Gloamwick beneath a violet sky that grows dimmer by the hour. The market stalls stand abandoned, the rune well has begun to whisper, and every lantern burns as though it fears the dark. Beyond the square, a Battle Mage named Mathias is holding the southern ward against the riftbound. If it falls, the town will be swallowed before dawn. Follow the lamps through the market and help him.”", "Enter Gloamwick • Reach Mathias beyond the market")
 	else:
-		_show_dialogue("THE FOREST REMEMBERS", "Your Chronicle stirs again. The voice is quieter now, but the violet lights still lead through the trees toward the broken ward—and the battle beyond the mist.", "Continue toward the distant clash")
+		_show_dialogue("THE BELLS OF GLOAMWICK", "Your Chronicle stirs again. The bells are silent, the market is deserted, and the southern ward still flickers. The rune lamps lead through the square toward Mathias and the riftbound.", "Continue through the market to Mathias")
 
 func _build_world() -> void:
 	for child in get_children():
@@ -472,7 +472,7 @@ func _build_world() -> void:
 	sanctuary_gate.name = "Sigil Sanctuary Gate"
 	add_child(sanctuary_gate)
 
-	# Beyond the old sanctuary threshold, the forest road opens into Gloamwick.
+	# Gloamwick surrounds the starting road; the sanctuary lies beyond its southern ward.
 	_build_gloamwick_town()
 
 	# Violet wisps act as subtle wayfinding lights from the waking place to the clearing.
@@ -483,7 +483,7 @@ func _build_world() -> void:
 		wisp.name = "Violet Forest Wisp " + str(i + 1)
 		add_child(wisp)
 
-	# The forest opens into a ward-clearing where Mathias is already holding the line.
+	# At the southern end of town, Mathias is holding the failing ward against the riftbound.
 	_add_box("Battle Clearing", Vector3(0, -0.02, -39), Vector3(22, 0.14, 19), Color(0.075, 0.06, 0.085), false)
 	mathias = _build_person("Mathias", Vector3(0, 0, -35), Color(0.16, 0.11, 0.28), Color(0.8, 0.72, 0.92), true)
 	if not battle_cleared:
