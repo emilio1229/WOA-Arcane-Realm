@@ -96,15 +96,16 @@ func _physics_process(delta: float) -> void:
     player.move_and_slide()
     _refresh_objective()
 
-func _unhandled_input(event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:
     if not started:
         return
+    # Handle mouse capture early: browser exports can otherwise let UI/unhandled-input
+    # routing swallow the first click, leaving the camera locked facing forward.
     if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT and not dialogue_open:
         Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
     elif event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and not dialogue_open:
-        # Use screen_relative so mouse-look sensitivity stays consistent in the browser at different sizes.
-        yaw -= event.screen_relative.x * 0.0022
-        pitch = clampf(pitch - event.screen_relative.y * 0.0016, -0.48, 0.32)
+        yaw -= event.screen_relative.x * 0.0035
+        pitch = clampf(pitch - event.screen_relative.y * 0.0025, -0.62, 0.42)
         if player != null:
             player.rotation.y = yaw
         if camera_pivot != null:
@@ -112,6 +113,8 @@ func _unhandled_input(event: InputEvent) -> void:
     elif event is InputEventKey and event.pressed and not event.echo:
         if event.keycode == KEY_ESCAPE:
             Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+        elif event.keycode == KEY_TAB:
+            Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED else Input.MOUSE_MODE_CAPTURED
         elif event.keycode == KEY_E:
             _interact()
         elif event.keycode == KEY_Q:
@@ -620,51 +623,38 @@ func _instantiate_model(role: String) -> Node3D:
     return null
 
 func _get_model_scene(role: String) -> PackedScene:
-    if not _model_scene_cache.has(role):
-        _build_model_file_index()
-        # Prefer exact, intentional assignments before trying generic filename keywords.
-        # This prevents "wizard" from accidentally selecting the tower for the player.
-        var preferred_names: Array[String] = []
-        match role:
-            "player":
-                preferred_names = ["fantasy_wizard_3d_model", "wizard_robe_3d_model", "player_wizard", "wizard", "mage", "hero", "character"]
-            "mathias":
-                preferred_names = ["wizard_robe_3d_model", "battle_mage", "mathias", "fantasy_wizard_3d_model"]
-            "riftbound":
-                preferred_names = ["shadow_beast_3d_model", "dark_fantasy_boss_3d_model", "riftbound", "shade", "enemy", "creature"]
-            "forest_monster":
-                preferred_names = ["haunted_forest_spirit_3d_model", "forest_spirit", "spirit", "creature"]
-            "tree":
-                preferred_names = ["forest_tree", "blackwood", "tree"]
-            "ruins":
-                preferred_names = ["ancient_ruin_stones_3d_model", "ancient_ruin", "ruin"]
-            "tower":
-                preferred_names = ["wizard_tower_3d_model", "wizard_tower", "tower"]
-            "spirit":
-                preferred_names = ["haunted_forest_spirit_3d_model", "forest_spirit", "spirit"]
-            "guardian":
-                preferred_names = ["dark_fantasy_boss_3d_model", "guardian", "boss"]
+    if _model_scene_cache.has(role):
+        return _model_scene_cache[role] as PackedScene
 
-        var selected_path := ""
-        for candidate in preferred_names:
-            if _model_file_index.has(candidate):
-                selected_path = str(_model_file_index[candidate])
-                break
+    # Use explicit resource paths instead of scanning res:// at runtime. Exported Godot
+    # web builds do not reliably expose packaged assets to DirAccess scans, and resources
+    # discovered only by a scan can be omitted from the export. Literal load paths are
+    # discoverable by Godot's export pipeline and load only when that character is needed.
+    var scene: PackedScene = null
+    match role:
+        "player":
+            scene = load("res://TripoModels/fantasy_wizard_3d_model/fantasy_wizard_3d_model.fbx") as PackedScene
+            if scene == null:
+                scene = load("res://TripoModels/wizard_robe_3d_model/wizard_robe_3d_model.fbx") as PackedScene
+        "mathias":
+            scene = load("res://TripoModels/wizard_robe_3d_model/wizard_robe_3d_model.fbx") as PackedScene
+        "riftbound":
+            scene = load("res://TripoModels/shadow_beast_3d_model/shadow_beast_3d_model.fbx") as PackedScene
+            if scene == null:
+                scene = load("res://TripoModels/dark_fantasy_boss_3d_model/dark_fantasy_boss_3d_model.fbx") as PackedScene
+        "forest_monster", "spirit":
+            scene = load("res://TripoModels/haunted_forest_spirit_3d_model/haunted_forest_spirit_3d_model.fbx") as PackedScene
+        "ruins":
+            scene = load("res://TripoModels/ancient_ruin_stones_3d_model/ancient_ruin_stones_3d_model.fbx") as PackedScene
+        "tower":
+            scene = load("res://TripoModels/wizard_tower_3d_model/wizard_tower_3d_model.fbx") as PackedScene
+        "guardian":
+            scene = load("res://TripoModels/dark_fantasy_boss_3d_model/dark_fantasy_boss_3d_model.fbx") as PackedScene
 
-        if selected_path.is_empty():
-            for candidate in preferred_names:
-                for file_key in _model_file_index.keys():
-                    if str(file_key).contains(candidate):
-                        selected_path = str(_model_file_index[file_key])
-                        break
-                if not selected_path.is_empty():
-                    break
-
-        if selected_path.is_empty():
-            _model_scene_cache[role] = null
-        else:
-            _model_scene_cache[role] = load(selected_path) as PackedScene
-    return _model_scene_cache[role] as PackedScene
+    _model_scene_cache[role] = scene
+    if scene == null:
+        push_warning("No imported model resource could be loaded for role: " + role)
+    return scene
 
 func _build_model_file_index() -> void:
     if _model_index_ready:
