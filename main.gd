@@ -430,7 +430,7 @@ func _enter_game(show_intro: bool) -> void:
     _build_player()
     _refresh_objective()
     if show_intro:
-        _show_dialogue("A VOICE BETWEEN THE TREES", "“Awaken, " + player_name + "… " + _path_intro() + " You lie beneath the black boughs of Gloamwood, far from any road you remember. The forest has taken your tracks, the night has swallowed the trail, and your mount is nowhere in sight. Beyond the mist, someone is fighting—and if the last ward falls, this forest will wake hungry. Follow the violet lights. They will lead you to the truth.”", "Awaken • Follow the violet lights through the forest")
+        _show_dialogue("A VOICE BETWEEN THE TREES", "“Awaken, " + player_name + "… " + _path_intro() + " You lie beneath the black boughs of Gloamwood, far from any road you remember. The forest has taken your tracks, and the night has swallowed the trail behind you. Beyond the mist, someone is fighting—and if the last ward falls, this forest will wake hungry. Follow the violet lights. They will lead you to the truth.”", "Awaken • Follow the violet lights through the forest")
     else:
         _show_dialogue("THE FOREST REMEMBERS", "Your Chronicle stirs again. The voice is quieter now, but the violet lights still lead through the trees toward the broken ward—and the battle beyond the mist.", "Continue toward the distant clash")
 
@@ -1075,7 +1075,7 @@ func _interact() -> void:
         return
 
     if story_stage == 0 and _distance_to(mathias) < 4.0:
-        _show_dialogue_choices("MATHIAS • BATTLE MAGE", "The last riftbound shade dissolves into violet sparks. Mathias lowers his staff, but keeps his eyes on the broken ward. “You could have fled. You didn't. Before I ask you to risk more, tell me what brought you here.”", "Your answer will shape Mathias’ trust", "mathias", [
+        _show_dialogue_choices("MATHIAS • BATTLE MAGE", "The last riftbound shade dissolves into violet sparks. The robed mage lowers his staff, revealing the silver Council sigil at his collar. “Mathias. Field mage of the Council. You have my thanks, " + player_name + "—though thanks are a poor shield against what is coming. You could have fled. You didn't. Before I ask you to risk more, tell me what brought you here.”", "Your answer will shape Mathias’ trust", "mathias", [
             {"id": "compassion", "label": "“No one should have to face that alone.”"},
             {"id": "suspicion", "label": "“You are hiding something. Start explaining.”"},
             {"id": "duty", "label": "“The ward was failing. That was reason enough.”"}
