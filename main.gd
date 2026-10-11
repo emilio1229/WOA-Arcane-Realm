@@ -42,6 +42,15 @@ var collected_sigils := 0
 var sigil_nodes: Array[Node3D] = []
 var enemy_nodes: Array[Node3D] = []
 var enemy_hp: Dictionary = {}
+var quest_npcs: Array[Node3D] = []
+var treasure_nodes: Array[Node3D] = []
+var collected_treasures: Array[String] = []
+var side_quest_progress: Dictionary = {"lanterns": 0, "relics": 0}
+var side_quest_complete: Dictionary = {"lanterns": false, "relics": false}
+var boss_defeated := false
+var boss_active := false
+var active_boss: Node3D
+var player_animation_state := ""
 var mathias: Node3D
 var whispering_warden: Node3D
 var sanctuary_gate: Node3D
@@ -94,6 +103,15 @@ func _physics_process(delta: float) -> void:
         player.velocity.x = move_toward(player.velocity.x, 0.0, 24.0 * delta)
         player.velocity.z = move_toward(player.velocity.z, 0.0, 24.0 * delta)
     player.move_and_slide()
+    var moving_now := input_vector.length_squared() > 0.0
+    var next_animation := ""
+    if moving_now:
+        next_animation = "run" if Input.is_key_pressed(KEY_SHIFT) else "walk"
+    else:
+        next_animation = "idle"
+    if next_animation != player_animation_state:
+        player_animation_state = next_animation
+        _play_model_animation(player_visual, [next_animation, "walking" if next_animation == "walk" else next_animation, "running" if next_animation == "run" else next_animation])
     _refresh_objective()
 
 func _input(event: InputEvent) -> void:
@@ -490,6 +508,100 @@ func _build_world() -> void:
         sigil_nodes.append(shrine)
         add_child(shrine)
 
+    _build_side_quests()
+
+
+func _build_side_quests() -> void:
+    quest_npcs.clear()
+    treasure_nodes.clear()
+
+    # All quest-giver and boss characters use imported Tripo FBX scenes.
+    var archivist := _build_person("Archivist Elowen", Vector3(5.8, 0, -12.0), Color(0.18, 0.1, 0.3), Color(0.72, 0.52, 1.0), true)
+    archivist.set_meta("quest_id", "lanterns")
+    quest_npcs.append(archivist)
+    var keeper := _build_person("Keeper of Ash", Vector3(-7.0, 0, -51.5), Color(0.18, 0.1, 0.3), Color(1.0, 0.56, 0.25), true)
+    keeper.set_meta("quest_id", "relics")
+    quest_npcs.append(keeper)
+
+    var treasure_data: Array[Dictionary] = [
+        {"id": "lantern_1", "quest": "lanterns", "pos": Vector3(-5.4, 0.9, -7.5), "color": Color(0.68, 0.42, 1.0), "name": "Lantern Shard I"},
+        {"id": "lantern_2", "quest": "lanterns", "pos": Vector3(5.2, 0.9, -21.5), "color": Color(0.68, 0.42, 1.0), "name": "Lantern Shard II"},
+        {"id": "lantern_3", "quest": "lanterns", "pos": Vector3(-6.5, 0.9, -33.5), "color": Color(0.68, 0.42, 1.0), "name": "Lantern Shard III"},
+        {"id": "relic_1", "quest": "relics", "pos": Vector3(8.5, 0.9, -36.0), "color": Color(1.0, 0.56, 0.25), "name": "Ashen Relic I"},
+        {"id": "relic_2", "quest": "relics", "pos": Vector3(-9.0, 0.9, -45.0), "color": Color(1.0, 0.56, 0.25), "name": "Ashen Relic II"}
+    ]
+    for item in treasure_data:
+        var item_id := str(item["id"])
+        if collected_treasures.has(item_id):
+            continue
+        var treasure := _make_sigil(item["pos"], item["color"], 0.42)
+        treasure.name = str(item["name"])
+        treasure.set_meta("treasure_id", item_id)
+        treasure.set_meta("quest_id", str(item["quest"]))
+        add_child(treasure)
+        treasure_nodes.append(treasure)
+
+func _interact_with_quest_npc(npc: Node3D) -> void:
+    var quest_id := str(npc.get_meta("quest_id", ""))
+    if quest_id == "lanterns":
+        if bool(side_quest_complete.get("lanterns", false)):
+            _show_dialogue("ARCHIVIST ELOWEN", "“The lanterns are whole again. Gloamwood will remember the road even when the stars forget it.” She gives you a small silver seal from the old archive.", "Side quest complete")
+        elif not collected_treasures.has("lantern_1") or not collected_treasures.has("lantern_2") or not collected_treasures.has("lantern_3"):
+            _show_dialogue("ARCHIVIST ELOWEN • LOST LANTERNS", "“The trail-lanterns were shattered when the ward failed. Find all three violet shards scattered through Gloamwood and bring their light back to me. Without them, the old paths will vanish into the mist.”", "Side quest • Find 3 Lantern Shards")
+        else:
+            side_quest_complete["lanterns"] = true
+            side_quest_progress["lanterns"] = 3
+            _save_game()
+            _show_dialogue("ARCHIVIST ELOWEN • QUEST COMPLETE", "Elowen joins the three shards in her palm. Their light becomes a tiny lantern, steady and warm. “You have restored one of the roads the Council forgot. Keep this blessing: the Realm now knows your name.”", "Reward earned • Lantern blessing")
+    elif quest_id == "relics":
+        if bool(side_quest_complete.get("relics", false)):
+            _show_dialogue("KEEPER OF ASH", "“The relics are accounted for. Their old fire is quiet now, and the debt is paid.”", "Side quest complete")
+        elif not collected_treasures.has("relic_1") or not collected_treasures.has("relic_2"):
+            _show_dialogue("KEEPER OF ASH • THE UNPAID DEBT", "“Two ash relics were lost when the sanctuary sealed itself. Find them near the ward-clearing and return here. Touch nothing else that glows; the old vaults are fond of tricks.”", "Side quest • Recover 2 Ashen Relics")
+        else:
+            side_quest_complete["relics"] = true
+            side_quest_progress["relics"] = 2
+            _save_game()
+            _show_dialogue("KEEPER OF ASH • QUEST COMPLETE", "The Keeper presses two blackened relics together. A clean flame burns between them. “The debt is paid. May your next enemy learn the difference between a spark and a wildfire.”", "Reward earned • Ash relic blessing")
+    _refresh_objective()
+
+func _collect_treasure(treasure: Node3D) -> void:
+    var item_id := str(treasure.get_meta("treasure_id", ""))
+    var quest_id := str(treasure.get_meta("quest_id", ""))
+    if item_id.is_empty() or collected_treasures.has(item_id):
+        return
+    collected_treasures.append(item_id)
+    if quest_id == "lanterns":
+        side_quest_progress["lanterns"] = int(side_quest_progress.get("lanterns", 0)) + 1
+    elif quest_id == "relics":
+        side_quest_progress["relics"] = int(side_quest_progress.get("relics", 0)) + 1
+    treasure_nodes.erase(treasure)
+    treasure.queue_free()
+    _save_game()
+    var display_name := item_id.replace("_", " ").capitalize()
+    _set_status("Recovered " + display_name + " • Lanterns " + str(side_quest_progress.get("lanterns", 0)) + "/3 • Relics " + str(side_quest_progress.get("relics", 0)) + "/2")
+    _refresh_objective()
+
+func _start_final_boss() -> void:
+    if boss_active or boss_defeated:
+        return
+    boss_active = true
+    var boss := _instantiate_model("guardian")
+    if boss == null:
+        boss_active = false
+        _set_status("The Hollow Warden model failed to import. Check the dark_fantasy_boss FBX import before starting the trial.")
+        return
+    boss.name = "The Hollow Warden"
+    boss.position = Vector3(0, 0, -67.0)
+    boss.scale = Vector3.ONE * 1.45
+    add_child(boss)
+    active_boss = boss
+    enemy_nodes.append(boss)
+    enemy_hp[boss.get_instance_id()] = 8
+    _play_model_idle(boss)
+    _set_status("BOSS TRIAL • The Hollow Warden awakens! Land 8 Arcane Pulses with Q.")
+    _show_dialogue("THE HOLLOW WARDEN", "A plated figure steps out of the gate's violet seam, carrying the broken crest of a forgotten Council. The Hollow Warden is no mere shade; its armor is bound to the seal itself. Keep your distance, aim with the mouse, and strike with Q. It will take several pulses to break the binding.", "Boss encounter • 8 hits required")
+
 func _build_player() -> void:
     player = CharacterBody3D.new()
     player.name = "PlayerWizard"
@@ -591,13 +703,13 @@ func _build_person(person_name: String, pos: Vector3, robe_color: Color, glow_co
     person.name = person_name
     person.position = pos
     var lower_name := person_name.to_lower()
-    var role := "mathias" if lower_name.contains("mathias") else ("forest_monster" if lower_name.contains("forest monster") else ("riftbound" if lower_name.contains("shadow beast") or lower_name.contains("riftbound") else "player"))
+    var role := "mathias" if lower_name.contains("mathias") or lower_name.contains("archivist") or lower_name.contains("keeper") else ("guardian" if lower_name.contains("hollow warden") else ("forest_monster" if lower_name.contains("forest monster") else ("riftbound" if lower_name.contains("shadow beast") or lower_name.contains("riftbound") else "player")))
     var imported_model := _instantiate_model(role)
     if imported_model != null:
         person.add_child(imported_model)
         _play_model_idle(imported_model)
     else:
-        _add_person_visual(person, robe_color, glow_color, is_mage)
+        push_error("Required character model failed to load for: " + person_name + ". Check the FBX import errors; no primitive character substitute was created.")
     add_child(person)
     return person
 
@@ -673,6 +785,21 @@ func _scan_model_directory(directory_path: String) -> void:
                 _model_file_index[entry.get_basename().to_lower()] = full_path
         entry = directory.get_next()
     directory.list_dir_end()
+
+func _play_model_animation(root: Node, candidates: Array[String]) -> void:
+    if root == null or not is_instance_valid(root):
+        return
+    if root is AnimationPlayer:
+        var animation_player := root as AnimationPlayer
+        var names := animation_player.get_animation_list()
+        for candidate in candidates:
+            for animation_name in names:
+                if str(animation_name).to_lower().contains(candidate.to_lower()):
+                    if animation_player.current_animation != animation_name:
+                        animation_player.play(animation_name)
+                    return
+    for child in root.get_children():
+        _play_model_animation(child, candidates)
 
 func _play_model_idle(root: Node) -> void:
     if root is AnimationPlayer:
@@ -1054,8 +1181,24 @@ func _interact() -> void:
                 _show_dialogue("THE THREEFOLD SEAL", "Dawn warms the stone. Dusk turns the air to violet glass. Heart hums like a memory shared by strangers. The three powers recognize one another, and the sanctuary gate begins to open.", "Continue")
             return
 
+    for npc in quest_npcs:
+        if npc != null and is_instance_valid(npc) and _distance_to(npc) < 4.0:
+            _interact_with_quest_npc(npc)
+            return
+
+    var nearest_treasure := _nearest_node(treasure_nodes)
+    if nearest_treasure != null and _distance_to(nearest_treasure) < 3.0:
+        _collect_treasure(nearest_treasure)
+        return
+
     if story_stage >= 2 and _distance_to(sanctuary_gate) < 6.0:
-        _show_dialogue("BEYOND GLOAMWICK", "The sanctuary's threshold leads into a wider Realm: wild places shaped by old magic, shifting hollows, sealed archives, and trials recorded by the Council. The road ahead is open. Your story is only beginning.", "Continue")
+        if not boss_defeated:
+            if not boss_active:
+                _start_final_boss()
+            else:
+                _set_status("The Hollow Warden is still bound to the gate. Cast Arcane Pulse with Q.")
+        else:
+            _show_dialogue("BEYOND GLOAMWICK", "The Hollow Warden's crown fractures into violet dust. Beyond the gate, the old road descends toward the sealed archives. Your Chronicle records the first victory against the Hollow Crown's servants; the wider Realm is now open to future chapters.", "Chapter I complete • Continue")
         return
 
     if _distance_to(mathias) < 4.0:
@@ -1078,10 +1221,19 @@ func _cast_arcane_pulse() -> void:
         enemy_nodes.erase(target)
         enemy_hp.erase(id)
         target.queue_free()
-        _set_status("Arcane Pulse disperses the creature. " + str(enemy_nodes.size()) + " remain.")
-        if enemy_nodes.is_empty():
-            _set_status("The clearing is safe. Find Mathias and press E to speak with him.")
+        if target == active_boss:
+            boss_active = false
+            boss_defeated = true
+            story_stage = 3
+            _set_status("THE HOLLOW WARDEN FALLS • Chapter I boss defeated! The gate is yours.")
             _save_game()
+            _refresh_objective()
+            _show_dialogue("THE HOLLOW WARDEN • DEFEATED", "The Warden's armor splits with a sound like a bell beneath deep water. A violet crown tumbles across the stone and dissolves into sparks. Mathias lowers his staff: “You have broken the seal's guardian. Beyond this gate are the lost archives, the old vault roads, and the truth the Council buried.”", "Continue")
+        else:
+            _set_status("Arcane Pulse disperses the creature. " + str(enemy_nodes.size()) + " remain.")
+            if enemy_nodes.is_empty():
+                _set_status("The clearing is safe. Find Mathias and press E to speak with him.")
+                _save_game()
     else:
         enemy_hp[id] = remaining
         _set_status("The shade recoils from the pulse.")
@@ -1117,8 +1269,10 @@ func _refresh_objective() -> void:
         objective_label.text = "Recover the Dawn, Dusk, and Heart Sigils (" + str(collected_sigils) + "/3). Press E near a Sigil."
     elif story_stage == 1:
         objective_label.text = "Return to Mathias and learn what the three Sigils have awakened."
+    elif story_stage == 2 and not boss_defeated:
+        objective_label.text = "FINAL TRIAL • Approach the Sanctuary Gate and press E to challenge the Hollow Warden."
     else:
-        objective_label.text = "Chapter I complete • The Saga of the Hollow Crown awaits beyond the sanctuary."
+        objective_label.text = "Chapter I complete • Side quests: Lanterns " + str(side_quest_progress.get("lanterns", 0)) + "/3, Relics " + str(side_quest_progress.get("relics", 0)) + "/2."
     if status_label != null and status_label.text == "":
         status_label.text = player_name + " • " + player_path + " • " + str(collected_sigils) + " Sigils"
 
@@ -1146,6 +1300,12 @@ func _load_save() -> void:
         mathias_stance = str(save_data.get_value("story", "mathias_stance", "unspoken"))
         warden_response = str(save_data.get_value("story", "warden_response", "unasked"))
         warden_consulted = bool(save_data.get_value("story", "warden_consulted", false))
+        collected_treasures.clear()
+        for treasure_name in save_data.get_value("side_quests", "collected_treasures", []):
+            collected_treasures.append(str(treasure_name))
+        side_quest_progress = save_data.get_value("side_quests", "progress", {"lanterns": 0, "relics": 0})
+        side_quest_complete = save_data.get_value("side_quests", "complete", {"lanterns": false, "relics": false})
+        boss_defeated = bool(save_data.get_value("boss", "hollow_warden_defeated", false))
 
 func _save_game() -> void:
     save_data.set_value("player", "name", player_name)
@@ -1156,6 +1316,10 @@ func _save_game() -> void:
     save_data.set_value("story", "mathias_stance", mathias_stance)
     save_data.set_value("story", "warden_response", warden_response)
     save_data.set_value("story", "warden_consulted", warden_consulted)
+    save_data.set_value("side_quests", "collected_treasures", collected_treasures)
+    save_data.set_value("side_quests", "progress", side_quest_progress)
+    save_data.set_value("side_quests", "complete", side_quest_complete)
+    save_data.set_value("boss", "hollow_warden_defeated", boss_defeated)
     save_data.set_value("world", "seed", WORLD_SEED)
     var err := save_data.save(SAVE_PATH)
     has_save = err == OK
