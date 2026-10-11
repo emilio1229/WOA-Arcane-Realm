@@ -6,7 +6,7 @@ const WALK_SPEED := 5.2
 const RUN_SPEED := 8.0
 const JUMP_VELOCITY := 6.8
 const GRAVITY := 18.0
-const PATHS := ["Ember Mage", "Frostweaver", "Verdant Warden", "Storm Herald", "Voidcaller", "Sigilbinder"]
+const PATHS := ["Wizard"]
 
 var player: CharacterBody3D
 var camera_pivot: Node3D
@@ -244,27 +244,18 @@ func _build_ui() -> void:
     layout.add_child(name_input)
 
     var path_label := Label.new()
-    path_label.text = "CHOOSE YOUR ARCANE PATH"
+    path_label.text = "YOUR PATH"
     path_label.add_theme_font_size_override("font_size", 12)
     path_label.add_theme_color_override("font_color", Color(0.81, 0.69, 0.94))
     layout.add_child(path_label)
 
-    path_select = OptionButton.new()
-    path_select.custom_minimum_size = Vector2(0, 44)
-    for path_name in PATHS:
-        path_select.add_item(path_name)
-    path_select.select(5)
-    path_select.add_theme_font_size_override("font_size", 15)
-    layout.add_child(path_select)
-
     path_note_label = Label.new()
-    path_note_label.text = "Your path shapes your legend. Your choices shape the Realm."
+    path_note_label.text = "WIZARD • Arcane apprentice\nA classic wizard, guided by curiosity and the old magic of the Sigils."
+    path_note_label.custom_minimum_size = Vector2(0, 54)
     path_note_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-    path_note_label.add_theme_font_size_override("font_size", 12)
-    path_note_label.add_theme_color_override("font_color", Color(0.66, 0.59, 0.75))
+    path_note_label.add_theme_font_size_override("font_size", 14)
+    path_note_label.add_theme_color_override("font_color", Color(0.87, 0.78, 0.96))
     layout.add_child(path_note_label)
-    path_select.item_selected.connect(_update_path_note)
-    _update_path_note(path_select.selected)
 
     var begin_button := _make_button("✦   BEGIN YOUR JOURNEY", Color(0.34, 0.15, 0.52))
     begin_button.pressed.connect(_start_new_game)
@@ -354,48 +345,15 @@ func _build_ui() -> void:
     dialogue_continue_button.pressed.connect(_advance_dialogue)
     dialogue_layout.add_child(dialogue_continue_button)
 
-func _update_path_note(_index: int) -> void:
-    if path_note_label == null or path_select == null:
-        return
-    var path_name := PATHS[path_select.selected] if path_select.selected >= 0 else "Sigilbinder"
-    match path_name:
-        "Ember Mage":
-            path_note_label.text = "Ember Mage • Bold flame magic. Your instinct is to act before fear can settle."
-        "Frostweaver":
-            path_note_label.text = "Frostweaver • Patient control magic. You look for the pattern beneath the chaos."
-        "Verdant Warden":
-            path_note_label.text = "Verdant Warden • Life and root magic. You listen before you strike."
-        "Storm Herald":
-            path_note_label.text = "Storm Herald • Swift storm magic. You meet danger head-on and adapt quickly."
-        "Voidcaller":
-            path_note_label.text = "Voidcaller • Rift-sense and shadow magic. You are willing to question what others fear."
-        _:
-            path_note_label.text = "Sigilbinder • Ancient runes and wardcraft. You seek the connections others overlook."
-
 func _path_intro() -> String:
-    match player_path:
-        "Ember Mage":
-            return "A coal-bright warmth stirs in your palm, answering the old name of the Ember Mage."
-        "Frostweaver":
-            return "Frost traces a quiet sigil across your fingers; the Frostweaver's patience wakes with you."
-        "Verdant Warden":
-            return "A green thread of life curls around your wrist, and the roots beneath you seem to listen."
-        "Storm Herald":
-            return "A tiny storm crackles beneath your skin, as if the sky has been waiting for your first breath."
-        "Voidcaller":
-            return "The shadows lean toward you—not in threat, but recognition—and a cold rift-light answers your pulse."
-        _:
-            return "A ring of faint runes circles your palm, each mark searching for the others it has lost."
+    return "Your wizard's fingers glow with a faint violet rune. The old magic recognizes you, though the Realm has forgotten your name."
 
 func _show_menu() -> void:
     menu_root.visible = true
     hud_root.visible = false
     if has_save:
         name_input.text = player_name
-        var saved_path_index := PATHS.find(player_path)
-        if saved_path_index >= 0:
-            path_select.select(saved_path_index)
-            _update_path_note(saved_path_index)
+        player_path = "Wizard"
     if continue_button != null:
         continue_button.disabled = not has_save
     Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -403,7 +361,7 @@ func _show_menu() -> void:
 func _start_new_game() -> void:
     var entered_name := name_input.text.strip_edges()
     player_name = entered_name if entered_name != "" else "Apprentice"
-    player_path = PATHS[path_select.selected] if path_select.selected >= 0 else "Sigilbinder"
+    player_path = "Wizard"
     story_stage = 0
     collected_sigils = 0
     collected_sigil_names.clear()
@@ -417,7 +375,7 @@ func _continue_game() -> void:
     if not has_save:
         return
     player_name = str(save_data.get_value("player", "name", "Apprentice"))
-    player_path = str(save_data.get_value("player", "path", "Sigilbinder"))
+    player_path = "Wizard"
     story_stage = int(save_data.get_value("progress", "stage", 0))
     collected_sigils = int(save_data.get_value("progress", "sigils", 0))
     _enter_game(false)
@@ -430,7 +388,7 @@ func _enter_game(show_intro: bool) -> void:
     _build_player()
     _refresh_objective()
     if show_intro:
-        _show_dialogue("A VOICE BETWEEN THE TREES", "“Awaken, " + player_name + "… " + _path_intro() + " You lie beneath the black boughs of Gloamwood, far from any road you remember. The forest has taken your tracks, and the night has swallowed the trail behind you. Beyond the mist, someone is fighting—and if the last ward falls, this forest will wake hungry. Follow the violet lights. They will lead you to the truth.”", "Awaken • Follow the violet lights through the forest")
+        _show_dialogue("A VOICE BETWEEN THE TREES", "“Awaken, " + player_name + "… " + _path_intro() + " You lie beneath the black boughs of Gloamwood, close enough to hear a battle beyond the trees. A robed wizard is holding the clearing, and strange creatures are closing in. Follow the violet lights. Help him, and you may learn why the forest has called you here.”", "Awaken • Follow the violet lights toward Mathias")
     else:
         _show_dialogue("THE FOREST REMEMBERS", "Your Chronicle stirs again. The voice is quieter now, but the violet lights still lead through the trees toward the broken ward—and the battle beyond the mist.", "Continue toward the distant clash")
 
@@ -493,7 +451,7 @@ func _build_world() -> void:
     # Imported Tripo landmarks make the opening path feel connected to the wider Realm.
     # Procedural scenery remains in place if any optional model cannot be imported.
     _add_imported_landmark("ruins", "Ancient Ruin Sentinel", Vector3(-6.8, 0.0, -31.0), 0.65)
-    _add_imported_landmark("tower", "The Distant Wizard Tower", Vector3(14.0, 0.0, -65.0), 0.55)
+    _add_imported_landmark("tower", "The Council Castle", Vector3(20.0, 0.0, -80.0), 1.1)
     whispering_warden = _add_imported_landmark("spirit", "The Whispering Warden", Vector3(7.5, 0.0, -28.0), 0.55)
     if whispering_warden == null:
         whispering_warden = _make_sigil(Vector3(7.5, 1.2, -28.0), Color(0.68, 0.88, 0.76), 0.9)
@@ -512,9 +470,10 @@ func _build_world() -> void:
     _add_box("Battle Clearing", Vector3(0, -0.02, -39), Vector3(22, 0.14, 19), Color(0.075, 0.06, 0.085), false)
     mathias = _build_person("Mathias", Vector3(0, 0, -35), Color(0.16, 0.11, 0.28), Color(0.8, 0.72, 0.92), true)
     if story_stage == 0:
-        for i in range(3):
+        var encounter_names := ["Forest Monster", "Shadow Beast 1", "Shadow Beast 2"]
+        for i in range(encounter_names.size()):
             var x := -3.2 + float(i) * 3.2
-            var enemy := _build_person("Riftbound " + str(i + 1), Vector3(x, 0, -40.5), Color(0.035, 0.02, 0.07), Color(0.56, 0.18, 0.75), false)
+            var enemy := _build_person(encounter_names[i], Vector3(x, 0, -40.5), Color(0.035, 0.02, 0.07), Color(0.56, 0.18, 0.75), false)
             enemy_nodes.append(enemy)
             enemy_hp[enemy.get_instance_id()] = 1
 
@@ -532,7 +491,7 @@ func _build_world() -> void:
 func _build_player() -> void:
     player = CharacterBody3D.new()
     player.name = "PlayerWizard"
-    player.position = Vector3(0, 0, 12.0)
+    player.position = Vector3(0, 0, -24.0)
     player.floor_snap_length = 0.35
     var collision := CollisionShape3D.new()
     var capsule := CapsuleShape3D.new()
@@ -638,7 +597,8 @@ func _build_person(person_name: String, pos: Vector3, robe_color: Color, glow_co
     var person := Node3D.new()
     person.name = person_name
     person.position = pos
-    var role := "mathias" if person_name.to_lower().contains("mathias") else ("riftbound" if person_name.to_lower().contains("riftbound") else "player")
+    var lower_name := person_name.to_lower()
+    var role := "mathias" if lower_name.contains("mathias") else ("forest_monster" if lower_name.contains("forest monster") else ("riftbound" if lower_name.contains("shadow beast") or lower_name.contains("riftbound") else "player"))
     var imported_model := _instantiate_model(role)
     if imported_model != null:
         person.add_child(imported_model)
@@ -672,7 +632,9 @@ func _get_model_scene(role: String) -> PackedScene:
             "mathias":
                 preferred_names = ["wizard_robe_3d_model", "battle_mage", "mathias", "fantasy_wizard_3d_model"]
             "riftbound":
-                preferred_names = ["shadow_beast_3d_model", "haunted_forest_spirit_3d_model", "dark_fantasy_boss_3d_model", "riftbound", "shade", "enemy", "creature"]
+                preferred_names = ["shadow_beast_3d_model", "dark_fantasy_boss_3d_model", "riftbound", "shade", "enemy", "creature"]
+            "forest_monster":
+                preferred_names = ["haunted_forest_spirit_3d_model", "forest_spirit", "spirit", "creature"]
             "tree":
                 preferred_names = ["forest_tree", "blackwood", "tree"]
             "ruins":
@@ -1045,6 +1007,9 @@ func _advance_dialogue() -> void:
     dialogue_panel.visible = false
     dialogue_open = false
     Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+    if dialogue_title.text == "A VOICE BETWEEN THE TREES":
+        _show_dialogue("FIRST LESSON • ARCANE PULSE", "Mathias is surrounded. Move with WASD or the arrow keys, turn with the mouse, and move closer to the creatures. Press Q to cast Arcane Pulse at the nearest target. Each creature in this first lesson needs one pulse. If you get lost, follow the violet wisps. Press E when you reach Mathias after the clearing is safe.", "Tutorial • Move, aim, and cast Q to help Mathias")
+        return
     if story_stage == 0 and enemy_nodes.is_empty() and dialogue_title.text == "MATHIAS • BATTLE MAGE":
         story_stage = 1
         _save_game()
@@ -1069,7 +1034,7 @@ func _interact() -> void:
     if not enemy_nodes.is_empty():
         var nearest_enemy := _nearest_node(enemy_nodes)
         if nearest_enemy != null and player.global_position.distance_to(nearest_enemy.global_position) < 16.0:
-            _set_status("The riftbound block your way. Press Q to cast an Arcane Pulse.")
+            _set_status("The creatures block your way. Move closer, then press Q to cast Arcane Pulse.")
         else:
             _set_status("The square is dangerous. Find Mathias near the broken ward.")
         return
@@ -1125,7 +1090,7 @@ func _cast_arcane_pulse() -> void:
     if target == null:
         return
     if player.global_position.distance_to(target.global_position) > 18.0:
-        _set_status("Too far away. Move closer to the riftbound.")
+        _set_status("Too far away. Move closer to the creature, then try Q again.")
         return
     var id := target.get_instance_id()
     var remaining := int(enemy_hp.get(id, 1)) - 1
@@ -1133,9 +1098,9 @@ func _cast_arcane_pulse() -> void:
         enemy_nodes.erase(target)
         enemy_hp.erase(id)
         target.queue_free()
-        _set_status("Arcane Pulse disperses a riftbound shade. " + str(enemy_nodes.size()) + " remain.")
+        _set_status("Arcane Pulse disperses the creature. " + str(enemy_nodes.size()) + " remain.")
         if enemy_nodes.is_empty():
-            _set_status("The last shade dissolves. Mathias is safe—speak with him using E.")
+            _set_status("The clearing is safe. Find Mathias and press E to speak with him.")
             _save_game()
     else:
         enemy_hp[id] = remaining
@@ -1163,7 +1128,7 @@ func _refresh_objective() -> void:
     if objective_label == null:
         return
     if not enemy_nodes.is_empty():
-        objective_label.text = "Protect Mathias: repel the riftbound with Q (" + str(enemy_nodes.size()) + " remain)."
+        objective_label.text = "TUTORIAL • Help Mathias: move closer and press Q to cast Arcane Pulse (" + str(enemy_nodes.size()) + " remain)."
     elif story_stage == 0:
         objective_label.text = "Speak with Mathias near the broken ward. Press E."
     elif story_stage == 1 and not warden_consulted:
