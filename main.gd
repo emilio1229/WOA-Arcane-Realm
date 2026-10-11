@@ -93,12 +93,14 @@ func _physics_process(delta: float) -> void:
 	player.move_and_slide()
 	_refresh_objective()
 
-func _unhandled_input(event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:
+	# Read mouse input before GUI controls can consume it. In the web build, the
+	# full-screen HUD could swallow the click, leaving the camera permanently uncaptured.
 	if not started:
 		return
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT and not dialogue_open:
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	elif event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and not dialogue_open:
+	elif event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		# Use screen_relative so mouse-look sensitivity stays consistent in the browser at different sizes.
 		yaw -= event.screen_relative.x * 0.0022
 		pitch = clampf(pitch - event.screen_relative.y * 0.0016, -0.48, 0.32)
@@ -449,21 +451,19 @@ func _build_world() -> void:
 	add_child(sun)
 
 	_add_box("Gloamwood and Gloamwick Ground", Vector3(0, -0.5, -70), Vector3(180, 1, 260), Color(0.035, 0.045, 0.045), true)
-	_add_box("Mossy Trail", Vector3(0, -0.02, -20), Vector3(5.5, 0.12, 112), Color(0.09, 0.075, 0.085), false)
-	# Dense, staggered trunks frame a winding forest path without blocking the playable trail.
+	_add_box("Gloamwick Road", Vector3(0, -0.02, -16), Vector3(6.5, 0.12, 112), Color(0.09, 0.075, 0.085), false)
+	# A wooded ridge frames the settlement while leaving the town streets open.
 	for i in range(18):
-		var z := 12.0 - float(i) * 4.8
-		var side_offset := 7.2 + float((i * 7) % 5) * 1.4
-		_build_tree(Vector3(-side_offset, 0, z), 5.0 + float(i % 4) * 0.9)
-		_build_tree(Vector3(side_offset + 1.0, 0, z - 2.2), 5.8 + float((i + 2) % 4) * 0.8)
-	# Fallen timber, standing stones and luminous spores establish a readable trail.
-	_add_box("Fallen Blackwood", Vector3(-4.9, 0.55, -8.5), Vector3(3.7, 0.45, 0.55), Color(0.055, 0.03, 0.04), false).rotation.z = -0.22
-	_add_box("Mossy Standing Stone", Vector3(4.5, 1.0, -18), Vector3(0.85, 2.0, 0.8), Color(0.11, 0.075, 0.15), false)
-	_add_box("Broken Wardstone", Vector3(-2.8, 0.75, -28), Vector3(0.65, 1.5, 0.65), Color(0.18, 0.09, 0.28), false)
-	_build_house(Vector3(-13.5, 0, -18), Color(0.095, 0.055, 0.11))
-	_build_house(Vector3(14.5, 0, -25), Color(0.07, 0.065, 0.105))
-	_add_box("Forgotten Shrine", Vector3(5.2, 0.7, -23), Vector3(1.4, 1.4, 1.1), Color(0.09, 0.055, 0.16), false)
-	archive_wisp = _make_sigil(Vector3(5.2, 2.0, -23), Color(0.36, 0.86, 0.95), 0.42)
+		var z := 25.0 - float(i) * 5.1
+		var side_offset := 27.0 + float((i * 7) % 5) * 1.8
+		_place_imported_asset("res://OBJ/CommonTree_" + str((i % 5) + 1) + ".obj", Vector3(-side_offset, 0, z), Vector3.ONE * 1.1, float(i) * 0.41)
+		_place_imported_asset("res://OBJ/CommonTree_" + str(((i + 2) % 5) + 1) + ".obj", Vector3(side_offset + 2.0, 0, z - 2.2), Vector3.ONE * 1.25, float(i) * -0.33)
+	# Broken stones and a forgotten shrine mark the old road into the settlement.
+	_add_box("Fallen Blackwood", Vector3(-24.9, 0.55, -8.5), Vector3(3.7, 0.45, 0.55), Color(0.055, 0.03, 0.04), false).rotation.z = -0.22
+	_add_box("Mossy Standing Stone", Vector3(23.5, 1.0, -18), Vector3(0.85, 2.0, 0.8), Color(0.11, 0.075, 0.15), false)
+	_add_box("Broken Wardstone", Vector3(-8.8, 0.75, -44), Vector3(0.65, 1.5, 0.65), Color(0.18, 0.09, 0.28), false)
+	_add_box("Forgotten Shrine", Vector3(10.5, 0.7, -45), Vector3(1.4, 1.4, 1.1), Color(0.09, 0.055, 0.16), false)
+	archive_wisp = _make_sigil(Vector3(10.5, 2.0, -45), Color(0.36, 0.86, 0.95), 0.42)
 	archive_wisp.name = "Archive Wisp"
 	archive_wisp.visible = not lore_discovered
 	add_child(archive_wisp)
@@ -543,83 +543,86 @@ func _build_player() -> void:
 	camera_pivot.rotation.x = pitch
 
 func _build_gloamwick_town() -> void:
-	# A walkable settlement beyond the sanctuary gate: main street, market, inn,
-	# small homes, gardens, lamps, and a central rune well.
-	_add_box("Gloamwick Main Street", Vector3(0, -0.015, -105), Vector3(8.5, 0.12, 74), Color(0.105, 0.082, 0.105), false)
-	_add_box("Gloamwick Market Square", Vector3(0, 0.0, -104), Vector3(27, 0.16, 24), Color(0.12, 0.09, 0.12), false)
-	_add_box("Rune Well Foundation", Vector3(0, 0.22, -103), Vector3(3.6, 0.45, 3.6), Color(0.16, 0.12, 0.2), false)
-	_add_box("Rune Well Inner Pool", Vector3(0, 0.49, -103), Vector3(2.15, 0.1, 2.15), Color(0.08, 0.18, 0.23), false)
-	var well_rune := _make_sigil(Vector3(0, 1.1, -103), Color(0.34, 0.76, 0.98), 0.42)
+	# Gloamwick is the opening map, not a distant prop cluster: the player enters
+	# through the north road, passes the market, and reaches Mathias at the south ward.
+	_add_box("Gloamwick North Road", Vector3(0, -0.015, -15), Vector3(7.0, 0.12, 62), Color(0.105, 0.082, 0.095), false)
+	_add_box("West Lane", Vector3(-13.0, -0.01, -19), Vector3(3.0, 0.1, 49), Color(0.085, 0.068, 0.08), false)
+	_add_box("East Lane", Vector3(13.0, -0.01, -19), Vector3(3.0, 0.1, 49), Color(0.085, 0.068, 0.08), false)
+	_add_box("Market Square", Vector3(0, 0.015, -15), Vector3(28, 0.16, 22), Color(0.13, 0.105, 0.13), false)
+	_add_box("Square Stone Inlay", Vector3(0, 0.105, -15), Vector3(11, 0.035, 11), Color(0.19, 0.15, 0.2), false)
+
+	# The Hollow Lantern is the town's landmark, with a gabled roof, chimney,
+	# warm windows, a readable sign, and an open approach from the road.
+	_build_house(Vector3(0, 0, 1.5), Color(0.13, 0.065, 0.105))
+	_add_box("Hollow Lantern Signboard", Vector3(0, 2.55, -1.18), Vector3(3.4, 0.72, 0.16), Color(0.22, 0.11, 0.31), false)
+	_add_box("Inn Sign Rune", Vector3(0, 2.56, -1.29), Vector3(0.34, 0.42, 0.08), Color(0.65, 0.36, 0.95), false)
+	_add_box("Inn Chimney", Vector3(2.15, 4.1, 1.0), Vector3(0.65, 1.7, 0.7), Color(0.16, 0.09, 0.12), true)
+
+	# Eight homes form two distinct streets, with small front gardens and lanes.
+	var house_colors: Array[Color] = [
+		Color(0.13, 0.075, 0.105), Color(0.09, 0.075, 0.13),
+		Color(0.12, 0.085, 0.07), Color(0.08, 0.09, 0.13),
+		Color(0.11, 0.065, 0.09), Color(0.12, 0.095, 0.065),
+		Color(0.095, 0.08, 0.12), Color(0.14, 0.075, 0.075)
+	]
+	var house_positions: Array[Vector3] = [
+		Vector3(-18, 0, -5), Vector3(18, 0, -5),
+		Vector3(-18, 0, -17), Vector3(18, 0, -17),
+		Vector3(-18, 0, -29), Vector3(18, 0, -29),
+		Vector3(-18, 0, -40), Vector3(18, 0, -40)
+	]
+	for i in range(house_positions.size()):
+		_build_house(house_positions[i], house_colors[i])
+
+	# The market has actual imported stalls and cargo props rather than empty cubes.
+	for i in range(4):
+		var stall_x: float = -9.0 + float(i) * 6.0
+		_place_imported_asset("res://OBJ/Stall_Empty.obj", Vector3(stall_x, 0.0, -8.5), Vector3.ONE * 0.9, 0.0)
+		_place_imported_asset("res://OBJ/Prop_Crate.obj", Vector3(stall_x + 1.0, 0.0, -6.5), Vector3.ONE * 0.55, float(i) * 0.4)
+		if i % 2 == 0:
+			_place_imported_asset("res://OBJ/Prop_Wagon.obj", Vector3(stall_x, 0.0, -23.0), Vector3.ONE * 0.7, 1.57)
+
+	# A rune well gives the square a central landmark and a natural meeting point.
+	_add_box("Rune Well Foundation", Vector3(0, 0.24, -16.5), Vector3(3.4, 0.48, 3.4), Color(0.16, 0.12, 0.2), true)
+	_add_box("Rune Well Inner Pool", Vector3(0, 0.51, -16.5), Vector3(2.0, 0.1, 2.0), Color(0.035, 0.13, 0.18), false)
+	var well_rune := _make_sigil(Vector3(0, 1.15, -16.5), Color(0.34, 0.76, 0.98), 0.42)
 	well_rune.name = "Gloamwick Rune Well"
 	add_child(well_rune)
 
-	# Distinct landmark buildings frame the square. Their doors face the street.
-	_build_house(Vector3(-12.5, 0, -88), Color(0.13, 0.075, 0.105))
-	_build_house(Vector3(12.5, 0, -88), Color(0.09, 0.075, 0.13))
-	_build_house(Vector3(-13.5, 0, -105), Color(0.12, 0.085, 0.07))
-	_build_house(Vector3(13.5, 0, -105), Color(0.08, 0.09, 0.13))
-	_build_house(Vector3(-12.5, 0, -122), Color(0.11, 0.065, 0.09))
-	_build_house(Vector3(12.5, 0, -122), Color(0.12, 0.095, 0.065))
-
-	# The inn is a larger landmark with a sign and glowing windows.
-	_add_box("The Hollow Lantern Inn", Vector3(0, 1.9, -136), Vector3(9, 3.8, 6.5), Color(0.12, 0.065, 0.09), true)
-	_add_box("Inn Roof", Vector3(0, 4.0, -136), Vector3(10, 0.65, 7.5), Color(0.055, 0.027, 0.075), false)
-	_add_box("Inn Sign", Vector3(0, 2.7, -132.55), Vector3(2.7, 0.7, 0.15), Color(0.22, 0.12, 0.29), false)
-	_add_box("Inn Door", Vector3(0, 1.0, -132.65), Vector3(1.15, 2.0, 0.12), Color(0.045, 0.025, 0.055), false)
+	# Benches, fences, plants, flowers, mushrooms, stones and trees add scale
+	# around the homes without obstructing the streets or combat approach.
 	for side in [-1.0, 1.0]:
-		var window_light := _make_sigil(Vector3(side * 2.7, 2.0, -132.55), Color(0.95, 0.52, 0.2), 0.18)
-		window_light.name = "Inn Amber Window"
-		add_child(window_light)
+		for garden_index in range(4):
+			var garden_z: float = -3.0 - float(garden_index) * 11.0
+			_place_imported_asset("res://OBJ/Prop_WoodenFence_Single.obj", Vector3(side * 22.0, 0.0, garden_z), Vector3.ONE * 0.8, 0.0)
+			_place_imported_asset("res://OBJ/Bush_Common_Flowers.obj", Vector3(side * 21.0, 0.0, garden_z - 2.0), Vector3.ONE * 0.55, float(garden_index) * 0.8)
+			_place_imported_asset("res://OBJ/Flower_3_Group.obj", Vector3(side * 15.3, 0.0, garden_z - 1.5), Vector3.ONE * 0.5, float(garden_index) * 0.6)
+	for i in range(12):
+		var tree_side: float = -1.0 if i % 2 == 0 else 1.0
+		var tree_z: float = 20.0 - float(i) * 6.2
+		var tree_x: float = tree_side * (29.0 + float(i % 3) * 2.5)
+		_place_imported_asset("res://OBJ/CommonTree_" + str((i % 5) + 1) + ".obj", Vector3(tree_x, 0.0, tree_z), Vector3.ONE * 1.1, float(i) * 0.53)
+	for i in range(8):
+		var plant_side: float = -1.0 if i % 2 == 0 else 1.0
+		var plant_pos := Vector3(plant_side * (9.0 + float(i % 3)), 0.0, -4.0 - float(i) * 4.4)
+		var plant_path: String = "res://OBJ/Bush_Common.obj" if i % 2 == 0 else "res://OBJ/Plant_1_Big.obj"
+		_place_imported_asset(plant_path, plant_pos, Vector3.ONE * 0.55, float(i) * 0.61)
+	_place_imported_asset("res://OBJ/Mushroom_Common.obj", Vector3(-6.5, 0.0, -35.5), Vector3.ONE * 0.55, 0.0)
+	_place_imported_asset("res://OBJ/Mushroom_Laetiporus.obj", Vector3(7.0, 0.0, -37.0), Vector3.ONE * 0.4, 0.0)
+	_place_imported_asset("res://OBJ/Rock_Medium_1.obj", Vector3(-9.0, 0.0, -44.5), Vector3.ONE * 0.55, 0.3)
+	_place_imported_asset("res://OBJ/Rock_Medium_2.obj", Vector3(9.5, 0.0, -44.0), Vector3.ONE * 0.6, -0.4)
 
-	# Market stalls and crates create a usable, lived-in square.
-	for stall_index in range(4):
-		var stall_x := -8.0 + float(stall_index) * 5.3
-		_add_box("Market Stall Counter " + str(stall_index + 1), Vector3(stall_x, 0.75, -97.0), Vector3(2.7, 1.1, 1.3), Color(0.17, 0.105, 0.075), true)
-		_add_box("Market Stall Canopy " + str(stall_index + 1), Vector3(stall_x, 1.75, -97.0), Vector3(3.0, 0.18, 1.65), [Color(0.32, 0.12, 0.2), Color(0.16, 0.19, 0.32), Color(0.25, 0.12, 0.34), Color(0.18, 0.28, 0.23)][stall_index], false)
-		for post_side in [-1.0, 1.0]:
-			_add_box("Stall Support", Vector3(stall_x + post_side * 1.25, 1.25, -97.0), Vector3(0.12, 1.0, 0.12), Color(0.07, 0.04, 0.055), false)
-		_add_box("Market Crate " + str(stall_index + 1), Vector3(stall_x + 0.65, 0.35, -95.8), Vector3(0.65, 0.65, 0.65), Color(0.18, 0.11, 0.07), false)
-
-	# Warm street lanterns, boundary fences, and garden details.
-	for lamp_index in range(8):
-		var lamp_z := -80.0 - float(lamp_index) * 8.0
+	# Tall rune lamps lead from the market to Mathias and the damaged southern ward.
+	for lamp_index in range(7):
+		var lamp_z: float = -24.0 - float(lamp_index) * 3.1
 		for side in [-1.0, 1.0]:
-			var lamp_x: float = float(side) * (6.0 if lamp_index < 5 else 8.0)
-			_add_box("Gloamwick Lamp Post", Vector3(lamp_x, 1.65, lamp_z), Vector3(0.16, 3.3, 0.16), Color(0.055, 0.035, 0.065), false)
+			var lamp_x: float = float(side) * (6.0 if lamp_index < 4 else 8.0)
+			_add_box("Gloamwick Rune Lamp Post", Vector3(lamp_x, 1.65, lamp_z), Vector3(0.16, 3.3, 0.16), Color(0.055, 0.035, 0.065), false)
 			var lantern := _make_sigil(Vector3(lamp_x, 3.25, lamp_z), Color(0.98, 0.58, 0.24), 0.2)
 			lantern.name = "Gloamwick Lantern"
 			add_child(lantern)
-
-	for side in [-1.0, 1.0]:
-		for fence_index in range(7):
-			var fence_z := -82.0 - float(fence_index) * 8.2
-			_add_box("Town Garden Fence", Vector3(side * 19.0, 0.45, fence_z), Vector3(0.18, 0.9, 5.0), Color(0.065, 0.04, 0.055), false)
-
-	# Use the actual imported environment assets already in the repository.
-	# These are real OBJ models, unlike the placeholder FBX/GLB LFS pointer files.
-	var tree_spots: Array[Vector3] = [
-		Vector3(-22, 0, -83), Vector3(23, 0, -85), Vector3(-23, 0, -101),
-		Vector3(23, 0, -110), Vector3(-22, 0, -126), Vector3(22, 0, -132),
-		Vector3(-8, 0, -145), Vector3(9, 0, -147)
-	]
-	for i in range(tree_spots.size()):
-		_place_imported_asset("res://OBJ/CommonTree_" + str((i % 5) + 1) + ".obj", tree_spots[i], Vector3.ONE * 1.15, float(i) * 0.73)
-	for i in range(10):
-		var side := -1.0 if i % 2 == 0 else 1.0
-		var shrub_pos := Vector3(side * (8.0 + float(i % 3) * 2.0), 0.0, -84.0 - float(i) * 5.7)
-		var shrub_path := "res://OBJ/Bush_Common_Flowers.obj" if i % 3 == 0 else "res://OBJ/Bush_Common.obj"
-		_place_imported_asset(shrub_path, shrub_pos, Vector3.ONE * 0.8, float(i) * 0.61)
-	for i in range(12):
-		var flower_pos := Vector3(-9.0 + float(i % 6) * 3.6, 0.0, -86.0 - float(i / 6) * 34.0)
-		var flower_path := "res://OBJ/Flower_3_Group.obj" if i % 2 == 0 else "res://OBJ/Flower_4_Group.obj"
-		_place_imported_asset(flower_path, flower_pos, Vector3.ONE * 0.65, float(i) * 0.42)
-	for i in range(8):
-		var rock_pos := Vector3(-10.0 + float(i % 4) * 6.5, 0.0, -116.0 - float(i / 4) * 19.0)
-		_place_imported_asset("res://OBJ/Rock_Medium_" + str((i % 3) + 1) + ".obj", rock_pos, Vector3.ONE * 0.6, float(i) * 0.9)
-	_place_imported_asset("res://OBJ/Prop_Wagon.obj", Vector3(8.2, 0.0, -96.0), Vector3.ONE * 0.8, -0.2)
-	_place_imported_asset("res://OBJ/Prop_Crate.obj", Vector3(-8.7, 0.0, -96.0), Vector3.ONE * 0.65, 0.25)
-	_place_imported_asset("res://OBJ/Mushroom_Common.obj", Vector3(-5.8, 0.0, -84.5), Vector3.ONE * 0.8, 0.0)
-	_place_imported_asset("res://OBJ/Mushroom_Laetiporus.obj", Vector3(6.2, 0.0, -126.0), Vector3.ONE * 0.7, 0.0)
+	_place_imported_asset("res://OBJ/Prop_Wagon.obj", Vector3(22.0, 0.0, -34.0), Vector3.ONE * 0.85, -0.3)
+	_place_imported_asset("res://OBJ/Prop_Crate.obj", Vector3(20.5, 0.0, -33.0), Vector3.ONE * 0.7, 0.2)
 
 func _place_imported_asset(asset_path: String, world_position: Vector3, asset_scale: Vector3, yaw_radians: float = 0.0) -> Node3D:
 	# OBJ imports may resolve as a PackedScene or a Mesh depending on importer settings.
@@ -653,9 +656,24 @@ func _place_imported_asset(asset_path: String, world_position: Vector3, asset_sc
 	return instance
 
 func _build_house(pos: Vector3, color: Color) -> void:
-	_add_box("Gloamwick House", pos + Vector3(0, 1.6, 0), Vector3(6, 3.2, 5), color, true)
-	_add_box("House Roof", pos + Vector3(0, 3.55, 0), Vector3(6.8, 0.55, 5.8), Color(0.07, 0.035, 0.09), false)
-	_add_box("House Door", pos + Vector3(0, 0.9, -2.55), Vector3(1.0, 1.8, 0.12), Color(0.08, 0.035, 0.08), false)
+	# Low-fantasy timber-and-plaster home with a pitched roof, recessed doorway,
+	# glowing leaded windows, and chimney; collision stays on the solid walls.
+	_add_box("Gloamwick Plaster House", pos + Vector3(0, 1.55, 0), Vector3(6.0, 3.1, 5.0), color, true)
+	_add_box("House Timber Beam", pos + Vector3(0, 2.75, -2.54), Vector3(5.8, 0.18, 0.12), Color(0.07, 0.035, 0.04), false)
+	_add_box("House Door", pos + Vector3(0, 0.92, -2.58), Vector3(1.0, 1.84, 0.14), Color(0.045, 0.025, 0.04), false)
+	_add_box("Door Handle", pos + Vector3(0.32, 0.95, -2.68), Vector3(0.08, 0.08, 0.05), Color(0.75, 0.48, 0.19), false)
+	for side in [-1.0, 1.0]:
+		_add_box("House Window Frame", pos + Vector3(side * 1.72, 1.9, -2.59), Vector3(0.95, 1.05, 0.12), Color(0.045, 0.025, 0.055), false)
+		_add_box("House Warm Window", pos + Vector3(side * 1.72, 1.9, -2.67), Vector3(0.7, 0.8, 0.06), Color(0.95, 0.48, 0.19), false)
+		_add_box("House Window Mullion", pos + Vector3(side * 1.72, 1.9, -2.72), Vector3(0.08, 0.82, 0.04), Color(0.12, 0.06, 0.07), false)
+	# Two sloped roof planes create a visible gable instead of a flat slab.
+	var roof_left := _add_box("House Pitched Roof Left", pos + Vector3(-1.55, 3.45, 0), Vector3(3.55, 0.28, 5.8), Color(0.055, 0.028, 0.075), false)
+	roof_left.rotation.z = -0.48
+	var roof_right := _add_box("House Pitched Roof Right", pos + Vector3(1.55, 3.45, 0), Vector3(3.55, 0.28, 5.8), Color(0.075, 0.035, 0.065), false)
+	roof_right.rotation.z = 0.48
+	_add_box("House Ridge Beam", pos + Vector3(0, 4.18, 0), Vector3(0.22, 0.22, 6.0), Color(0.12, 0.055, 0.07), false)
+	_add_box("House Chimney", pos + Vector3(2.0, 4.05, 1.0), Vector3(0.55, 1.2, 0.55), Color(0.16, 0.075, 0.095), true)
+	_place_imported_asset("res://OBJ/Prop_Vine1.obj", pos + Vector3(-2.7, 1.8, -2.62), Vector3.ONE * 0.55, 0.0)
 
 func _build_tree(pos: Vector3, height: float) -> void:
 	var trunk := MeshInstance3D.new()
