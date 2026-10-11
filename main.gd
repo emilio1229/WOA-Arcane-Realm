@@ -388,6 +388,12 @@ func _start_new_game() -> void:
     mathias_stance = "unspoken"
     warden_response = "unasked"
     warden_consulted = false
+    collected_treasures.clear()
+    side_quest_progress = {"lanterns": 0, "relics": 0}
+    side_quest_complete = {"lanterns": false, "relics": false}
+    boss_defeated = false
+    boss_active = false
+    active_boss = null
     _save_game()
     _enter_game(true)
 
