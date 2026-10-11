@@ -556,10 +556,10 @@ func _build_gloamwick_town() -> void:
 	_place_imported_asset("res://OBJ/Wall_Arch.obj", Vector3(0.0, 0.0, -43.0), Vector3.ONE * 1.7, 0.0)
 	# The Hollow Lantern is the town's landmark, with a gabled roof, chimney,
 	# warm windows, a readable sign, and an open approach from the road.
-	_build_house(Vector3(0, 0, 1.5), Color(0.13, 0.065, 0.105))
-	_add_box("Hollow Lantern Signboard", Vector3(0, 2.55, -1.18), Vector3(3.4, 0.72, 0.16), Color(0.22, 0.11, 0.31), false)
-	_add_box("Inn Sign Rune", Vector3(0, 2.56, -1.29), Vector3(0.34, 0.42, 0.08), Color(0.65, 0.36, 0.95), false)
-	_add_box("Inn Chimney", Vector3(2.15, 4.1, 1.0), Vector3(0.65, 1.7, 0.7), Color(0.16, 0.09, 0.12), true)
+	_build_house(Vector3(0, 0, -2.5), Color(0.13, 0.065, 0.105))
+	_add_box("Hollow Lantern Signboard", Vector3(0, 2.55, -5.18), Vector3(3.4, 0.72, 0.16), Color(0.22, 0.11, 0.31), false)
+	_add_box("Inn Sign Rune", Vector3(0, 2.56, -5.29), Vector3(0.34, 0.42, 0.08), Color(0.65, 0.36, 0.95), false)
+	_add_box("Inn Chimney", Vector3(2.15, 4.1, -1.5), Vector3(0.65, 1.7, 0.7), Color(0.16, 0.09, 0.12), true)
 
 	# Eight homes form two distinct streets, with small front gardens and lanes.
 	var house_colors: Array[Color] = [
@@ -668,9 +668,17 @@ func _build_house(pos: Vector3, color: Color) -> void:
 	_add_box("House Door", pos + Vector3(0, 0.92, -2.58), Vector3(1.0, 1.84, 0.14), Color(0.045, 0.025, 0.04), false)
 	_add_box("Door Handle", pos + Vector3(0.32, 0.95, -2.68), Vector3(0.08, 0.08, 0.05), Color(0.75, 0.48, 0.19), false)
 	for side in [-1.0, 1.0]:
-		_add_box("House Window Frame", pos + Vector3(side * 1.72, 1.9, -2.59), Vector3(0.95, 1.05, 0.12), Color(0.045, 0.025, 0.055), false)
-		_add_box("House Warm Window", pos + Vector3(side * 1.72, 1.9, -2.67), Vector3(0.7, 0.8, 0.06), Color(0.95, 0.48, 0.19), false)
-		_add_box("House Window Mullion", pos + Vector3(side * 1.72, 1.9, -2.72), Vector3(0.08, 0.82, 0.04), Color(0.12, 0.06, 0.07), false)
+		var front_window_x: float = float(side) * 1.72
+		_add_box("House Window Frame", pos + Vector3(front_window_x, 1.9, -2.59), Vector3(0.95, 1.05, 0.12), Color(0.045, 0.025, 0.055), false)
+		_add_box("House Warm Window", pos + Vector3(front_window_x, 1.9, -2.67), Vector3(0.7, 0.8, 0.06), Color(0.95, 0.48, 0.19), false)
+		_add_box("House Window Mullion", pos + Vector3(front_window_x, 1.9, -2.72), Vector3(0.08, 0.82, 0.04), Color(0.12, 0.06, 0.07), false)
+		# Side doors and windows face the narrow lanes between each row of homes.
+		var side_door: Node3D = _add_box("House Side Door", pos + Vector3(float(side) * 3.06, 0.92, 0.0), Vector3(0.14, 1.84, 1.0), Color(0.045, 0.025, 0.04), false)
+		side_door.rotation.y = PI * 0.5
+		_add_box("House Side Window Frame", pos + Vector3(float(side) * 3.06, 1.95, 1.55), Vector3(0.12, 0.92, 0.8), Color(0.045, 0.025, 0.055), false)
+		_add_box("House Side Warm Window", pos + Vector3(float(side) * 3.13, 1.95, 1.55), Vector3(0.06, 0.68, 0.56), Color(0.95, 0.48, 0.19), false)
+		_add_box("House Side Window Frame", pos + Vector3(float(side) * 3.06, 1.95, -1.55), Vector3(0.12, 0.92, 0.8), Color(0.045, 0.025, 0.055), false)
+		_add_box("House Side Warm Window", pos + Vector3(float(side) * 3.13, 1.95, -1.55), Vector3(0.06, 0.68, 0.56), Color(0.95, 0.48, 0.19), false)
 	# Two sloped roof planes create a visible gable instead of a flat slab.
 	var roof_left := _add_box("House Pitched Roof Left", pos + Vector3(-1.55, 3.45, 0), Vector3(3.55, 0.28, 5.8), Color(0.055, 0.028, 0.075), false)
 	roof_left.rotation.z = -0.48
