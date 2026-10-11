@@ -1,0 +1,16 @@
+newmtl wood
+Kd 0.14 0.055 0.045
+Ka 0.03 0.015 0.01
+
+newmtl wood_light
+Kd 0.25 0.11 0.07
+Ka 0.05 0.025 0.015
+
+newmtl iron
+Kd 0.24 0.2 0.31
+Ka 0.05 0.04 0.07
+
+newmtl crystal
+Kd 0.45 0.2 0.9
+Ka 0.12 0.04 0.25
+Ke 0.1 0.02 0.3

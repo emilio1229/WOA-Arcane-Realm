@@ -60,9 +60,13 @@ var has_save := false
 var _model_scene_cache: Dictionary = {}
 var _model_file_index: Dictionary = {}
 var _model_index_ready := false
+var audio_music: AudioStreamPlayer
+var audio_ready := false
+const AUDIO_RATE := 11025
 
 func _ready() -> void:
     _build_ui()
+    _setup_audio()
     _load_save()
     _show_menu()
     Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -407,6 +411,7 @@ func _continue_game() -> void:
     _enter_game(false)
 
 func _enter_game(show_intro: bool) -> void:
+    _start_ambient_audio()
     menu_root.visible = false
     hud_root.visible = true
     started = true
@@ -474,6 +479,13 @@ func _build_world() -> void:
     _add_box("Mossy Standing Stone", Vector3(4.5, 1.0, -18), Vector3(0.85, 2.0, 0.8), Color(0.11, 0.075, 0.15), false)
     _add_box("Broken Wardstone", Vector3(-2.8, 0.75, -28), Vector3(0.65, 1.5, 0.65), Color(0.18, 0.09, 0.28), false)
     _add_box("Sanctuary Gate", Vector3(0, 3.0, -62), Vector3(10, 6, 0.8), Color(0.12, 0.075, 0.19), false)
+    # Original low-poly assets authored for this game: imported OBJ meshes, not placeholder primitives.
+    _add_obj_prop("res://Assets/Models/ancient_tree.obj", "The Old Crown Tree", Vector3(-10.5, 0, -24.0), Vector3(2.5, 3.1, 2.5))
+    _add_obj_prop("res://Assets/Models/ancient_tree.obj", "The Split Crown Tree", Vector3(11.0, 0, -37.0), Vector3(2.0, 2.7, 2.0))
+    _add_obj_prop("res://Assets/Models/rune_shrine.obj", "Forgotten Rune Shrine", Vector3(4.5, 0, -27.0), Vector3(1.25, 1.5, 1.25))
+    _add_obj_prop("res://Assets/Models/rune_shrine.obj", "Sanctuary Waystone", Vector3(-5.4, 0, -56.0), Vector3(1.1, 1.35, 1.1))
+    _add_obj_prop("res://Assets/Models/relic_chest.obj", "Old Archive Chest", Vector3(9.0, 0, -18.5), Vector3(1.1, 1.1, 1.1))
+    _add_obj_prop("res://Assets/Models/relic_chest.obj", "Buried Relic Chest", Vector3(-10.0, 0, -43.5), Vector3(0.95, 0.95, 0.95))
     sanctuary_gate = _make_sigil(Vector3(0, 2.4, -61.45), Color(0.38, 0.12, 0.75), 2.1)
     sanctuary_gate.name = "Sigil Sanctuary Gate"
     add_child(sanctuary_gate)
@@ -594,6 +606,7 @@ func _collect_treasure(treasure: Node3D) -> void:
     if item_id.is_empty() or collected_treasures.has(item_id):
         return
     collected_treasures.append(item_id)
+    _play_sound_effect("pickup")
     if quest_id == "lanterns":
         side_quest_progress["lanterns"] = int(side_quest_progress.get("lanterns", 0)) + 1
     elif quest_id == "relics":
@@ -609,6 +622,7 @@ func _start_final_boss() -> void:
     if boss_active or boss_defeated:
         return
     boss_active = true
+    _play_sound_effect("boss")
     var boss := _instantiate_model("guardian")
     if boss == null:
         boss_active = false
@@ -659,6 +673,100 @@ func _build_player() -> void:
     game_camera.fov = 72.0
     camera_pivot.add_child(game_camera)
     camera_pivot.rotation.x = pitch
+
+func _setup_audio() -> void:
+    # Original synthesized ambience and one-shot effects keep the build self-contained.
+    # Browsers may block playback until the player clicks Begin; ambient audio starts there.
+    audio_music = AudioStreamPlayer.new()
+    audio_music.name = "Original Gloamwood Ambience"
+    audio_music.bus = "Master"
+    audio_music.volume_db = -23.0
+    audio_music.stream = _synthesize_sound("ambience", 6.0, true)
+    ui_layer.add_child(audio_music)
+    audio_ready = true
+
+func _start_ambient_audio() -> void:
+    if not audio_ready or audio_music == null:
+        return
+    if not audio_music.playing:
+        audio_music.play()
+
+func _play_sound_effect(kind: String) -> void:
+    if not audio_ready:
+        return
+    var player_audio := AudioStreamPlayer.new()
+    player_audio.name = "SFX_" + kind
+    player_audio.volume_db = -10.0 if kind != "ambience" else -20.0
+    player_audio.stream = _synthesize_sound(kind, 0.52, false)
+    ui_layer.add_child(player_audio)
+    player_audio.finished.connect(player_audio.queue_free)
+    player_audio.play()
+
+func _synthesize_sound(kind: String, duration: float, looping: bool) -> AudioStreamWAV:
+    # A tiny original software synthesizer: soft drones, glassy pickup chimes and a layered spell whoosh.
+    # Kept at 11.025 kHz to avoid excessive GDScript CPU cost in browser builds.
+    var sample_count := maxi(1, int(AUDIO_RATE * duration))
+    var raw := PackedByteArray()
+    raw.resize(sample_count * 2)
+    var base_frequency := 110.0
+    match kind:
+        "spell":
+            base_frequency = 185.0
+        "pickup":
+            base_frequency = 660.0
+        "boss":
+            base_frequency = 73.0
+        "dialogue":
+            base_frequency = 330.0
+        "ambience":
+            base_frequency = 82.4
+        _:
+            base_frequency = 220.0
+    for i in range(sample_count):
+        var t := float(i) / float(AUDIO_RATE)
+        var envelope := 1.0
+        if not looping:
+            envelope = minf(1.0, t * 22.0) * minf(1.0, maxf(0.0, duration - t) * 5.0)
+        var sample := sin(TAU * base_frequency * t)
+        if kind == "spell":
+            sample = sample * 0.45 + sin(TAU * (base_frequency * 2.03) * t) * 0.3 + sin(TAU * (base_frequency * 0.48) * t) * 0.25
+            sample *= 0.72 + 0.28 * sin(TAU * 7.0 * t)
+        elif kind == "pickup":
+            sample = sin(TAU * base_frequency * t) * 0.55 + sin(TAU * base_frequency * 1.5 * t) * 0.3 + sin(TAU * base_frequency * 2.0 * t) * 0.15
+        elif kind == "boss":
+            sample = sin(TAU * base_frequency * t) * 0.65 + sin(TAU * base_frequency * 1.51 * t) * 0.25 + sin(TAU * 37.0 * t) * 0.1
+            sample *= 0.65 + 0.35 * sin(TAU * 1.3 * t)
+        elif kind == "ambience":
+            sample = sin(TAU * base_frequency * t) * 0.28 + sin(TAU * (base_frequency * 1.5) * t) * 0.13 + sin(TAU * (base_frequency * 2.01) * t) * 0.08
+            sample *= 0.8 + 0.2 * sin(TAU * 0.17 * t)
+        else:
+            sample = sin(TAU * base_frequency * t) * 0.65 + sin(TAU * base_frequency * 2.0 * t) * 0.2
+        var pcm := clampf(sample * envelope * 0.42, -1.0, 1.0)
+        raw.encode_s16(i * 2, int(pcm * 32767.0))
+    var stream := AudioStreamWAV.new()
+    stream.format = AudioStreamWAV.FORMAT_16_BITS
+    stream.mix_rate = AUDIO_RATE
+    stream.stereo = false
+    stream.data = raw
+    if looping:
+        stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
+        stream.loop_begin = 0
+        stream.loop_end = sample_count
+    return stream
+
+func _add_obj_prop(resource_path: String, object_name: String, world_position: Vector3, object_scale: Vector3) -> Node3D:
+    var imported_mesh := load(resource_path) as Mesh
+    if imported_mesh == null:
+        push_warning("Original OBJ asset could not be imported: " + resource_path)
+        return null
+    var prop := MeshInstance3D.new()
+    prop.name = object_name
+    prop.mesh = imported_mesh
+    prop.position = world_position
+    prop.scale = object_scale
+    prop.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+    add_child(prop)
+    return prop
 
 func _add_imported_landmark(role: String, landmark_name: String, pos: Vector3, model_scale: float) -> Node3D:
     var model := _instantiate_model(role)
@@ -1194,6 +1302,7 @@ func _interact() -> void:
                 _set_status("The Sigils remain veiled. Seek the Whispering Warden beside the broken ward first.")
                 return
             var sigil_name := str(nearest_sigil.get_meta("sigil_name", "Unknown"))
+            _play_sound_effect("pickup")
             nearest_sigil.visible = false
             sigil_nodes.erase(nearest_sigil)
             if not collected_sigil_names.has(sigil_name):
@@ -1240,6 +1349,7 @@ func _cast_arcane_pulse() -> void:
     if player.global_position.distance_to(target.global_position) > 18.0:
         _set_status("Too far away. Move closer to the creature, then try Q again.")
         return
+    _play_sound_effect("spell")
     var id := target.get_instance_id()
     var remaining := int(enemy_hp.get(id, 1)) - 1
     if remaining <= 0:
