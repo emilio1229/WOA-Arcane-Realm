@@ -551,6 +551,9 @@ func _build_gloamwick_town() -> void:
 	_add_box("Market Square", Vector3(0, 0.015, -15), Vector3(28, 0.16, 22), Color(0.13, 0.105, 0.13), false)
 	_add_box("Square Stone Inlay", Vector3(0, 0.105, -15), Vector3(11, 0.035, 11), Color(0.19, 0.15, 0.2), false)
 
+	# Modeled stone arches frame the north entrance and the damaged ward road.
+	_place_imported_asset("res://OBJ/Wall_Arch.obj", Vector3(0.0, 0.0, 13.0), Vector3.ONE * 1.7, 0.0)
+	_place_imported_asset("res://OBJ/Wall_Arch.obj", Vector3(0.0, 0.0, -43.0), Vector3.ONE * 1.7, 0.0)
 	# The Hollow Lantern is the town's landmark, with a gabled roof, chimney,
 	# warm windows, a readable sign, and an open approach from the road.
 	_build_house(Vector3(0, 0, 1.5), Color(0.13, 0.065, 0.105))
@@ -573,11 +576,13 @@ func _build_gloamwick_town() -> void:
 	]
 	for i in range(house_positions.size()):
 		_build_house(house_positions[i], house_colors[i])
+		var front_lantern_z: float = house_positions[i].z - 2.8
+		_place_imported_asset("res://Exports/OBJ/Lantern_Wall.obj", house_positions[i] + Vector3(-2.35, 2.15, front_lantern_z - house_positions[i].z), Vector3.ONE * 0.32, 0.0)
 
 	# The market has actual imported stalls and cargo props rather than empty cubes.
 	for i in range(4):
 		var stall_x: float = -9.0 + float(i) * 6.0
-		_place_imported_asset("res://OBJ/Stall_Empty.obj", Vector3(stall_x, 0.0, -8.5), Vector3.ONE * 0.9, 0.0)
+		_place_imported_asset("res://Exports/OBJ/Stall_Empty.obj", Vector3(stall_x, 0.0, -8.5), Vector3.ONE * 0.9, 0.0)
 		_place_imported_asset("res://OBJ/Prop_Crate.obj", Vector3(stall_x + 1.0, 0.0, -6.5), Vector3.ONE * 0.55, float(i) * 0.4)
 		if i % 2 == 0:
 			_place_imported_asset("res://OBJ/Prop_Wagon.obj", Vector3(stall_x, 0.0, -23.0), Vector3.ONE * 0.7, 1.57)
