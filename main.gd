@@ -495,6 +495,10 @@ func _build_world() -> void:
     _add_imported_landmark("ruins", "Ancient Ruin Sentinel", Vector3(-6.8, 0.0, -31.0), 0.65)
     _add_imported_landmark("tower", "The Distant Wizard Tower", Vector3(14.0, 0.0, -65.0), 0.55)
     whispering_warden = _add_imported_landmark("spirit", "The Whispering Warden", Vector3(7.5, 0.0, -28.0), 0.55)
+    if whispering_warden == null:
+        whispering_warden = _make_sigil(Vector3(7.5, 1.2, -28.0), Color(0.68, 0.88, 0.76), 0.9)
+        whispering_warden.name = "The Whispering Warden"
+        add_child(whispering_warden)
 
     # Violet wisps act as subtle wayfinding lights from the waking place to the clearing.
     for i in range(9):
@@ -507,11 +511,12 @@ func _build_world() -> void:
     # The forest opens into a ward-clearing where Mathias is already holding the line.
     _add_box("Battle Clearing", Vector3(0, -0.02, -39), Vector3(22, 0.14, 19), Color(0.075, 0.06, 0.085), false)
     mathias = _build_person("Mathias", Vector3(0, 0, -35), Color(0.16, 0.11, 0.28), Color(0.8, 0.72, 0.92), true)
-    for i in range(3):
-        var x := -3.2 + float(i) * 3.2
-        var enemy := _build_person("Riftbound " + str(i + 1), Vector3(x, 0, -40.5), Color(0.035, 0.02, 0.07), Color(0.56, 0.18, 0.75), false)
-        enemy_nodes.append(enemy)
-        enemy_hp[enemy.get_instance_id()] = 1
+    if story_stage == 0:
+        for i in range(3):
+            var x := -3.2 + float(i) * 3.2
+            var enemy := _build_person("Riftbound " + str(i + 1), Vector3(x, 0, -40.5), Color(0.035, 0.02, 0.07), Color(0.56, 0.18, 0.75), false)
+            enemy_nodes.append(enemy)
+            enemy_hp[enemy.get_instance_id()] = 1
 
     var sigil_positions := [Vector3(-8.0, 0.0, -48.0), Vector3(8.0, 0.0, -48.0), Vector3(0.0, 0.0, -54.0)]
     var sigil_names := ["Dawn", "Dusk", "Heart"]
