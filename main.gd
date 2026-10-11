@@ -448,7 +448,7 @@ func _build_world() -> void:
 	sun.shadow_enabled = true
 	add_child(sun)
 
-	_add_box("Gloamwood Floor", Vector3(0, -0.5, -20), Vector3(100, 1, 150), Color(0.035, 0.045, 0.045), true)
+	_add_box("Gloamwood and Gloamwick Ground", Vector3(0, -0.5, -70), Vector3(180, 1, 260), Color(0.035, 0.045, 0.045), true)
 	_add_box("Mossy Trail", Vector3(0, -0.02, -20), Vector3(5.5, 0.12, 112), Color(0.09, 0.075, 0.085), false)
 	# Dense, staggered trunks frame a winding forest path without blocking the playable trail.
 	for i in range(18):
@@ -471,6 +471,9 @@ func _build_world() -> void:
 	sanctuary_gate = _make_sigil(Vector3(0, 2.4, -61.45), Color(0.38, 0.12, 0.75), 2.1)
 	sanctuary_gate.name = "Sigil Sanctuary Gate"
 	add_child(sanctuary_gate)
+
+	# Beyond the old sanctuary threshold, the forest road opens into Gloamwick.
+	_build_gloamwick_town()
 
 	# Violet wisps act as subtle wayfinding lights from the waking place to the clearing.
 	for i in range(9):
@@ -538,6 +541,116 @@ func _build_player() -> void:
 	game_camera.fov = 72.0
 	camera_pivot.add_child(game_camera)
 	camera_pivot.rotation.x = pitch
+
+func _build_gloamwick_town() -> void:
+	# A walkable settlement beyond the sanctuary gate: main street, market, inn,
+	# small homes, gardens, lamps, and a central rune well.
+	_add_box("Gloamwick Main Street", Vector3(0, -0.015, -105), Vector3(8.5, 0.12, 74), Color(0.105, 0.082, 0.105), false)
+	_add_box("Gloamwick Market Square", Vector3(0, 0.0, -104), Vector3(27, 0.16, 24), Color(0.12, 0.09, 0.12), false)
+	_add_box("Rune Well Foundation", Vector3(0, 0.22, -103), Vector3(3.6, 0.45, 3.6), Color(0.16, 0.12, 0.2), false)
+	_add_box("Rune Well Inner Pool", Vector3(0, 0.49, -103), Vector3(2.15, 0.1, 2.15), Color(0.08, 0.18, 0.23), false)
+	var well_rune := _make_sigil(Vector3(0, 1.1, -103), Color(0.34, 0.76, 0.98), 0.42)
+	well_rune.name = "Gloamwick Rune Well"
+	add_child(well_rune)
+
+	# Distinct landmark buildings frame the square. Their doors face the street.
+	_build_house(Vector3(-12.5, 0, -88), Color(0.13, 0.075, 0.105))
+	_build_house(Vector3(12.5, 0, -88), Color(0.09, 0.075, 0.13))
+	_build_house(Vector3(-13.5, 0, -105), Color(0.12, 0.085, 0.07))
+	_build_house(Vector3(13.5, 0, -105), Color(0.08, 0.09, 0.13))
+	_build_house(Vector3(-12.5, 0, -122), Color(0.11, 0.065, 0.09))
+	_build_house(Vector3(12.5, 0, -122), Color(0.12, 0.095, 0.065))
+
+	# The inn is a larger landmark with a sign and glowing windows.
+	_add_box("The Hollow Lantern Inn", Vector3(0, 1.9, -136), Vector3(9, 3.8, 6.5), Color(0.12, 0.065, 0.09), true)
+	_add_box("Inn Roof", Vector3(0, 4.0, -136), Vector3(10, 0.65, 7.5), Color(0.055, 0.027, 0.075), false)
+	_add_box("Inn Sign", Vector3(0, 2.7, -132.55), Vector3(2.7, 0.7, 0.15), Color(0.22, 0.12, 0.29), false)
+	_add_box("Inn Door", Vector3(0, 1.0, -132.65), Vector3(1.15, 2.0, 0.12), Color(0.045, 0.025, 0.055), false)
+	for side in [-1.0, 1.0]:
+		var window_light := _make_sigil(Vector3(side * 2.7, 2.0, -132.55), Color(0.95, 0.52, 0.2), 0.18)
+		window_light.name = "Inn Amber Window"
+		add_child(window_light)
+
+	# Market stalls and crates create a usable, lived-in square.
+	for stall_index in range(4):
+		var stall_x := -8.0 + float(stall_index) * 5.3
+		_add_box("Market Stall Counter " + str(stall_index + 1), Vector3(stall_x, 0.75, -97.0), Vector3(2.7, 1.1, 1.3), Color(0.17, 0.105, 0.075), true)
+		_add_box("Market Stall Canopy " + str(stall_index + 1), Vector3(stall_x, 1.75, -97.0), Vector3(3.0, 0.18, 1.65), [Color(0.32, 0.12, 0.2), Color(0.16, 0.19, 0.32), Color(0.25, 0.12, 0.34), Color(0.18, 0.28, 0.23)][stall_index], false)
+		for post_side in [-1.0, 1.0]:
+			_add_box("Stall Support", Vector3(stall_x + post_side * 1.25, 1.25, -97.0), Vector3(0.12, 1.0, 0.12), Color(0.07, 0.04, 0.055), false)
+		_add_box("Market Crate " + str(stall_index + 1), Vector3(stall_x + 0.65, 0.35, -95.8), Vector3(0.65, 0.65, 0.65), Color(0.18, 0.11, 0.07), false)
+
+	# Warm street lanterns, boundary fences, and garden details.
+	for lamp_index in range(8):
+		var lamp_z := -80.0 - float(lamp_index) * 8.0
+		for side in [-1.0, 1.0]:
+			var lamp_x := side * (6.0 if lamp_index < 5 else 8.0)
+			_add_box("Gloamwick Lamp Post", Vector3(lamp_x, 1.65, lamp_z), Vector3(0.16, 3.3, 0.16), Color(0.055, 0.035, 0.065), false)
+			var lantern := _make_sigil(Vector3(lamp_x, 3.25, lamp_z), Color(0.98, 0.58, 0.24), 0.2)
+			lantern.name = "Gloamwick Lantern"
+			add_child(lantern)
+
+	for side in [-1.0, 1.0]:
+		for fence_index in range(7):
+			var fence_z := -82.0 - float(fence_index) * 8.2
+			_add_box("Town Garden Fence", Vector3(side * 19.0, 0.45, fence_z), Vector3(0.18, 0.9, 5.0), Color(0.065, 0.04, 0.055), false)
+
+	# Use the actual imported environment assets already in the repository.
+	# These are real OBJ models, unlike the placeholder FBX/GLB LFS pointer files.
+	var tree_spots: Array[Vector3] = [
+		Vector3(-22, 0, -83), Vector3(23, 0, -85), Vector3(-23, 0, -101),
+		Vector3(23, 0, -110), Vector3(-22, 0, -126), Vector3(22, 0, -132),
+		Vector3(-8, 0, -145), Vector3(9, 0, -147)
+	]
+	for i in range(tree_spots.size()):
+		_place_imported_asset("res://OBJ/CommonTree_" + str((i % 5) + 1) + ".obj", tree_spots[i], Vector3.ONE * 1.15, float(i) * 0.73)
+	for i in range(10):
+		var side := -1.0 if i % 2 == 0 else 1.0
+		var shrub_pos := Vector3(side * (8.0 + float(i % 3) * 2.0), 0.0, -84.0 - float(i) * 5.7)
+		var shrub_path := "res://OBJ/Bush_Common_Flowers.obj" if i % 3 == 0 else "res://OBJ/Bush_Common.obj"
+		_place_imported_asset(shrub_path, shrub_pos, Vector3.ONE * 0.8, float(i) * 0.61)
+	for i in range(12):
+		var flower_pos := Vector3(-9.0 + float(i % 6) * 3.6, 0.0, -86.0 - float(i / 6) * 34.0)
+		var flower_path := "res://OBJ/Flower_3_Group.obj" if i % 2 == 0 else "res://OBJ/Flower_4_Group.obj"
+		_place_imported_asset(flower_path, flower_pos, Vector3.ONE * 0.65, float(i) * 0.42)
+	for i in range(8):
+		var rock_pos := Vector3(-10.0 + float(i % 4) * 6.5, 0.0, -116.0 - float(i / 4) * 19.0)
+		_place_imported_asset("res://OBJ/Rock_Medium_" + str((i % 3) + 1) + ".obj", rock_pos, Vector3.ONE * 0.6, float(i) * 0.9)
+	_place_imported_asset("res://OBJ/Prop_Wagon.obj", Vector3(8.2, 0.0, -96.0), Vector3.ONE * 0.8, -0.2)
+	_place_imported_asset("res://OBJ/Prop_Crate.obj", Vector3(-8.7, 0.0, -96.0), Vector3.ONE * 0.65, 0.25)
+	_place_imported_asset("res://OBJ/Mushroom_Common.obj", Vector3(-5.8, 0.0, -84.5), Vector3.ONE * 0.8, 0.0)
+	_place_imported_asset("res://OBJ/Mushroom_Laetiporus.obj", Vector3(6.2, 0.0, -126.0), Vector3.ONE * 0.7, 0.0)
+
+func _place_imported_asset(asset_path: String, world_position: Vector3, asset_scale: Vector3, yaw_radians: float = 0.0) -> Node3D:
+	# OBJ imports may resolve as a PackedScene or a Mesh depending on importer settings.
+	# Handle both so one missing optional import never breaks world generation.
+	if not ResourceLoader.exists(asset_path):
+		return null
+	var resource: Resource = load(asset_path)
+	if resource == null:
+		push_warning("Optional world asset could not be loaded: " + asset_path)
+		return null
+	var instance: Node3D
+	if resource is PackedScene:
+		var spawned: Node = (resource as PackedScene).instantiate()
+		if spawned is Node3D:
+			instance = spawned as Node3D
+		else:
+			spawned.free()
+			return null
+	elif resource is Mesh:
+		var mesh_instance := MeshInstance3D.new()
+		mesh_instance.mesh = resource as Mesh
+		instance = mesh_instance
+	else:
+		push_warning("Unsupported imported world asset type: " + asset_path)
+		return null
+	instance.name = asset_path.get_file().get_basename()
+	instance.position = world_position
+	instance.scale = asset_scale
+	instance.rotation.y = yaw_radians
+	add_child(instance)
+	return instance
 
 func _build_house(pos: Vector3, color: Color) -> void:
 	_add_box("Gloamwick House", pos + Vector3(0, 1.6, 0), Vector3(6, 3.2, 5), color, true)
