@@ -35,10 +35,20 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path build/windows | Out-Null
-          godot --headless --path . --export-release "Windows Desktop" build/windows/WOA-Arcane-Realm.exe
-          if (!(Test-Path "build/windows/WOA-Arcane-Realm.exe")) {
-            throw "Godot did not create build/windows/WOA-Arcane-Realm.exe"
+          godot --headless --verbose --path . --export-debug "Windows Desktop" "build/windows/WOA-Arcane-Realm.exe" 2>&1 | Tee-Object -FilePath build/windows/export.log
+          $godotExitCode = $LASTEXITCODE
+          if ($godotExitCode -ne 0) {
+            Write-Error "Godot export failed with exit code $godotExitCode. Export log follows:"
+            Get-Content build/windows/export.log
+            exit $godotExitCode
           }
+          if (!(Test-Path "build/windows/WOA-Arcane-Realm.exe")) {
+            Write-Error "Godot exited successfully but did not create the executable. Export log follows:"
+            Get-Content build/windows/export.log
+            Get-ChildItem build/windows -Force
+            exit 1
+          }
+          Get-ChildItem build/windows -Force
 
       - name: Upload Windows build
         uses: actions/upload-artifact@v4
@@ -64,9 +74,9 @@ jobs:
           java-version: "17"
 
       - name: Install Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
         with:
-          packages: ''
+          packages: "platform-tools"
 
       - name: Install Android SDK packages
         run: sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
@@ -96,7 +106,7 @@ jobs:
       - name: Export Android debug APK
         run: |
           mkdir -p build/android
-          godot --headless --path . --export-debug "Android" build/android/WOA-Arcane-Realm.apk
+          godot --headless --verbose --path . --export-debug "Android" build/android/WOA-Arcane-Realm.apk
           test -s build/android/WOA-Arcane-Realm.apk
 
       - name: Upload Android APK
