@@ -19,6 +19,14 @@ var dialogue_panel: PanelContainer
 var dialogue_title: Label
 var dialogue_body: Label
 var dialogue_hint: Label
+var dialogue_choices_box: VBoxContainer
+var dialogue_continue_button: Button
+var path_note_label: Label
+var pending_choice_context := ""
+var mathias_stance := "unspoken"
+var warden_response := "unasked"
+var warden_consulted := false
+var collected_sigil_names: Array[String] = []
 var objective_label: Label
 var status_label: Label
 var name_input: LineEdit
@@ -249,12 +257,14 @@ func _build_ui() -> void:
     path_select.add_theme_font_size_override("font_size", 15)
     layout.add_child(path_select)
 
-    var path_note := Label.new()
-    path_note.text = "Your path shapes your legend. Your choices shape the Realm."
-    path_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-    path_note.add_theme_font_size_override("font_size", 12)
-    path_note.add_theme_color_override("font_color", Color(0.66, 0.59, 0.75))
-    layout.add_child(path_note)
+    path_note_label = Label.new()
+    path_note_label.text = "Your path shapes your legend. Your choices shape the Realm."
+    path_note_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    path_note_label.add_theme_font_size_override("font_size", 12)
+    path_note_label.add_theme_color_override("font_color", Color(0.66, 0.59, 0.75))
+    layout.add_child(path_note_label)
+    path_select.item_selected.connect(_update_path_note)
+    _update_path_note(path_select.selected)
 
     var begin_button := _make_button("✦   BEGIN YOUR JOURNEY", Color(0.34, 0.15, 0.52))
     begin_button.pressed.connect(_start_new_game)
@@ -329,15 +339,53 @@ func _build_ui() -> void:
     dialogue_body.add_theme_font_size_override("font_size", 15)
     dialogue_layout.add_child(dialogue_body)
 
+    dialogue_choices_box = VBoxContainer.new()
+    dialogue_choices_box.add_theme_constant_override("separation", 6)
+    dialogue_choices_box.visible = false
+    dialogue_layout.add_child(dialogue_choices_box)
+
     dialogue_hint = Label.new()
     dialogue_hint.text = "Press E or select Continue"
     dialogue_hint.add_theme_font_size_override("font_size", 12)
     dialogue_hint.add_theme_color_override("font_color", Color(0.72, 0.65, 0.8))
     dialogue_layout.add_child(dialogue_hint)
 
-    var dialogue_button := _make_button("CONTINUE", Color(0.31, 0.13, 0.48))
-    dialogue_button.pressed.connect(_advance_dialogue)
-    dialogue_layout.add_child(dialogue_button)
+    dialogue_continue_button = _make_button("CONTINUE", Color(0.31, 0.13, 0.48))
+    dialogue_continue_button.pressed.connect(_advance_dialogue)
+    dialogue_layout.add_child(dialogue_continue_button)
+
+func _update_path_note(_index: int) -> void:
+    if path_note_label == null or path_select == null:
+        return
+    var path_name := PATHS[path_select.selected] if path_select.selected >= 0 else "Sigilbinder"
+    match path_name:
+        "Ember Mage":
+            path_note_label.text = "Ember Mage • Bold flame magic. Your instinct is to act before fear can settle."
+        "Frostweaver":
+            path_note_label.text = "Frostweaver • Patient control magic. You look for the pattern beneath the chaos."
+        "Verdant Warden":
+            path_note_label.text = "Verdant Warden • Life and root magic. You listen before you strike."
+        "Storm Herald":
+            path_note_label.text = "Storm Herald • Swift storm magic. You meet danger head-on and adapt quickly."
+        "Voidcaller":
+            path_note_label.text = "Voidcaller • Rift-sense and shadow magic. You are willing to question what others fear."
+        _:
+            path_note_label.text = "Sigilbinder • Ancient runes and wardcraft. You seek the connections others overlook."
+
+func _path_intro() -> String:
+    match player_path:
+        "Ember Mage":
+            return "A coal-bright warmth stirs in your palm, answering the old name of the Ember Mage."
+        "Frostweaver":
+            return "Frost traces a quiet sigil across your fingers; the Frostweaver's patience wakes with you."
+        "Verdant Warden":
+            return "A green thread of life curls around your wrist, and the roots beneath you seem to listen."
+        "Storm Herald":
+            return "A tiny storm crackles beneath your skin, as if the sky has been waiting for your first breath."
+        "Voidcaller":
+            return "The shadows lean toward you—not in threat, but recognition—and a cold rift-light answers your pulse."
+        _:
+            return "A ring of faint runes circles your palm, each mark searching for the others it has lost."
 
 func _show_menu() -> void:
     menu_root.visible = true
@@ -352,6 +400,10 @@ func _start_new_game() -> void:
     player_path = PATHS[path_select.selected] if path_select.selected >= 0 else "Sigilbinder"
     story_stage = 0
     collected_sigils = 0
+    collected_sigil_names.clear()
+    mathias_stance = "unspoken"
+    warden_response = "unasked"
+    warden_consulted = false
     _save_game()
     _enter_game(true)
 
@@ -372,7 +424,7 @@ func _enter_game(show_intro: bool) -> void:
     _build_player()
     _refresh_objective()
     if show_intro:
-        _show_dialogue("A VOICE BETWEEN THE TREES", "“Awaken, " + player_name + "… Do not fear the dark. It has not found you by accident. You lie beneath the black boughs of Gloamwood, far from any road you remember. The forest has taken your tracks, the night has swallowed the trail, and your mount is nowhere in sight. You carry little but a fading mark of magic and the will to keep moving. Listen. Beyond the mist, someone is fighting—and if the last ward falls, this forest will wake hungry. Follow the violet lights. They will lead you to the truth.”", "Awaken • Follow the violet lights through the forest")
+        _show_dialogue("A VOICE BETWEEN THE TREES", "“Awaken, " + player_name + "… " + _path_intro() + " You lie beneath the black boughs of Gloamwood, far from any road you remember. The forest has taken your tracks, the night has swallowed the trail, and your mount is nowhere in sight. Beyond the mist, someone is fighting—and if the last ward falls, this forest will wake hungry. Follow the violet lights. They will lead you to the truth.”", "Awaken • Follow the violet lights through the forest")
     else:
         _show_dialogue("THE FOREST REMEMBERS", "Your Chronicle stirs again. The voice is quieter now, but the violet lights still lead through the trees toward the broken ward—and the battle beyond the mist.", "Continue toward the distant clash")
 
@@ -462,7 +514,7 @@ func _build_world() -> void:
         var shrine := _make_sigil(sigil_positions[i] + Vector3(0, 1.1, 0), sigil_colors[i], 0.75)
         shrine.name = sigil_names[i] + " Sigil"
         shrine.set_meta("sigil_name", sigil_names[i])
-        shrine.visible = i >= collected_sigils
+        shrine.visible = not collected_sigil_names.has(sigil_names[i])
         sigil_nodes.append(shrine)
         add_child(shrine)
 
@@ -918,8 +970,61 @@ func _show_dialogue(title_text: String, body_text: String, hint_text: String) ->
     dialogue_title.text = title_text
     dialogue_body.text = body_text
     dialogue_hint.text = hint_text
+    dialogue_choices_box.visible = false
+    for child in dialogue_choices_box.get_children():
+        child.queue_free()
+    dialogue_continue_button.visible = true
     dialogue_panel.visible = true
     Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+
+func _show_dialogue_choices(title_text: String, body_text: String, hint_text: String, context: String, choices: Array[Dictionary]) -> void:
+    _show_dialogue(title_text, body_text, hint_text)
+    pending_choice_context = context
+    dialogue_choices_box.visible = true
+    dialogue_continue_button.visible = false
+    for choice in choices:
+        var choice_button := _make_button(str(choice.get("label", "Choose")), Color(0.22, 0.12, 0.34))
+        choice_button.custom_minimum_size.y = 38
+        choice_button.add_theme_font_size_override("font_size", 14)
+        choice_button.pressed.connect(_choose_dialogue.bind(str(choice.get("id", ""))))
+        dialogue_choices_box.add_child(choice_button)
+
+func _choose_dialogue(choice_id: String) -> void:
+    if not dialogue_open:
+        return
+    if pending_choice_context == "mathias":
+        mathias_stance = choice_id
+        story_stage = max(story_stage, 1)
+        var response := ""
+        match choice_id:
+            "compassion":
+                response = "Mathias studies you, then gives a tired nod. “Good. Power is easy to admire. The choice to stand beside someone when the cost is unknown—that tells me more.” He gestures toward the broken ward. “The Warden nearby remembers the old vows. Hear its warning before you touch the three Sigils.”"
+            "suspicion":
+                response = "Mathias' jaw tightens. “Fair. I have withheld too much, and I won't ask you to trust a stranger. The Warden beside the broken ward remembers what my Council records do not. Question it—and question me again when you return.”"
+            "duty":
+                response = "Mathias turns back to the wounded ward. “Then we understand each other. Keep people alive first; explanations can follow. The Warden nearby remembers the vows behind the seals. Speak with it, then recover Dawn, Dusk, and Heart.”"
+            _:
+                response = "Mathias points toward the broken ward and the waiting Sigils."
+        _save_game()
+        _refresh_objective()
+        _show_dialogue("MATHIAS • THE FIRST VOW", response + " Dawn, Dusk, and Heart are not trophies. Each holds one part of the promise that keeps this valley whole.", "Quest updated • Seek the Whispering Warden")
+    elif pending_choice_context == "warden":
+        warden_response = choice_id
+        warden_consulted = true
+        var response := ""
+        match choice_id:
+            "dawn":
+                response = "“Dawn is not hope,” the Warden whispers. “It is the courage to begin after hope has failed. Find it where the first light touches broken stone.” A pale root curls toward the sanctuary trail."
+            "fourth":
+                response = "The Warden's light dims. “Three vows were spoken. A fourth was cut from the telling—not broken, not kept, but removed. Ask who benefits when a name cannot be remembered.”"
+            "mathias":
+                response = "“Trust is a bridge, not a blindfold,” says the Warden. “Let Mathias guide your steps, but let the stones judge his words. The Sigils remember what even loyal hearts forget.”"
+            _:
+                response = "“Listen to the old stones. They will remember for you.”"
+        _save_game()
+        _refresh_objective()
+        _show_dialogue("THE WARDEN'S ANSWER", response + " “Now you may approach the three Sigils. Dawn, Dusk, and Heart must be gathered together—or the gate will remain a wound pretending to be a door.”", "Quest updated • Recover the three Sigils")
+    pending_choice_context = ""
 
 func _advance_dialogue() -> void:
     if not dialogue_open:
@@ -957,20 +1062,33 @@ func _interact() -> void:
         return
 
     if story_stage == 0 and _distance_to(mathias) < 4.0:
-        _show_dialogue("MATHIAS • BATTLE MAGE", "“The first wave is gone, but the ward is still bleeding light. I have served the Council for decades, and I have never seen a seal answer to something outside the Realm. Gather the three Sigils. Dawn, Dusk, Heart—remember their names. They are not keys alone; they are promises the Council made.”", "Continue")
+        _show_dialogue_choices("MATHIAS • BATTLE MAGE", "The last riftbound shade dissolves into violet sparks. Mathias lowers his staff, but keeps his eyes on the broken ward. “You could have fled. You didn't. Before I ask you to risk more, tell me what brought you here.”", "Your answer will shape Mathias’ trust", "mathias", [
+            {"id": "compassion", "label": "“No one should have to face that alone.”"},
+            {"id": "suspicion", "label": "“You are hiding something. Start explaining.”"},
+            {"id": "duty", "label": "“The ward was failing. That was reason enough.”"}
+        ])
         return
 
     if whispering_warden != null and _distance_to(whispering_warden) < 3.8:
-        _show_dialogue("THE WHISPERING WARDEN", "A figure of root-dark wood and pale, wandering light turns its face toward you. “Do not mistake the ward for a wall, little spark. It is a promise made visible. Dawn remembers what the Realm hoped for. Dusk remembers what it feared. Heart remembers the names the Council chose to bury.” The Warden's voice thins into the trees. “When Mathias speaks of three Sigils, listen for the fourth thing he cannot yet name: the hand that broke them.”", "The Warden's warning settles into your Chronicle")
+        _show_dialogue_choices("THE WHISPERING WARDEN", "The Warden's bark shifts like a face seen through rain. “Mathias knows the names of the three vows. I remember the silence around them. Ask, little spark—but choose what you wish to carry away.”", "Your question will be recorded in the Chronicle", "warden", [
+            {"id": "dawn", "label": "“What does Dawn truly ask of me?”"},
+            {"id": "fourth", "label": "“Tell me about the thing erased from the vows.”"},
+            {"id": "mathias", "label": "“Can Mathias be trusted?”"}
+        ])
         return
 
     if story_stage <= 1:
         var nearest_sigil := _nearest_node(sigil_nodes)
         if nearest_sigil != null and _distance_to(nearest_sigil) < 3.2:
+            if not warden_consulted:
+                _set_status("The Sigils remain veiled. Seek the Whispering Warden beside the broken ward first.")
+                return
             var sigil_name := str(nearest_sigil.get_meta("sigil_name", "Unknown"))
             nearest_sigil.visible = false
             sigil_nodes.erase(nearest_sigil)
-            collected_sigils += 1
+            if not collected_sigil_names.has(sigil_name):
+                collected_sigil_names.append(sigil_name)
+            collected_sigils = collected_sigil_names.size()
             _set_status(sigil_name + " Sigil recovered • " + str(collected_sigils) + "/3")
             _save_game()
             _refresh_objective()
@@ -1035,6 +1153,8 @@ func _refresh_objective() -> void:
         objective_label.text = "Protect Mathias: repel the riftbound with Q (" + str(enemy_nodes.size()) + " remain)."
     elif story_stage == 0:
         objective_label.text = "Speak with Mathias near the broken ward. Press E."
+    elif story_stage == 1 and not warden_consulted:
+        objective_label.text = "Speak with the Whispering Warden by the broken ward. Learn why the three Sigils must be gathered."
     elif story_stage == 1 and collected_sigils < 3:
         objective_label.text = "Recover the Dawn, Dusk, and Heart Sigils (" + str(collected_sigils) + "/3). Press E near a Sigil."
     elif story_stage == 1:
@@ -1057,12 +1177,27 @@ func _load_save() -> void:
         player_path = str(save_data.get_value("player", "path", "Sigilbinder"))
         story_stage = int(save_data.get_value("progress", "stage", 0))
         collected_sigils = int(save_data.get_value("progress", "sigils", 0))
+        collected_sigil_names.clear()
+        var saved_names = save_data.get_value("progress", "sigil_names", [])
+        for saved_name in saved_names:
+            collected_sigil_names.append(str(saved_name))
+        if collected_sigil_names.is_empty() and collected_sigils > 0:
+            var legacy_names := ["Dawn", "Dusk", "Heart"]
+            for legacy_index in range(mini(collected_sigils, legacy_names.size())):
+                collected_sigil_names.append(legacy_names[legacy_index])
+        mathias_stance = str(save_data.get_value("story", "mathias_stance", "unspoken"))
+        warden_response = str(save_data.get_value("story", "warden_response", "unasked"))
+        warden_consulted = bool(save_data.get_value("story", "warden_consulted", false))
 
 func _save_game() -> void:
     save_data.set_value("player", "name", player_name)
     save_data.set_value("player", "path", player_path)
     save_data.set_value("progress", "stage", story_stage)
     save_data.set_value("progress", "sigils", collected_sigils)
+    save_data.set_value("progress", "sigil_names", collected_sigil_names)
+    save_data.set_value("story", "mathias_stance", mathias_stance)
+    save_data.set_value("story", "warden_response", warden_response)
+    save_data.set_value("story", "warden_consulted", warden_consulted)
     save_data.set_value("world", "seed", WORLD_SEED)
     var err := save_data.save(SAVE_PATH)
     has_save = err == OK
