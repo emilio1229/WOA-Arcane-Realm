@@ -30,10 +30,9 @@ var collected_sigil_names: Array[String] = []
 var objective_label: Label
 var status_label: Label
 var name_input: LineEdit
-var path_select: OptionButton
 var continue_button: Button
 var player_name := "Apprentice"
-var player_path := "Sigilbinder"
+var player_path := "Wizard"
 var yaw := 0.0
 var pitch := -0.16
 var started := false
@@ -1152,7 +1151,7 @@ func _load_save() -> void:
     has_save = err == OK
     if has_save:
         player_name = str(save_data.get_value("player", "name", "Apprentice"))
-        player_path = str(save_data.get_value("player", "path", "Sigilbinder"))
+        player_path = "Wizard"
         story_stage = int(save_data.get_value("progress", "stage", 0))
         collected_sigils = int(save_data.get_value("progress", "sigils", 0))
         collected_sigil_names.clear()
