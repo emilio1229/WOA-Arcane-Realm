@@ -6,7 +6,7 @@ const WALK_SPEED := 5.2
 const RUN_SPEED := 8.0
 const JUMP_VELOCITY := 6.8
 const GRAVITY := 18.0
-const PATHS := ["Ember Mage", "Frostweaver", "Verdant Warden", "Storm Herald", "Voidcaller", "Sigilbinder"]
+const PATHS := ["Wizard"]
 
 var player: CharacterBody3D
 var camera_pivot: Node3D
@@ -19,13 +19,20 @@ var dialogue_panel: PanelContainer
 var dialogue_title: Label
 var dialogue_body: Label
 var dialogue_hint: Label
+var dialogue_choices_box: VBoxContainer
+var dialogue_continue_button: Button
+var path_note_label: Label
+var pending_choice_context := ""
+var mathias_stance := "unspoken"
+var warden_response := "unasked"
+var warden_consulted := false
+var collected_sigil_names: Array[String] = []
 var objective_label: Label
 var status_label: Label
 var name_input: LineEdit
-var path_select: OptionButton
 var continue_button: Button
 var player_name := "Apprentice"
-var player_path := "Sigilbinder"
+var player_path := "Wizard"
 var yaw := 0.0
 var pitch := -0.16
 var started := false
@@ -236,25 +243,18 @@ func _build_ui() -> void:
     layout.add_child(name_input)
 
     var path_label := Label.new()
-    path_label.text = "CHOOSE YOUR ARCANE PATH"
+    path_label.text = "YOUR PATH"
     path_label.add_theme_font_size_override("font_size", 12)
     path_label.add_theme_color_override("font_color", Color(0.81, 0.69, 0.94))
     layout.add_child(path_label)
 
-    path_select = OptionButton.new()
-    path_select.custom_minimum_size = Vector2(0, 44)
-    for path_name in PATHS:
-        path_select.add_item(path_name)
-    path_select.select(5)
-    path_select.add_theme_font_size_override("font_size", 15)
-    layout.add_child(path_select)
-
-    var path_note := Label.new()
-    path_note.text = "Your path shapes your legend. Your choices shape the Realm."
-    path_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-    path_note.add_theme_font_size_override("font_size", 12)
-    path_note.add_theme_color_override("font_color", Color(0.66, 0.59, 0.75))
-    layout.add_child(path_note)
+    path_note_label = Label.new()
+    path_note_label.text = "WIZARD • Arcane apprentice\nA classic wizard, guided by curiosity and the old magic of the Sigils."
+    path_note_label.custom_minimum_size = Vector2(0, 54)
+    path_note_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    path_note_label.add_theme_font_size_override("font_size", 14)
+    path_note_label.add_theme_color_override("font_color", Color(0.87, 0.78, 0.96))
+    layout.add_child(path_note_label)
 
     var begin_button := _make_button("✦   BEGIN YOUR JOURNEY", Color(0.34, 0.15, 0.52))
     begin_button.pressed.connect(_start_new_game)
@@ -329,19 +329,30 @@ func _build_ui() -> void:
     dialogue_body.add_theme_font_size_override("font_size", 15)
     dialogue_layout.add_child(dialogue_body)
 
+    dialogue_choices_box = VBoxContainer.new()
+    dialogue_choices_box.add_theme_constant_override("separation", 6)
+    dialogue_choices_box.visible = false
+    dialogue_layout.add_child(dialogue_choices_box)
+
     dialogue_hint = Label.new()
     dialogue_hint.text = "Press E or select Continue"
     dialogue_hint.add_theme_font_size_override("font_size", 12)
     dialogue_hint.add_theme_color_override("font_color", Color(0.72, 0.65, 0.8))
     dialogue_layout.add_child(dialogue_hint)
 
-    var dialogue_button := _make_button("CONTINUE", Color(0.31, 0.13, 0.48))
-    dialogue_button.pressed.connect(_advance_dialogue)
-    dialogue_layout.add_child(dialogue_button)
+    dialogue_continue_button = _make_button("CONTINUE", Color(0.31, 0.13, 0.48))
+    dialogue_continue_button.pressed.connect(_advance_dialogue)
+    dialogue_layout.add_child(dialogue_continue_button)
+
+func _path_intro() -> String:
+    return "Your wizard's fingers glow with a faint violet rune. The old magic recognizes you, though the Realm has forgotten your name."
 
 func _show_menu() -> void:
     menu_root.visible = true
     hud_root.visible = false
+    if has_save:
+        name_input.text = player_name
+        player_path = "Wizard"
     if continue_button != null:
         continue_button.disabled = not has_save
     Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -349,9 +360,13 @@ func _show_menu() -> void:
 func _start_new_game() -> void:
     var entered_name := name_input.text.strip_edges()
     player_name = entered_name if entered_name != "" else "Apprentice"
-    player_path = PATHS[path_select.selected] if path_select.selected >= 0 else "Sigilbinder"
+    player_path = "Wizard"
     story_stage = 0
     collected_sigils = 0
+    collected_sigil_names.clear()
+    mathias_stance = "unspoken"
+    warden_response = "unasked"
+    warden_consulted = false
     _save_game()
     _enter_game(true)
 
@@ -359,7 +374,7 @@ func _continue_game() -> void:
     if not has_save:
         return
     player_name = str(save_data.get_value("player", "name", "Apprentice"))
-    player_path = str(save_data.get_value("player", "path", "Sigilbinder"))
+    player_path = "Wizard"
     story_stage = int(save_data.get_value("progress", "stage", 0))
     collected_sigils = int(save_data.get_value("progress", "sigils", 0))
     _enter_game(false)
@@ -372,7 +387,7 @@ func _enter_game(show_intro: bool) -> void:
     _build_player()
     _refresh_objective()
     if show_intro:
-        _show_dialogue("A VOICE BETWEEN THE TREES", "“Awaken, " + player_name + "… Do not fear the dark. It has not found you by accident. You lie beneath the black boughs of Gloamwood, far from any road you remember. The forest has taken your tracks, the night has swallowed the trail, and your mount is nowhere in sight. You carry little but a fading mark of magic and the will to keep moving. Listen. Beyond the mist, someone is fighting—and if the last ward falls, this forest will wake hungry. Follow the violet lights. They will lead you to the truth.”", "Awaken • Follow the violet lights through the forest")
+        _show_dialogue("A VOICE BETWEEN THE TREES", "“Awaken, " + player_name + "… " + _path_intro() + " You lie beneath the black boughs of Gloamwood, close enough to hear a battle beyond the trees. A robed wizard is holding the clearing, and strange creatures are closing in. Follow the violet lights. Help him, and you may learn why the forest has called you here.”", "Awaken • Follow the violet lights toward Mathias")
     else:
         _show_dialogue("THE FOREST REMEMBERS", "Your Chronicle stirs again. The voice is quieter now, but the violet lights still lead through the trees toward the broken ward—and the battle beyond the mist.", "Continue toward the distant clash")
 
@@ -435,8 +450,12 @@ func _build_world() -> void:
     # Imported Tripo landmarks make the opening path feel connected to the wider Realm.
     # Procedural scenery remains in place if any optional model cannot be imported.
     _add_imported_landmark("ruins", "Ancient Ruin Sentinel", Vector3(-6.8, 0.0, -31.0), 0.65)
-    _add_imported_landmark("tower", "The Distant Wizard Tower", Vector3(14.0, 0.0, -65.0), 0.55)
+    _add_imported_landmark("tower", "The Council Castle", Vector3(20.0, 0.0, -80.0), 1.1)
     whispering_warden = _add_imported_landmark("spirit", "The Whispering Warden", Vector3(7.5, 0.0, -28.0), 0.55)
+    if whispering_warden == null:
+        whispering_warden = _make_sigil(Vector3(7.5, 1.2, -28.0), Color(0.68, 0.88, 0.76), 0.9)
+        whispering_warden.name = "The Whispering Warden"
+        add_child(whispering_warden)
 
     # Violet wisps act as subtle wayfinding lights from the waking place to the clearing.
     for i in range(9):
@@ -449,11 +468,13 @@ func _build_world() -> void:
     # The forest opens into a ward-clearing where Mathias is already holding the line.
     _add_box("Battle Clearing", Vector3(0, -0.02, -39), Vector3(22, 0.14, 19), Color(0.075, 0.06, 0.085), false)
     mathias = _build_person("Mathias", Vector3(0, 0, -35), Color(0.16, 0.11, 0.28), Color(0.8, 0.72, 0.92), true)
-    for i in range(3):
-        var x := -3.2 + float(i) * 3.2
-        var enemy := _build_person("Riftbound " + str(i + 1), Vector3(x, 0, -40.5), Color(0.035, 0.02, 0.07), Color(0.56, 0.18, 0.75), false)
-        enemy_nodes.append(enemy)
-        enemy_hp[enemy.get_instance_id()] = 1
+    if story_stage == 0:
+        var encounter_names := ["Forest Monster", "Shadow Beast 1", "Shadow Beast 2"]
+        for i in range(encounter_names.size()):
+            var x := -3.2 + float(i) * 3.2
+            var enemy := _build_person(encounter_names[i], Vector3(x, 0, -40.5), Color(0.035, 0.02, 0.07), Color(0.56, 0.18, 0.75), false)
+            enemy_nodes.append(enemy)
+            enemy_hp[enemy.get_instance_id()] = 1
 
     var sigil_positions := [Vector3(-8.0, 0.0, -48.0), Vector3(8.0, 0.0, -48.0), Vector3(0.0, 0.0, -54.0)]
     var sigil_names := ["Dawn", "Dusk", "Heart"]
@@ -462,14 +483,14 @@ func _build_world() -> void:
         var shrine := _make_sigil(sigil_positions[i] + Vector3(0, 1.1, 0), sigil_colors[i], 0.75)
         shrine.name = sigil_names[i] + " Sigil"
         shrine.set_meta("sigil_name", sigil_names[i])
-        shrine.visible = i >= collected_sigils
+        shrine.visible = not collected_sigil_names.has(sigil_names[i])
         sigil_nodes.append(shrine)
         add_child(shrine)
 
 func _build_player() -> void:
     player = CharacterBody3D.new()
     player.name = "PlayerWizard"
-    player.position = Vector3(0, 0, 12.0)
+    player.position = Vector3(0, 0, -24.0)
     player.floor_snap_length = 0.35
     var collision := CollisionShape3D.new()
     var capsule := CapsuleShape3D.new()
@@ -575,7 +596,8 @@ func _build_person(person_name: String, pos: Vector3, robe_color: Color, glow_co
     var person := Node3D.new()
     person.name = person_name
     person.position = pos
-    var role := "mathias" if person_name.to_lower().contains("mathias") else ("riftbound" if person_name.to_lower().contains("riftbound") else "player")
+    var lower_name := person_name.to_lower()
+    var role := "mathias" if lower_name.contains("mathias") else ("forest_monster" if lower_name.contains("forest monster") else ("riftbound" if lower_name.contains("shadow beast") or lower_name.contains("riftbound") else "player"))
     var imported_model := _instantiate_model(role)
     if imported_model != null:
         person.add_child(imported_model)
@@ -609,7 +631,9 @@ func _get_model_scene(role: String) -> PackedScene:
             "mathias":
                 preferred_names = ["wizard_robe_3d_model", "battle_mage", "mathias", "fantasy_wizard_3d_model"]
             "riftbound":
-                preferred_names = ["shadow_beast_3d_model", "haunted_forest_spirit_3d_model", "dark_fantasy_boss_3d_model", "riftbound", "shade", "enemy", "creature"]
+                preferred_names = ["shadow_beast_3d_model", "dark_fantasy_boss_3d_model", "riftbound", "shade", "enemy", "creature"]
+            "forest_monster":
+                preferred_names = ["haunted_forest_spirit_3d_model", "forest_spirit", "spirit", "creature"]
             "tree":
                 preferred_names = ["forest_tree", "blackwood", "tree"]
             "ruins":
@@ -918,15 +942,73 @@ func _show_dialogue(title_text: String, body_text: String, hint_text: String) ->
     dialogue_title.text = title_text
     dialogue_body.text = body_text
     dialogue_hint.text = hint_text
+    dialogue_choices_box.visible = false
+    for child in dialogue_choices_box.get_children():
+        child.queue_free()
+    dialogue_continue_button.visible = true
+    dialogue_panel.anchor_top = 0.68
     dialogue_panel.visible = true
     Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
-func _advance_dialogue() -> void:
+func _show_dialogue_choices(title_text: String, body_text: String, hint_text: String, context: String, choices: Array[Dictionary]) -> void:
+    _show_dialogue(title_text, body_text, hint_text)
+    dialogue_panel.anchor_top = 0.54
+    pending_choice_context = context
+    dialogue_choices_box.visible = true
+    dialogue_continue_button.visible = false
+    for choice in choices:
+        var choice_button := _make_button(str(choice.get("label", "Choose")), Color(0.22, 0.12, 0.34))
+        choice_button.custom_minimum_size.y = 38
+        choice_button.add_theme_font_size_override("font_size", 14)
+        choice_button.pressed.connect(_choose_dialogue.bind(str(choice.get("id", ""))))
+        dialogue_choices_box.add_child(choice_button)
+
+func _choose_dialogue(choice_id: String) -> void:
     if not dialogue_open:
+        return
+    if pending_choice_context == "mathias":
+        mathias_stance = choice_id
+        story_stage = max(story_stage, 1)
+        var mathias_response := ""
+        match choice_id:
+            "compassion":
+                mathias_response = "Mathias studies you, then gives a tired nod. “Good. Power is easy to admire. The choice to stand beside someone when the cost is unknown—that tells me more.” He gestures toward the broken ward. “The Warden nearby remembers the old vows. Hear its warning before you touch the three Sigils.”"
+            "suspicion":
+                mathias_response = "Mathias' jaw tightens. “Fair. I have withheld too much, and I won't ask you to trust a stranger. The Warden beside the broken ward remembers what my Council records do not. Question it—and question me again when you return.”"
+            "duty":
+                mathias_response = "Mathias turns back to the wounded ward. “Then we understand each other. Keep people alive first; explanations can follow. The Warden nearby remembers the vows behind the seals. Speak with it, then recover Dawn, Dusk, and Heart.”"
+            _:
+                mathias_response = "Mathias points toward the broken ward and the waiting Sigils."
+        _save_game()
+        _refresh_objective()
+        _show_dialogue("MATHIAS • THE FIRST VOW", mathias_response + " Dawn, Dusk, and Heart are not trophies. Each holds one part of the promise that keeps this valley whole.", "Quest updated • Seek the Whispering Warden")
+    elif pending_choice_context == "warden":
+        warden_response = choice_id
+        warden_consulted = true
+        var warden_answer_text := ""
+        match choice_id:
+            "dawn":
+                warden_answer_text = "“Dawn is not hope,” the Warden whispers. “It is the courage to begin after hope has failed. Find it where the first light touches broken stone.” A pale root curls toward the sanctuary trail."
+            "fourth":
+                warden_answer_text = "The Warden's light dims. “Three vows were spoken. A fourth was cut from the telling—not broken, not kept, but removed. Ask who benefits when a name cannot be remembered.”"
+            "mathias":
+                warden_answer_text = "“Trust is a bridge, not a blindfold,” says the Warden. “Let Mathias guide your steps, but let the stones judge his words. The Sigils remember what even loyal hearts forget.”"
+            _:
+                warden_answer_text = "“Listen to the old stones. They will remember for you.”"
+        _save_game()
+        _refresh_objective()
+        _show_dialogue("THE WARDEN'S ANSWER", warden_answer_text + " “Now you may approach the three Sigils. Dawn, Dusk, and Heart must be gathered together—or the gate will remain a wound pretending to be a door.”", "Quest updated • Recover the three Sigils")
+    pending_choice_context = ""
+
+func _advance_dialogue() -> void:
+    if not dialogue_open or dialogue_choices_box.visible:
         return
     dialogue_panel.visible = false
     dialogue_open = false
     Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+    if dialogue_title.text == "A VOICE BETWEEN THE TREES":
+        _show_dialogue("FIRST LESSON • ARCANE PULSE", "Mathias is surrounded. Move with WASD or the arrow keys, turn with the mouse, and move closer to the creatures. Press Q to cast Arcane Pulse at the nearest target. Each creature in this first lesson needs one pulse. If you get lost, follow the violet wisps. Press E when you reach Mathias after the clearing is safe.", "Tutorial • Move, aim, and cast Q to help Mathias")
+        return
     if story_stage == 0 and enemy_nodes.is_empty() and dialogue_title.text == "MATHIAS • BATTLE MAGE":
         story_stage = 1
         _save_game()
@@ -951,26 +1033,39 @@ func _interact() -> void:
     if not enemy_nodes.is_empty():
         var nearest_enemy := _nearest_node(enemy_nodes)
         if nearest_enemy != null and player.global_position.distance_to(nearest_enemy.global_position) < 16.0:
-            _set_status("The riftbound block your way. Press Q to cast an Arcane Pulse.")
+            _set_status("The creatures block your way. Move closer, then press Q to cast Arcane Pulse.")
         else:
             _set_status("The square is dangerous. Find Mathias near the broken ward.")
         return
 
     if story_stage == 0 and _distance_to(mathias) < 4.0:
-        _show_dialogue("MATHIAS • BATTLE MAGE", "“The first wave is gone, but the ward is still bleeding light. I have served the Council for decades, and I have never seen a seal answer to something outside the Realm. Gather the three Sigils. Dawn, Dusk, Heart—remember their names. They are not keys alone; they are promises the Council made.”", "Continue")
+        _show_dialogue_choices("MATHIAS • BATTLE MAGE", "The last riftbound shade dissolves into violet sparks. The robed mage lowers his staff, revealing the silver Council sigil at his collar. “Mathias. Field mage of the Council. You have my thanks, " + player_name + "—though thanks are a poor shield against what is coming. You could have fled. You didn't. Before I ask you to risk more, tell me what brought you here.”", "Your answer will shape Mathias’ trust", "mathias", [
+            {"id": "compassion", "label": "“No one should have to face that alone.”"},
+            {"id": "suspicion", "label": "“You are hiding something. Start explaining.”"},
+            {"id": "duty", "label": "“The ward was failing. That was reason enough.”"}
+        ])
         return
 
     if whispering_warden != null and _distance_to(whispering_warden) < 3.8:
-        _show_dialogue("THE WHISPERING WARDEN", "A figure of root-dark wood and pale, wandering light turns its face toward you. “Do not mistake the ward for a wall, little spark. It is a promise made visible. Dawn remembers what the Realm hoped for. Dusk remembers what it feared. Heart remembers the names the Council chose to bury.” The Warden's voice thins into the trees. “When Mathias speaks of three Sigils, listen for the fourth thing he cannot yet name: the hand that broke them.”", "The Warden's warning settles into your Chronicle")
+        _show_dialogue_choices("THE WHISPERING WARDEN", "The Warden's bark shifts like a face seen through rain. “Mathias knows the names of the three vows. I remember the silence around them. Ask, little spark—but choose what you wish to carry away.”", "Your question will be recorded in the Chronicle", "warden", [
+            {"id": "dawn", "label": "“What does Dawn truly ask of me?”"},
+            {"id": "fourth", "label": "“Tell me about the thing erased from the vows.”"},
+            {"id": "mathias", "label": "“Can Mathias be trusted?”"}
+        ])
         return
 
     if story_stage <= 1:
         var nearest_sigil := _nearest_node(sigil_nodes)
         if nearest_sigil != null and _distance_to(nearest_sigil) < 3.2:
+            if not warden_consulted:
+                _set_status("The Sigils remain veiled. Seek the Whispering Warden beside the broken ward first.")
+                return
             var sigil_name := str(nearest_sigil.get_meta("sigil_name", "Unknown"))
             nearest_sigil.visible = false
             sigil_nodes.erase(nearest_sigil)
-            collected_sigils += 1
+            if not collected_sigil_names.has(sigil_name):
+                collected_sigil_names.append(sigil_name)
+            collected_sigils = collected_sigil_names.size()
             _set_status(sigil_name + " Sigil recovered • " + str(collected_sigils) + "/3")
             _save_game()
             _refresh_objective()
@@ -994,7 +1089,7 @@ func _cast_arcane_pulse() -> void:
     if target == null:
         return
     if player.global_position.distance_to(target.global_position) > 18.0:
-        _set_status("Too far away. Move closer to the riftbound.")
+        _set_status("Too far away. Move closer to the creature, then try Q again.")
         return
     var id := target.get_instance_id()
     var remaining := int(enemy_hp.get(id, 1)) - 1
@@ -1002,9 +1097,9 @@ func _cast_arcane_pulse() -> void:
         enemy_nodes.erase(target)
         enemy_hp.erase(id)
         target.queue_free()
-        _set_status("Arcane Pulse disperses a riftbound shade. " + str(enemy_nodes.size()) + " remain.")
+        _set_status("Arcane Pulse disperses the creature. " + str(enemy_nodes.size()) + " remain.")
         if enemy_nodes.is_empty():
-            _set_status("The last shade dissolves. Mathias is safe—speak with him using E.")
+            _set_status("The clearing is safe. Find Mathias and press E to speak with him.")
             _save_game()
     else:
         enemy_hp[id] = remaining
@@ -1032,9 +1127,11 @@ func _refresh_objective() -> void:
     if objective_label == null:
         return
     if not enemy_nodes.is_empty():
-        objective_label.text = "Protect Mathias: repel the riftbound with Q (" + str(enemy_nodes.size()) + " remain)."
+        objective_label.text = "TUTORIAL • Help Mathias: move closer and press Q to cast Arcane Pulse (" + str(enemy_nodes.size()) + " remain)."
     elif story_stage == 0:
         objective_label.text = "Speak with Mathias near the broken ward. Press E."
+    elif story_stage == 1 and not warden_consulted:
+        objective_label.text = "Speak with the Whispering Warden by the broken ward. Learn why the three Sigils must be gathered."
     elif story_stage == 1 and collected_sigils < 3:
         objective_label.text = "Recover the Dawn, Dusk, and Heart Sigils (" + str(collected_sigils) + "/3). Press E near a Sigil."
     elif story_stage == 1:
@@ -1054,15 +1151,30 @@ func _load_save() -> void:
     has_save = err == OK
     if has_save:
         player_name = str(save_data.get_value("player", "name", "Apprentice"))
-        player_path = str(save_data.get_value("player", "path", "Sigilbinder"))
+        player_path = "Wizard"
         story_stage = int(save_data.get_value("progress", "stage", 0))
         collected_sigils = int(save_data.get_value("progress", "sigils", 0))
+        collected_sigil_names.clear()
+        var saved_names = save_data.get_value("progress", "sigil_names", [])
+        for saved_name in saved_names:
+            collected_sigil_names.append(str(saved_name))
+        if collected_sigil_names.is_empty() and collected_sigils > 0:
+            var legacy_names := ["Dawn", "Dusk", "Heart"]
+            for legacy_index in range(mini(collected_sigils, legacy_names.size())):
+                collected_sigil_names.append(legacy_names[legacy_index])
+        mathias_stance = str(save_data.get_value("story", "mathias_stance", "unspoken"))
+        warden_response = str(save_data.get_value("story", "warden_response", "unasked"))
+        warden_consulted = bool(save_data.get_value("story", "warden_consulted", false))
 
 func _save_game() -> void:
     save_data.set_value("player", "name", player_name)
     save_data.set_value("player", "path", player_path)
     save_data.set_value("progress", "stage", story_stage)
     save_data.set_value("progress", "sigils", collected_sigils)
+    save_data.set_value("progress", "sigil_names", collected_sigil_names)
+    save_data.set_value("story", "mathias_stance", mathias_stance)
+    save_data.set_value("story", "warden_response", warden_response)
+    save_data.set_value("story", "warden_consulted", warden_consulted)
     save_data.set_value("world", "seed", WORLD_SEED)
     var err := save_data.save(SAVE_PATH)
     has_save = err == OK
