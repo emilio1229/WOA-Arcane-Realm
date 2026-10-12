@@ -43,6 +43,10 @@ config/features=PackedStringArray("4.7", "GL Compatibility")
 AudioManager="*uid://dngiuhq5ehbk6"
 SimpleGrass="*uid://bfq0snth8sj3h"
 
+[audio]
+
+default_bus_layout="res://default_bus_layout.tres"
+
 [display]
 
 window/size/viewport_width=1280
