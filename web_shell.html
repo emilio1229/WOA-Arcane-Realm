@@ -75,6 +75,7 @@
       let hasError = false;
       let lastProgress = 0;
       const startupErrors = [];
+      const lastEngineMessages = [];
       function showError(message) {
         hasError = true;
         boot.classList.remove("fade-away");
@@ -83,7 +84,7 @@
         // Godot reports one error as several print-error lines. Keep the full
         // sequence visible instead of replacing the root cause with the final
         // "at: instantiate (...)" stack frame.
-        errorBox.textContent = startupErrors.slice(-30).join("\\n");
+        errorBox.textContent = startupErrors.slice(-30).join("\n");
         errorBox.classList.add("visible");
         errorHelp.hidden = false;
         status.textContent = "The Realm could not start";
@@ -113,6 +114,11 @@
           },
           onPrint: text => {
             console.log("[Godot]", text);
+            const line = String(text || "").trim();
+            if (line) {
+              lastEngineMessages.push(line);
+              if (lastEngineMessages.length > 12) lastEngineMessages.shift();
+            }
           },
           onPrintError: text => {
             console.error("[Godot]", text);
@@ -133,7 +139,7 @@
         const startupTimeout = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? 60000 : 35000;
         window.setTimeout(() => {
           if (!engineStarted && !hasError) {
-            showError("The game engine did not finish starting within " + Math.round(startupTimeout / 1000) + " seconds. Last reported download progress: " + lastProgress + "%. If this stays at 0%, the Web export files may not be loading; if it reaches 100%, the engine may be failing during WebAssembly/WebGL initialization.");
+            showError("The game engine did not finish starting within " + Math.round(startupTimeout / 1000) + " seconds. Last reported download progress: " + lastProgress + "%.\n\nLatest Godot output:\n" + (lastEngineMessages.length ? lastEngineMessages.slice(-8).join("\n") : "Godot did not print a startup message. The failure may be occurring before the project scene starts."));
           }
         }, startupTimeout);
       } catch (error) {
