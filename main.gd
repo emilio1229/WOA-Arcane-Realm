@@ -442,7 +442,7 @@ func _on_mobile_button_up(action: String) -> void:
 		"right": mobile_right = false
 		"forward": mobile_forward = false
 		"back": mobile_back = false
-		run: mobile_running = false
+		"run": mobile_running = false
 
 func _on_path_selected(index: int) -> void:
 	if path_note_label == null or index < 0 or index >= PATHS.size():
