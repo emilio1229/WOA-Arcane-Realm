@@ -99,6 +99,7 @@ func _ready() -> void:
 	_build_ui()
 	_load_save()
 	_show_menu()
+	_play_music(&"music_dusk", -19.0)
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 func _process(delta: float) -> void:
@@ -949,6 +950,11 @@ func _play(key: StringName, volume_db: float = 0.0, pitch_scale: float = 1.0) ->
 	if am != null and am.has_method("play_sfx"):
 		am.play_sfx(key, volume_db, pitch_scale)
 
+func _play_music(key: StringName, volume_db: float = -18.0) -> void:
+	var am := get_node_or_null("/root/AudioManager")
+	if am != null and am.has_method("play_music"):
+		am.play_music(key, true, volume_db)
+
 func _update_skirmish(delta: float) -> void:
 	skirmish_timer -= delta
 	if skirmish_timer > 0.0:
@@ -1242,10 +1248,12 @@ func _advance_dialogue() -> void:
 	if story_stage == 1 and collected_sigils >= 3:
 		story_stage = 2
 		_save_game()
+		_play_music(&"music_dark_heart", -17.0)
 		var revelation := "Mathias admits that he feared the Council would repeat its oldest mistake." if trust_mathias else "Mathias sees that you still doubt him. He gives you one truth anyway: the Council erased a name to keep the Hollow Crown from claiming it."
 		_show_dialogue("THE SANCTUARY OPENS", "The three sigils circle the gate and settle into its stonework. The violet sky clears for a heartbeat. " + revelation + " The Realm's Archivists speak of a page that never was, an Archive Wisp, and a crown erased from every record. If this corruption reaches that secret, Gloamwick is only the beginning. The trail leads beyond this valley—and into the Saga of the Hollow Crown.", "Enter the Sigil Sanctuary")
 		return
 	if story_stage >= 2:
+		_play_music(&"music_after_dark", -18.0)
 		_show_dialogue("CHAPTER I COMPLETE", "Your Chronicle now carries the first record of the failing wards. The Council's saga continues beyond Gloamwick: forbidden pages, familiars born from memory, rival paths, ancient relics, and the Hollow Crown. Future chapters will build on this journey.", "Return to the Realm")
 		return
 	_refresh_objective()
@@ -1325,6 +1333,7 @@ func _cast_arcane_pulse() -> void:
 	if player.global_position.distance_to(target.global_position) > 18.0:
 		_set_status("Too far away. Move closer to the riftbound.")
 		return
+	_play_music(&"music_reinforcements", -16.0)
 	var spell_names := {
 		"Ember Mage": "Cinder Lance",
 		"Frostweaver": "Glacial Shard",
@@ -1345,6 +1354,7 @@ func _cast_arcane_pulse() -> void:
 		_set_status(str(spell_names.get(player_path, "Arcane Pulse")) + " disperses a riftbound shade. " + str(enemy_nodes.size()) + " remain.")
 		if enemy_nodes.is_empty():
 			battle_cleared = true
+			_play_music(&"music_voices_of_mire", -19.0)
 			_set_status("The last shade dissolves. Mathias is safe—speak with him using E.")
 			_save_game()
 	else:
