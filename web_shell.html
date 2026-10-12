@@ -73,6 +73,7 @@
       const errorHelp = document.getElementById("error-help");
       let engineStarted = false;
       let hasError = false;
+      let lastProgress = 0;
       const startupErrors = [];
       function showError(message) {
         hasError = true;
@@ -104,6 +105,7 @@
           onProgress: (current, total) => {
             if (total > 0) {
               const value = Math.min(100, Math.floor(current / total * 100));
+              lastProgress = value;
               progress.style.width = value + "%";
               percent.textContent = value + "%";
             }
@@ -126,9 +128,14 @@
             if (!hasError) boot.classList.add("fade-away");
           }, 1800);
         }).catch(error => showError(error && (error.stack || error.message) || error));
+        // Mobile Safari can take longer to compile WebAssembly and initialize WebGL.
+        // Give phones extra time and include the last observed load progress in the error.
+        const startupTimeout = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? 60000 : 35000;
         window.setTimeout(() => {
-          if (!engineStarted && !hasError) showError("The game engine has not finished starting after 20 seconds. Check the browser Console for the first red error; this usually points to a runtime or WebGL problem.");
-        }, 20000);
+          if (!engineStarted && !hasError) {
+            showError("The game engine did not finish starting within " + Math.round(startupTimeout / 1000) + " seconds. Last reported download progress: " + lastProgress + "%. If this stays at 0%, the Web export files may not be loading; if it reaches 100%, the engine may be failing during WebAssembly/WebGL initialization.");
+          }
+        }, startupTimeout);
       } catch (error) {
         showError(error && (error.stack || error.message) || error);
       }
