@@ -48,6 +48,13 @@ var sanctuary_gate: Node3D
 var last_message := ""
 var save_data := ConfigFile.new()
 var has_save := false
+var mobile_controls: Control
+var mobile_left := false
+var mobile_right := false
+var mobile_forward := false
+var mobile_back := false
+var mobile_jump_requested := false
+var mobile_running := false
 
 func _ready() -> void:
 	_build_ui()
@@ -56,6 +63,8 @@ func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 func _physics_process(delta: float) -> void:
+	if mobile_controls != null:
+		mobile_controls.visible = started and not dialogue_open and (OS.has_feature("web") or DisplayServer.is_touchscreen_available())
 	if not started or player == null or dialogue_open:
 		if player != null:
 			player.velocity.x = move_toward(player.velocity.x, 0.0, 22.0 * delta)
@@ -67,23 +76,24 @@ func _physics_process(delta: float) -> void:
 
 	if not player.is_on_floor():
 		player.velocity.y -= GRAVITY * delta
-	elif Input.is_key_pressed(KEY_SPACE):
+	elif Input.is_key_pressed(KEY_SPACE) or mobile_jump_requested:
 		player.velocity.y = JUMP_VELOCITY
+		mobile_jump_requested = false
 
 	var input_vector := Vector2.ZERO
-	if Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT):
+	if Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT) or mobile_left:
 		input_vector.x -= 1.0
-	if Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT):
+	if Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT) or mobile_right:
 		input_vector.x += 1.0
-	if Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_UP):
+	if Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_UP) or mobile_forward:
 		input_vector.y -= 1.0
-	if Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN):
+	if Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN) or mobile_back:
 		input_vector.y += 1.0
 
 	var direction := Vector3(input_vector.x, 0.0, input_vector.y)
 	if direction.length_squared() > 0.0:
 		direction = direction.normalized().rotated(Vector3.UP, yaw)
-		var speed := RUN_SPEED if Input.is_key_pressed(KEY_SHIFT) else WALK_SPEED
+		var speed := RUN_SPEED if Input.is_key_pressed(KEY_SHIFT) or mobile_running else WALK_SPEED
 		player.velocity.x = direction.x * speed
 		player.velocity.z = direction.z * speed
 		player.rotation.y = yaw
@@ -98,7 +108,17 @@ func _input(event: InputEvent) -> void:
 	# full-screen HUD could swallow the click, leaving the camera permanently uncaptured.
 	if not started:
 		return
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT and not dialogue_open:
+	if event is InputEventScreenDrag and not dialogue_open:
+		var viewport_size := get_viewport().get_visible_rect().size
+		# Drag on the right side to rotate the camera; the lower strip is reserved for action buttons.
+		if event.position.x > viewport_size.x * 0.42 and event.position.y < viewport_size.y - 245.0:
+			yaw -= event.relative.x * 0.006
+			pitch = clampf(pitch - event.relative.y * 0.004, -0.48, 0.32)
+			if player != null:
+				player.rotation.y = yaw
+			if camera_pivot != null:
+				camera_pivot.rotation.x = pitch
+	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT and not dialogue_open:
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	elif event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		# Use screen_relative so mouse-look sensitivity stays consistent in the browser at different sizes.
@@ -356,6 +376,73 @@ func _build_ui() -> void:
 	var dialogue_button := _make_button("CONTINUE", Color(0.31, 0.13, 0.48))
 	dialogue_button.pressed.connect(_advance_dialogue)
 	dialogue_layout.add_child(dialogue_button)
+
+	_build_mobile_controls()
+
+func _build_mobile_controls() -> void:
+	mobile_controls = Control.new()
+	mobile_controls.name = "TouchControls"
+	mobile_controls.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	mobile_controls.mouse_filter = Control.MOUSE_FILTER_PASS
+	mobile_controls.visible = OS.has_feature("web") or DisplayServer.is_touchscreen_available()
+	hud_root.add_child(mobile_controls)
+
+	# Large, translucent controls are positioned from the screen edges for phones and tablets.
+	_add_mobile_button("▲", Vector2(174, -438), "forward", false)
+	_add_mobile_button("◀", Vector2(28, -292), "left", false)
+	_add_mobile_button("▼", Vector2(174, -292), "back", false)
+	_add_mobile_button("▶", Vector2(320, -292), "right", false)
+	_add_mobile_button("RUN", Vector2(38, -150), "run", false)
+	_add_mobile_button("JUMP", Vector2(-300, -158), "jump", true)
+	_add_mobile_button("MAGIC", Vector2(-458, -270), "pulse", true)
+	_add_mobile_button("USE", Vector2(-300, -310), "interact", true)
+
+func _add_mobile_button(caption: String, offset: Vector2, action: String, one_shot: bool) -> void:
+	var button := Button.new()
+	button.text = caption
+	button.custom_minimum_size = Vector2(138, 118)
+	button.add_theme_font_size_override("font_size", 21 if caption.length() <= 4 else 17)
+	button.add_theme_color_override("font_color", Color(0.96, 0.9, 1.0))
+	button.add_theme_stylebox_override("normal", _panel_style(Color(0.12, 0.055, 0.19, 0.78), Color(0.65, 0.4, 0.86, 0.92)))
+	button.add_theme_stylebox_override("pressed", _panel_style(Color(0.36, 0.15, 0.52, 0.94), Color(0.92, 0.72, 1.0, 1.0)))
+	if action in ["jump", "pulse", "interact", "run"]:
+		button.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+		button.position = offset
+	else:
+		button.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
+		button.position = offset
+	mobile_controls.add_child(button)
+	if one_shot:
+		if action == "pulse":
+			button.pressed.connect(_cast_arcane_pulse)
+		elif action == "interact":
+			button.pressed.connect(_interact)
+		elif action == "jump":
+			button.button_down.connect(_on_mobile_button_down.bind(action))
+			button.button_up.connect(_on_mobile_button_up.bind(action))
+		elif action == "run":
+			button.button_down.connect(_on_mobile_button_down.bind(action))
+			button.button_up.connect(_on_mobile_button_up.bind(action))
+	else:
+		button.button_down.connect(_on_mobile_button_down.bind(action))
+		button.button_up.connect(_on_mobile_button_up.bind(action))
+
+func _on_mobile_button_down(action: String) -> void:
+	match action:
+		"left": mobile_left = true
+		"right": mobile_right = true
+		"forward": mobile_forward = true
+		"back": mobile_back = true
+		"jump": mobile_jump_requested = true
+		"run": mobile_running = true
+
+func _on_mobile_button_up(action: String) -> void:
+	match action:
+		"left": mobile_left = false
+		"right": mobile_right = false
+		"forward": mobile_forward = false
+		"back": mobile_back = false
+		run: mobile_running = false
 
 func _on_path_selected(index: int) -> void:
 	if path_note_label == null or index < 0 or index >= PATHS.size():
