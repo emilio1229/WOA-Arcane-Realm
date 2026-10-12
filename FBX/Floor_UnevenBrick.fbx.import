@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://clo6xphqflpsm"
-path="res://.godot/imported/Floor_UnevenBrick.fbx-6247d21433221d0550f514e9af43dbfe.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Floor_UnevenBrick.fbx"
-dest_files=["res://.godot/imported/Floor_UnevenBrick.fbx-6247d21433221d0550f514e9af43dbfe.scn"]
 
 [params]
 

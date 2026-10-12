@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://c5pcljowhbltc"
-path="res://.godot/imported/Roof_Front_Brick8_Half_L.fbx-856defedb6d3d180cf6c0700eba62da6.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Roof_Front_Brick8_Half_L.fbx"
-dest_files=["res://.godot/imported/Roof_Front_Brick8_Half_L.fbx-856defedb6d3d180cf6c0700eba62da6.scn"]
 
 [params]
 

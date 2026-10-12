@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://81hr8gp6r8ki"
-path="res://.godot/imported/Carrot.gltf-0e1a56604af2607cd25076870857da7c.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Carrot.gltf"
-dest_files=["res://.godot/imported/Carrot.gltf-0e1a56604af2607cd25076870857da7c.scn"]
 
 [params]
 

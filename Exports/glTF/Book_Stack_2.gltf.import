@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://j04fhobc23hd"
-path="res://.godot/imported/Book_Stack_2.gltf-eb6878f103347bd0c7377ce9e3f5f758.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Book_Stack_2.gltf"
-dest_files=["res://.godot/imported/Book_Stack_2.gltf-eb6878f103347bd0c7377ce9e3f5f758.scn"]
 
 [params]
 

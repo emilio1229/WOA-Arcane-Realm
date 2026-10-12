@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://16v62fd6aaxp"
-path="res://.godot/imported/Overhang_RoofIncline_Plaster.fbx-8ebb5dc6151ec82fa1345560f5983766.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Overhang_RoofIncline_Plaster.fbx"
-dest_files=["res://.godot/imported/Overhang_RoofIncline_Plaster.fbx-8ebb5dc6151ec82fa1345560f5983766.scn"]
 
 [params]
 

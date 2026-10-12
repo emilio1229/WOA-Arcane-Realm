@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://b0pib441ko2i6"
-path="res://.godot/imported/Shelf_Simple.fbx-84446dcc55696d4c40f437acc83ed1f3.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Shelf_Simple.fbx"
-dest_files=["res://.godot/imported/Shelf_Simple.fbx-84446dcc55696d4c40f437acc83ed1f3.scn"]
 
 [params]
 

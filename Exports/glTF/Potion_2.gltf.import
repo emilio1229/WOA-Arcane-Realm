@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://e2fyoksyk8rj"
-path="res://.godot/imported/Potion_2.gltf-7ca1900786a265a1aaeca5fa7903e021.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Potion_2.gltf"
-dest_files=["res://.godot/imported/Potion_2.gltf-7ca1900786a265a1aaeca5fa7903e021.scn"]
 
 [params]
 

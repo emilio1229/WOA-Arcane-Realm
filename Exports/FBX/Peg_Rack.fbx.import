@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bx4458732n13w"
-path="res://.godot/imported/Peg_Rack.fbx-550833fcf0ae54b556b63f72917add67.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Peg_Rack.fbx"
-dest_files=["res://.godot/imported/Peg_Rack.fbx-550833fcf0ae54b556b63f72917add67.scn"]
 
 [params]
 

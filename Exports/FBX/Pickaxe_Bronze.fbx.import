@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://beut5d7v2yxr7"
-path="res://.godot/imported/Pickaxe_Bronze.fbx-1542542c47142bc414fe002ec8d4b382.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Pickaxe_Bronze.fbx"
-dest_files=["res://.godot/imported/Pickaxe_Bronze.fbx-1542542c47142bc414fe002ec8d4b382.scn"]
 
 [params]
 

@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://o4a8nbdyued3"
-path="res://.godot/imported/Prop_Vine9.gltf-569e3982dd34b324800d4626f0414e8c.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Prop_Vine9.gltf"
-dest_files=["res://.godot/imported/Prop_Vine9.gltf-569e3982dd34b324800d4626f0414e8c.scn"]
 
 [params]
 

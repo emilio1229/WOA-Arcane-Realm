@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://cnphmng7r1qg8"
-path="res://.godot/imported/Nightstand_Shelf.gltf-dc95eea23641ac00111054972888afcf.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Nightstand_Shelf.gltf"
-dest_files=["res://.godot/imported/Nightstand_Shelf.gltf-dc95eea23641ac00111054972888afcf.scn"]
 
 [params]
 

@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bcpo6qlinsdfb"
-path="res://.godot/imported/Overhang_UnevenBrick_Long.fbx-bffbdb82831af95ed0c3759e71782e94.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Overhang_UnevenBrick_Long.fbx"
-dest_files=["res://.godot/imported/Overhang_UnevenBrick_Long.fbx-bffbdb82831af95ed0c3759e71782e94.scn"]
 
 [params]
 

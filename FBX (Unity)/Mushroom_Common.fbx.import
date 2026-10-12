@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://gmmdqx8xont1"
-path="res://.godot/imported/Mushroom_Common.fbx-dac5db6cc0f68d508462148bddb08309.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX (Unity)/Mushroom_Common.fbx"
-dest_files=["res://.godot/imported/Mushroom_Common.fbx-dac5db6cc0f68d508462148bddb08309.scn"]
 
 [params]
 

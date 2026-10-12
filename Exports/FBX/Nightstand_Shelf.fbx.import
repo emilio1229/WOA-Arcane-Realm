@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://cgo7m8pwrwx4h"
-path="res://.godot/imported/Nightstand_Shelf.fbx-a35122dcc2130f819baf9fea3644ec25.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Nightstand_Shelf.fbx"
-dest_files=["res://.godot/imported/Nightstand_Shelf.fbx-a35122dcc2130f819baf9fea3644ec25.scn"]
 
 [params]
 

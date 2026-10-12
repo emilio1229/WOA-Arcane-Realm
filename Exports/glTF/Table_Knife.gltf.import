@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bark8vqagdrpq"
-path="res://.godot/imported/Table_Knife.gltf-6c3ee04a5db1d432d42bdcdfd9882f8d.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Table_Knife.gltf"
-dest_files=["res://.godot/imported/Table_Knife.gltf-6c3ee04a5db1d432d42bdcdfd9882f8d.scn"]
 
 [params]
 

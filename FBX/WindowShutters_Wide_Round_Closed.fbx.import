@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://g442nnbt832r"
-path="res://.godot/imported/WindowShutters_Wide_Round_Closed.fbx-a56315bae275b0532e3f31a76bb1ab37.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/WindowShutters_Wide_Round_Closed.fbx"
-dest_files=["res://.godot/imported/WindowShutters_Wide_Round_Closed.fbx-a56315bae275b0532e3f31a76bb1ab37.scn"]
 
 [params]
 

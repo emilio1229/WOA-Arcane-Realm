@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://cpd0hx36hocmd"
-path="res://.godot/imported/SmallBottles_1.fbx-a9c694961a9cf78b36e88561beeb59d2.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/SmallBottles_1.fbx"
-dest_files=["res://.godot/imported/SmallBottles_1.fbx-a9c694961a9cf78b36e88561beeb59d2.scn"]
 
 [params]
 

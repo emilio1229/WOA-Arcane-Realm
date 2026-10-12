@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dxh048ljv64t0"
-path="res://.godot/imported/Roof_Front_Brick4_Half_L.gltf-8b133ecb6f0f0c62a288165a0d30ebda.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Roof_Front_Brick4_Half_L.gltf"
-dest_files=["res://.godot/imported/Roof_Front_Brick4_Half_L.gltf-8b133ecb6f0f0c62a288165a0d30ebda.scn"]
 
 [params]
 

@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bairo1mguwu4a"
-path="res://.godot/imported/Wall_Plaster_Window_Thin_Round.fbx-0f8d90c3c40cdf86544df8f2e9af5bd1.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Wall_Plaster_Window_Thin_Round.fbx"
-dest_files=["res://.godot/imported/Wall_Plaster_Window_Thin_Round.fbx-0f8d90c3c40cdf86544df8f2e9af5bd1.scn"]
 
 [params]
 

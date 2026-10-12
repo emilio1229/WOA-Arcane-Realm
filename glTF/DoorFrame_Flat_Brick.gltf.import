@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dnbfplcxu8udq"
-path="res://.godot/imported/DoorFrame_Flat_Brick.gltf-099fa4c503e828860ebd84bb4c74dfb0.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/DoorFrame_Flat_Brick.gltf"
-dest_files=["res://.godot/imported/DoorFrame_Flat_Brick.gltf-099fa4c503e828860ebd84bb4c74dfb0.scn"]
 
 [params]
 

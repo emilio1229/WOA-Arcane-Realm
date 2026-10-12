@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://ddvf5ac86rt10"
-path="res://.godot/imported/Lantern_Wall.fbx-f8b2eeccd54ca30c50c9e435dba8035f.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Lantern_Wall.fbx"
-dest_files=["res://.godot/imported/Lantern_Wall.fbx-f8b2eeccd54ca30c50c9e435dba8035f.scn"]
 
 [params]
 

@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bj3dq6qk632kc"
-path="res://.godot/imported/AnimationLibrary_Godot_Standard.glb-701c3948743f38c5d83d9dbe5e82fe9e.scn"
+valid=false
 
 [deps]
 
 source_file="res://Godot/AnimationLibrary_Godot_Standard.glb"
-dest_files=["res://.godot/imported/AnimationLibrary_Godot_Standard.glb-701c3948743f38c5d83d9dbe5e82fe9e.scn"]
 
 [params]
 

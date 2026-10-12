@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://duey4p0lbt8m3"
-path="res://.godot/imported/Coin.gltf-a561a5236313a483d897d78db98504eb.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Coin.gltf"
-dest_files=["res://.godot/imported/Coin.gltf-a561a5236313a483d897d78db98504eb.scn"]
 
 [params]
 

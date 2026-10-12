@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dl0e2ro41ib83"
-path.s3tc="res://.godot/imported/T_Trim_Cloth_BaseColor.png-797d926c03f88de0aa187a95bc2f4c56.s3tc.ctex"
+path.s3tc="res://.godot/imported/T_Trim_Cloth_BaseColor.png-7c8862e550c87bbdb4734035fe011f63.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://textures/T_Trim_Cloth_BaseColor.png"
-dest_files=["res://.godot/imported/T_Trim_Cloth_BaseColor.png-797d926c03f88de0aa187a95bc2f4c56.s3tc.ctex"]
+source_file="res://Textures/T_Trim_Cloth_BaseColor.png"
+dest_files=["res://.godot/imported/T_Trim_Cloth_BaseColor.png-7c8862e550c87bbdb4734035fe011f63.s3tc.ctex"]
 
 [params]
 

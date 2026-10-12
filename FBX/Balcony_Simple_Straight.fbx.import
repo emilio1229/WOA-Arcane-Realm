@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://b0daei7eyk4v7"
-path="res://.godot/imported/Balcony_Simple_Straight.fbx-283f1e49686ec3c200302348cb48524c.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Balcony_Simple_Straight.fbx"
-dest_files=["res://.godot/imported/Balcony_Simple_Straight.fbx-283f1e49686ec3c200302348cb48524c.scn"]
 
 [params]
 

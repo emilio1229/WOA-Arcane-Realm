@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://b7j5n3hn2dsag"
-path="res://.godot/imported/Key_Gold.gltf-6541d48f2618fe4027867fbf3d62819b.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Key_Gold.gltf"
-dest_files=["res://.godot/imported/Key_Gold.gltf-6541d48f2618fe4027867fbf3d62819b.scn"]
 
 [params]
 

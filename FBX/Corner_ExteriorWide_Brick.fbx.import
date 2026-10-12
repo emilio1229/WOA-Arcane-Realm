@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://chba52boeuosp"
-path="res://.godot/imported/Corner_ExteriorWide_Brick.fbx-865212f6da82665f27936b3832b46efd.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Corner_ExteriorWide_Brick.fbx"
-dest_files=["res://.godot/imported/Corner_ExteriorWide_Brick.fbx-865212f6da82665f27936b3832b46efd.scn"]
 
 [params]
 

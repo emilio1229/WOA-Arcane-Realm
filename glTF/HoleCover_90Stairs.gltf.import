@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bm7aaspjh3r81"
-path="res://.godot/imported/HoleCover_90Stairs.gltf-8b98454b313d3bb1300d1f7c1f5ccc5b.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/HoleCover_90Stairs.gltf"
-dest_files=["res://.godot/imported/HoleCover_90Stairs.gltf-8b98454b313d3bb1300d1f7c1f5ccc5b.scn"]
 
 [params]
 

@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dxj74sobmvifg"
-path="res://.godot/imported/Roof_Dormer_RoundTile.fbx-dc4991edf466669d2680f77f047fc457.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Roof_Dormer_RoundTile.fbx"
-dest_files=["res://.godot/imported/Roof_Dormer_RoundTile.fbx-dc4991edf466669d2680f77f047fc457.scn"]
 
 [params]
 

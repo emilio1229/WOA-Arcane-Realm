@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://1rmug7omueei"
-path="res://.godot/imported/DoorFrame_Flat_WoodDark.fbx-7ee7f08d7e111fbd9753ff8f0b1e8804.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/DoorFrame_Flat_WoodDark.fbx"
-dest_files=["res://.godot/imported/DoorFrame_Flat_WoodDark.fbx-7ee7f08d7e111fbd9753ff8f0b1e8804.scn"]
 
 [params]
 

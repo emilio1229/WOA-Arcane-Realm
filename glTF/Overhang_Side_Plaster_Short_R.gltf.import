@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://b1i87kw33rmkd"
-path="res://.godot/imported/Overhang_Side_Plaster_Short_R.gltf-5827e2c1bc0f4969d67247530f7b400d.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Overhang_Side_Plaster_Short_R.gltf"
-dest_files=["res://.godot/imported/Overhang_Side_Plaster_Short_R.gltf-5827e2c1bc0f4969d67247530f7b400d.scn"]
 
 [params]
 

@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://c0ggggfcj3hqb"
-path="res://.godot/imported/Candle_2.gltf-bed60cf2e2bb50fb163a09ee1c0f4591.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Candle_2.gltf"
-dest_files=["res://.godot/imported/Candle_2.gltf-bed60cf2e2bb50fb163a09ee1c0f4591.scn"]
 
 [params]
 

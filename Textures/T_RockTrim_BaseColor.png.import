@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://ipe8ak2g1bpx"
-path.s3tc="res://.godot/imported/T_RockTrim_BaseColor.png-92ea1e53bf11dbe130b9de57231eccb9.s3tc.ctex"
+path.s3tc="res://.godot/imported/T_RockTrim_BaseColor.png-690cae342d75f190ceb81ee1f5c8007f.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://textures/T_RockTrim_BaseColor.png"
-dest_files=["res://.godot/imported/T_RockTrim_BaseColor.png-92ea1e53bf11dbe130b9de57231eccb9.s3tc.ctex"]
+source_file="res://Textures/T_RockTrim_BaseColor.png"
+dest_files=["res://.godot/imported/T_RockTrim_BaseColor.png-690cae342d75f190ceb81ee1f5c8007f.s3tc.ctex"]
 
 [params]
 

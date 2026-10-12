@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://5nd4dqigu5vc"
-path="res://.godot/imported/Bed_Twin1.fbx-b088f5ba1f2ae93c710c1c7c9fdbc806.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Bed_Twin1.fbx"
-dest_files=["res://.godot/imported/Bed_Twin1.fbx-b088f5ba1f2ae93c710c1c7c9fdbc806.scn"]
 
 [params]
 

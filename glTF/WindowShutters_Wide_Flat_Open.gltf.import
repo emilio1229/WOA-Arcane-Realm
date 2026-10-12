@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://c3qfm3dc0b8t1"
-path="res://.godot/imported/WindowShutters_Wide_Flat_Open.gltf-e3b8ebdb03434d75730f04a0e891be66.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/WindowShutters_Wide_Flat_Open.gltf"
-dest_files=["res://.godot/imported/WindowShutters_Wide_Flat_Open.gltf-e3b8ebdb03434d75730f04a0e891be66.scn"]
 
 [params]
 

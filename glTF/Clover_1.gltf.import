@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://cl4jmjvdufg8w"
-path="res://.godot/imported/Clover_1.gltf-1cc1e3a1ae7f0c115194f7523a82345a.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Clover_1.gltf"
-dest_files=["res://.godot/imported/Clover_1.gltf-1cc1e3a1ae7f0c115194f7523a82345a.scn"]
 
 [params]
 

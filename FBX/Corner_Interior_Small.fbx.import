@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://cw24yvi7er8jc"
-path="res://.godot/imported/Corner_Interior_Small.fbx-d7f7cbae9ab9638b67570a8c1e643890.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Corner_Interior_Small.fbx"
-dest_files=["res://.godot/imported/Corner_Interior_Small.fbx-d7f7cbae9ab9638b67570a8c1e643890.scn"]
 
 [params]
 

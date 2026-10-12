@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://c3cfj1bie1rq1"
-path="res://.godot/imported/Chalice.gltf-3ac245edadf9423f54d92fe228fcdc4a.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Chalice.gltf"
-dest_files=["res://.godot/imported/Chalice.gltf-3ac245edadf9423f54d92fe228fcdc4a.scn"]
 
 [params]
 

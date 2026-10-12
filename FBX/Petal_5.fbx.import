@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://ekxr60lnvk4u"
-path="res://.godot/imported/Petal_5.fbx-cb18651c7805ac503c0357bb6ce7d815.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Petal_5.fbx"
-dest_files=["res://.godot/imported/Petal_5.fbx-cb18651c7805ac503c0357bb6ce7d815.scn"]
 
 [params]
 

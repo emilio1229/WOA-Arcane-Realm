@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://et4a74cm4pfl"
-path="res://.godot/imported/Cabinet.gltf-0e4b13847a9290eb239117ab38782810.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Cabinet.gltf"
-dest_files=["res://.godot/imported/Cabinet.gltf-0e4b13847a9290eb239117ab38782810.scn"]
 
 [params]
 

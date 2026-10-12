@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://cwu1s4ib6es2f"
-path="res://.godot/imported/AnimationLibrary_Unity_Standard.fbx-e27969a32a0eceeb76ebd5eee08596b6.scn"
+valid=false
 
 [deps]
 
 source_file="res://Unity/AnimationLibrary_Unity_Standard.fbx"
-dest_files=["res://.godot/imported/AnimationLibrary_Unity_Standard.fbx-e27969a32a0eceeb76ebd5eee08596b6.scn"]
 
 [params]
 

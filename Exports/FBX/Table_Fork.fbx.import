@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://ct82ri0hu8o3c"
-path="res://.godot/imported/Table_Fork.fbx-0712c61d55057a394d57361295cbca34.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Table_Fork.fbx"
-dest_files=["res://.godot/imported/Table_Fork.fbx-0712c61d55057a394d57361295cbca34.scn"]
 
 [params]
 

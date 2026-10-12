@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://rr0tul5rbv72"
-path="res://.godot/imported/Stair_Interior_Solid.fbx-910598148e77b1bfdb16e7be0474d9e1.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Stair_Interior_Solid.fbx"
-dest_files=["res://.godot/imported/Stair_Interior_Solid.fbx-910598148e77b1bfdb16e7be0474d9e1.scn"]
 
 [params]
 

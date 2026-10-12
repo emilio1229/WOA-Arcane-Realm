@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://g2gcqjt7u43j"
-path="res://.godot/imported/Prop_ExteriorBorder_Straight1.fbx-2d050f4bdd20ef4fa31b08c94f43c3b7.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Prop_ExteriorBorder_Straight1.fbx"
-dest_files=["res://.godot/imported/Prop_ExteriorBorder_Straight1.fbx-2d050f4bdd20ef4fa31b08c94f43c3b7.scn"]
 
 [params]
 

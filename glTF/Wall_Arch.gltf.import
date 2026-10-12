@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://b1ttbmquvuxja"
-path="res://.godot/imported/Wall_Arch.gltf-5bfbab6d3cd884cc654f5f432aeaa608.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Wall_Arch.gltf"
-dest_files=["res://.godot/imported/Wall_Arch.gltf-5bfbab6d3cd884cc654f5f432aeaa608.scn"]
 
 [params]
 

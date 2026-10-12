@@ -73,9 +73,7 @@
       const errorHelp = document.getElementById("error-help");
       let engineStarted = false;
       let hasError = false;
-      let lastProgress = 0;
       const startupErrors = [];
-      const lastEngineMessages = [];
       function showError(message) {
         hasError = true;
         boot.classList.remove("fade-away");
@@ -84,7 +82,7 @@
         // Godot reports one error as several print-error lines. Keep the full
         // sequence visible instead of replacing the root cause with the final
         // "at: instantiate (...)" stack frame.
-        errorBox.textContent = startupErrors.slice(-30).join("\n");
+        errorBox.textContent = startupErrors.slice(-30).join("\\n");
         errorBox.classList.add("visible");
         errorHelp.hidden = false;
         status.textContent = "The Realm could not start";
@@ -106,7 +104,6 @@
           onProgress: (current, total) => {
             if (total > 0) {
               const value = Math.min(100, Math.floor(current / total * 100));
-              lastProgress = value;
               progress.style.width = value + "%";
               percent.textContent = value + "%";
             }
@@ -114,11 +111,6 @@
           },
           onPrint: text => {
             console.log("[Godot]", text);
-            const line = String(text || "").trim();
-            if (line) {
-              lastEngineMessages.push(line);
-              if (lastEngineMessages.length > 12) lastEngineMessages.shift();
-            }
           },
           onPrintError: text => {
             console.error("[Godot]", text);
@@ -134,14 +126,9 @@
             if (!hasError) boot.classList.add("fade-away");
           }, 1800);
         }).catch(error => showError(error && (error.stack || error.message) || error));
-        // Mobile Safari can take longer to compile WebAssembly and initialize WebGL.
-        // Give phones extra time and include the last observed load progress in the error.
-        const startupTimeout = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? 60000 : 35000;
         window.setTimeout(() => {
-          if (!engineStarted && !hasError) {
-            showError("The game engine did not finish starting within " + Math.round(startupTimeout / 1000) + " seconds. Last reported download progress: " + lastProgress + "%.\n\nLatest Godot output:\n" + (lastEngineMessages.length ? lastEngineMessages.slice(-8).join("\n") : "Godot did not print a startup message. The failure may be occurring before the project scene starts."));
-          }
-        }, startupTimeout);
+          if (!engineStarted && !hasError) showError("The game engine has not finished starting after 20 seconds. Check the browser Console for the first red error; this usually points to a runtime or WebGL problem.");
+        }, 20000);
       } catch (error) {
         showError(error && (error.stack || error.message) || error);
       }

@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://b7ag6eydhae3o"
-path="res://.godot/imported/Key_Gold.fbx-960ecef0a6cb30bb49a7bbee4203ad4a.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Key_Gold.fbx"
-dest_files=["res://.godot/imported/Key_Gold.fbx-960ecef0a6cb30bb49a7bbee4203ad4a.scn"]
 
 [params]
 

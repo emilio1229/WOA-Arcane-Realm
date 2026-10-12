@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://g4722of1rccw"
-path="res://.godot/imported/Flower_3_Single.fbx-55c89b103587582a48ac3fbc5b543fe1.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Flower_3_Single.fbx"
-dest_files=["res://.godot/imported/Flower_3_Single.fbx-55c89b103587582a48ac3fbc5b543fe1.scn"]
 
 [params]
 

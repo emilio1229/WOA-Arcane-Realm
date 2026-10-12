@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bxk2i2afmuj2i"
-path="res://.godot/imported/FarmCrate_Apple.fbx-7cc9d1f336b05e64c6ea8d52631a678b.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/FarmCrate_Apple.fbx"
-dest_files=["res://.godot/imported/FarmCrate_Apple.fbx-7cc9d1f336b05e64c6ea8d52631a678b.scn"]
 
 [params]
 

@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://c78r2hsy3f3bm"
-path="res://.godot/imported/WeaponStand.fbx-58e783723afc50cba8edb41a45c2b08b.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/WeaponStand.fbx"
-dest_files=["res://.godot/imported/WeaponStand.fbx-58e783723afc50cba8edb41a45c2b08b.scn"]
 
 [params]
 

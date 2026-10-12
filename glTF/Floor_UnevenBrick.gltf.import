@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://b2loj8eherabu"
-path="res://.godot/imported/Floor_UnevenBrick.gltf-0b81b88e68096117d2cb10899424f18b.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Floor_UnevenBrick.gltf"
-dest_files=["res://.godot/imported/Floor_UnevenBrick.gltf-0b81b88e68096117d2cb10899424f18b.scn"]
 
 [params]
 

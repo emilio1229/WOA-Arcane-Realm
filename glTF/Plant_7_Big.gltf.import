@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://fdeqbf1t46gh"
-path="res://.godot/imported/Plant_7_Big.gltf-78c369259295e07a381ee9ee18239ca5.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Plant_7_Big.gltf"
-dest_files=["res://.godot/imported/Plant_7_Big.gltf-78c369259295e07a381ee9ee18239ca5.scn"]
 
 [params]
 

@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://lblf2xvuuk8o"
-path="res://.godot/imported/WindowShutters_Thin_Flat_Open.fbx-c19977266abf2e67ace69a3d26c0b29b.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/WindowShutters_Thin_Flat_Open.fbx"
-dest_files=["res://.godot/imported/WindowShutters_Thin_Flat_Open.fbx-c19977266abf2e67ace69a3d26c0b29b.scn"]
 
 [params]
 

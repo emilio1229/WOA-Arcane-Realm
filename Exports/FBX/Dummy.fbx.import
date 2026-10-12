@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://d4lcfhhopmgh0"
-path="res://.godot/imported/Dummy.fbx-59c5304dd07a65b8f476bdab6a24a093.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Dummy.fbx"
-dest_files=["res://.godot/imported/Dummy.fbx-59c5304dd07a65b8f476bdab6a24a093.scn"]
 
 [params]
 

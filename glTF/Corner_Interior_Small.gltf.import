@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bj6ukmil6djnp"
-path="res://.godot/imported/Corner_Interior_Small.gltf-26094385c6ed4b1350a0cd97a38f9524.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Corner_Interior_Small.gltf"
-dest_files=["res://.godot/imported/Corner_Interior_Small.gltf-26094385c6ed4b1350a0cd97a38f9524.scn"]
 
 [params]
 

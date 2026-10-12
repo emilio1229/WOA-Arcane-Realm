@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://m5y857gow2ow"
-path="res://.godot/imported/Overhang_RoofIncline_UnevenBricks.fbx-6bd00e0a37d6f85cbea24400be6f0770.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Overhang_RoofIncline_UnevenBricks.fbx"
-dest_files=["res://.godot/imported/Overhang_RoofIncline_UnevenBricks.fbx-6bd00e0a37d6f85cbea24400be6f0770.scn"]
 
 [params]
 

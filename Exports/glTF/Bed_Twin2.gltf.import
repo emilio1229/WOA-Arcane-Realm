@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://qkras2p2m13w"
-path="res://.godot/imported/Bed_Twin2.gltf-fcca9da7cd0e59ea6d04414bc90eff03.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Bed_Twin2.gltf"
-dest_files=["res://.godot/imported/Bed_Twin2.gltf-fcca9da7cd0e59ea6d04414bc90eff03.scn"]
 
 [params]
 

@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dgauw0tjljwtk"
-path="res://.godot/imported/Barrel_Apples.gltf-7be017ec50366d7b6a28d7e37033b726.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Barrel_Apples.gltf"
-dest_files=["res://.godot/imported/Barrel_Apples.gltf-7be017ec50366d7b6a28d7e37033b726.scn"]
 
 [params]
 

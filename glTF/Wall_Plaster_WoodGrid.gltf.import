@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://sxgk0i1nfrq7"
-path="res://.godot/imported/Wall_Plaster_WoodGrid.gltf-8789e3842889244e6ac6bcdbc77bde06.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Wall_Plaster_WoodGrid.gltf"
-dest_files=["res://.godot/imported/Wall_Plaster_WoodGrid.gltf-8789e3842889244e6ac6bcdbc77bde06.scn"]
 
 [params]
 

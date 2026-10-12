@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://besag5xqa2d3"
-path="res://.godot/imported/Potion_2.fbx-773cba3c9dfdea8fbe00a9a11ddb0dc7.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Potion_2.fbx"
-dest_files=["res://.godot/imported/Potion_2.fbx-773cba3c9dfdea8fbe00a9a11ddb0dc7.scn"]
 
 [params]
 

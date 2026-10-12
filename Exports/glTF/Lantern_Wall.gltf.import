@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://b8xk757vf70j6"
-path="res://.godot/imported/Lantern_Wall.gltf-dd1a375600585357ca07d7920ae91eba.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Lantern_Wall.gltf"
-dest_files=["res://.godot/imported/Lantern_Wall.gltf-dd1a375600585357ca07d7920ae91eba.scn"]
 
 [params]
 

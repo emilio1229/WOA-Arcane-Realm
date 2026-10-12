@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://chai7wof1xmm"
-path="res://.godot/imported/Overhang_Roof_Plaster.gltf-249acb62096555ccd754380cd2dc0bac.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Overhang_Roof_Plaster.gltf"
-dest_files=["res://.godot/imported/Overhang_Roof_Plaster.gltf-249acb62096555ccd754380cd2dc0bac.scn"]
 
 [params]
 

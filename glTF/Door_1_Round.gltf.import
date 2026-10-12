@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://c7wuge0nwgqvs"
-path="res://.godot/imported/Door_1_Round.gltf-7951bcd680f6db26855248231559f4f5.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Door_1_Round.gltf"
-dest_files=["res://.godot/imported/Door_1_Round.gltf-7951bcd680f6db26855248231559f4f5.scn"]
 
 [params]
 

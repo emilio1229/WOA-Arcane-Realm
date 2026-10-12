@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://b30fqf4ia1g08"
-path="res://.godot/imported/Prop_Vine4.fbx-cd189d7f6033488e31e97c7a903fdc2e.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Prop_Vine4.fbx"
-dest_files=["res://.godot/imported/Prop_Vine4.fbx-cd189d7f6033488e31e97c7a903fdc2e.scn"]
 
 [params]
 

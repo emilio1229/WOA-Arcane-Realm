@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://cm5u4irtaplto"
-path="res://.godot/imported/Scroll_1.gltf-a25d4a4e2afa43c4c9f77955592e0a2f.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Scroll_1.gltf"
-dest_files=["res://.godot/imported/Scroll_1.gltf-a25d4a4e2afa43c4c9f77955592e0a2f.scn"]
 
 [params]
 

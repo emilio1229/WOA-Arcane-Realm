@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bc51ym7k10xxb"
-path="res://.godot/imported/Grass_Wispy_Short.fbx-c21a877f6fb230e648a77828d55678d0.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX (Unity)/Grass_Wispy_Short.fbx"
-dest_files=["res://.godot/imported/Grass_Wispy_Short.fbx-c21a877f6fb230e648a77828d55678d0.scn"]
 
 [params]
 

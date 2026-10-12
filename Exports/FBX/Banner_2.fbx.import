@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://c3k4vsx8v31js"
-path="res://.godot/imported/Banner_2.fbx-40b52447c93a193ef2fa17185474391b.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Banner_2.fbx"
-dest_files=["res://.godot/imported/Banner_2.fbx-40b52447c93a193ef2fa17185474391b.scn"]
 
 [params]
 

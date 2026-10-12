@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dgo3122wt6cen"
-path="res://.godot/imported/Roof_RoundTiles_4x6.gltf-1b072ae97af860d36b5d1fb84a956862.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Roof_RoundTiles_4x6.gltf"
-dest_files=["res://.godot/imported/Roof_RoundTiles_4x6.gltf-1b072ae97af860d36b5d1fb84a956862.scn"]
 
 [params]
 

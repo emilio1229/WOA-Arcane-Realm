@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bf88hwlmq3and"
-path="res://.godot/imported/Roof_Wooden_2x1_Center_Mirror.gltf-c731737a6eb6c908b262223bf7bf1d0d.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Roof_Wooden_2x1_Center_Mirror.gltf"
-dest_files=["res://.godot/imported/Roof_Wooden_2x1_Center_Mirror.gltf-c731737a6eb6c908b262223bf7bf1d0d.scn"]
 
 [params]
 

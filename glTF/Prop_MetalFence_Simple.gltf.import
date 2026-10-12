@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dnsy0us2gt27y"
-path="res://.godot/imported/Prop_MetalFence_Simple.gltf-eddcd0ea811f4a377d8defc63ae009c2.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Prop_MetalFence_Simple.gltf"
-dest_files=["res://.godot/imported/Prop_MetalFence_Simple.gltf-eddcd0ea811f4a377d8defc63ae009c2.scn"]
 
 [params]
 

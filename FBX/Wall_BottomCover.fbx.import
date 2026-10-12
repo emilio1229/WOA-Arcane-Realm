@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://3wdk6mj7n8ji"
-path="res://.godot/imported/Wall_BottomCover.fbx-cb3d4568e68c452cbf4ad9068704de1a.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Wall_BottomCover.fbx"
-dest_files=["res://.godot/imported/Wall_BottomCover.fbx-cb3d4568e68c452cbf4ad9068704de1a.scn"]
 
 [params]
 

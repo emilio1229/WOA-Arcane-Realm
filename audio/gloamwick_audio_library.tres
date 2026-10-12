@@ -1,0 +1,50 @@
+[gd_resource type="Resource" script_class="AudioLibrary" format=3 uid="uid://tawi5sfnh02c"]
+
+[ext_resource type="Script" uid="uid://cgcton68ihwfi" path="res://addons/any_audio_manager/Scripts/Resources/audio_entry.gd" id="1_c0tya"]
+[ext_resource type="Script" uid="uid://c8hltc037dgci" path="res://addons/any_audio_manager/Scripts/Resources/audio_library.gd" id="2_qa5vc"]
+
+[sub_resource type="Resource" id="Resource_qp200"]
+resource_name = "ui_hover"
+script = ExtResource("1_c0tya")
+key = &"ui_hover"
+path = "res://Modern/Menu_Sounds_V2_Modern_HOVER.wav"
+
+[sub_resource type="Resource" id="Resource_57k0e"]
+resource_name = "ui_click"
+script = ExtResource("1_c0tya")
+key = &"ui_click"
+path = "res://SynthOrGlitch/Menu_Sound_V2_SoG_CLICK.wav"
+
+[sub_resource type="Resource" id="Resource_denr2"]
+resource_name = "ui_confirm"
+script = ExtResource("1_c0tya")
+key = &"ui_confirm"
+path = "res://Metallic/Menu_Sounds_V2_Metallic_ENTER.wav"
+
+[sub_resource type="Resource" id="Resource_kifkq"]
+resource_name = "ui_back"
+script = ExtResource("1_c0tya")
+key = &"ui_back"
+path = "res://Minimalistic/Menu_Sounds_V2_Minimalistic_BACKWARD.wav"
+
+[sub_resource type="Resource" id="Resource_vmolw"]
+resource_name = "ui_error"
+script = ExtResource("1_c0tya")
+key = &"ui_error"
+path = "res://SynthOrGlitch/Menu_Sound_V2_SoG_LOCKED.wav"
+
+[sub_resource type="Resource" id="Resource_kp2f1"]
+resource_name = "text_letter"
+script = ExtResource("1_c0tya")
+key = &"text_letter"
+path = "res://Text_Input_Sounds/TEXT_SOUND_LETTER_SHORT.wav"
+
+[sub_resource type="Resource" id="Resource_o4va8"]
+resource_name = "text_enter"
+script = ExtResource("1_c0tya")
+key = &"text_enter"
+path = "res://Text_Input_Sounds/TEXT_SOUND_ENTER.wav"
+
+[resource]
+script = ExtResource("2_qa5vc")
+entries = [SubResource("Resource_qp200"), SubResource("Resource_57k0e"), SubResource("Resource_denr2"), SubResource("Resource_kifkq"), SubResource("Resource_vmolw"), SubResource("Resource_kp2f1"), SubResource("Resource_o4va8")]

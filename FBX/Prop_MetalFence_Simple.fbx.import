@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://u3b5g2nc5rs0"
-path="res://.godot/imported/Prop_MetalFence_Simple.fbx-c0675a6ae005e520bd3e7bf9ded01169.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Prop_MetalFence_Simple.fbx"
-dest_files=["res://.godot/imported/Prop_MetalFence_Simple.fbx-c0675a6ae005e520bd3e7bf9ded01169.scn"]
 
 [params]
 

@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://sn4v88nepdkl"
-path="res://.godot/imported/Dummy.gltf-937cadc9a0962430ad258d451eff39bb.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Dummy.gltf"
-dest_files=["res://.godot/imported/Dummy.gltf-937cadc9a0962430ad258d451eff39bb.scn"]
 
 [params]
 

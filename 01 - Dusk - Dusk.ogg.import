@@ -1,0 +1,19 @@
+[remap]
+
+importer="oggvorbisstr"
+type="AudioStreamOggVorbis"
+uid="uid://cfi7cwa0bl7bs"
+path="res://.godot/imported/01 - Dusk - Dusk.ogg-8383891f8ec0b5902d99c815afd6c5b9.oggvorbisstr"
+
+[deps]
+
+source_file="res://01 - Dusk - Dusk.ogg"
+dest_files=["res://.godot/imported/01 - Dusk - Dusk.ogg-8383891f8ec0b5902d99c815afd6c5b9.oggvorbisstr"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

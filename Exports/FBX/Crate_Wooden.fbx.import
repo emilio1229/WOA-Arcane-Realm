@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dxsk5eil262sv"
-path="res://.godot/imported/Crate_Wooden.fbx-8f6c9edf423a4b7767d1e7fa2a99232d.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Crate_Wooden.fbx"
-dest_files=["res://.godot/imported/Crate_Wooden.fbx-8f6c9edf423a4b7767d1e7fa2a99232d.scn"]
 
 [params]
 

@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://br0fd7jebly6g"
-path="res://.godot/imported/Cauldron.fbx-4d78cd7f7ff1b2fd665d73f2b6f3c952.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Cauldron.fbx"
-dest_files=["res://.godot/imported/Cauldron.fbx-4d78cd7f7ff1b2fd665d73f2b6f3c952.scn"]
 
 [params]
 

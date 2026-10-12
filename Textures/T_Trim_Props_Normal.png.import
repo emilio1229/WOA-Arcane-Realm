@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://iglj510ow41a"
-path.s3tc="res://.godot/imported/T_Trim_Props_Normal.png-d19a145725c30ba36fe0e8c19c9acf05.s3tc.ctex"
+path.s3tc="res://.godot/imported/T_Trim_Props_Normal.png-21864d34dc812ada985c00cb98ab8d8b.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://textures/T_Trim_Props_Normal.png"
-dest_files=["res://.godot/imported/T_Trim_Props_Normal.png-d19a145725c30ba36fe0e8c19c9acf05.s3tc.ctex"]
+source_file="res://Textures/T_Trim_Props_Normal.png"
+dest_files=["res://.godot/imported/T_Trim_Props_Normal.png-21864d34dc812ada985c00cb98ab8d8b.s3tc.ctex"]
 
 [params]
 

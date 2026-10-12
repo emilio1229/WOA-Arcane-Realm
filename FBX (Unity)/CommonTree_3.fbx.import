@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://cbrw5vsvtdb7l"
-path="res://.godot/imported/CommonTree_3.fbx-0d737887019dd72b25ae1357364c3252.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX (Unity)/CommonTree_3.fbx"
-dest_files=["res://.godot/imported/CommonTree_3.fbx-0d737887019dd72b25ae1357364c3252.scn"]
 
 [params]
 

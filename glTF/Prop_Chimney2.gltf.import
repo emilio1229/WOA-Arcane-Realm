@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://c2vwdr6f131pe"
-path="res://.godot/imported/Prop_Chimney2.gltf-c4117ccafd21086a7a6b9bbf71085d0d.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Prop_Chimney2.gltf"
-dest_files=["res://.godot/imported/Prop_Chimney2.gltf-c4117ccafd21086a7a6b9bbf71085d0d.scn"]
 
 [params]
 

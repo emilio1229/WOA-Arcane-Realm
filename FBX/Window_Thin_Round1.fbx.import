@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dq2na01glc4he"
-path="res://.godot/imported/Window_Thin_Round1.fbx-ee094ae0343d30bf0467fbd02edf8222.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Window_Thin_Round1.fbx"
-dest_files=["res://.godot/imported/Window_Thin_Round1.fbx-ee094ae0343d30bf0467fbd02edf8222.scn"]
 
 [params]
 

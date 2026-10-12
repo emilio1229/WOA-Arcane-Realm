@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://c2rtst7ut6xuf"
-path="res://.godot/imported/Wall_Plaster_Door_Round.gltf-77ea6f06a0342285383a42d2c41a878e.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Wall_Plaster_Door_Round.gltf"
-dest_files=["res://.godot/imported/Wall_Plaster_Door_Round.gltf-77ea6f06a0342285383a42d2c41a878e.scn"]
 
 [params]
 

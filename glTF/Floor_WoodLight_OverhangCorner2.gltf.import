@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dyu3x2malgayc"
-path="res://.godot/imported/Floor_WoodLight_OverhangCorner2.gltf-59ff87498bfa189820b1a550cd4a9de7.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Floor_WoodLight_OverhangCorner2.gltf"
-dest_files=["res://.godot/imported/Floor_WoodLight_OverhangCorner2.gltf-59ff87498bfa189820b1a550cd4a9de7.scn"]
 
 [params]
 

@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://c1ty6vdssgano"
-path="res://.godot/imported/Window_Thin_Round1.gltf-ec8f127f6f7acf0d5f085f8f22559973.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Window_Thin_Round1.gltf"
-dest_files=["res://.godot/imported/Window_Thin_Round1.gltf-ec8f127f6f7acf0d5f085f8f22559973.scn"]
 
 [params]
 

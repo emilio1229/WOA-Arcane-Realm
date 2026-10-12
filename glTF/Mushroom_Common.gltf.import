@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dfcxi5rd5v2k5"
-path="res://.godot/imported/Mushroom_Common.gltf-9138d677157d45c69287a906a860f64f.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Mushroom_Common.gltf"
-dest_files=["res://.godot/imported/Mushroom_Common.gltf-9138d677157d45c69287a906a860f64f.scn"]
 
 [params]
 

@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://du7pilttfihk"
-path="res://.godot/imported/Grass_Common_Short.fbx-c20ea0ccf5e7e68e710c0f2377895d03.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Grass_Common_Short.fbx"
-dest_files=["res://.godot/imported/Grass_Common_Short.fbx-c20ea0ccf5e7e68e710c0f2377895d03.scn"]
 
 [params]
 

@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dap1x2ps28oix"
-path="res://.godot/imported/Sword_Bronze.gltf-9c76fa700ebf4504382c6bcd6308dac7.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Sword_Bronze.gltf"
-dest_files=["res://.godot/imported/Sword_Bronze.gltf-9c76fa700ebf4504382c6bcd6308dac7.scn"]
 
 [params]
 

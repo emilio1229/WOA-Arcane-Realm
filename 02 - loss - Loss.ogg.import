@@ -1,0 +1,19 @@
+[remap]
+
+importer="oggvorbisstr"
+type="AudioStreamOggVorbis"
+uid="uid://cymagq1erg2fk"
+path="res://.godot/imported/02 - loss - Loss.ogg-f9c541bbb7ab43ea0cd6906fb2e4163e.oggvorbisstr"
+
+[deps]
+
+source_file="res://02 - loss - Loss.ogg"
+dest_files=["res://.godot/imported/02 - loss - Loss.ogg-f9c541bbb7ab43ea0cd6906fb2e4163e.oggvorbisstr"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://e838f47m2stb"
-path="res://.godot/imported/Wall_Plaster_Straight_R.fbx-7f87930d3f1306f9164369c7cc615a3d.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Wall_Plaster_Straight_R.fbx"
-dest_files=["res://.godot/imported/Wall_Plaster_Straight_R.fbx-7f87930d3f1306f9164369c7cc615a3d.scn"]
 
 [params]
 

@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://cepm2cyrbsmmk"
-path="res://.godot/imported/Pebble_Square_3.fbx-c631d49b8a9061bdee443c1f7badc8f1.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX (Unity)/Pebble_Square_3.fbx"
-dest_files=["res://.godot/imported/Pebble_Square_3.fbx-c631d49b8a9061bdee443c1f7badc8f1.scn"]
 
 [params]
 

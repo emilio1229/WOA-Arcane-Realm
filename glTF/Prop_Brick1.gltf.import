@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bpgqt03m0jhbx"
-path="res://.godot/imported/Prop_Brick1.gltf-86c2598d56db30885458b8724b9b0bbb.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Prop_Brick1.gltf"
-dest_files=["res://.godot/imported/Prop_Brick1.gltf-86c2598d56db30885458b8724b9b0bbb.scn"]
 
 [params]
 

@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bkke2uxod28a3"
-path="res://.godot/imported/Peg_Rack.gltf-6f10bfada3ccf54b8458098b4fd5a6ab.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Peg_Rack.gltf"
-dest_files=["res://.godot/imported/Peg_Rack.gltf-6f10bfada3ccf54b8458098b4fd5a6ab.scn"]
 
 [params]
 

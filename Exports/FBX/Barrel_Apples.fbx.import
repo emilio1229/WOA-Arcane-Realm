@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bk5g66qgbv75p"
-path="res://.godot/imported/Barrel_Apples.fbx-690dbf1c2482a4850de463449edcfb66.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Barrel_Apples.fbx"
-dest_files=["res://.godot/imported/Barrel_Apples.fbx-690dbf1c2482a4850de463449edcfb66.scn"]
 
 [params]
 

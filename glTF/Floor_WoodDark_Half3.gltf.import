@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://do4cqvqkpwjsc"
-path="res://.godot/imported/Floor_WoodDark_Half3.gltf-c3e2faed33e98d70e44b244e794b9fb4.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Floor_WoodDark_Half3.gltf"
-dest_files=["res://.godot/imported/Floor_WoodDark_Half3.gltf-c3e2faed33e98d70e44b244e794b9fb4.scn"]
 
 [params]
 

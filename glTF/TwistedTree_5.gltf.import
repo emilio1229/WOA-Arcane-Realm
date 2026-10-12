@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://c25cv0lgku7x3"
-path="res://.godot/imported/TwistedTree_5.gltf-04c550f79317e61c8a7b27efd087c7fd.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/TwistedTree_5.gltf"
-dest_files=["res://.godot/imported/TwistedTree_5.gltf-04c550f79317e61c8a7b27efd087c7fd.scn"]
 
 [params]
 

@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dl1ylmxgw3pe1"
-path="res://.godot/imported/TwistedTree_2.fbx-9874b8780939c396c096886929110c02.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/TwistedTree_2.fbx"
-dest_files=["res://.godot/imported/TwistedTree_2.fbx-9874b8780939c396c096886929110c02.scn"]
 
 [params]
 

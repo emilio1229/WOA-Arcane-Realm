@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://ccf670c6bkob8"
-path="res://.godot/imported/character-male-e.glb-4a1c925960f571a864f45fd0a8c569e9.scn"
+valid=false
 
 [deps]
 
 source_file="res://addons/srcoder_thirdperson_controller/assets/character-male-e.glb"
-dest_files=["res://.godot/imported/character-male-e.glb-4a1c925960f571a864f45fd0a8c569e9.scn"]
 
 [params]
 

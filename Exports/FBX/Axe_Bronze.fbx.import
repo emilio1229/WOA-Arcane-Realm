@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://cd7pd4t2ej2cc"
-path="res://.godot/imported/Axe_Bronze.fbx-8c33ab7d4d5cf836e2def867b82b26dc.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Axe_Bronze.fbx"
-dest_files=["res://.godot/imported/Axe_Bronze.fbx-8c33ab7d4d5cf836e2def867b82b26dc.scn"]
 
 [params]
 

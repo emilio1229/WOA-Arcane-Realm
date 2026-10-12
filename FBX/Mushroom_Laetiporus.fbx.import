@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dg007pc4hs5v8"
-path="res://.godot/imported/Mushroom_Laetiporus.fbx-14de79990b36d79c2e79efdd6c9569ae.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Mushroom_Laetiporus.fbx"
-dest_files=["res://.godot/imported/Mushroom_Laetiporus.fbx-14de79990b36d79c2e79efdd6c9569ae.scn"]
 
 [params]
 

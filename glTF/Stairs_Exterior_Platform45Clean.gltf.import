@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://b4aqbr5n6ycrd"
-path="res://.godot/imported/Stairs_Exterior_Platform45Clean.gltf-3f07d4d4a65897504c231a4745493109.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Stairs_Exterior_Platform45Clean.gltf"
-dest_files=["res://.godot/imported/Stairs_Exterior_Platform45Clean.gltf-3f07d4d4a65897504c231a4745493109.scn"]
 
 [params]
 

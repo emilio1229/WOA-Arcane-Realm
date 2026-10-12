@@ -1,0 +1,22 @@
+10 original tracks for dark fantasy game worlds, villain character themes, cursed environments, and morally complex characters who believe they're the hero of their own story.
+
+Villain music that doesn't rush. These tracks move with the certainty of someone who has already won — slow, purposeful orchestral arrangements with a corrupted underbelly. Ideal for final area ambience, antagonist cutscenes, and the parts of your world that used to be something else.
+
+All tracks are provided as .ogg files — the recommended format for music in Godot for optimal streaming performance and file size.
+
+TRACKS INCLUDED
+1. Dusk — the light leaving, Dm
+2. Loss — grief with power remaining, Bm
+3. The Basement — something buried and wrong, Dm
+4. Toxic Lollipop — sweet and deeply corrupted, Bbm
+5. Voices of Mire — many voices, one agenda, C
+6. Dark Heart — the source of it all, Gm
+7. What Comes After the Dark — aftermath and cold resolve, Fm
+8. Parasite Unrest — invasive and spreading, Bbm
+9. The Pauper's Sermon — righteous and dangerous, Ebm
+10. Reinforcements — more are coming, Bm
+
+LICENSE
+Free to use in any Godot project with attribution. Credit "Music: Talon Trueblood" in your game credits or itch.io page. Commercial use permitted with credit.
+
+Part of the Talon catalog — 203 original tracks across themed packs, all free with attribution.

@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://oe6t885vxvar"
-path="res://.godot/imported/Rope_3.gltf-6b39528bf4b16a438e552e1d3a1c8c2e.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Rope_3.gltf"
-dest_files=["res://.godot/imported/Rope_3.gltf-6b39528bf4b16a438e552e1d3a1c8c2e.scn"]
 
 [params]
 

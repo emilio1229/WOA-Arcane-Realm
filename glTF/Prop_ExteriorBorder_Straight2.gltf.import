@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://fubdo3fev6f4"
-path="res://.godot/imported/Prop_ExteriorBorder_Straight2.gltf-30a6cdfbabc82970ee19215001eec718.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Prop_ExteriorBorder_Straight2.gltf"
-dest_files=["res://.godot/imported/Prop_ExteriorBorder_Straight2.gltf-30a6cdfbabc82970ee19215001eec718.scn"]
 
 [params]
 

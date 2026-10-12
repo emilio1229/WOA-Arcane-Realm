@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://cxehrxcblnj8m"
-path="res://.godot/imported/DeadTree_5.gltf-b416c806d4c09c478e690bb33100ee71.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/DeadTree_5.gltf"
-dest_files=["res://.godot/imported/DeadTree_5.gltf-b416c806d4c09c478e690bb33100ee71.scn"]
 
 [params]
 

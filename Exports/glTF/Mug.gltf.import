@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://ci613ianokky5"
-path="res://.godot/imported/Mug.gltf-e25bf9328de4602419b0ee027003e6cf.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Mug.gltf"
-dest_files=["res://.godot/imported/Mug.gltf-e25bf9328de4602419b0ee027003e6cf.scn"]
 
 [params]
 

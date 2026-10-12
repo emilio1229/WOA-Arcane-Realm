@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://cgmgm3jeq54nl"
-path="res://.godot/imported/Banner_2.gltf-f9eb607fb4c016102bb4b687e5234242.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Banner_2.gltf"
-dest_files=["res://.godot/imported/Banner_2.gltf-f9eb607fb4c016102bb4b687e5234242.scn"]
 
 [params]
 

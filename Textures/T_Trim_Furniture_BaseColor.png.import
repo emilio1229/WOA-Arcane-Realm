@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dftdatimkk4f6"
-path.s3tc="res://.godot/imported/T_Trim_Furniture_BaseColor.png-8d4f97d968c0a61c830567dd251a5c79.s3tc.ctex"
+path.s3tc="res://.godot/imported/T_Trim_Furniture_BaseColor.png-525cbe76dd288b4318bec0c2988e4a84.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://textures/T_Trim_Furniture_BaseColor.png"
-dest_files=["res://.godot/imported/T_Trim_Furniture_BaseColor.png-8d4f97d968c0a61c830567dd251a5c79.s3tc.ctex"]
+source_file="res://Textures/T_Trim_Furniture_BaseColor.png"
+dest_files=["res://.godot/imported/T_Trim_Furniture_BaseColor.png-525cbe76dd288b4318bec0c2988e4a84.s3tc.ctex"]
 
 [params]
 

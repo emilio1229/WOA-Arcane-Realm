@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://cjwnawm2pp5wr"
-path="res://.godot/imported/Pine_5.gltf-5fda061d8eafc8d088da57f3483c147d.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Pine_5.gltf"
-dest_files=["res://.godot/imported/Pine_5.gltf-5fda061d8eafc8d088da57f3483c147d.scn"]
 
 [params]
 

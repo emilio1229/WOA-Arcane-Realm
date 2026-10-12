@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://qgtxu78hgor4"
-path="res://.godot/imported/Roof_Support2.gltf-b6604ef4823c667143b8e7905a9b2ec7.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Roof_Support2.gltf"
-dest_files=["res://.godot/imported/Roof_Support2.gltf-b6604ef4823c667143b8e7905a9b2ec7.scn"]
 
 [params]
 

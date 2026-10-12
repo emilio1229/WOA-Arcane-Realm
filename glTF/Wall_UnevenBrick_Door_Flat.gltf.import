@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://cfpxexnkc0mgm"
-path="res://.godot/imported/Wall_UnevenBrick_Door_Flat.gltf-5b472117dc57fa69248ac741ef328067.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Wall_UnevenBrick_Door_Flat.gltf"
-dest_files=["res://.godot/imported/Wall_UnevenBrick_Door_Flat.gltf-5b472117dc57fa69248ac741ef328067.scn"]
 
 [params]
 

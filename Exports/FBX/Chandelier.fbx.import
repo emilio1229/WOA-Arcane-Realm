@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://c5c773hxqeihl"
-path="res://.godot/imported/Chandelier.fbx-2051108d2bb051247a15f317ac591736.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Chandelier.fbx"
-dest_files=["res://.godot/imported/Chandelier.fbx-2051108d2bb051247a15f317ac591736.scn"]
 
 [params]
 

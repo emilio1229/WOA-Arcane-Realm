@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://cqe2jnym1h65c"
-path="res://.godot/imported/Bag.fbx-37db4809d6b8dd0ba64868811072bc11.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Bag.fbx"
-dest_files=["res://.godot/imported/Bag.fbx-37db4809d6b8dd0ba64868811072bc11.scn"]
 
 [params]
 

@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://os75mq5d00av"
-path="res://.godot/imported/Torch_Metal.gltf-48423ae8988210eea3695aa89d15b77a.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Torch_Metal.gltf"
-dest_files=["res://.godot/imported/Torch_Metal.gltf-48423ae8988210eea3695aa89d15b77a.scn"]
 
 [params]
 

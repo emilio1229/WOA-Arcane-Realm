@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bf6y7eh73i1ra"
-path="res://.godot/imported/Roof_Support2.fbx-b5e8d21b8cf5c119663e92f5a1bcbe56.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Roof_Support2.fbx"
-dest_files=["res://.godot/imported/Roof_Support2.fbx-b5e8d21b8cf5c119663e92f5a1bcbe56.scn"]
 
 [params]
 

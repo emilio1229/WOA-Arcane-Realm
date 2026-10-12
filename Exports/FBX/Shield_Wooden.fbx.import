@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://cqnhbqjcotmak"
-path="res://.godot/imported/Shield_Wooden.fbx-1ffde00a2a14b651c0be582a838df6fc.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Shield_Wooden.fbx"
-dest_files=["res://.godot/imported/Shield_Wooden.fbx-1ffde00a2a14b651c0be582a838df6fc.scn"]
 
 [params]
 

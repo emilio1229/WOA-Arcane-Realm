@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://buihgk35l1vhd"
-path="res://.godot/imported/AL_Standard.fbx-0915d92698498417ee698a618545c201.scn"
+valid=false
 
 [deps]
 
 source_file="res://Unreal Engine/AL_Standard.fbx"
-dest_files=["res://.godot/imported/AL_Standard.fbx-0915d92698498417ee698a618545c201.scn"]
 
 [params]
 

@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://caqhwbeh8by1j"
-path="res://.godot/imported/ancient_ruin_stones_3d_model.fbx-3371144ac092d59870d78603ae50db8e.scn"
+valid=false
 
 [deps]
 
 source_file="res://TripoModels/ancient_ruin_stones_3d_model/ancient_ruin_stones_3d_model.fbx"
-dest_files=["res://.godot/imported/ancient_ruin_stones_3d_model.fbx-3371144ac092d59870d78603ae50db8e.scn"]
 
 [params]
 

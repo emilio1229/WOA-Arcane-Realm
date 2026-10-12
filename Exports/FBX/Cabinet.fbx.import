@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://b5b44ci8u0sdf"
-path="res://.godot/imported/Cabinet.fbx-820be8bce9d572dfc85831591ebd1518.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Cabinet.fbx"
-dest_files=["res://.godot/imported/Cabinet.fbx-820be8bce9d572dfc85831591ebd1518.scn"]
 
 [params]
 

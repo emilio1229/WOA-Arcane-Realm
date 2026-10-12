@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bcsm43x0l2ybq"
-path="res://.godot/imported/Prop_WoodenFence_Single.gltf-595cfd569e70a1e3f3734e9b69cf73ee.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Prop_WoodenFence_Single.gltf"
-dest_files=["res://.godot/imported/Prop_WoodenFence_Single.gltf-595cfd569e70a1e3f3734e9b69cf73ee.scn"]
 
 [params]
 

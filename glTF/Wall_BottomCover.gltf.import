@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://fgxcgcbmvsou"
-path="res://.godot/imported/Wall_BottomCover.gltf-9d971fe9f7e8c0ea55a5325ed59a811a.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Wall_BottomCover.gltf"
-dest_files=["res://.godot/imported/Wall_BottomCover.gltf-9d971fe9f7e8c0ea55a5325ed59a811a.scn"]
 
 [params]
 

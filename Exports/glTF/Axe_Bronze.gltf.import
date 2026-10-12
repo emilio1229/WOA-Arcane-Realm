@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dvtsci2o1ubla"
-path="res://.godot/imported/Axe_Bronze.gltf-aa78f4d11b0fe91acb33892733dad3d2.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Axe_Bronze.gltf"
-dest_files=["res://.godot/imported/Axe_Bronze.gltf-aa78f4d11b0fe91acb33892733dad3d2.scn"]
 
 [params]
 
