@@ -50,6 +50,12 @@ var save_data := ConfigFile.new()
 var has_save := false
 # Reuse materials across repeated props and character parts to reduce resource churn and GPU state changes.
 var _material_cache: Dictionary = {}
+var touch_controls_root: Control
+var touch_left := false
+var touch_right := false
+var touch_up := false
+var touch_down := false
+var touch_run := false
 
 func _ready() -> void:
 	_build_ui()
@@ -73,19 +79,19 @@ func _physics_process(delta: float) -> void:
 		player.velocity.y = JUMP_VELOCITY
 
 	var input_vector := Vector2.ZERO
-	if Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT):
+	if Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT) or touch_left:
 		input_vector.x -= 1.0
-	if Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT):
+	if Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT) or touch_right:
 		input_vector.x += 1.0
-	if Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_UP):
+	if Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_UP) or touch_up:
 		input_vector.y -= 1.0
-	if Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN):
+	if Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN) or touch_down:
 		input_vector.y += 1.0
 
 	var direction := Vector3(input_vector.x, 0.0, input_vector.y)
 	if direction.length_squared() > 0.0:
 		direction = direction.normalized().rotated(Vector3.UP, yaw)
-		var speed := RUN_SPEED if Input.is_key_pressed(KEY_SHIFT) else WALK_SPEED
+		var speed := RUN_SPEED if Input.is_key_pressed(KEY_SHIFT) or touch_run else WALK_SPEED
 		player.velocity.x = direction.x * speed
 		player.velocity.z = direction.z * speed
 		player.rotation.y = yaw
@@ -106,10 +112,14 @@ func _input(event: InputEvent) -> void:
 		# Use screen_relative so mouse-look sensitivity stays consistent in the browser at different sizes.
 		yaw -= event.screen_relative.x * 0.0022
 		pitch = clampf(pitch - event.screen_relative.y * 0.0016, -0.48, 0.32)
-		if player != null:
-			player.rotation.y = yaw
-		if camera_pivot != null:
-			camera_pivot.rotation.x = pitch
+		_apply_camera_look()
+	elif event is InputEventScreenDrag and started and not dialogue_open:
+		# On touch devices, drag the right side of the screen to look around.
+		var screen_width := get_viewport().get_visible_rect().size.x
+		if event.position.x > screen_width * 0.35:
+			yaw -= event.relative.x * 0.004
+			pitch = clampf(pitch - event.relative.y * 0.003, -0.48, 0.32)
+			_apply_camera_look()
 	elif event is InputEventKey and event.pressed and not event.echo:
 		if event.keycode == KEY_ESCAPE:
 			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -315,6 +325,8 @@ func _build_ui() -> void:
 	status_label.add_theme_color_override("font_color", Color(0.95, 0.83, 1.0))
 	hud_root.add_child(status_label)
 
+	_build_touch_controls()
+
 	dialogue_panel = PanelContainer.new()
 	dialogue_panel.anchor_left = 0.08
 	dialogue_panel.anchor_right = 0.92
@@ -358,6 +370,94 @@ func _build_ui() -> void:
 	var dialogue_button := _make_button("CONTINUE", Color(0.31, 0.13, 0.48))
 	dialogue_button.pressed.connect(_advance_dialogue)
 	dialogue_layout.add_child(dialogue_button)
+
+func _build_touch_controls() -> void:
+	touch_controls_root = Control.new()
+	touch_controls_root.name = "TouchControls"
+	touch_controls_root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	touch_controls_root.mouse_filter = Control.MOUSE_FILTER_PASS
+	touch_controls_root.visible = DisplayServer.is_touchscreen_available()
+	hud_root.add_child(touch_controls_root)
+
+	# D-pad buttons stay anchored to the bottom-left so they remain reachable on phones.
+	_add_touch_button("◀", Vector2(18, -112), false, "left")
+	_add_touch_button("▶", Vector2(146, -112), false, "right")
+	_add_touch_button("▲", Vector2(82, -176), false, "up")
+	_add_touch_button("▼", Vector2(82, -48), false, "down")
+	_add_touch_button("RUN", Vector2(82, -238), false, "run")
+
+	# Action buttons sit on the opposite side to avoid covering the movement controls.
+	_add_touch_button("JUMP", Vector2(-92, -210), true, "jump")
+	_add_touch_button("CAST", Vector2(-92, -142), true, "cast")
+	_add_touch_button("TALK", Vector2(-92, -74), true, "interact")
+
+
+func _add_touch_button(caption: String, offset: Vector2, action_button: bool, action: String) -> void:
+	var button := Button.new()
+	button.text = caption
+	button.custom_minimum_size = Vector2(62, 58) if not action_button else Vector2(76, 58)
+	button.add_theme_font_size_override("font_size", 15 if action_button else 22)
+	button.add_theme_color_override("font_color", Color(0.98, 0.93, 1.0))
+	button.modulate = Color(1.0, 1.0, 1.0, 0.88)
+	button.add_theme_stylebox_override("normal", _panel_style(Color(0.09, 0.045, 0.15, 0.78), Color(0.58, 0.36, 0.78)))
+	button.add_theme_stylebox_override("hover", _panel_style(Color(0.18, 0.09, 0.27, 0.92), Color(0.78, 0.53, 0.96)))
+	if action_button:
+		button.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+		button.position = offset
+	else:
+		button.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+		button.position = offset
+	touch_controls_root.add_child(button)
+
+	match action:
+		"left":
+			button.button_down.connect(_set_touch_direction.bind("left", true))
+			button.button_up.connect(_set_touch_direction.bind("left", false))
+		"right":
+			button.button_down.connect(_set_touch_direction.bind("right", true))
+			button.button_up.connect(_set_touch_direction.bind("right", false))
+		"up":
+			button.button_down.connect(_set_touch_direction.bind("up", true))
+			button.button_up.connect(_set_touch_direction.bind("up", false))
+		"down":
+			button.button_down.connect(_set_touch_direction.bind("down", true))
+			button.button_up.connect(_set_touch_direction.bind("down", false))
+		"run":
+			button.button_down.connect(_set_touch_direction.bind("run", true))
+			button.button_up.connect(_set_touch_direction.bind("run", false))
+		"jump":
+			button.pressed.connect(_touch_jump)
+		"cast":
+			button.pressed.connect(_cast_arcane_pulse)
+		"interact":
+			button.pressed.connect(_interact)
+
+
+func _set_touch_direction(direction: String, pressed: bool) -> void:
+	match direction:
+		"left":
+			touch_left = pressed
+		"right":
+			touch_right = pressed
+		"up":
+			touch_up = pressed
+		"down":
+			touch_down = pressed
+		"run":
+			touch_run = pressed
+
+
+func _touch_jump() -> void:
+	if started and player != null and player.is_on_floor() and not dialogue_open:
+		player.velocity.y = JUMP_VELOCITY
+
+
+func _apply_camera_look() -> void:
+	if player != null:
+		player.rotation.y = yaw
+	if camera_pivot != null:
+		camera_pivot.rotation.x = pitch
+
 
 func _on_path_selected(index: int) -> void:
 	if path_note_label == null or index < 0 or index >= PATHS.size():
