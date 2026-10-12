@@ -24,7 +24,7 @@ window/stretch/mode="canvas_items"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/Tripo3d_Godot_Bridge/plugin.cfg")
+enabled=PackedStringArray()
 
 [rendering]
 
