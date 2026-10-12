@@ -609,6 +609,17 @@ func _build_world() -> void:
 	environment.fog_enabled = true
 	environment.fog_light_color = Color(0.12, 0.055, 0.17)
 	environment.fog_density = 0.009
+	# Subtle cinematic grading and bloom make rune lights readable without
+	# washing out the dark-fantasy palette or relying on high-end renderers.
+	environment.tonemap_mode = Environment.TONE_MAPPER_FILMIC
+	environment.adjustment_enabled = true
+	environment.adjustment_brightness = 1.04
+	environment.adjustment_contrast = 1.08
+	environment.adjustment_saturation = 1.12
+	environment.glow_enabled = true
+	environment.glow_intensity = 0.55
+	environment.glow_strength = 0.65
+	environment.glow_bloom = 0.04
 	environment_node.environment = environment
 	add_child(environment_node)
 
@@ -1078,7 +1089,8 @@ func _add_box(object_name: String, pos: Vector3, size: Vector3, color: Color, co
 	var mesh := BoxMesh.new()
 	mesh.size = size
 	mesh_node.mesh = mesh
-	mesh_node.material_override = _material(color)
+	var emissive_prop := object_name.contains("Window") or object_name.contains("Lantern") or object_name.contains("Sign Rune") or object_name.contains("Rune Well Inner Pool") or object_name.contains("Wardstone")
+	mesh_node.material_override = _material(color, emissive_prop)
 	root.add_child(mesh_node)
 	add_child(root)
 	return root
