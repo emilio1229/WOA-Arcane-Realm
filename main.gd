@@ -48,6 +48,8 @@ var sanctuary_gate: Node3D
 var last_message := ""
 var save_data := ConfigFile.new()
 var has_save := false
+# Reuse materials across repeated props and character parts to reduce resource churn and GPU state changes.
+var _material_cache: Dictionary = {}
 
 func _ready() -> void:
 	_build_ui()
@@ -440,20 +442,20 @@ func _build_world() -> void:
 	environment.ambient_light_energy = 0.8
 	environment.fog_enabled = true
 	environment.fog_light_color = Color(0.12, 0.055, 0.17)
-	environment.fog_density = 0.009
+	environment.fog_density = 0.006
 	environment_node.environment = environment
 	add_child(environment_node)
 
 	var sun := DirectionalLight3D.new()
 	sun.rotation_degrees = Vector3(-52, -28, 0)
 	sun.light_energy = 1.2
-	sun.shadow_enabled = true
+	sun.shadow_enabled = false
 	add_child(sun)
 
 	_add_box("Gloamwood and Gloamwick Ground", Vector3(0, -0.5, -70), Vector3(180, 1, 260), Color(0.035, 0.045, 0.045), true)
 	_add_box("Gloamwick Road", Vector3(0, -0.02, -16), Vector3(6.5, 0.12, 112), Color(0.09, 0.075, 0.085), false)
 	# A wooded ridge frames the settlement while leaving the town streets open.
-	for i in range(18):
+	for i in range(10):
 		var z := 25.0 - float(i) * 5.1
 		var side_offset := 27.0 + float((i * 7) % 5) * 1.8
 		_place_imported_asset("res://OBJ/CommonTree_" + str((i % 5) + 1) + ".obj", Vector3(-side_offset, 0, z), Vector3.ONE * 1.1, float(i) * 0.41)
@@ -597,12 +599,12 @@ func _build_gloamwick_town() -> void:
 	# Benches, fences, plants, flowers, mushrooms, stones and trees add scale
 	# around the homes without obstructing the streets or combat approach.
 	for side in [-1.0, 1.0]:
-		for garden_index in range(4):
-			var garden_z: float = -3.0 - float(garden_index) * 11.0
+		for garden_index in range(3):
+			var garden_z: float = -3.0 - float(garden_index) * 13.0
 			_place_imported_asset("res://OBJ/Prop_WoodenFence_Single.obj", Vector3(side * 22.0, 0.0, garden_z), Vector3.ONE * 0.8, 0.0)
 			_place_imported_asset("res://OBJ/Bush_Common_Flowers.obj", Vector3(side * 21.0, 0.0, garden_z - 2.0), Vector3.ONE * 0.55, float(garden_index) * 0.8)
 			_place_imported_asset("res://OBJ/Flower_3_Group.obj", Vector3(side * 15.3, 0.0, garden_z - 1.5), Vector3.ONE * 0.5, float(garden_index) * 0.6)
-	for i in range(12):
+	for i in range(8):
 		var tree_side: float = -1.0 if i % 2 == 0 else 1.0
 		var tree_z: float = 20.0 - float(i) * 6.2
 		var tree_x: float = tree_side * (29.0 + float(i % 3) * 2.5)
@@ -618,8 +620,8 @@ func _build_gloamwick_town() -> void:
 	_place_imported_asset("res://OBJ/Rock_Medium_2.obj", Vector3(9.5, 0.0, -44.0), Vector3.ONE * 0.6, -0.4)
 
 	# Tall rune lamps lead from the market to Mathias and the damaged southern ward.
-	for lamp_index in range(7):
-		var lamp_z: float = -24.0 - float(lamp_index) * 3.1
+	for lamp_index in range(5):
+		var lamp_z: float = -24.0 - float(lamp_index) * 3.7
 		for side in [-1.0, 1.0]:
 			var lamp_x: float = float(side) * (6.0 if lamp_index < 4 else 8.0)
 			_add_box("Gloamwick Rune Lamp Post", Vector3(lamp_x, 1.65, lamp_z), Vector3(0.16, 3.3, 0.16), Color(0.055, 0.035, 0.065), false)
@@ -884,11 +886,15 @@ func _make_sigil(pos: Vector3, color: Color, size: float) -> Node3D:
 	crystal.mesh = crystal_mesh
 	crystal.material_override = _material(color, true)
 	root.add_child(crystal)
-	var light := OmniLight3D.new()
-	light.light_color = color
-	light.light_energy = 1.2
-	light.omni_range = size * 5.0
-	root.add_child(light)
+	# Emissive meshes provide the magical glow without a costly real-time light
+	# on every collectible. Only the monumental gate receives a small local light.
+	if size >= 1.8:
+		var light := OmniLight3D.new()
+		light.light_color = color
+		light.light_energy = 0.45
+		light.omni_range = size * 2.5
+		light.shadow_enabled = false
+		root.add_child(light)
 	return root
 
 func _add_box(object_name: String, pos: Vector3, size: Vector3, color: Color, collision: bool) -> Node3D:
@@ -924,6 +930,10 @@ func _make_sphere(pos: Vector3, radius: float, color: Color) -> MeshInstance3D:
 	return node
 
 func _material(color: Color, glow: bool = false) -> StandardMaterial3D:
+	var cache_key := color.to_html(true) + ("_emissive" if glow else "_surface")
+	if _material_cache.has(cache_key):
+		return _material_cache[cache_key] as StandardMaterial3D
+
 	var material := StandardMaterial3D.new()
 	material.albedo_color = color
 	material.roughness = 0.72
@@ -931,6 +941,7 @@ func _material(color: Color, glow: bool = false) -> StandardMaterial3D:
 		material.emission_enabled = true
 		material.emission = color
 		material.emission_energy_multiplier = 1.4
+	_material_cache[cache_key] = material
 	return material
 
 func _make_button(label_text: String, color: Color) -> Button:
