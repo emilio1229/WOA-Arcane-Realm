@@ -1124,8 +1124,9 @@ func _add_class_details(parent: Node3D, path_name: String) -> void:
 			focus.rotation_degrees = Vector3(0, 0, 28)
 			focus.position = Vector3(0.48, 1.12, -0.04)
 		"Verdant Warden":
-			var leaf := ConeMesh.new()
-			leaf.radius = 0.24
+			var leaf := CylinderMesh.new()
+			leaf.top_radius = 0.0
+			leaf.bottom_radius = 0.24
 			leaf.height = 0.72
 			focus.mesh = leaf
 			focus.rotation_degrees = Vector3(0, 0, -34)
@@ -1163,8 +1164,9 @@ func _add_class_details(parent: Node3D, path_name: String) -> void:
 
 	if path_name == "Ember Mage" or path_name == "Storm Herald":
 		var crest := MeshInstance3D.new()
-		var crest_mesh := ConeMesh.new()
-		crest_mesh.radius = 0.17
+		var crest_mesh := CylinderMesh.new()
+		crest_mesh.top_radius = 0.0
+		crest_mesh.bottom_radius = 0.17
 		crest_mesh.height = 0.48
 		crest.mesh = crest_mesh
 		crest.position = Vector3(0, 1.91, 0)
