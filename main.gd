@@ -965,9 +965,40 @@ func _add_person_visual(parent: Node3D, robe_color: Color, face_color: Color, is
 		parent.add_child(_make_sphere(Vector3(0.09, 1.57, -0.238), 0.035, face_color))
 
 	# The chest sigil is a small focal point rather than a large floating ornament.
+	# A short mantle broadens the silhouette so the robe reads clearly at phone size.
+	for side in [-1.0, 1.0]:
+		var shoulder := MeshInstance3D.new()
+		var shoulder_mesh := SphereMesh.new()
+		shoulder_mesh.radius = 0.22
+		shoulder_mesh.height = 0.24
+		shoulder.mesh = shoulder_mesh
+		shoulder.position = Vector3(side * 0.29, 1.38, 0.015)
+		shoulder.scale = Vector3(1.0, 0.72, 0.9)
+		shoulder.material_override = _material(robe_color.lightened(0.12))
+		parent.add_child(shoulder)
+
 	var pendant := _make_sphere(Vector3(0, 1.25, -0.285), 0.07, face_color)
 	pendant.scale = Vector3(0.72, 1.0, 0.5)
 	parent.add_child(pendant)
+
+	if is_mage:
+		# A lightweight, six-sided staff and emissive crystal give the wizard a
+		# readable fantasy silhouette without importing a heavy rigged asset.
+		var staff := MeshInstance3D.new()
+		var staff_mesh := CylinderMesh.new()
+		staff_mesh.top_radius = 0.035
+		staff_mesh.bottom_radius = 0.065
+		staff_mesh.height = 1.55
+		staff_mesh.radial_segments = 6
+		staff.mesh = staff_mesh
+		staff.position = Vector3(0.54, 0.9, 0.08)
+		staff.rotation.z = -0.035
+		staff.material_override = _material(Color(0.075, 0.038, 0.095))
+		parent.add_child(staff)
+
+		var staff_crystal := _make_sphere(Vector3(0.54, 1.72, 0.08), 0.12, face_color)
+		staff_crystal.scale = Vector3(0.78, 1.3, 0.78)
+		parent.add_child(staff_crystal)
 
 func _make_sigil(pos: Vector3, color: Color, size: float) -> Node3D:
 	var root := Node3D.new()
