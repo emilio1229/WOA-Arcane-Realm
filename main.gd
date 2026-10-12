@@ -14,6 +14,12 @@ var game_camera: Camera3D
 var player_visual: Node3D
 var ui_layer: CanvasLayer
 var menu_root: Control
+var menu_margin: MarginContainer
+var menu_columns: BoxContainer
+var class_grid: GridContainer
+var class_preview_label: Label
+var class_preview_symbol: Label
+var class_buttons: Array[Button] = []
 var hud_root: Control
 var dialogue_panel: PanelContainer
 var dialogue_title: Label
@@ -150,17 +156,18 @@ func _build_ui() -> void:
 	backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	menu_root.add_child(backdrop)
 
-	var margin := MarginContainer.new()
-	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	margin.add_theme_constant_override("margin_left", 42)
-	margin.add_theme_constant_override("margin_right", 42)
-	margin.add_theme_constant_override("margin_top", 30)
-	margin.add_theme_constant_override("margin_bottom", 30)
-	menu_root.add_child(margin)
+	menu_margin = MarginContainer.new()
+	menu_margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	menu_margin.add_theme_constant_override("margin_left", 42)
+	menu_margin.add_theme_constant_override("margin_right", 42)
+	menu_margin.add_theme_constant_override("margin_top", 30)
+	menu_margin.add_theme_constant_override("margin_bottom", 30)
+	menu_root.add_child(menu_margin)
 
 	var columns := HBoxContainer.new()
-	columns.add_theme_constant_override("separation", 42)
-	margin.add_child(columns)
+	menu_columns = columns
+	columns.add_theme_constant_override("separation", 32)
+	menu_margin.add_child(columns)
 
 	var story_side := VBoxContainer.new()
 	story_side.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -268,12 +275,46 @@ func _build_ui() -> void:
 	layout.add_child(path_label)
 
 	path_select = OptionButton.new()
-	path_select.custom_minimum_size = Vector2(0, 44)
 	for path_name in PATHS:
 		path_select.add_item(path_name)
 	path_select.select(5)
-	path_select.add_theme_font_size_override("font_size", 15)
+	path_select.visible = false
 	layout.add_child(path_select)
+
+	class_grid = GridContainer.new()
+	class_grid.columns = 2
+	class_grid.add_theme_constant_override("h_separation", 8)
+	class_grid.add_theme_constant_override("v_separation", 8)
+	layout.add_child(class_grid)
+	class_buttons.clear()
+	for i in range(PATHS.size()):
+		var class_button := Button.new()
+		class_button.text = _class_symbol(PATHS[i]) + "  " + PATHS[i]
+		class_button.custom_minimum_size = Vector2(0, 48)
+		class_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		class_button.add_theme_font_size_override("font_size", 13)
+		class_button.pressed.connect(_select_class.bind(i))
+		class_grid.add_child(class_button)
+		class_buttons.append(class_button)
+
+	var preview_panel := PanelContainer.new()
+	preview_panel.add_theme_stylebox_override("panel", _panel_style(Color(0.08, 0.035, 0.12, 0.95), Color(0.55, 0.31, 0.76)))
+	layout.add_child(preview_panel)
+	var preview_row := HBoxContainer.new()
+	preview_row.add_theme_constant_override("separation", 12)
+	preview_panel.add_child(preview_row)
+	class_preview_symbol = Label.new()
+	class_preview_symbol.custom_minimum_size = Vector2(62, 62)
+	class_preview_symbol.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	class_preview_symbol.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	class_preview_symbol.add_theme_font_size_override("font_size", 42)
+	preview_row.add_child(class_preview_symbol)
+	class_preview_label = Label.new()
+	class_preview_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	class_preview_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	class_preview_label.add_theme_font_size_override("font_size", 12)
+	class_preview_label.add_theme_color_override("font_color", Color(0.87, 0.81, 0.94))
+	preview_row.add_child(class_preview_label)
 
 	path_note_label = Label.new()
 	path_note_label.text = "Your path shapes your legend. Your choices shape the Realm."
@@ -378,6 +419,8 @@ func _build_ui() -> void:
 	dialogue_layout.add_child(dialogue_button)
 
 	_build_mobile_controls()
+	menu_root.resized.connect(_layout_main_menu)
+	_layout_main_menu()
 
 func _build_mobile_controls() -> void:
 	mobile_controls = Control.new()
@@ -456,9 +499,47 @@ func _on_path_selected(index: int) -> void:
 		"Sigilbinder": "Sigil magic • balanced arcana attuned to ancient wards and relics."
 	}
 	path_note_label.text = descriptions.get(PATHS[index], "Your path shapes your legend. Your choices shape the Realm.")
+	if class_preview_label != null:
+		class_preview_label.text = _class_title(PATHS[index]) + "\n" + descriptions.get(PATHS[index], "Your path shapes your legend.")
+	if class_preview_symbol != null:
+		class_preview_symbol.text = _class_symbol(PATHS[index])
+	if class_buttons.size() == PATHS.size():
+		for i in range(class_buttons.size()):
+			var selected := i == index
+			var accent := _class_accent(PATHS[i])
+			var bg := Color(accent.r * 0.30, accent.g * 0.22, accent.b * 0.34, 0.98) if selected else Color(0.045, 0.025, 0.075, 0.98)
+			class_buttons[i].add_theme_stylebox_override("normal", _panel_style(bg, accent if selected else Color(0.26, 0.18, 0.34)))
+			class_buttons[i].add_theme_stylebox_override("hover", _panel_style(Color(0.16, 0.08, 0.22, 0.98), accent))
+
+func _select_class(index: int) -> void:
+	if index < 0 or index >= PATHS.size():
+		return
+	path_select.select(index)
+	_on_path_selected(index)
+
+func _class_symbol(path_name: String) -> String:
+	return {"Ember Mage": "✹", "Frostweaver": "❄", "Verdant Warden": "❧", "Storm Herald": "ϟ", "Voidcaller": "◉", "Sigilbinder": "✧"}.get(path_name, "✧")
+
+func _class_title(path_name: String) -> String:
+	return {"Ember Mage": "KEEPER OF THE LIVING FLAME", "Frostweaver": "WEAVER OF SILENT WINTER", "Verdant Warden": "OATHBOUND TO THE WILD", "Storm Herald": "VOICE OF THE TEMPEST", "Voidcaller": "WALKER BEYOND THE VEIL", "Sigilbinder": "BEARER OF THE ANCIENT SIGILS"}.get(path_name, "YOUR LEGEND BEGINS")
+
+func _class_accent(path_name: String) -> Color:
+	return {"Ember Mage": Color(1.0, 0.31, 0.12), "Frostweaver": Color(0.30, 0.78, 1.0), "Verdant Warden": Color(0.36, 0.88, 0.46), "Storm Herald": Color(0.74, 0.55, 1.0), "Voidcaller": Color(0.83, 0.28, 0.95), "Sigilbinder": Color(1.0, 0.75, 0.35)}.get(path_name, Color(0.75, 0.55, 1.0))
+
+func _layout_main_menu() -> void:
+	if menu_columns == null or menu_margin == null:
+		return
+	var compact := get_viewport().get_visible_rect().size.x < 850.0
+	menu_columns.vertical = compact
+	menu_columns.add_theme_constant_override("separation", 18 if compact else 32)
+	menu_margin.add_theme_constant_override("margin_left", 14 if compact else 42)
+	menu_margin.add_theme_constant_override("margin_right", 14 if compact else 42)
+	menu_margin.add_theme_constant_override("margin_top", 12 if compact else 30)
+	menu_margin.add_theme_constant_override("margin_bottom", 12 if compact else 30)
 
 func _show_menu() -> void:
 	menu_root.visible = true
+	_layout_main_menu()
 	hud_root.visible = false
 	if continue_button != null:
 		continue_button.disabled = not has_save
@@ -615,7 +696,7 @@ func _build_player() -> void:
 		"Voidcaller": Color(0.12, 0.055, 0.2),
 		"Sigilbinder": Color(0.22, 0.12, 0.42)
 	}
-	_add_person_visual(player_visual, path_colors.get(player_path, Color(0.22, 0.12, 0.42)), Color(0.83, 0.75, 0.96), true)
+	_add_person_visual(player_visual, path_colors.get(player_path, Color(0.22, 0.12, 0.42)), Color(0.83, 0.75, 0.96), true, player_path)
 	add_child(player)
 
 	camera_pivot = Node3D.new()
@@ -828,7 +909,7 @@ func _build_person(person_name: String, pos: Vector3, robe_color: Color, glow_co
 	add_child(person)
 	return person
 
-func _add_person_visual(parent: Node3D, robe_color: Color, face_color: Color, is_mage: bool) -> void:
+func _add_person_visual(parent: Node3D, robe_color: Color, face_color: Color, is_mage: bool, path_name: String = "") -> void:
 	# Layered silhouette: broad hem, fitted torso, sleeves, sash and a compact hat.
 	# Keeping the character built from low-poly meshes avoids missing external model imports.
 	var robe := MeshInstance3D.new()
@@ -933,8 +1014,10 @@ func _add_person_visual(parent: Node3D, robe_color: Color, face_color: Color, is
 		band_mesh.outer_radius = 0.245
 		hat_band.mesh = band_mesh
 		hat_band.position.y = 1.91
-		hat_band.material_override = _material(face_color, true)
+		hat_band.material_override = _material(_class_accent(path_name) if path_name != "" else face_color, true)
 		parent.add_child(hat_band)
+		if path_name != "":
+			_add_class_details(parent, path_name)
 	else:
 		# Mathias' shadowed hood and bright eyes give him a distinct battle-mage shape.
 		var hood := MeshInstance3D.new()
@@ -1019,6 +1102,75 @@ func _material(color: Color, glow: bool = false) -> StandardMaterial3D:
 		material.emission = color
 		material.emission_energy_multiplier = 1.4
 	return material
+
+func _add_class_details(parent: Node3D, path_name: String) -> void:
+	var accent := _class_accent(path_name)
+	# Distinct magical focuses and shoulder pieces give each path a readable silhouette.
+	var focus := MeshInstance3D.new()
+	focus.name = "ClassFocus_" + path_name.replace(" ", "")
+	focus.position = Vector3(0.48, 1.02, -0.04)
+	match path_name:
+		"Ember Mage":
+			var flame := SphereMesh.new()
+			flame.radius = 0.22
+			flame.height = 0.58
+			focus.mesh = flame
+			focus.position = Vector3(0.52, 1.05, -0.04)
+			focus.scale = Vector3(0.72, 1.25, 0.72)
+		"Frostweaver":
+			var crystal := PrismMesh.new()
+			crystal.size = Vector3(0.32, 0.62, 0.32)
+			focus.mesh = crystal
+			focus.rotation_degrees = Vector3(0, 0, 28)
+			focus.position = Vector3(0.48, 1.12, -0.04)
+		"Verdant Warden":
+			var leaf := ConeMesh.new()
+			leaf.radius = 0.24
+			leaf.height = 0.72
+			focus.mesh = leaf
+			focus.rotation_degrees = Vector3(0, 0, -34)
+			focus.position = Vector3(0.48, 1.08, -0.04)
+		"Storm Herald":
+			var storm := PrismMesh.new()
+			storm.size = Vector3(0.22, 0.68, 0.22)
+			focus.mesh = storm
+			focus.rotation_degrees = Vector3(0, 0, 24)
+			focus.position = Vector3(0.48, 1.08, -0.04)
+		"Voidcaller":
+			var void_orb := SphereMesh.new()
+			void_orb.radius = 0.22
+			void_orb.height = 0.44
+			focus.mesh = void_orb
+			focus.position = Vector3(0.48, 1.03, -0.04)
+		"Sigilbinder":
+			var sigil := TorusMesh.new()
+			sigil.inner_radius = 0.12
+			sigil.outer_radius = 0.23
+			focus.mesh = sigil
+			focus.position = Vector3(0.48, 1.03, -0.04)
+	focus.material_override = _material(accent, true)
+	parent.add_child(focus)
+
+	var shoulder := MeshInstance3D.new()
+	var shoulder_mesh := SphereMesh.new()
+	shoulder_mesh.radius = 0.24
+	shoulder_mesh.height = 0.32
+	shoulder.mesh = shoulder_mesh
+	shoulder.position = Vector3(-0.34, 1.35, 0.0)
+	shoulder.scale = Vector3(1.0, 0.78, 0.7)
+	shoulder.material_override = _material(accent.darkened(0.22))
+	parent.add_child(shoulder)
+
+	if path_name == "Ember Mage" or path_name == "Storm Herald":
+		var crest := MeshInstance3D.new()
+		var crest_mesh := ConeMesh.new()
+		crest_mesh.radius = 0.17
+		crest_mesh.height = 0.48
+		crest.mesh = crest_mesh
+		crest.position = Vector3(0, 1.91, 0)
+		crest.rotation.z = -0.2 if path_name == "Ember Mage" else 0.2
+		crest.material_override = _material(accent)
+		parent.add_child(crest)
 
 func _make_button(label_text: String, color: Color) -> Button:
 	var button := Button.new()
