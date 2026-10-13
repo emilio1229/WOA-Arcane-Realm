@@ -1274,6 +1274,23 @@ func _choose_question_mathias() -> void:
 	dialogue_hint.text = "Quest started • Mathias now knows you doubt him"
 	_save_game()
 
+func _face_mathias_for_conversation() -> void:
+	# Turn both characters toward one another before the dialogue appears, so the
+	# conversation reads as a shared moment instead of two models facing away.
+	if player == null or mathias == null or not is_instance_valid(mathias):
+		return
+	var toward_mathias := mathias.global_position - player.global_position
+	toward_mathias.y = 0.0
+	if toward_mathias.length_squared() < 0.01:
+		return
+	var toward_player := -toward_mathias
+	var player_yaw := atan2(-toward_mathias.x, -toward_mathias.z)
+	var mathias_yaw := atan2(-toward_player.x, -toward_player.z)
+	yaw = player_yaw
+	var turn_tween := create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	turn_tween.tween_property(player, "rotation:y", player_yaw, 0.28)
+	turn_tween.parallel().tween_property(mathias, "rotation:y", mathias_yaw, 0.28)
+
 func _show_dialogue(title_text: String, body_text: String, hint_text: String) -> void:
 	if dialogue_choice_trust != null:
 		dialogue_choice_trust.visible = false
@@ -1292,6 +1309,13 @@ func _show_dialogue(title_text: String, body_text: String, hint_text: String) ->
 
 func _advance_dialogue() -> void:
 	if not dialogue_open:
+		return
+	# The post-battle conversation offers an explicit trust/doubt choice.
+	# E/click should finish the spoken line without hiding the buttons underneath it.
+	if story_stage == 0 and enemy_nodes.is_empty() and dialogue_choice_trust.visible:
+		dialogue_typing = false
+		dialogue_body.text = dialogue_full_text
+		dialogue_hint.text = "Choose how you answer Mathias"
 		return
 	# A single click finishes the line and advances in the same press.
 	dialogue_typing = false
@@ -1353,6 +1377,7 @@ func _interact() -> void:
 		return
 
 	if story_stage == 0 and _distance_to(mathias) < 4.0:
+		_face_mathias_for_conversation()
 		_show_dialogue("MATHIAS • BATTLE MAGE", "“The first wave is gone, but the ward is still bleeding light. I have served the Council for decades, and I have never seen a seal answer to something outside the Realm. Gather the three Sigils. Dawn, Dusk, Heart—remember their names. They are not keys alone; they are promises the Council made.”", "Choose how you answer Mathias")
 		dialogue_choice_trust.visible = true
 		dialogue_choice_question.visible = true
@@ -1379,6 +1404,7 @@ func _interact() -> void:
 		return
 
 	if _distance_to(mathias) < 4.0:
+		_face_mathias_for_conversation()
 		_show_dialogue("MATHIAS", "“The Sigils remember more than we do. Let the Codex guide your next step.”", "Continue")
 		return
 	_set_status("Nothing answers here. Move closer to Mathias, a Sigil, or the sanctuary gate.")
