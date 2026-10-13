@@ -57,7 +57,7 @@ window/stretch/mode="canvas_items"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/Tripo3d_Godot_Bridge/plugin.cfg", "res://addons/animation_combiner/plugin.cfg", "res://addons/any_audio_manager/plugin.cfg", "res://addons/health_hitbox_hurtbox/plugin.cfg", "res://addons/modular_builder_en/plugin.cfg", "res://addons/ragdoll_generator/plugin.cfg", "res://addons/simplegrasstextured/plugin.cfg", "res://addons/sky_3d/plugin.cfg", "res://addons/terrain_3d/plugin.cfg")
+enabled=PackedStringArray()
 
 [layer_names]
 
