@@ -35,7 +35,9 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path build/windows | Out-Null
-          godot --headless --verbose --path . --export-debug "Windows Desktop" "build/windows/WOA-Arcane-Realm.exe" 2>&1 | Tee-Object -FilePath build/windows/export.log
+          $godotExe = Join-Path $env:USERPROFILE "godot/Godot_v4.7.2-stable_win64.exe"
+          if (!(Test-Path $godotExe)) { $godotExe = (Get-Command godot).Source }
+          & $godotExe --headless --verbose --path . --export-debug "Windows Desktop" "build/windows/WOA-Arcane-Realm.exe" *> build/windows/export.log
           $godotExitCode = $LASTEXITCODE
           if ($godotExitCode -ne 0) {
             Write-Error "Godot export failed with exit code $godotExitCode. Export log follows:"
