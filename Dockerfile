@@ -20,12 +20,16 @@ RUN find . -type f -not -path './.git/*' -exec sh -c 'for f do if head -c 64 "$f
 RUN find . -type f -name '*.mtl' -exec sed -i -E '/^[[:space:]]*map_(Kd|Bump|Ka|Ks)[[:space:]]+T_Trim_(Metal|Furniture|Cloth)_(BaseColor|Normal)\.png[[:space:]]*$/d' {} +
 
 RUN mkdir -p build
+# Verify the addon texture source files are present before Godot starts importing resources.
+RUN test -s addons/simplegrasstextured/images/motion.png \\
+    && test -s addons/simplegrasstextured/images/wind_pattern.png \\
+    && test -s addons/real-controller/HumanAnimations_ColorPalette.png
 # Editor plugins are authoring tools and are not needed to import/export the playable game.
 # Some bundled addons initialize editor-only UI during headless imports and emit script errors
 # (for example empty toolbar-button arrays or missing editor color conversions). Disable only
 # their editor-plugin registration for this container build; runtime autoloads and game assets remain intact.
 RUN sed -i '/^\[editor_plugins\]/,/^\[/ { /^enabled=/s/.*/enabled=PackedStringArray()/; }' project.godot
-RUN set +e; godot --headless --path . --editor --quit > /tmp/godot-import.log 2>&1; result=$?; cat /tmp/godot-import.log; if [ "$result" -ne 0 ]; then echo "GODOT_IMPORT_FAILED exit=$result"; exit "$result"; fi
+RUN set +e; godot --headless --path . --editor --import --quit > /tmp/godot-import.log 2>&1; result=$?; cat /tmp/godot-import.log; if [ "$result" -ne 0 ]; then echo "GODOT_IMPORT_FAILED exit=$result"; exit "$result"; fi
 RUN if grep -E 'SCRIPT ERROR:|Parse Error:' /tmp/godot-import.log; then echo 'Godot asset import reported a script parse/runtime error.'; exit 1; fi
 RUN set +e; godot --headless --path . --quit-after 5 > /tmp/godot-runtime.log 2>&1; result=$?; cat /tmp/godot-runtime.log; if [ "$result" -ne 0 ]; then echo "GODOT_RUNTIME_FAILED exit=$result"; exit "$result"; fi
 RUN if grep -E 'SCRIPT ERROR:|Parse Error:' /tmp/godot-runtime.log; then echo 'Godot runtime smoke test reported a script parse/runtime error.'; exit 1; fi
