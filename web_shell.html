@@ -82,7 +82,7 @@
         // Godot reports one error as several print-error lines. Keep the full
         // sequence visible instead of replacing the root cause with the final
         // "at: instantiate (...)" stack frame.
-        errorBox.textContent = startupErrors.slice(-30).join("\\n");
+        errorBox.textContent = startupErrors.slice(-30).join("\n");
         errorBox.classList.add("visible");
         errorHelp.hidden = false;
         status.textContent = "The Realm could not start";
