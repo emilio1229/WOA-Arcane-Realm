@@ -1107,17 +1107,24 @@ func _build_player() -> void:
 
 ## Spawn a character driven by an imported 3D model, falling back to the
 ## procedural figure if the model is unavailable.
-func _spawn_character(scene_path: String, char_name: String, pos: Vector3, height: float, face_yaw: float) -> Node3D:
+func _spawn_character(_scene_path: String, char_name: String, pos: Vector3, _height: float, face_yaw: float) -> Node3D:
+	# Temporary animated placeholder characters deliberately avoid loading heavy
+	# imported FBX/RES models while the final character assets are being prepared.
 	var root := Node3D.new()
 	root.name = char_name
 	root.position = pos
 	root.rotation.y = face_yaw
-	var vis: CharacterVisual = CharacterVisualScript.new()
-	var modeled := vis.setup(scene_path, height, PI)
-	if modeled:
-		root.add_child(vis)
+	var vis: AnimatedCharacter = AnimatedCharacterScript.new()
+	match char_name:
+		"Mathias":
+			vis.set_tint(Color(0.22, 0.13, 0.34))
+		_:
+			vis.set_tint(Color(0.12, 0.16, 0.23))
+	root.add_child(vis)
+	if vis.setup(root):
 		root.set_meta("visual", vis)
 	else:
+		vis.queue_free()
 		_add_person_visual(root, Color(0.16, 0.11, 0.28), Color(0.8, 0.72, 0.92), true)
 	add_child(root)
 	return root
