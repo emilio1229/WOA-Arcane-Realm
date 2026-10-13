@@ -10,7 +10,7 @@ extends Node3D
 ## gameplay body's movement into the locomotion state machine so idle, walk,
 ## run, jump, fall and landing all play for real.
 
-const RIG_SCENE := "res://addons/real-controller/character.tscn"
+const RIG_SCENE: PackedScene = preload("res://addons/real-controller/character.tscn")
 const PALETTE_TEXTURE := "res://addons/real-controller/HumanAnimations_ColorPalette.png"
 
 var _body: CharacterBody3D
@@ -23,13 +23,10 @@ var _blend := Vector2.ZERO
 var _tint := Color(1, 1, 1, 1)
 
 func setup(body: CharacterBody3D) -> bool:
-	if not ResourceLoader.exists(RIG_SCENE):
-		push_warning("AnimatedCharacter: rig scene missing")
+	# Preload the rig so Godot's Web exporter includes this dynamically-instantiated scene.
+	if RIG_SCENE == null:
 		return false
-	var packed := load(RIG_SCENE) as PackedScene
-	if packed == null:
-		return false
-	var rig := packed.instantiate() as Node3D
+	var rig := RIG_SCENE.instantiate() as Node3D
 	if rig == null:
 		return false
 	_body = body
