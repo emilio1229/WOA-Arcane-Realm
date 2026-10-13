@@ -62,3 +62,8 @@ Railway is currently hosting the public test build. Keep the current public URL 
 The overworld now expands into a seeded 1,200 × 1,200 metre wilderness around the handcrafted starting town and Sigil Sanctuary. Explore four fixed arcane landmarks and enter **The Shifting Hollow** to generate a new winding dungeon layout. The overworld layout seed is saved with story progress. The first procedural pass focuses on exploration geometry and landmarks; biome terrain, combat/loot dungeon rooms, and chunk streaming are planned next.
 
 See [`docs/PROCEDURAL_WORLD_GENERATION.md`](docs/PROCEDURAL_WORLD_GENERATION.md) for the implementation notes and roadmap.
+
+
+## Licensing and third-party notices
+
+WOA: Arcane Realm does not declare a blanket open-source license for its original game code or original content. The Godot Engine license and the third-party add-ons currently present in the repository are documented in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md); each add-on's own license file remains with that component. Asset provenance for the bundled OBJ/texture packs and the redistribution terms of two editor add-ons still require verification, so the repository has not yet been fully cleared for redistribution.
