@@ -21,8 +21,8 @@ RUN find . -type f -name '*.mtl' -exec sed -i -E '/^[[:space:]]*map_(Kd|Bump|Ka|
 
 RUN mkdir -p build
 # Verify the addon texture source files are present before Godot starts importing resources.
-RUN test -s addons/simplegrasstextured/images/motion.png \\
-    && test -s addons/simplegrasstextured/images/wind_pattern.png \\
+RUN test -s addons/simplegrasstextured/images/motion.png \
+    && test -s addons/simplegrasstextured/images/wind_pattern.png \
     && test -s addons/real-controller/HumanAnimations_ColorPalette.png
 # Editor plugins are authoring tools and are not needed to import/export the playable game.
 # Some bundled addons initialize editor-only UI during headless imports and emit script errors
