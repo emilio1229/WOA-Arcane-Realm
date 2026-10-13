@@ -7,6 +7,12 @@ const WizardAppearanceScript := preload("res://world/wizard_appearance.gd")
 const MinimapScript := preload("res://world/minimap.gd")
 const Materials := preload("res://world/gloamwick_materials.gd")
 const PROPS_OBJ := "res://Exports/OBJ/"
+# Keep shader-global textures in the exported Web build; their project.godot references are strings.
+const _WEB_SHADER_TEXTURE_DEPENDENCIES := [
+	preload("res://addons/simplegrasstextured/images/normal.png"),
+	preload("res://addons/simplegrasstextured/images/motion.png"),
+	preload("res://addons/simplegrasstextured/images/wind_pattern.png"),
+]
 
 const MATHIAS_MODEL := "res://Assets/generated/mathias_opt.res"
 const ENEMY_MODEL := "res://TripoModels/stone_golem_3d_model/stone_golem_3d_model.fbx"
