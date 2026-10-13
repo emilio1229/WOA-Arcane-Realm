@@ -65,6 +65,7 @@ enabled=PackedStringArray("res://addons/Tripo3d_Godot_Bridge/plugin.cfg", "res:/
 
 [rendering]
 
+textures/vram_compression/import_etc2_astc=true
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
 lights_and_shadows/directional_shadow/size=1024.0
