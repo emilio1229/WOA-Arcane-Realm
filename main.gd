@@ -622,15 +622,16 @@ func _build_ui() -> void:
 		satchel_icons.append(ic)
 		satchel_keys.append(item_key)
 
-	# --- Loading overlay: shown while a chronicle is assembled. ---
+	# --- Cinematic loading screen: use the project's key art as the realm backdrop. ---
 	loading_root = Control.new()
 	loading_root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	loading_root.visible = false
 	loading_root.mouse_filter = Control.MOUSE_FILTER_STOP
+	loading_root.clip_contents = true
 	ui_layer.add_child(loading_root)
 
 	var lveil := ColorRect.new()
-	lveil.color = Color(0.02, 0.012, 0.05, 1.0)
+	lveil.color = Color(0.015, 0.008, 0.035, 1.0)
 	lveil.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	loading_root.add_child(lveil)
 
@@ -640,55 +641,113 @@ func _build_ui() -> void:
 		lart.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		lart.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		lart.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-		lart.modulate = Color(1, 1, 1, 0.40)
+		lart.modulate = Color(1.0, 0.92, 1.0, 0.78)
+		lart.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		loading_root.add_child(lart)
-		var lveil2 := ColorRect.new()
-		lveil2.color = Color(0.02, 0.01, 0.05, 0.55)
-		lveil2.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		loading_root.add_child(lveil2)
+
+	# Deep violet veil keeps the key art atmospheric while leaving it visible.
+	var lveil2 := ColorRect.new()
+	lveil2.color = Color(0.025, 0.012, 0.055, 0.48)
+	lveil2.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	lveil2.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	loading_root.add_child(lveil2)
+
+	var top_brand := Label.new()
+	top_brand.text = "✧   W I Z A R D S   O F   A R K"
+	top_brand.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	top_brand.offset_left = 42.0
+	top_brand.offset_top = 28.0
+	top_brand.offset_right = -42.0
+	top_brand.offset_bottom = 56.0
+	top_brand.add_theme_font_size_override("font_size", 13)
+	top_brand.add_theme_color_override("font_color", Color(0.82, 0.67, 1.0, 0.95))
+	top_brand.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	loading_root.add_child(top_brand)
 
 	var lcenter := CenterContainer.new()
 	lcenter.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	lcenter.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	loading_root.add_child(lcenter)
 
+	var lpanel := PanelContainer.new()
+	lpanel.custom_minimum_size = Vector2(620, 0)
+	lpanel.add_theme_stylebox_override("panel", _panel_style(Color(0.025, 0.012, 0.055, 0.82), Color(0.52, 0.34, 0.72, 0.78)))
+	lcenter.add_child(lpanel)
+
 	var lcol := VBoxContainer.new()
-	lcol.add_theme_constant_override("separation", 14)
+	lcol.add_theme_constant_override("separation", 12)
 	lcol.alignment = BoxContainer.ALIGNMENT_CENTER
-	lcenter.add_child(lcol)
+	lcol.custom_minimum_size = Vector2(560, 0)
+	lpanel.add_child(lcol)
 
 	loading_spinner = Label.new()
 	loading_spinner.text = "✧"
 	loading_spinner.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	loading_spinner.add_theme_font_size_override("font_size", 60)
-	loading_spinner.add_theme_color_override("font_color", Color(0.82, 0.58, 1.0))
+	loading_spinner.add_theme_font_size_override("font_size", 52)
+	loading_spinner.add_theme_color_override("font_color", Color(0.84, 0.64, 1.0))
 	lcol.add_child(loading_spinner)
 
 	var ltitle := Label.new()
-	ltitle.text = "ENTERING GLOAMWICK"
+	ltitle.text = "ARCANE REALM"
 	ltitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	ltitle.add_theme_font_size_override("font_size", 26)
-	ltitle.add_theme_color_override("font_color", Color(0.94, 0.84, 1.0))
+	ltitle.add_theme_font_size_override("font_size", 42)
+	ltitle.add_theme_color_override("font_color", Color(0.97, 0.91, 1.0))
+	ltitle.add_theme_constant_override("outline_size", 2)
+	ltitle.add_theme_color_override("font_outline_color", Color(0.08, 0.025, 0.12, 0.9))
 	lcol.add_child(ltitle)
+
+	var lsubtitle := Label.new()
+	lsubtitle.text = "CHRONICLES OF THE HOLLOW CROWN"
+	lsubtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lsubtitle.add_theme_font_size_override("font_size", 12)
+	lsubtitle.add_theme_color_override("font_color", Color(0.77, 0.63, 0.91))
+	lcol.add_child(lsubtitle)
+
+	var ldivider_wrap := CenterContainer.new()
+	lcol.add_child(ldivider_wrap)
+	var ldivider := ColorRect.new()
+	ldivider.custom_minimum_size = Vector2(150, 2)
+	ldivider.color = Color(0.66, 0.42, 0.92, 0.9)
+	ldivider_wrap.add_child(ldivider)
+
+	var lchapter := Label.new()
+	lchapter.text = "CHAPTER I   •   THE BELLS OF GLOAMWICK"
+	lchapter.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lchapter.add_theme_font_size_override("font_size", 13)
+	lchapter.add_theme_color_override("font_color", Color(0.92, 0.83, 1.0))
+	lcol.add_child(lchapter)
 
 	var lbar_wrap := CenterContainer.new()
 	lcol.add_child(lbar_wrap)
 	loading_bar = ProgressBar.new()
-	loading_bar.custom_minimum_size = Vector2(360, 14)
+	loading_bar.custom_minimum_size = Vector2(500, 12)
 	loading_bar.min_value = 0.0
 	loading_bar.max_value = 100.0
 	loading_bar.value = 0.0
 	loading_bar.show_percentage = false
-	loading_bar.add_theme_stylebox_override("background", _panel_style(Color(0.06, 0.035, 0.10), Color(0.30, 0.18, 0.44)))
-	loading_bar.add_theme_stylebox_override("fill", _panel_style(Color(0.48, 0.26, 0.72), Color(0.72, 0.5, 1.0)))
+	loading_bar.add_theme_stylebox_override("background", _panel_style(Color(0.055, 0.025, 0.09, 0.95), Color(0.28, 0.17, 0.4, 0.9)))
+	loading_bar.add_theme_stylebox_override("fill", _panel_style(Color(0.54, 0.3, 0.78, 1.0), Color(0.83, 0.63, 1.0, 1.0)))
 	lbar_wrap.add_child(loading_bar)
 
 	loading_status = Label.new()
-	loading_status.text = "Chapter I  •  The Bells of Gloamwick"
+	loading_status.text = "Awakening the wards…"
 	loading_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	loading_status.add_theme_font_size_override("font_size", 13)
-	loading_status.add_theme_color_override("font_color", Color(0.72, 0.64, 0.81))
+	loading_status.add_theme_color_override("font_color", Color(0.79, 0.72, 0.88))
 	lcol.add_child(loading_status)
 
+	var lfooter := Label.new()
+	lfooter.text = "THE REALM REMEMBERS EVERY CHOICE"
+	lfooter.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	lfooter.offset_left = 32.0
+	lfooter.offset_top = -48.0
+	lfooter.offset_right = -32.0
+	lfooter.offset_bottom = -22.0
+	lfooter.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lfooter.add_theme_font_size_override("font_size", 10)
+	lfooter.add_theme_color_override("font_color", Color(0.72, 0.62, 0.83, 0.9))
+	lfooter.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	loading_root.add_child(lfooter)
 func _on_path_selected(index: int) -> void:
 	if path_note_label == null or index < 0 or index >= PATHS.size():
 		return
