@@ -1,175 +1,180 @@
 class_name AnimatedCharacter
 extends Node3D
 
-## Drives the rigged humanoid from the "real-controller" addon (56 bones, 24
-## locomotion clips) as a drop-in animated visual for any CharacterBody3D.
-##
-## The addon ships character.tscn as a complete controller with its own script,
-## collision and third-person camera. We keep only the rigged mesh + its
-## AnimationPlayer / AnimationTree, strip the rest, and feed the existing
-## gameplay body's movement into the locomotion state machine so idle, walk,
-## run, jump, fall and landing all play for real.
+## Lightweight procedural placeholder humanoid. Keeps the game playable while
+## final character assets are unavailable: idle sway, walk/run cycles, jump bob,
+## a simple attack motion, and named head/hand attachment points for wizard gear.
+## No imported rig, FBX, textures, or animation resources are required.
 
-const RIG_SCENE: PackedScene = preload("res://addons/real-controller/character.tscn")
-const PALETTE_TEXTURE := "res://addons/real-controller/HumanAnimations_ColorPalette.png"
-
-var _body: CharacterBody3D
-var _anim_tree: AnimationTree
-var _anim_player: AnimationPlayer
+var _body: Node3D
 var _rig: Node3D
-var _skeleton: Skeleton3D
+var _head_anchor: Node3D
+var _hand_anchor: Node3D
+var _left_arm: Node3D
+var _right_arm: Node3D
+var _left_leg: Node3D
+var _right_leg: Node3D
+var _torso: MeshInstance3D
 var _active := false
+var _tint := Color(0.25, 0.14, 0.42)
+var _phase := 0.0
 var _blend := Vector2.ZERO
-var _tint := Color(1, 1, 1, 1)
+var _moving := false
+var _sprinting := false
+var _attacking := 0.0
 
-func setup(body: CharacterBody3D) -> bool:
-	# Preload the rig so Godot's Web exporter includes this dynamically-instantiated scene.
-	if RIG_SCENE == null:
-		return false
-	var rig := RIG_SCENE.instantiate() as Node3D
-	if rig == null:
-		return false
+func setup(body: Node3D) -> bool:
 	_body = body
+	_rig = Node3D.new()
+	_rig.name = "PlaceholderHumanoid"
+	add_child(_rig)
 
-	# Strip the addon's own controller: its script, any child scripts (the addon
-	# attaches animation.gd which expects its own controller API), its collision
-	# (the gameplay body already has one) and its camera (main.gd owns the camera).
-	_strip_scripts(rig)
-	for extra in ["CameraPivot", "CollisionShape3D"]:
-		var node := rig.get_node_or_null(extra)
-		if node != null:
-			node.queue_free()
-	if rig is CollisionObject3D:
-		(rig as CollisionObject3D).collision_layer = 0
-		(rig as CollisionObject3D).collision_mask = 0
+	var robe_color := _tint
+	var robe := _material(robe_color)
+	var trim := _material(Color(0.72, 0.53, 0.96))
+	var skin := _material(Color(0.72, 0.52, 0.39))
+	var dark := _material(Color(0.12, 0.08, 0.19))
 
-	_anim_tree = rig.get_node_or_null("AnimationTree") as AnimationTree
-	_anim_player = rig.get_node_or_null("AnimationPlayer") as AnimationPlayer
-	if _anim_tree == null or _anim_player == null:
-		rig.queue_free()
-		return false
+	_torso = _mesh_capsule("RobedBody", 0.36, 0.92, robe, Vector3(0, 1.02, 0))
+	_rig.add_child(_torso)
+	_add_sphere("Shoulders", Vector3(0, 1.42, 0), Vector3(0.48, 0.22, 0.28), trim)
+	_add_sphere("Face", Vector3(0, 1.77, 0), Vector3(0.22, 0.25, 0.22), skin)
+	_head_anchor = Node3D.new()
+	_head_anchor.name = "Head"
+	_head_anchor.position = Vector3(0, 1.91, 0)
+	_rig.add_child(_head_anchor)
 
-	add_child(rig)
-	# The addon ships the mesh sunk 0.8 m into the body and tinted flat orange;
-	# stand it on the origin and let the texture show through untinted.
-	_rig = rig
-	_skeleton = _find_skeleton(rig)
-	var aabb := _local_aabb(rig, Transform3D.IDENTITY)
-	var centre := aabb.get_center()
-	rig.position = Vector3(-centre.x, -aabb.position.y, -centre.z)
-	_tune_materials(rig)
-	# The state machine decides jump/fall/land from an "advance expression" that
-	# reads is_on_floor() and velocity. Point it at the real, simulated body.
-	if body.is_inside_tree():
-		_anim_tree.advance_expression_base_node = _anim_tree.get_path_to(body)
-	_anim_tree.active = true
-	_anim_player.play(&"idle")
+	_left_arm = _make_limb("LeftSleeve", Vector3(-0.43, 1.25, 0), robe)
+	_right_arm = _make_limb("RightSleeve", Vector3(0.43, 1.25, 0), robe)
+	_left_leg = _make_limb("LeftHem", Vector3(-0.18, 0.42, 0), dark)
+	_right_leg = _make_limb("RightHem", Vector3(0.18, 0.42, 0), dark)
+
+	_hand_anchor = Node3D.new()
+	_hand_anchor.name = "B-handProp.R"
+	_hand_anchor.position = Vector3(0.52, 1.12, 0)
+	_rig.add_child(_hand_anchor)
+
+	# A small luminous sigil on the chest makes the temporary models readable.
+	var sigil := _mesh_sphere("ChestSigil", Vector3(0, 1.18, -0.285), Vector3(0.09, 0.09, 0.045), _material(Color(0.48, 0.83, 1.0), true))
+	_rig.add_child(sigil)
 	_active = true
 	return true
 
-func _local_aabb(node: Node, acc: Transform3D) -> AABB:
-	var result := AABB()
-	var first := true
-	var xf := acc
-	if node is Node3D and node != self:
-		xf = acc * (node as Node3D).transform
-	if node is MeshInstance3D and (node as MeshInstance3D).mesh != null:
-		result = xf * (node as MeshInstance3D).mesh.get_aabb()
-		first = false
-	for child in node.get_children():
-		var child_box := _local_aabb(child, xf)
-		if child_box.size == Vector3.ZERO and child_box.position == Vector3.ZERO:
-			continue
-		result = child_box if first else result.merge(child_box)
-		first = false
-	return result
+func _material(color: Color, emission := false) -> StandardMaterial3D:
+	var mat := StandardMaterial3D.new()
+	mat.albedo_color = color
+	mat.roughness = 0.78
+	if emission:
+		mat.emission_enabled = true
+		mat.emission = color
+		mat.emission_energy_multiplier = 1.4
+	return mat
 
-## The addon attaches an ORANGE material override that hides the mesh's own
-## baked colour. Drop the override so the character's real vertex-coloured skin
-## and clothing show through.
-func _tune_materials(node: Node) -> void:
-	if node is MeshInstance3D and (node as MeshInstance3D).mesh != null:
-		var mi := node as MeshInstance3D
-		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
-		# The mesh ships a baked body colour we cannot override through its own
-		# material, so give the body a fresh override driven by the creator's tone.
-		var body_mat := StandardMaterial3D.new()
-		body_mat.albedo_color = _tint
-		body_mat.roughness = 0.85
-		mi.material_override = body_mat
-	for child in node.get_children():
-		_tune_materials(child)
+func _mesh_capsule(label: String, radius: float, height: float, material: Material, pos: Vector3) -> MeshInstance3D:
+	var node := MeshInstance3D.new()
+	node.name = label
+	var mesh := CapsuleMesh.new()
+	mesh.radius = radius
+	mesh.height = height
+	node.mesh = mesh
+	node.material_override = material
+	node.position = pos
+	return node
 
-## Recolour the character (used by the character creator).
+func _mesh_sphere(label: String, pos: Vector3, scale_value: Vector3, material: Material) -> MeshInstance3D:
+	var node := MeshInstance3D.new()
+	node.name = label
+	var mesh := SphereMesh.new()
+	mesh.radius = 0.5
+	mesh.height = 1.0
+	node.mesh = mesh
+	node.material_override = material
+	node.position = pos
+	node.scale = scale_value * 2.0
+	return node
+
+func _add_sphere(label: String, pos: Vector3, scale_value: Vector3, material: Material) -> void:
+	_rig.add_child(_mesh_sphere(label, pos, scale_value, material))
+
+func _make_limb(label: String, pos: Vector3, material: Material) -> Node3D:
+	var pivot := Node3D.new()
+	pivot.name = label
+	pivot.position = pos
+	var limb := _mesh_capsule("Shape", 0.115, 0.66, material, Vector3(0, -0.22, 0))
+	pivot.add_child(limb)
+	_rig.add_child(pivot)
+	return pivot
+
 func set_tint(color: Color) -> void:
 	_tint = color
-	if _rig != null:
-		_tune_materials(_rig)
+	if _torso != null and is_instance_valid(_torso):
+		_torso.material_override = _material(color)
+	for node in [_left_arm, _right_arm]:
+		if node != null:
+			var shape := node.get_node_or_null("Shape") as MeshInstance3D
+			if shape != null:
+				shape.material_override = _material(color)
 
-func _find_skeleton(node: Node) -> Skeleton3D:
-	if node is Skeleton3D:
-		return node as Skeleton3D
-	for child in node.get_children():
-		var found := _find_skeleton(child)
-		if found != null:
-			return found
-	return null
-
-## Parent a prop to a bone (e.g. a staff in the hand). Returns false if the rig
-## has no such bone.
 func attach_to_bone(bone_name: String, node: Node3D, offset := Vector3.ZERO) -> bool:
-	if _skeleton == null or _skeleton.find_bone(bone_name) < 0:
+	var anchor: Node3D
+	if bone_name == "Head":
+		anchor = _head_anchor
+	elif bone_name == "B-handProp.R":
+		anchor = _hand_anchor
+	else:
 		return false
-	var attachment := BoneAttachment3D.new()
-	attachment.bone_name = bone_name
-	_skeleton.add_child(attachment)
+	if anchor == null:
+		return false
 	node.position = offset
-	attachment.add_child(node)
+	anchor.add_child(node)
 	return true
 
-## Preview helper: freeze the locomotion state machine on a plain idle loop.
 func use_simple_idle() -> void:
-	if _anim_tree != null:
-		_anim_tree.active = false
-	if _anim_player != null:
-		_anim_player.play(&"idle")
+	_moving = false
+	_sprinting = false
 
-## Feed the player's movement each physics frame.
-## input_dir: raw WASD vector (x = right, y = back). walking/sprinting pick the
-## clip set; delta smooths the blend so direction changes are not jerky.
 func set_locomotion(input_dir: Vector2, walking: bool, sprinting: bool, delta: float) -> void:
-	if not _active or _anim_tree == null:
+	if not _active:
 		return
-	var target := Vector2(clampf(input_dir.x, -1.0, 1.0), clampf(-input_dir.y, -1.0, 1.0))
-	if target.length() > 1.0:
-		target = target.normalized()
-	_blend = _blend.lerp(target, clampf(delta * 10.0, 0.0, 1.0))
-	_anim_tree.set("parameters/Locomotion/WalkBlend/blend_position", _blend)
-	_anim_tree.set("parameters/Locomotion/RunBlend/blend_position", _blend)
-	_anim_tree.set("parameters/Locomotion/SprintBlend/blend_position", _blend)
-	var walk_run_target := 1.0 if not walking else 0.0
-	_anim_tree.set("parameters/Locomotion/WalkRunBlend/blend_amount", walk_run_target)
-	_anim_tree.set("parameters/Locomotion/SpeedBlend/blend_amount", 1.0 if sprinting else 0.0)
+	_blend = input_dir
+	_moving = input_dir.length_squared() > 0.015
+	_sprinting = sprinting or not walking
 
-## Play a one-shot animation from the rig's library, if present (used for
-## reactions/attacks). Falls back silently when the clip does not exist.
-func play_once(clip: StringName, blend: float = 0.15) -> bool:
-	if not _active or _anim_player == null:
+func play_once(clip: StringName, _blend_time: float = 0.15) -> bool:
+	if not _active:
 		return false
-	if not _anim_player.has_animation(clip):
-		return false
-	_anim_player.play(clip, blend)
-	return true
+	if String(clip).to_lower().contains("attack") or String(clip).to_lower().contains("cast"):
+		_attacking = 0.55
+		return true
+	return String(clip) == "idle" or String(clip).contains("walk") or String(clip).contains("run")
+
+func attack() -> void:
+	_attacking = 0.55
 
 func is_ready() -> bool:
 	return _active
 
-## Remove every script under the rig, so the addon's own controller code cannot
-## run and error against our gameplay node (it expects a different API).
-func _strip_scripts(node: Node) -> void:
-	for child in node.get_children():
-		_strip_scripts(child)
-	if node is AnimationPlayer or node is AnimationTree:
+func _process(delta: float) -> void:
+	if not _active:
 		return
-	if node.get_script() != null:
-		node.set_script(null)
+	_phase += delta * (9.5 if _moving and _sprinting else (6.5 if _moving else 1.8))
+	_attacking = maxf(0.0, _attacking - delta)
+	var stride := sin(_phase) * (0.52 if _moving else 0.035)
+	if _left_leg != null:
+		_left_leg.rotation.x = stride
+	if _right_leg != null:
+		_right_leg.rotation.x = -stride
+	if _left_arm != null:
+		_left_arm.rotation.x = -stride * 0.7
+	if _right_arm != null:
+		_right_arm.rotation.x = stride * 0.7 - (_attacking * 1.8)
+	if _rig != null:
+		_rig.position.y = absf(sin(_phase * 2.0)) * (0.07 if _moving else 0.015)
+		_rig.rotation.z = sin(_phase) * (0.025 if _moving else 0.008)
+		if _attacking > 0.0:
+			_rig.rotation.y = sin(_attacking * 8.0) * 0.12
+		else:
+			_rig.rotation.y = 0.0
+
+func is_ready_unused() -> bool:
+	return _active
