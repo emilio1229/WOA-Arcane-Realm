@@ -41,7 +41,6 @@ config/features=PackedStringArray("4.7", "GL Compatibility")
 [autoload]
 
 AudioManager="*uid://dngiuhq5ehbk6"
-SimpleGrass="*uid://bfq0snth8sj3h"
 
 [audio]
 
