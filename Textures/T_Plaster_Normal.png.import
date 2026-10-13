@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bnavp4r1xcnbn"
-path.s3tc="res://.godot/imported/T_Plaster_Normal.png-acb7c1eb07f0882b14e286c97b8586ad.s3tc.ctex"
+path.s3tc="res://.godot/imported/T_Plaster_Normal.png-bcfc9e5a165c0cb6e7daeb399080ef48.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://textures/T_Plaster_Normal.png"
-dest_files=["res://.godot/imported/T_Plaster_Normal.png-acb7c1eb07f0882b14e286c97b8586ad.s3tc.ctex"]
+source_file="res://Textures/T_Plaster_Normal.png"
+dest_files=["res://.godot/imported/T_Plaster_Normal.png-bcfc9e5a165c0cb6e7daeb399080ef48.s3tc.ctex"]
 
 [params]
 

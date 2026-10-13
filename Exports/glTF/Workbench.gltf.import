@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://culfypd221lcg"
-path="res://.godot/imported/Workbench.gltf-46550d8709cc5680378b4708f9b40840.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Workbench.gltf"
-dest_files=["res://.godot/imported/Workbench.gltf-46550d8709cc5680378b4708f9b40840.scn"]
 
 [params]
 

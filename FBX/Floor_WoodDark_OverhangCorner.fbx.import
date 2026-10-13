@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://p1rrsjdyx8nn"
-path="res://.godot/imported/Floor_WoodDark_OverhangCorner.fbx-aa0d3c00e9d087f61fda481fcf0ae73d.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Floor_WoodDark_OverhangCorner.fbx"
-dest_files=["res://.godot/imported/Floor_WoodDark_OverhangCorner.fbx-aa0d3c00e9d087f61fda481fcf0ae73d.scn"]
 
 [params]
 

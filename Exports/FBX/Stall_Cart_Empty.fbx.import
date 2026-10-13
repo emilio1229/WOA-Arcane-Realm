@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dkofi7m4eghtn"
-path="res://.godot/imported/Stall_Cart_Empty.fbx-a5ef37a5bc531c5b3658bf9d3ce02f3f.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Stall_Cart_Empty.fbx"
-dest_files=["res://.godot/imported/Stall_Cart_Empty.fbx-a5ef37a5bc531c5b3658bf9d3ce02f3f.scn"]
 
 [params]
 

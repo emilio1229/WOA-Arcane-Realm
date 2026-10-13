@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://5rih0sp6terj"
-path="res://.godot/imported/Corner_Exterior_Wood.gltf-89226328b0c563e1d80d804a719fa0db.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Corner_Exterior_Wood.gltf"
-dest_files=["res://.godot/imported/Corner_Exterior_Wood.gltf-89226328b0c563e1d80d804a719fa0db.scn"]
 
 [params]
 

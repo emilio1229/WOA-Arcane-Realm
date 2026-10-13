@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dagsq5jtqvpgl"
-path="res://.godot/imported/Floor_RedBrick.gltf-5d3d0f4456cb45813c8d25d4d4c5c83d.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Floor_RedBrick.gltf"
-dest_files=["res://.godot/imported/Floor_RedBrick.gltf-5d3d0f4456cb45813c8d25d4d4c5c83d.scn"]
 
 [params]
 

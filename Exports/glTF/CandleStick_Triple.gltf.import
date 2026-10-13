@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://cp7lbbtjt7hra"
-path="res://.godot/imported/CandleStick_Triple.gltf-ab9e4f7fd062991f309466d38bfdc2f8.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/CandleStick_Triple.gltf"
-dest_files=["res://.godot/imported/CandleStick_Triple.gltf-ab9e4f7fd062991f309466d38bfdc2f8.scn"]
 
 [params]
 

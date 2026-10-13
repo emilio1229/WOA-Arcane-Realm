@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://wj7i3v75n58h"
-path="res://.godot/imported/Wall_UnevenBrick_Window_Wide_Round.fbx-b26c6f1cf2216e0f460fe1dd8ba3b9a1.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Wall_UnevenBrick_Window_Wide_Round.fbx"
-dest_files=["res://.godot/imported/Wall_UnevenBrick_Window_Wide_Round.fbx-b26c6f1cf2216e0f460fe1dd8ba3b9a1.scn"]
 
 [params]
 

@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://br8kwfoju5f1o"
-path="res://.godot/imported/haunted_forest_spirit_3d_model.fbx-4c26de06d76f59f0102a6a9acd46355c.scn"
+valid=false
 
 [deps]
 
 source_file="res://TripoModels/haunted_forest_spirit_3d_model/haunted_forest_spirit_3d_model.fbx"
-dest_files=["res://.godot/imported/haunted_forest_spirit_3d_model.fbx-4c26de06d76f59f0102a6a9acd46355c.scn"]
 
 [params]
 

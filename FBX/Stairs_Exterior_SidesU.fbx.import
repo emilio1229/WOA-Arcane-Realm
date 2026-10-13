@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dmgg4ak3puhfm"
-path="res://.godot/imported/Stairs_Exterior_SidesU.fbx-ae658ddbbf26bd5abdd0a36ddac00c38.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Stairs_Exterior_SidesU.fbx"
-dest_files=["res://.godot/imported/Stairs_Exterior_SidesU.fbx-ae658ddbbf26bd5abdd0a36ddac00c38.scn"]
 
 [params]
 

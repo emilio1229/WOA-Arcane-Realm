@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://csh3w6g3fpub6"
-path="res://.godot/imported/WindowShutters_Thin_Round_Closed.gltf-4eb9a0b876856adbd121f9d69b2fd38a.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/WindowShutters_Thin_Round_Closed.gltf"
-dest_files=["res://.godot/imported/WindowShutters_Thin_Round_Closed.gltf-4eb9a0b876856adbd121f9d69b2fd38a.scn"]
 
 [params]
 

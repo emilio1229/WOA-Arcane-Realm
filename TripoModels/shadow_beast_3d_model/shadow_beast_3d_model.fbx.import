@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://ddlbdih6cb84l"
-path="res://.godot/imported/shadow_beast_3d_model.fbx-e7db4b9a47c43490bdf0c7f0ee8a57d4.scn"
+valid=false
 
 [deps]
 
 source_file="res://TripoModels/shadow_beast_3d_model/shadow_beast_3d_model.fbx"
-dest_files=["res://.godot/imported/shadow_beast_3d_model.fbx-e7db4b9a47c43490bdf0c7f0ee8a57d4.scn"]
 
 [params]
 

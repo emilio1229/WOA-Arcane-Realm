@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://pqwmw4u07o36"
-path="res://.godot/imported/Overhang_Side_UnevenBrick_Long_L.gltf-eca72eccee9975d293c4a7dad4ab106d.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Overhang_Side_UnevenBrick_Long_L.gltf"
-dest_files=["res://.godot/imported/Overhang_Side_UnevenBrick_Long_L.gltf-eca72eccee9975d293c4a7dad4ab106d.scn"]
 
 [params]
 

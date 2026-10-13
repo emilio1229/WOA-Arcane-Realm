@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bk3mb03qv1lvb"
-path="res://.godot/imported/Sword_Bronze.fbx-57d3ebc2b8f3790e3ed7df803d58a38e.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Sword_Bronze.fbx"
-dest_files=["res://.godot/imported/Sword_Bronze.fbx-57d3ebc2b8f3790e3ed7df803d58a38e.scn"]
 
 [params]
 

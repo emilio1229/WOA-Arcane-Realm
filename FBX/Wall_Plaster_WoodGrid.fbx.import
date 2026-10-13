@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://larnfpkjs7co"
-path="res://.godot/imported/Wall_Plaster_WoodGrid.fbx-0f525cefdf0e6489120d0db1e8ac84da.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Wall_Plaster_WoodGrid.fbx"
-dest_files=["res://.godot/imported/Wall_Plaster_WoodGrid.fbx-0f525cefdf0e6489120d0db1e8ac84da.scn"]
 
 [params]
 

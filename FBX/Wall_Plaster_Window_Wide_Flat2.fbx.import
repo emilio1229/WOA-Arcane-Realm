@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://denbxmh3n327v"
-path="res://.godot/imported/Wall_Plaster_Window_Wide_Flat2.fbx-a8b22a6867c67c20391967bd200e5972.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Wall_Plaster_Window_Wide_Flat2.fbx"
-dest_files=["res://.godot/imported/Wall_Plaster_Window_Wide_Flat2.fbx-a8b22a6867c67c20391967bd200e5972.scn"]
 
 [params]
 

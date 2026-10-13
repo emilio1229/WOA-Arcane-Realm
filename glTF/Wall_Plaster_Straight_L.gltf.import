@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://drqxo34gavr8j"
-path="res://.godot/imported/Wall_Plaster_Straight_L.gltf-7947331d3f2a4704f11857e0f5eb9735.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Wall_Plaster_Straight_L.gltf"
-dest_files=["res://.godot/imported/Wall_Plaster_Straight_L.gltf-7947331d3f2a4704f11857e0f5eb9735.scn"]
 
 [params]
 

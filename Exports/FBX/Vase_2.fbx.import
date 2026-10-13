@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bskl5smt0onwp"
-path="res://.godot/imported/Vase_2.fbx-9fdf5501513291983f72268feab9ea41.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Vase_2.fbx"
-dest_files=["res://.godot/imported/Vase_2.fbx-9fdf5501513291983f72268feab9ea41.scn"]
 
 [params]
 

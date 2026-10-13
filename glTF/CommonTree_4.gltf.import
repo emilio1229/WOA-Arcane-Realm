@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://c52f548cwbhpw"
-path="res://.godot/imported/CommonTree_4.gltf-2b05b6e7a10a0f6231fd27acfcdcdcbf.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/CommonTree_4.gltf"
-dest_files=["res://.godot/imported/CommonTree_4.gltf-2b05b6e7a10a0f6231fd27acfcdcdcbf.scn"]
 
 [params]
 

@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://2i3juja0ldk7"
-path="res://.godot/imported/Carrot.fbx-1b0cfc5e2507c505294c428327e5c258.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Carrot.fbx"
-dest_files=["res://.godot/imported/Carrot.fbx-1b0cfc5e2507c505294c428327e5c258.scn"]
 
 [params]
 

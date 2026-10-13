@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bhub77wm68hjt"
-path.s3tc="res://.godot/imported/T_RoundTiles_BaseColor.png-5ac8d2aa12eb2586c37f3a9051b3b9da.s3tc.ctex"
+path.s3tc="res://.godot/imported/T_RoundTiles_BaseColor.png-36f18b6ce23970891f746e481bce7180.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://textures/T_RoundTiles_BaseColor.png"
-dest_files=["res://.godot/imported/T_RoundTiles_BaseColor.png-5ac8d2aa12eb2586c37f3a9051b3b9da.s3tc.ctex"]
+source_file="res://Textures/T_RoundTiles_BaseColor.png"
+dest_files=["res://.godot/imported/T_RoundTiles_BaseColor.png-36f18b6ce23970891f746e481bce7180.s3tc.ctex"]
 
 [params]
 

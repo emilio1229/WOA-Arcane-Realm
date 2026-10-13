@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://btgob664difep"
-path="res://.godot/imported/Whetstone.fbx-754f4540ebe48abefec284b5e811f623.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Whetstone.fbx"
-dest_files=["res://.godot/imported/Whetstone.fbx-754f4540ebe48abefec284b5e811f623.scn"]
 
 [params]
 

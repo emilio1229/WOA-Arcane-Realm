@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://twewprdgr6wy"
-path="res://.godot/imported/Table_Large.fbx-7f48c55b1faddd36129d7459eddec6e8.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Table_Large.fbx"
-dest_files=["res://.godot/imported/Table_Large.fbx-7f48c55b1faddd36129d7459eddec6e8.scn"]
 
 [params]
 

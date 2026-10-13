@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://cvng3oh6crsqx"
-path="res://.godot/imported/Table_Fork.gltf-5634bd54ef8edf77063429b3f0b6acf4.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Table_Fork.gltf"
-dest_files=["res://.godot/imported/Table_Fork.gltf-5634bd54ef8edf77063429b3f0b6acf4.scn"]
 
 [params]
 

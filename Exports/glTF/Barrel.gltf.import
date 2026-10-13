@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://mqvy518sn1nx"
-path="res://.godot/imported/Barrel.gltf-a954560660f1dac1cd254f06116f492c.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Barrel.gltf"
-dest_files=["res://.godot/imported/Barrel.gltf-a954560660f1dac1cd254f06116f492c.scn"]
 
 [params]
 

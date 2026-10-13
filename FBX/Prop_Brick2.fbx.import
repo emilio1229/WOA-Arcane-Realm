@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dwuskstwcbqqk"
-path="res://.godot/imported/Prop_Brick2.fbx-a610d8d89e040c9d587769531027e747.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Prop_Brick2.fbx"
-dest_files=["res://.godot/imported/Prop_Brick2.fbx-a610d8d89e040c9d587769531027e747.scn"]
 
 [params]
 

@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dd4yehrkaoyc2"
-path="res://.godot/imported/HoleCover_StraightHalf.gltf-9a44cb67127167fe89224beebe2915ca.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/HoleCover_StraightHalf.gltf"
-dest_files=["res://.godot/imported/HoleCover_StraightHalf.gltf-9a44cb67127167fe89224beebe2915ca.scn"]
 
 [params]
 

@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://c72s2bad3lb43"
-path="res://.godot/imported/FarmCrate_Carrot.fbx-d1836dcdd33f7ecb4a686d31d8afc583.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/FarmCrate_Carrot.fbx"
-dest_files=["res://.godot/imported/FarmCrate_Carrot.fbx-d1836dcdd33f7ecb4a686d31d8afc583.scn"]
 
 [params]
 

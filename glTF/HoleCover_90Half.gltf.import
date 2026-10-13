@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://b1mjkx5bmww7f"
-path="res://.godot/imported/HoleCover_90Half.gltf-0e834b9a1383285e420dd16756d6ac60.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/HoleCover_90Half.gltf"
-dest_files=["res://.godot/imported/HoleCover_90Half.gltf-0e834b9a1383285e420dd16756d6ac60.scn"]
 
 [params]
 

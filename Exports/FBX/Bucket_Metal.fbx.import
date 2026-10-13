@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://j8hqgqllftaf"
-path="res://.godot/imported/Bucket_Metal.fbx-5f920db5b39ce952d98772997cbaf322.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Bucket_Metal.fbx"
-dest_files=["res://.godot/imported/Bucket_Metal.fbx-5f920db5b39ce952d98772997cbaf322.scn"]
 
 [params]
 

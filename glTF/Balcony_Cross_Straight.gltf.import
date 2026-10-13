@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://chk00njq3i0wj"
-path="res://.godot/imported/Balcony_Cross_Straight.gltf-326e16eee740eda58d648412d0c2ba14.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Balcony_Cross_Straight.gltf"
-dest_files=["res://.godot/imported/Balcony_Cross_Straight.gltf-326e16eee740eda58d648412d0c2ba14.scn"]
 
 [params]
 

@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://d35mqudrvv012"
-path="res://.godot/imported/Roof_Wooden_2x1_Center_Mirror.fbx-1d4619eb9e2a220afe1c8f37f3550ccf.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Roof_Wooden_2x1_Center_Mirror.fbx"
-dest_files=["res://.godot/imported/Roof_Wooden_2x1_Center_Mirror.fbx-1d4619eb9e2a220afe1c8f37f3550ccf.scn"]
 
 [params]
 

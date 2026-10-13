@@ -1,0 +1,198 @@
+[gd_scene format=3 uid="uid://bhqjr5fnvh3kv"]
+
+[ext_resource type="Script" uid="uid://b642tr2ufctdt" path="res://addons/animation_combiner/animation_combiner_dock.gd" id="1_animation_combiner"]
+
+[sub_resource type="DPITexture" id="DPITexture_ng3op"]
+_source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\"><path fill=\"#ff5d5d\" d=\"M2 1v8.586l1.293-1.293a1 1 0 0 1 1.414 0L7 10.587l2.293-2.293a1 1 0 0 1 1.414 0L13 10.586l1-1V6H9V1H2zm8 0v4h4zm-6 9.414-2 2V15h12v-2.586l-.293.293a1 1 0 0 1-1.414 0L10 10.414l-2.293 2.293a1 1 0 0 1-1.414 0L4 10.414z\"/></svg>
+"
+
+[node name="AnimationCombinerDock" type="Control" unique_id=212371922]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_animation_combiner")
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=278009324]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=1274752814]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TitleRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=442051855]
+layout_mode = 2
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="MarginContainer/VBoxContainer/TitleRow" unique_id=19934181]
+layout_mode = 2
+theme_type_variation = &"HeaderMedium"
+text = "Animation Combiner"
+
+[node name="HelpButton" type="Button" parent="MarginContainer/VBoxContainer/TitleRow" unique_id=2052948637]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "HOW TO USE:
+1. [Blender Executable] Set the path to your Blender binary (leave empty to use the system PATH version).
+2. [Base Model] Select your rigged base character FBX file.
+3. [Animations] Click 'Add Animations' to add one or more animation FBX files.
+4. [Output] Choose where to save the combined .gltf or .glb file.
+5. Click 'Export Combined GLTF' — Blender runs in the background and merges everything.
+
+"
+text = "?"
+icon = SubResource("DPITexture_ng3op")
+flat = true
+
+[node name="HSeparator1" type="HSeparator" parent="MarginContainer/VBoxContainer" unique_id=1989079114]
+layout_mode = 2
+
+[node name="BlenderSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=1812240182]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="BlenderLabel" type="Label" parent="MarginContainer/VBoxContainer/BlenderSection" unique_id=1546612776]
+layout_mode = 2
+text = "Blender Executable (optional):"
+
+[node name="BlenderPathContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/BlenderSection" unique_id=1662461661]
+layout_mode = 2
+
+[node name="BlenderPathEdit" type="LineEdit" parent="MarginContainer/VBoxContainer/BlenderSection/BlenderPathContainer" unique_id=233037938]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = ""
+placeholder_text = "Leave empty to use system Blender"
+
+[node name="BrowseBlenderBtn" type="Button" parent="MarginContainer/VBoxContainer/BlenderSection/BlenderPathContainer" unique_id=1620417728]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Browse"
+
+[node name="HSeparator2" type="HSeparator" parent="MarginContainer/VBoxContainer" unique_id=2023160725]
+layout_mode = 2
+
+[node name="BaseModelSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=1688913480]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="BaseModelTitle" type="Label" parent="MarginContainer/VBoxContainer/BaseModelSection" unique_id=536793898]
+layout_mode = 2
+theme_type_variation = &"HeaderSmall"
+text = "Base Model (FBX):"
+
+[node name="BaseModelRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/BaseModelSection" unique_id=1640878860]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="BaseModelPathEdit" type="LineEdit" parent="MarginContainer/VBoxContainer/BaseModelSection/BaseModelRow" unique_id=1071692548]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "No file selected — click Browse"
+editable = false
+
+[node name="BrowseBaseModelBtn" type="Button" parent="MarginContainer/VBoxContainer/BaseModelSection/BaseModelRow" unique_id=1361438607]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Browse"
+
+[node name="ClearBaseModelBtn" type="Button" parent="MarginContainer/VBoxContainer/BaseModelSection/BaseModelRow" unique_id=456878582]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Clear"
+
+[node name="HSeparator3" type="HSeparator" parent="MarginContainer/VBoxContainer" unique_id=1662325292]
+layout_mode = 2
+
+[node name="AnimationsSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=463720784]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 5
+
+[node name="AnimationsHeader" type="HBoxContainer" parent="MarginContainer/VBoxContainer/AnimationsSection" unique_id=300472032]
+layout_mode = 2
+
+[node name="AnimationsTitle" type="Label" parent="MarginContainer/VBoxContainer/AnimationsSection/AnimationsHeader" unique_id=81517578]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"HeaderSmall"
+text = "Animations (FBX):"
+
+[node name="AddAnimationBtn" type="Button" parent="MarginContainer/VBoxContainer/AnimationsSection/AnimationsHeader" unique_id=2101899265]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Add Animations"
+
+[node name="ClearAnimationsBtn" type="Button" parent="MarginContainer/VBoxContainer/AnimationsSection/AnimationsHeader" unique_id=579622033]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Clear All"
+
+[node name="AnimationsScroll" type="ScrollContainer" parent="MarginContainer/VBoxContainer/AnimationsSection" unique_id=1687595017]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="AnimationsList" type="VBoxContainer" parent="MarginContainer/VBoxContainer/AnimationsSection/AnimationsScroll" unique_id=136326539]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="HSeparator4" type="HSeparator" parent="MarginContainer/VBoxContainer" unique_id=1782368461]
+layout_mode = 2
+
+[node name="OutputSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=2097665958]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="OutputLabel" type="Label" parent="MarginContainer/VBoxContainer/OutputSection" unique_id=348921579]
+layout_mode = 2
+theme_type_variation = &"HeaderSmall"
+text = "Output GLTF/GLB File:"
+
+[node name="OutputPathContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/OutputSection" unique_id=1714023463]
+layout_mode = 2
+
+[node name="OutputPathEdit" type="LineEdit" parent="MarginContainer/VBoxContainer/OutputSection/OutputPathContainer" unique_id=452260619]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = ""
+placeholder_text = "output.gltf"
+
+[node name="BrowseOutputBtn" type="Button" parent="MarginContainer/VBoxContainer/OutputSection/OutputPathContainer" unique_id=114813264]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Browse"
+
+[node name="HSeparator5" type="HSeparator" parent="MarginContainer/VBoxContainer" unique_id=716181775]
+layout_mode = 2
+
+[node name="ExportSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=1490189386]
+layout_mode = 2
+
+[node name="ExportBtn" type="Button" parent="MarginContainer/VBoxContainer/ExportSection" unique_id=1318947479]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"AccentButton"
+text = "Export Combined GLTF"
+
+[node name="StatusLabel" type="Label" parent="MarginContainer/VBoxContainer/ExportSection" unique_id=146289813]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Ready"
+horizontal_alignment = 1

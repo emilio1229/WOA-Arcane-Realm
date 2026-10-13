@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dv3ax8qcdrmbv"
-path="res://.godot/imported/Balcony_Cross_Straight.fbx-6579b7bfa1df2161fb929a53ee55fee0.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Balcony_Cross_Straight.fbx"
-dest_files=["res://.godot/imported/Balcony_Cross_Straight.fbx-6579b7bfa1df2161fb929a53ee55fee0.scn"]
 
 [params]
 

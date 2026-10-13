@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://b1pbuht0r72a3"
-path="res://.godot/imported/Crate_Metal.gltf-3081b04ef9ed05ad39605e49077737b4.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Crate_Metal.gltf"
-dest_files=["res://.godot/imported/Crate_Metal.gltf-3081b04ef9ed05ad39605e49077737b4.scn"]
 
 [params]
 

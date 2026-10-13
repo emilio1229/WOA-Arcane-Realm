@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://c4085thjcrcnh"
-path="res://.godot/imported/Table_Spoon.fbx-2937862a46dcf71627bf0924fd6c4cb0.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Table_Spoon.fbx"
-dest_files=["res://.godot/imported/Table_Spoon.fbx-2937862a46dcf71627bf0924fd6c4cb0.scn"]
 
 [params]
 

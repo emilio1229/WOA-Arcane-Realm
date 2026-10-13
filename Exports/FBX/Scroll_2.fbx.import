@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dc62qajpi1bg0"
-path="res://.godot/imported/Scroll_2.fbx-533f955bd24f67e6e66701fd0aed7987.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Scroll_2.fbx"
-dest_files=["res://.godot/imported/Scroll_2.fbx-533f955bd24f67e6e66701fd0aed7987.scn"]
 
 [params]
 

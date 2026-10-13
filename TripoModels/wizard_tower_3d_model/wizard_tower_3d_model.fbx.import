@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bdvg6e1pxvr7k"
-path="res://.godot/imported/wizard_tower_3d_model.fbx-28d34109336d92cde301d54b141b16e7.scn"
+valid=false
 
 [deps]
 
 source_file="res://TripoModels/wizard_tower_3d_model/wizard_tower_3d_model.fbx"
-dest_files=["res://.godot/imported/wizard_tower_3d_model.fbx-28d34109336d92cde301d54b141b16e7.scn"]
 
 [params]
 

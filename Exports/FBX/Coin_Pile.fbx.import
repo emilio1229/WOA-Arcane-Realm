@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bxbam8ewhb5yr"
-path="res://.godot/imported/Coin_Pile.fbx-65492c2175c6f7b31cf360780f3d7add.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Coin_Pile.fbx"
-dest_files=["res://.godot/imported/Coin_Pile.fbx-65492c2175c6f7b31cf360780f3d7add.scn"]
 
 [params]
 

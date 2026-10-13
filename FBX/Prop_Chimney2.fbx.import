@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://8clqu2w82xyh"
-path="res://.godot/imported/Prop_Chimney2.fbx-e0762b9b7c4cc4b34779d552418121d4.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Prop_Chimney2.fbx"
-dest_files=["res://.godot/imported/Prop_Chimney2.fbx-e0762b9b7c4cc4b34779d552418121d4.scn"]
 
 [params]
 

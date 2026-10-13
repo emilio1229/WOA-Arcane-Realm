@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://clulxgmhg4pcq"
-path="res://.godot/imported/Torch_Metal.fbx-dd669613f755af59b7bbd7d22036c8a5.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Torch_Metal.fbx"
-dest_files=["res://.godot/imported/Torch_Metal.fbx-dd669613f755af59b7bbd7d22036c8a5.scn"]
 
 [params]
 

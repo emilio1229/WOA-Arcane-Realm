@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bjjm2dqe74leu"
-path="res://.godot/imported/Crate_Metal.fbx-022a6e1a973431c9d5760244e366cb87.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Crate_Metal.fbx"
-dest_files=["res://.godot/imported/Crate_Metal.fbx-022a6e1a973431c9d5760244e366cb87.scn"]
 
 [params]
 

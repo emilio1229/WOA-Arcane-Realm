@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dsu1kj7o6ie6g"
-path="res://.godot/imported/Pine_4.fbx-bd28ebdb6f8975ac6df6ffea2c673774.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Pine_4.fbx"
-dest_files=["res://.godot/imported/Pine_4.fbx-bd28ebdb6f8975ac6df6ffea2c673774.scn"]
 
 [params]
 

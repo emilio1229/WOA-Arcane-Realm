@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://ds2jmpqrqjip2"
-path="res://.godot/imported/Cage_Small.gltf-5ae4d243dbf673024ae3319812895a26.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Cage_Small.gltf"
-dest_files=["res://.godot/imported/Cage_Small.gltf-5ae4d243dbf673024ae3319812895a26.scn"]
 
 [params]
 

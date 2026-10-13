@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://skol82ivm4ok"
-path="res://.godot/imported/Window_Wide_Flat1.fbx-e1800ccd8df27eb9d652800357c4830c.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Window_Wide_Flat1.fbx"
-dest_files=["res://.godot/imported/Window_Wide_Flat1.fbx-e1800ccd8df27eb9d652800357c4830c.scn"]
 
 [params]
 

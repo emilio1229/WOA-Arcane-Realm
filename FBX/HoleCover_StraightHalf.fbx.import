@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bi38v1oah8pgv"
-path="res://.godot/imported/HoleCover_StraightHalf.fbx-6205c10e4ebc0c4c1d1bcac72a16b46a.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/HoleCover_StraightHalf.fbx"
-dest_files=["res://.godot/imported/HoleCover_StraightHalf.fbx-6205c10e4ebc0c4c1d1bcac72a16b46a.scn"]
 
 [params]
 

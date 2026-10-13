@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://brmi2juajp8ml"
-path="res://.godot/imported/Roof_Wooden_2x1_Middle.gltf-4450ccd1775846a0af33a4572b409239.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Roof_Wooden_2x1_Middle.gltf"
-dest_files=["res://.godot/imported/Roof_Wooden_2x1_Middle.gltf-4450ccd1775846a0af33a4572b409239.scn"]
 
 [params]
 

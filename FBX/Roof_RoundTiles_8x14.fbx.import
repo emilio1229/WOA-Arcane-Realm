@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://xxy7cd7salrg"
-path="res://.godot/imported/Roof_RoundTiles_8x14.fbx-5aa54349f15cdc12987be4e114cba81a.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Roof_RoundTiles_8x14.fbx"
-dest_files=["res://.godot/imported/Roof_RoundTiles_8x14.fbx-5aa54349f15cdc12987be4e114cba81a.scn"]
 
 [params]
 

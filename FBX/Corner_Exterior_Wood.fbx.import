@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://gu0o5x3ac4oq"
-path="res://.godot/imported/Corner_Exterior_Wood.fbx-44ff85618fe1bae28f93859d89dff73d.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Corner_Exterior_Wood.fbx"
-dest_files=["res://.godot/imported/Corner_Exterior_Wood.fbx-44ff85618fe1bae28f93859d89dff73d.scn"]
 
 [params]
 

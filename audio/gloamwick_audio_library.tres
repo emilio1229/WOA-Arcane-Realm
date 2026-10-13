@@ -1,0 +1,110 @@
+[gd_resource type="Resource" script_class="AudioLibrary" format=3 uid="uid://tawi5sfnh02c"]
+
+[ext_resource type="Script" uid="uid://cgcton68ihwfi" path="res://addons/any_audio_manager/Scripts/Resources/audio_entry.gd" id="1_c0tya"]
+[ext_resource type="Script" uid="uid://c8hltc037dgci" path="res://addons/any_audio_manager/Scripts/Resources/audio_library.gd" id="2_qa5vc"]
+
+[sub_resource type="Resource" id="Resource_qp200"]
+resource_name = "ui_hover"
+script = ExtResource("1_c0tya")
+key = &"ui_hover"
+path = "res://Modern/Menu_Sounds_V2_Modern_HOVER.wav"
+
+[sub_resource type="Resource" id="Resource_57k0e"]
+resource_name = "ui_click"
+script = ExtResource("1_c0tya")
+key = &"ui_click"
+path = "res://SynthOrGlitch/Menu_Sound_V2_SoG_CLICK.wav"
+
+[sub_resource type="Resource" id="Resource_denr2"]
+resource_name = "ui_confirm"
+script = ExtResource("1_c0tya")
+key = &"ui_confirm"
+path = "res://Metallic/Menu_Sounds_V2_Metallic_ENTER.wav"
+
+[sub_resource type="Resource" id="Resource_kifkq"]
+resource_name = "ui_back"
+script = ExtResource("1_c0tya")
+key = &"ui_back"
+path = "res://Minimalistic/Menu_Sounds_V2_Minimalistic_BACKWARD.wav"
+
+[sub_resource type="Resource" id="Resource_vmolw"]
+resource_name = "ui_error"
+script = ExtResource("1_c0tya")
+key = &"ui_error"
+path = "res://SynthOrGlitch/Menu_Sound_V2_SoG_LOCKED.wav"
+
+[sub_resource type="Resource" id="Resource_kp2f1"]
+resource_name = "text_letter"
+script = ExtResource("1_c0tya")
+key = &"text_letter"
+path = "res://Text_Input_Sounds/TEXT_SOUND_LETTER_SHORT.wav"
+
+[sub_resource type="Resource" id="Resource_o4va8"]
+resource_name = "text_enter"
+script = ExtResource("1_c0tya")
+key = &"text_enter"
+path = "res://Text_Input_Sounds/TEXT_SOUND_ENTER.wav"
+
+[sub_resource type="Resource" id="Resource_music_0"]
+resource_name = "music_dusk"
+script = ExtResource("1_c0tya")
+key = &"music_dusk"
+path = "res://01 - Dusk - Dusk.ogg"
+
+[sub_resource type="Resource" id="Resource_music_1"]
+resource_name = "music_loss"
+script = ExtResource("1_c0tya")
+key = &"music_loss"
+path = "res://02 - loss - Loss.ogg"
+
+[sub_resource type="Resource" id="Resource_music_2"]
+resource_name = "music_basement"
+script = ExtResource("1_c0tya")
+key = &"music_basement"
+path = "res://03 - The Basement - The Basement.ogg"
+
+[sub_resource type="Resource" id="Resource_music_3"]
+resource_name = "music_toxic_lollipop"
+script = ExtResource("1_c0tya")
+key = &"music_toxic_lollipop"
+path = "res://04 - Toxic lollipop - Toxic Lollipop.ogg"
+
+[sub_resource type="Resource" id="Resource_music_4"]
+resource_name = "music_voices_of_mire"
+script = ExtResource("1_c0tya")
+key = &"music_voices_of_mire"
+path = "res://05 - Voices of mire - Voices of mire.ogg"
+
+[sub_resource type="Resource" id="Resource_music_5"]
+resource_name = "music_dark_heart"
+script = ExtResource("1_c0tya")
+key = &"music_dark_heart"
+path = "res://06 - dark heart.ogg"
+
+[sub_resource type="Resource" id="Resource_music_6"]
+resource_name = "music_after_dark"
+script = ExtResource("1_c0tya")
+key = &"music_after_dark"
+path = "res://07 - What comes after the dark.ogg"
+
+[sub_resource type="Resource" id="Resource_music_7"]
+resource_name = "music_parasite_unrest"
+script = ExtResource("1_c0tya")
+key = &"music_parasite_unrest"
+path = "res://08 - Parasite Unrest - parasite unrest.ogg"
+
+[sub_resource type="Resource" id="Resource_music_8"]
+resource_name = "music_paupers_sermon"
+script = ExtResource("1_c0tya")
+key = &"music_paupers_sermon"
+path = "res://09 - The paupers sermon.ogg"
+
+[sub_resource type="Resource" id="Resource_music_9"]
+resource_name = "music_reinforcements"
+script = ExtResource("1_c0tya")
+key = &"music_reinforcements"
+path = "res://10 - Reinforcements - Reinforcements.ogg"
+
+[resource]
+script = ExtResource("2_qa5vc")
+entries = [SubResource("Resource_qp200"), SubResource("Resource_57k0e"), SubResource("Resource_denr2"), SubResource("Resource_kifkq"), SubResource("Resource_vmolw"), SubResource("Resource_kp2f1"), SubResource("Resource_o4va8"), SubResource("Resource_music_0"), SubResource("Resource_music_1"), SubResource("Resource_music_2"), SubResource("Resource_music_3"), SubResource("Resource_music_4"), SubResource("Resource_music_5"), SubResource("Resource_music_6"), SubResource("Resource_music_7"), SubResource("Resource_music_8"), SubResource("Resource_music_9")]

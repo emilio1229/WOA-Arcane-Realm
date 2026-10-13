@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://hiqur3lpmf6x"
-path="res://.godot/imported/HoleCover_90Stairs.fbx-1eebffd87854b0e669ea503d7c86d7c3.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/HoleCover_90Stairs.fbx"
-dest_files=["res://.godot/imported/HoleCover_90Stairs.fbx-1eebffd87854b0e669ea503d7c86d7c3.scn"]
 
 [params]
 

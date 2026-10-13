@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://oqc15s8enyhx"
-path="res://.godot/imported/Floor_RedBrick.fbx-2e1f19fe4aa9146cd89defa24ca5ce0b.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Floor_RedBrick.fbx"
-dest_files=["res://.godot/imported/Floor_RedBrick.fbx-2e1f19fe4aa9146cd89defa24ca5ce0b.scn"]
 
 [params]
 

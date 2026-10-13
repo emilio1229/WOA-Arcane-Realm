@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://b8seofdb2jumc"
-path="res://.godot/imported/Floor_WoodDark_Half1.fbx-1b118d794efbddcc52cabd2ebfecb990.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Floor_WoodDark_Half1.fbx"
-dest_files=["res://.godot/imported/Floor_WoodDark_Half1.fbx-1b118d794efbddcc52cabd2ebfecb990.scn"]
 
 [params]
 

@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bhkdanuvfr7gl"
-path="res://.godot/imported/Stair_Interior_SolidExtended.gltf-467ce4bae07c7440a19bfe1ec3fd0ba3.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Stair_Interior_SolidExtended.gltf"
-dest_files=["res://.godot/imported/Stair_Interior_SolidExtended.gltf-467ce4bae07c7440a19bfe1ec3fd0ba3.scn"]
 
 [params]
 

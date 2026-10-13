@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://p01mw5bjm5km"
-path="res://.godot/imported/Table_Knife.fbx-fc511f1d3ffdb6d1c883f247b2bdeedf.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Table_Knife.fbx"
-dest_files=["res://.godot/imported/Table_Knife.fbx-fc511f1d3ffdb6d1c883f247b2bdeedf.scn"]
 
 [params]
 

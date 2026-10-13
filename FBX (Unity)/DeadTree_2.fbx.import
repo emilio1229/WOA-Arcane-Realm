@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://doxhqx3ghim6r"
-path="res://.godot/imported/DeadTree_2.fbx-f30f450da2b7a1edcb4ead0655ef0468.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX (Unity)/DeadTree_2.fbx"
-dest_files=["res://.godot/imported/DeadTree_2.fbx-f30f450da2b7a1edcb4ead0655ef0468.scn"]
 
 [params]
 

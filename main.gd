@@ -1,5 +1,18 @@
 extends Node3D
 
+const GloamwickBuilder := preload("res://world/gloamwick.gd")
+const CharacterVisualScript := preload("res://world/character_visual.gd")
+const AnimatedCharacterScript := preload("res://world/animated_character.gd")
+const WizardAppearanceScript := preload("res://world/wizard_appearance.gd")
+const MinimapScript := preload("res://world/minimap.gd")
+const Materials := preload("res://world/gloamwick_materials.gd")
+const PROPS_OBJ := "res://Exports/OBJ/"
+
+const MATHIAS_MODEL := "res://Assets/generated/mathias_opt.res"
+const ENEMY_MODEL := "res://TripoModels/stone_golem_3d_model/stone_golem_3d_model.fbx"
+const PLAYER_MODEL := "res://Assets/generated/wizard_opt.res"
+const SPIRIT_MODEL := "res://Assets/generated/spirit_opt.res"
+const BOSS_MODEL := "res://Assets/generated/boss_opt.res"
 const SAVE_PATH := "user://woa_arcane_realm.cfg"
 const WORLD_SEED := 730241
 const WALK_SPEED := 5.2
@@ -7,19 +20,26 @@ const RUN_SPEED := 8.0
 const JUMP_VELOCITY := 6.8
 const GRAVITY := 18.0
 const PATHS := ["Ember Mage", "Frostweaver", "Verdant Warden", "Storm Herald", "Voidcaller", "Sigilbinder"]
+const ICONS := {
+	"Gold Key": "res://Assets/generated/icon_key.png",
+	"Silver Chalice": "res://Assets/generated/icon_chalice.png",
+	"Violet Potion": "res://Assets/generated/icon_potion.png",
+	"Bronze Sword": "res://Assets/generated/icon_sword.png",
+	"Wooden Shield": "res://Assets/generated/icon_shield.png",
+}
 
 var player: CharacterBody3D
+var player_spawn := Vector3(0.0, 0.0, 17.0)
+var skirmish_timer := 0.0
+var dialogue_full_text := ""
+var dialogue_reveal := 0.0
+var dialogue_typing := false
+var _letter_timer := 0.0
 var camera_pivot: Node3D
 var game_camera: Camera3D
 var player_visual: Node3D
 var ui_layer: CanvasLayer
 var menu_root: Control
-var menu_margin: MarginContainer
-var menu_columns: BoxContainer
-var class_grid: GridContainer
-var class_preview_label: Label
-var class_preview_symbol: Label
-var class_buttons: Array[Button] = []
 var hud_root: Control
 var dialogue_panel: PanelContainer
 var dialogue_title: Label
@@ -27,6 +47,10 @@ var dialogue_body: Label
 var dialogue_hint: Label
 var objective_label: Label
 var status_label: Label
+var minimap: Minimap
+var inventory_label: Label
+var collectibles: Array[Node3D] = []
+var collected_items: Array[String] = []
 var name_input: LineEdit
 var path_select: OptionButton
 var path_note_label: Label
@@ -54,23 +78,67 @@ var sanctuary_gate: Node3D
 var last_message := ""
 var save_data := ConfigFile.new()
 var has_save := false
-var mobile_controls: Control
-var mobile_left := false
-var mobile_right := false
-var mobile_forward := false
-var mobile_back := false
-var mobile_jump_requested := false
-var mobile_running := false
+# Mobile input state for browser and Discord Activity play.
+var touch_controls_root: Control
+var touch_left := false
+var touch_right := false
+var touch_up := false
+var touch_down := false
+var touch_run := false
+var loading_root: Control
+var loading_bar: ProgressBar
+var loading_status: Label
+var loading_spinner: Label
+var satchel_icons: Array[TextureRect] = []
+var satchel_keys: Array[String] = []
+var player_char_vis: CharacterVisual
+var player_anim: AnimatedCharacter
+var appearance: WizardAppearance = WizardAppearanceScript.new()
+var preview_viewport: SubViewport
+var preview_pivot: Node3D
+var _player_moving := false
+var _player_walk_phase := 0.0
+var spin_nodes: Array[Node3D] = []
+var flicker_lights: Array[OmniLight3D] = []
+var _world_time := 0.0
 
 func _ready() -> void:
 	_build_ui()
 	_load_save()
 	_show_menu()
+	_play_music(&"music_dusk", -19.0)
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
+func _process(delta: float) -> void:
+	_animate_world(delta)
+	if preview_pivot != null and is_instance_valid(preview_pivot) and menu_root != null and menu_root.visible:
+		preview_pivot.rotation.y += delta * 0.6
+	if player_visual != null and is_instance_valid(player_visual):
+		_player_walk_phase += delta * (10.0 if _player_moving else 1.8)
+		if _player_moving:
+			player_visual.position.y = absf(sin(_player_walk_phase)) * 0.06
+			player_visual.rotation.z = sin(_player_walk_phase * 0.5) * 0.03
+		else:
+			player_visual.position.y = sin(_player_walk_phase) * 0.02
+			player_visual.rotation.z = 0.0
+	# Typewriter reveal for dialogue, with soft per-letter blips.
+	if not dialogue_typing:
+		return
+	dialogue_reveal += delta * 62.0
+	var count := int(dialogue_reveal)
+	if count >= dialogue_full_text.length():
+		dialogue_body.text = dialogue_full_text
+		dialogue_typing = false
+		return
+	dialogue_body.text = dialogue_full_text.substr(0, count)
+	_letter_timer -= delta
+	if _letter_timer <= 0.0:
+		_letter_timer = 0.045
+		_play(&"text_letter", -20.0, randf_range(0.95, 1.12))
+
 func _physics_process(delta: float) -> void:
-	if mobile_controls != null:
-		mobile_controls.visible = started and not dialogue_open and (OS.has_feature("web") or DisplayServer.is_touchscreen_available())
+	if started and not battle_cleared and mathias != null and is_instance_valid(mathias):
+		_update_skirmish(delta)
 	if not started or player == null or dialogue_open:
 		if player != null:
 			player.velocity.x = move_toward(player.velocity.x, 0.0, 22.0 * delta)
@@ -78,35 +146,45 @@ func _physics_process(delta: float) -> void:
 			if not player.is_on_floor():
 				player.velocity.y -= GRAVITY * delta
 			player.move_and_slide()
+		if player_char_vis != null and is_instance_valid(player_char_vis):
+			player_char_vis.set_walking(false)
+		if player_anim != null and is_instance_valid(player_anim):
+			player_anim.set_locomotion(Vector2.ZERO, true, false, delta)
+		_player_moving = false
 		return
 
 	if not player.is_on_floor():
 		player.velocity.y -= GRAVITY * delta
-	elif Input.is_key_pressed(KEY_SPACE) or mobile_jump_requested:
+	elif Input.is_key_pressed(KEY_SPACE):
 		player.velocity.y = JUMP_VELOCITY
-		mobile_jump_requested = false
 
 	var input_vector := Vector2.ZERO
-	if Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT) or mobile_left:
+	if Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT) or touch_left:
 		input_vector.x -= 1.0
-	if Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT) or mobile_right:
+	if Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT) or touch_right:
 		input_vector.x += 1.0
-	if Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_UP) or mobile_forward:
+	if Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_UP) or touch_up:
 		input_vector.y -= 1.0
-	if Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN) or mobile_back:
+	if Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN) or touch_down:
 		input_vector.y += 1.0
 
 	var direction := Vector3(input_vector.x, 0.0, input_vector.y)
 	if direction.length_squared() > 0.0:
 		direction = direction.normalized().rotated(Vector3.UP, yaw)
-		var speed := RUN_SPEED if Input.is_key_pressed(KEY_SHIFT) or mobile_running else WALK_SPEED
+		var speed := RUN_SPEED if Input.is_key_pressed(KEY_SHIFT) or touch_run else WALK_SPEED
 		player.velocity.x = direction.x * speed
 		player.velocity.z = direction.z * speed
 		player.rotation.y = yaw
 	else:
 		player.velocity.x = move_toward(player.velocity.x, 0.0, 24.0 * delta)
 		player.velocity.z = move_toward(player.velocity.z, 0.0, 24.0 * delta)
+	var running := Input.is_key_pressed(KEY_SHIFT) or touch_run
+	if player_anim != null and is_instance_valid(player_anim):
+		player_anim.set_locomotion(input_vector, not running, false, delta)
 	player.move_and_slide()
+	_player_moving = direction.length_squared() > 0.0
+	if player_char_vis != null and is_instance_valid(player_char_vis):
+		player_char_vis.set_walking(_player_moving)
 	_refresh_objective()
 
 func _input(event: InputEvent) -> void:
@@ -114,26 +192,20 @@ func _input(event: InputEvent) -> void:
 	# full-screen HUD could swallow the click, leaving the camera permanently uncaptured.
 	if not started:
 		return
-	if event is InputEventScreenDrag and not dialogue_open:
-		var viewport_size := get_viewport().get_visible_rect().size
-		# Drag on the right side to rotate the camera; the lower strip is reserved for action buttons.
-		if event.position.x > viewport_size.x * 0.42 and event.position.y < viewport_size.y - 245.0:
-			yaw -= event.relative.x * 0.006
-			pitch = clampf(pitch - event.relative.y * 0.004, -0.48, 0.32)
-			if player != null:
-				player.rotation.y = yaw
-			if camera_pivot != null:
-				camera_pivot.rotation.x = pitch
-	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT and not dialogue_open:
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT and not dialogue_open:
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	elif event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		# Use screen_relative so mouse-look sensitivity stays consistent in the browser at different sizes.
 		yaw -= event.screen_relative.x * 0.0022
 		pitch = clampf(pitch - event.screen_relative.y * 0.0016, -0.48, 0.32)
-		if player != null:
-			player.rotation.y = yaw
-		if camera_pivot != null:
-			camera_pivot.rotation.x = pitch
+		_apply_camera_look()
+	elif event is InputEventScreenDrag and started and not dialogue_open:
+		# Drag the right side of the screen to rotate the camera on touch devices.
+		var screen_width := get_viewport().get_visible_rect().size.x
+		if event.position.x > screen_width * 0.35:
+			yaw -= event.relative.x * 0.004
+			pitch = clampf(pitch - event.relative.y * 0.003, -0.48, 0.32)
+			_apply_camera_look()
 	elif event is InputEventKey and event.pressed and not event.echo:
 		if event.keycode == KEY_ESCAPE:
 			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -151,23 +223,30 @@ func _build_ui() -> void:
 	menu_root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	ui_layer.add_child(menu_root)
 
+	var art := TextureRect.new()
+	if ResourceLoader.exists("res://Assets/generated/menu_keyart.png"):
+		art.texture = load("res://Assets/generated/menu_keyart.png")
+	art.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	menu_root.add_child(art)
+
 	var backdrop := ColorRect.new()
-	backdrop.color = Color(0.025, 0.012, 0.055, 0.96)
+	backdrop.color = Color(0.03, 0.015, 0.06, 0.58)
 	backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	menu_root.add_child(backdrop)
 
-	menu_margin = MarginContainer.new()
-	menu_margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	menu_margin.add_theme_constant_override("margin_left", 42)
-	menu_margin.add_theme_constant_override("margin_right", 42)
-	menu_margin.add_theme_constant_override("margin_top", 30)
-	menu_margin.add_theme_constant_override("margin_bottom", 30)
-	menu_root.add_child(menu_margin)
+	var margin := MarginContainer.new()
+	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	margin.add_theme_constant_override("margin_left", 42)
+	margin.add_theme_constant_override("margin_right", 42)
+	margin.add_theme_constant_override("margin_top", 30)
+	margin.add_theme_constant_override("margin_bottom", 30)
+	menu_root.add_child(margin)
 
 	var columns := HBoxContainer.new()
-	menu_columns = columns
-	columns.add_theme_constant_override("separation", 32)
-	menu_margin.add_child(columns)
+	columns.add_theme_constant_override("separation", 28)
+	margin.add_child(columns)
 
 	var story_side := VBoxContainer.new()
 	story_side.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -222,6 +301,61 @@ func _build_ui() -> void:
 	chapter.add_theme_color_override("font_color", Color(0.64, 0.54, 0.75))
 	story_side.add_child(chapter)
 
+	# Middle column: the live 3D preview of the wizard being created.
+	var preview_wrap := VBoxContainer.new()
+	preview_wrap.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	preview_wrap.add_theme_constant_override("separation", 8)
+	columns.add_child(preview_wrap)
+
+	var preview_panel := PanelContainer.new()
+	preview_panel.add_theme_stylebox_override("panel", _panel_style(Color(0.055, 0.032, 0.09, 0.97), Color(0.48, 0.29, 0.67)))
+	preview_wrap.add_child(preview_panel)
+
+	var preview_container := SubViewportContainer.new()
+	preview_container.custom_minimum_size = Vector2(240, 380)
+	preview_container.stretch = true
+	preview_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	preview_panel.add_child(preview_container)
+	preview_viewport = SubViewport.new()
+	preview_viewport.size = Vector2i(240, 380)
+	preview_viewport.transparent_bg = true
+	preview_viewport.own_world_3d = true
+	preview_viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	preview_container.add_child(preview_viewport)
+
+	var preview_env := WorldEnvironment.new()
+	var pe := Environment.new()
+	pe.background_mode = Environment.BG_COLOR
+	pe.background_color = Color(0.05, 0.03, 0.09, 0.0)
+	pe.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	pe.ambient_light_color = Color(0.55, 0.5, 0.7)
+	pe.ambient_light_energy = 0.85
+	preview_env.environment = pe
+	preview_viewport.add_child(preview_env)
+
+	var preview_light := DirectionalLight3D.new()
+	preview_light.rotation_degrees = Vector3(-28, -42, 0)
+	preview_light.light_energy = 1.25
+	preview_viewport.add_child(preview_light)
+
+	var preview_cam := Camera3D.new()
+	preview_cam.position = Vector3(0, 1.15, 2.9)
+	preview_cam.rotation.x = -0.04
+	preview_cam.fov = 52.0
+	preview_cam.current = true
+	preview_viewport.add_child(preview_cam)
+
+	preview_pivot = Node3D.new()
+	preview_viewport.add_child(preview_pivot)
+	_refresh_preview()
+
+	var preview_caption := Label.new()
+	preview_caption.text = "YOUR WIZARD"
+	preview_caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	preview_caption.add_theme_font_size_override("font_size", 12)
+	preview_caption.add_theme_color_override("font_color", Color(0.73, 0.55, 0.9))
+	preview_wrap.add_child(preview_caption)
+
 	var form_wrap := CenterContainer.new()
 	form_wrap.custom_minimum_size = Vector2(410, 0)
 	columns.add_child(form_wrap)
@@ -233,11 +367,11 @@ func _build_ui() -> void:
 	form_wrap.add_child(panel)
 
 	var layout := VBoxContainer.new()
-	layout.add_theme_constant_override("separation", 12)
+	layout.add_theme_constant_override("separation", 8)
 	panel.add_child(layout)
 
 	var menu_heading := Label.new()
-	menu_heading.text = "ENTER THE REALM"
+	menu_heading.text = "CREATE YOUR WIZARD"
 	menu_heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	menu_heading.add_theme_font_size_override("font_size", 23)
 	menu_heading.add_theme_color_override("font_color", Color(0.93, 0.83, 1.0))
@@ -275,46 +409,12 @@ func _build_ui() -> void:
 	layout.add_child(path_label)
 
 	path_select = OptionButton.new()
+	path_select.custom_minimum_size = Vector2(0, 44)
 	for path_name in PATHS:
 		path_select.add_item(path_name)
 	path_select.select(5)
-	path_select.visible = false
+	path_select.add_theme_font_size_override("font_size", 15)
 	layout.add_child(path_select)
-
-	class_grid = GridContainer.new()
-	class_grid.columns = 2
-	class_grid.add_theme_constant_override("h_separation", 8)
-	class_grid.add_theme_constant_override("v_separation", 8)
-	layout.add_child(class_grid)
-	class_buttons.clear()
-	for i in range(PATHS.size()):
-		var class_button := Button.new()
-		class_button.text = _class_symbol(PATHS[i]) + "  " + PATHS[i]
-		class_button.custom_minimum_size = Vector2(0, 48)
-		class_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		class_button.add_theme_font_size_override("font_size", 13)
-		class_button.pressed.connect(_select_class.bind(i))
-		class_grid.add_child(class_button)
-		class_buttons.append(class_button)
-
-	var preview_panel := PanelContainer.new()
-	preview_panel.add_theme_stylebox_override("panel", _panel_style(Color(0.08, 0.035, 0.12, 0.95), Color(0.55, 0.31, 0.76)))
-	layout.add_child(preview_panel)
-	var preview_row := HBoxContainer.new()
-	preview_row.add_theme_constant_override("separation", 12)
-	preview_panel.add_child(preview_row)
-	class_preview_symbol = Label.new()
-	class_preview_symbol.custom_minimum_size = Vector2(62, 62)
-	class_preview_symbol.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	class_preview_symbol.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	class_preview_symbol.add_theme_font_size_override("font_size", 42)
-	preview_row.add_child(class_preview_symbol)
-	class_preview_label = Label.new()
-	class_preview_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	class_preview_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	class_preview_label.add_theme_font_size_override("font_size", 12)
-	class_preview_label.add_theme_color_override("font_color", Color(0.87, 0.81, 0.94))
-	preview_row.add_child(class_preview_label)
 
 	path_note_label = Label.new()
 	path_note_label.text = "Your path shapes your legend. Your choices shape the Realm."
@@ -324,6 +424,43 @@ func _build_ui() -> void:
 	layout.add_child(path_note_label)
 	path_select.item_selected.connect(_on_path_selected)
 	_on_path_selected(path_select.selected)
+
+	_make_swatch_row(layout, "ROBE COLOUR", WizardAppearanceScript.ROBES, func(c: Color) -> void:
+		appearance.robe = c
+		_refresh_preview())
+	_make_swatch_row(layout, "ACCENT", WizardAppearanceScript.ACCENTS, func(c: Color) -> void:
+		appearance.accent = c
+		_refresh_preview())
+	_make_swatch_row(layout, "SKIN TONE", WizardAppearanceScript.SKINS, func(c: Color) -> void:
+		appearance.skin = c
+		_refresh_preview())
+
+	var hat_row := HBoxContainer.new()
+	hat_row.add_theme_constant_override("separation", 6)
+	var hat_label := Label.new()
+	hat_label.text = "HEAD"
+	hat_label.custom_minimum_size = Vector2(110, 0)
+	hat_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	hat_label.add_theme_font_size_override("font_size", 12)
+	hat_label.add_theme_color_override("font_color", Color(0.81, 0.69, 0.94))
+	hat_row.add_child(hat_label)
+	for option in [["Hat", 0], ["Hood", 1], ["Bare", 2]]:
+		var hb := _make_button(str(option[0]), Color(0.24, 0.16, 0.36))
+		hb.custom_minimum_size = Vector2(76, 34)
+		hb.pressed.connect(func() -> void:
+			appearance.hat = int(option[1])
+			_refresh_preview())
+		hat_row.add_child(hb)
+	layout.add_child(hat_row)
+
+	var staff_check := CheckButton.new()
+	staff_check.text = "CARRY A STAFF"
+	staff_check.button_pressed = appearance.staff
+	staff_check.add_theme_font_size_override("font_size", 12)
+	staff_check.toggled.connect(func(on: bool) -> void:
+		appearance.staff = on
+		_refresh_preview())
+	layout.add_child(staff_check)
 
 	var begin_button := _make_button("✦   BEGIN YOUR JOURNEY", Color(0.34, 0.15, 0.52))
 	begin_button.pressed.connect(_start_new_game)
@@ -368,17 +505,37 @@ func _build_ui() -> void:
 	objective_box.add_child(objective_label)
 
 	status_label = Label.new()
-	status_label.position = Vector2(20, 100)
+	status_label.position = Vector2(20, 176)
 	status_label.custom_minimum_size = Vector2(480, 34)
 	status_label.add_theme_font_size_override("font_size", 14)
 	status_label.add_theme_color_override("font_color", Color(0.95, 0.83, 1.0))
 	hud_root.add_child(status_label)
 
+	inventory_label = Label.new()
+	inventory_label.position = Vector2(20, 208)
+	inventory_label.custom_minimum_size = Vector2(520, 28)
+	inventory_label.add_theme_font_size_override("font_size", 13)
+	inventory_label.add_theme_color_override("font_color", Color(0.85, 0.93, 0.78))
+	hud_root.add_child(inventory_label)
+
+	minimap = MinimapScript.new()
+	minimap.name = "Minimap"
+	minimap.anchor_left = 1.0
+	minimap.anchor_right = 1.0
+	minimap.offset_left = -196.0
+	minimap.offset_right = -16.0
+	minimap.offset_top = 18.0
+	minimap.offset_bottom = 198.0
+	minimap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	hud_root.add_child(minimap)
+
+	_build_touch_controls()
+
 	dialogue_panel = PanelContainer.new()
 	dialogue_panel.anchor_left = 0.08
 	dialogue_panel.anchor_right = 0.92
-	dialogue_panel.anchor_top = 0.68
-	dialogue_panel.anchor_bottom = 0.96
+	dialogue_panel.anchor_top = 0.56
+	dialogue_panel.anchor_bottom = 0.97
 	dialogue_panel.add_theme_stylebox_override("panel", _panel_style(Color(0.035, 0.018, 0.07, 0.97), Color(0.65, 0.38, 0.88)))
 	dialogue_panel.visible = false
 	hud_root.add_child(dialogue_panel)
@@ -395,7 +552,8 @@ func _build_ui() -> void:
 	dialogue_body = Label.new()
 	dialogue_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	dialogue_body.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	dialogue_body.add_theme_font_size_override("font_size", 15)
+	dialogue_body.clip_text = true
+	dialogue_body.add_theme_font_size_override("font_size", 14)
 	dialogue_layout.add_child(dialogue_body)
 
 	dialogue_hint = Label.new()
@@ -418,74 +576,276 @@ func _build_ui() -> void:
 	dialogue_button.pressed.connect(_advance_dialogue)
 	dialogue_layout.add_child(dialogue_button)
 
-	_build_mobile_controls()
-	menu_root.resized.connect(_layout_main_menu)
-	_layout_main_menu()
+	# --- Player panel: name, path and chapter, under the objective. ---
+	var player_panel := PanelContainer.new()
+	player_panel.position = Vector2(20, 96)
+	player_panel.custom_minimum_size = Vector2(390, 0)
+	player_panel.add_theme_stylebox_override("panel", _panel_style(Color(0.035, 0.02, 0.07, 0.82), Color(0.30, 0.18, 0.45)))
+	hud_root.add_child(player_panel)
 
-func _build_mobile_controls() -> void:
-	mobile_controls = Control.new()
-	mobile_controls.name = "TouchControls"
-	mobile_controls.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	mobile_controls.mouse_filter = Control.MOUSE_FILTER_PASS
-	mobile_controls.visible = OS.has_feature("web") or DisplayServer.is_touchscreen_available()
-	hud_root.add_child(mobile_controls)
+	var player_box := VBoxContainer.new()
+	player_box.add_theme_constant_override("separation", 2)
+	player_panel.add_child(player_box)
 
-	# Large, translucent controls are positioned from the screen edges for phones and tablets.
-	_add_mobile_button("▲", Vector2(174, -438), "forward", false)
-	_add_mobile_button("◀", Vector2(28, -292), "left", false)
-	_add_mobile_button("▼", Vector2(174, -292), "back", false)
-	_add_mobile_button("▶", Vector2(320, -292), "right", false)
-	_add_mobile_button("RUN", Vector2(38, -150), "run", false)
-	_add_mobile_button("JUMP", Vector2(-300, -158), "jump", true)
-	_add_mobile_button("MAGIC", Vector2(-458, -270), "pulse", true)
-	_add_mobile_button("USE", Vector2(-300, -310), "interact", true)
+	var name_line := Label.new()
+	name_line.name = "PlayerNameLine"
+	name_line.add_theme_font_size_override("font_size", 17)
+	name_line.add_theme_color_override("font_color", Color(0.95, 0.86, 1.0))
+	player_box.add_child(name_line)
 
-func _add_mobile_button(caption: String, offset: Vector2, action: String, one_shot: bool) -> void:
+	var path_line := Label.new()
+	path_line.name = "PlayerPathLine"
+	path_line.add_theme_font_size_override("font_size", 12)
+	path_line.add_theme_color_override("font_color", Color(0.74, 0.62, 0.9))
+	player_box.add_child(path_line)
+
+	# --- Satchel: collectible item icons across the bottom-left. ---
+	var satchel := PanelContainer.new()
+	satchel.anchor_top = 1.0
+	satchel.anchor_bottom = 1.0
+	satchel.offset_left = 20.0
+	satchel.offset_top = -94.0
+	satchel.offset_bottom = -20.0
+	satchel.add_theme_stylebox_override("panel", _panel_style(Color(0.035, 0.02, 0.07, 0.86), Color(0.38, 0.22, 0.57)))
+	hud_root.add_child(satchel)
+
+	var satchel_row := HBoxContainer.new()
+	satchel_row.add_theme_constant_override("separation", 6)
+	satchel.add_child(satchel_row)
+
+	var satchel_tag := Label.new()
+	satchel_tag.text = "SATCHEL"
+	satchel_tag.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	satchel_tag.add_theme_font_size_override("font_size", 11)
+	satchel_tag.add_theme_color_override("font_color", Color(0.73, 0.55, 0.9))
+	satchel_row.add_child(satchel_tag)
+
+	for item_key in ICONS.keys():
+		var slot := PanelContainer.new()
+		slot.custom_minimum_size = Vector2(58, 58)
+		slot.add_theme_stylebox_override("panel", _panel_style(Color(0.02, 0.012, 0.04, 0.92), Color(0.30, 0.19, 0.44)))
+		var ic := TextureRect.new()
+		ic.custom_minimum_size = Vector2(46, 46)
+		ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		ic.texture = load(ICONS[item_key])
+		ic.modulate = Color(0.6, 0.6, 0.65, 0.16)
+		slot.add_child(ic)
+		satchel_row.add_child(slot)
+		satchel_icons.append(ic)
+		satchel_keys.append(item_key)
+
+	# --- Cinematic loading screen: use the project's key art as the realm backdrop. ---
+	loading_root = Control.new()
+	loading_root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	loading_root.visible = false
+	loading_root.mouse_filter = Control.MOUSE_FILTER_STOP
+	loading_root.clip_contents = true
+	ui_layer.add_child(loading_root)
+
+	var lveil := ColorRect.new()
+	lveil.color = Color(0.015, 0.008, 0.035, 1.0)
+	lveil.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	loading_root.add_child(lveil)
+
+	if ResourceLoader.exists("res://Assets/generated/menu_keyart.png"):
+		var lart := TextureRect.new()
+		lart.texture = load("res://Assets/generated/menu_keyart.png")
+		lart.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		lart.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		lart.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		lart.modulate = Color(1.0, 0.92, 1.0, 0.78)
+		lart.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		loading_root.add_child(lart)
+
+	# Deep violet veil keeps the key art atmospheric while leaving it visible.
+	var lveil2 := ColorRect.new()
+	lveil2.color = Color(0.025, 0.012, 0.055, 0.48)
+	lveil2.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	lveil2.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	loading_root.add_child(lveil2)
+
+	var top_brand := Label.new()
+	top_brand.text = "✧   W I Z A R D S   O F   A R K"
+	top_brand.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	top_brand.offset_left = 42.0
+	top_brand.offset_top = 28.0
+	top_brand.offset_right = -42.0
+	top_brand.offset_bottom = 56.0
+	top_brand.add_theme_font_size_override("font_size", 13)
+	top_brand.add_theme_color_override("font_color", Color(0.82, 0.67, 1.0, 0.95))
+	top_brand.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	loading_root.add_child(top_brand)
+
+	var lcenter := CenterContainer.new()
+	lcenter.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	lcenter.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	loading_root.add_child(lcenter)
+
+	var lpanel := PanelContainer.new()
+	lpanel.custom_minimum_size = Vector2(620, 0)
+	lpanel.add_theme_stylebox_override("panel", _panel_style(Color(0.025, 0.012, 0.055, 0.82), Color(0.52, 0.34, 0.72, 0.78)))
+	lcenter.add_child(lpanel)
+
+	var lcol := VBoxContainer.new()
+	lcol.add_theme_constant_override("separation", 12)
+	lcol.alignment = BoxContainer.ALIGNMENT_CENTER
+	lcol.custom_minimum_size = Vector2(560, 0)
+	lpanel.add_child(lcol)
+
+	loading_spinner = Label.new()
+	loading_spinner.text = "✧"
+	loading_spinner.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	loading_spinner.add_theme_font_size_override("font_size", 52)
+	loading_spinner.add_theme_color_override("font_color", Color(0.84, 0.64, 1.0))
+	lcol.add_child(loading_spinner)
+
+	var ltitle := Label.new()
+	ltitle.text = "ARCANE REALM"
+	ltitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	ltitle.add_theme_font_size_override("font_size", 42)
+	ltitle.add_theme_color_override("font_color", Color(0.97, 0.91, 1.0))
+	ltitle.add_theme_constant_override("outline_size", 2)
+	ltitle.add_theme_color_override("font_outline_color", Color(0.08, 0.025, 0.12, 0.9))
+	lcol.add_child(ltitle)
+
+	var lsubtitle := Label.new()
+	lsubtitle.text = "CHRONICLES OF THE HOLLOW CROWN"
+	lsubtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lsubtitle.add_theme_font_size_override("font_size", 12)
+	lsubtitle.add_theme_color_override("font_color", Color(0.77, 0.63, 0.91))
+	lcol.add_child(lsubtitle)
+
+	var ldivider_wrap := CenterContainer.new()
+	lcol.add_child(ldivider_wrap)
+	var ldivider := ColorRect.new()
+	ldivider.custom_minimum_size = Vector2(150, 2)
+	ldivider.color = Color(0.66, 0.42, 0.92, 0.9)
+	ldivider_wrap.add_child(ldivider)
+
+	var lchapter := Label.new()
+	lchapter.text = "CHAPTER I   •   THE BELLS OF GLOAMWICK"
+	lchapter.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lchapter.add_theme_font_size_override("font_size", 13)
+	lchapter.add_theme_color_override("font_color", Color(0.92, 0.83, 1.0))
+	lcol.add_child(lchapter)
+
+	var lbar_wrap := CenterContainer.new()
+	lcol.add_child(lbar_wrap)
+	loading_bar = ProgressBar.new()
+	loading_bar.custom_minimum_size = Vector2(500, 12)
+	loading_bar.min_value = 0.0
+	loading_bar.max_value = 100.0
+	loading_bar.value = 0.0
+	loading_bar.show_percentage = false
+	loading_bar.add_theme_stylebox_override("background", _panel_style(Color(0.055, 0.025, 0.09, 0.95), Color(0.28, 0.17, 0.4, 0.9)))
+	loading_bar.add_theme_stylebox_override("fill", _panel_style(Color(0.54, 0.3, 0.78, 1.0), Color(0.83, 0.63, 1.0, 1.0)))
+	lbar_wrap.add_child(loading_bar)
+
+	loading_status = Label.new()
+	loading_status.text = "Awakening the wards…"
+	loading_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	loading_status.add_theme_font_size_override("font_size", 13)
+	loading_status.add_theme_color_override("font_color", Color(0.79, 0.72, 0.88))
+	lcol.add_child(loading_status)
+
+	var lfooter := Label.new()
+	lfooter.text = "THE REALM REMEMBERS EVERY CHOICE"
+	lfooter.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	lfooter.offset_left = 32.0
+	lfooter.offset_top = -48.0
+	lfooter.offset_right = -32.0
+	lfooter.offset_bottom = -22.0
+	lfooter.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lfooter.add_theme_font_size_override("font_size", 10)
+	lfooter.add_theme_color_override("font_color", Color(0.72, 0.62, 0.83, 0.9))
+	lfooter.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	loading_root.add_child(lfooter)
+
+func _build_touch_controls() -> void:
+	touch_controls_root = Control.new()
+	touch_controls_root.name = "TouchControls"
+	touch_controls_root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	touch_controls_root.mouse_filter = Control.MOUSE_FILTER_PASS
+	touch_controls_root.visible = DisplayServer.is_touchscreen_available()
+	hud_root.add_child(touch_controls_root)
+
+	# Bottom-left movement controls; action buttons stay on the right.
+	_add_touch_button("◀", Vector2(18, -112), false, "left")
+	_add_touch_button("▶", Vector2(146, -112), false, "right")
+	_add_touch_button("▲", Vector2(82, -176), false, "up")
+	_add_touch_button("▼", Vector2(82, -48), false, "down")
+	_add_touch_button("RUN", Vector2(82, -238), false, "run")
+	_add_touch_button("JUMP", Vector2(-92, -210), true, "jump")
+	_add_touch_button("CAST", Vector2(-92, -142), true, "cast")
+	_add_touch_button("TALK", Vector2(-92, -74), true, "interact")
+
+
+func _add_touch_button(caption: String, offset: Vector2, action_button: bool, action: String) -> void:
 	var button := Button.new()
 	button.text = caption
-	button.custom_minimum_size = Vector2(138, 118)
-	button.add_theme_font_size_override("font_size", 21 if caption.length() <= 4 else 17)
-	button.add_theme_color_override("font_color", Color(0.96, 0.9, 1.0))
-	button.add_theme_stylebox_override("normal", _panel_style(Color(0.12, 0.055, 0.19, 0.78), Color(0.65, 0.4, 0.86, 0.92)))
-	button.add_theme_stylebox_override("pressed", _panel_style(Color(0.36, 0.15, 0.52, 0.94), Color(0.92, 0.72, 1.0, 1.0)))
-	if action in ["jump", "pulse", "interact", "run"]:
-		button.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+	button.custom_minimum_size = Vector2(62, 58) if not action_button else Vector2(76, 58)
+	button.add_theme_font_size_override("font_size", 15 if action_button else 22)
+	button.add_theme_color_override("font_color", Color(0.98, 0.93, 1.0))
+	button.modulate = Color(1.0, 1.0, 1.0, 0.88)
+	button.add_theme_stylebox_override("normal", _panel_style(Color(0.09, 0.045, 0.15, 0.78), Color(0.58, 0.36, 0.78)))
+	button.add_theme_stylebox_override("hover", _panel_style(Color(0.18, 0.09, 0.27, 0.92), Color(0.78, 0.53, 0.96)))
+	if action_button:
+		button.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
 		button.position = offset
 	else:
-		button.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
+		button.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
 		button.position = offset
-	mobile_controls.add_child(button)
-	if one_shot:
-		if action == "pulse":
+	touch_controls_root.add_child(button)
+	match action:
+		"left":
+			button.button_down.connect(_set_touch_direction.bind("left", true))
+			button.button_up.connect(_set_touch_direction.bind("left", false))
+		"right":
+			button.button_down.connect(_set_touch_direction.bind("right", true))
+			button.button_up.connect(_set_touch_direction.bind("right", false))
+		"up":
+			button.button_down.connect(_set_touch_direction.bind("up", true))
+			button.button_up.connect(_set_touch_direction.bind("up", false))
+		"down":
+			button.button_down.connect(_set_touch_direction.bind("down", true))
+			button.button_up.connect(_set_touch_direction.bind("down", false))
+		"run":
+			button.button_down.connect(_set_touch_direction.bind("run", true))
+			button.button_up.connect(_set_touch_direction.bind("run", false))
+		"jump":
+			button.pressed.connect(_touch_jump)
+		"cast":
 			button.pressed.connect(_cast_arcane_pulse)
-		elif action == "interact":
+		"interact":
 			button.pressed.connect(_interact)
-		elif action == "jump":
-			button.button_down.connect(_on_mobile_button_down.bind(action))
-			button.button_up.connect(_on_mobile_button_up.bind(action))
-		elif action == "run":
-			button.button_down.connect(_on_mobile_button_down.bind(action))
-			button.button_up.connect(_on_mobile_button_up.bind(action))
-	else:
-		button.button_down.connect(_on_mobile_button_down.bind(action))
-		button.button_up.connect(_on_mobile_button_up.bind(action))
 
-func _on_mobile_button_down(action: String) -> void:
-	match action:
-		"left": mobile_left = true
-		"right": mobile_right = true
-		"forward": mobile_forward = true
-		"back": mobile_back = true
-		"jump": mobile_jump_requested = true
-		"run": mobile_running = true
 
-func _on_mobile_button_up(action: String) -> void:
-	match action:
-		"left": mobile_left = false
-		"right": mobile_right = false
-		"forward": mobile_forward = false
-		"back": mobile_back = false
-		"run": mobile_running = false
+func _set_touch_direction(direction: String, pressed: bool) -> void:
+	match direction:
+		"left":
+			touch_left = pressed
+		"right":
+			touch_right = pressed
+		"up":
+			touch_up = pressed
+		"down":
+			touch_down = pressed
+		"run":
+			touch_run = pressed
+
+
+func _touch_jump() -> void:
+	if started and player != null and player.is_on_floor() and not dialogue_open:
+		player.velocity.y = JUMP_VELOCITY
+
+
+func _apply_camera_look() -> void:
+	if player != null:
+		player.rotation.y = yaw
+	if camera_pivot != null:
+		camera_pivot.rotation.x = pitch
+
 
 func _on_path_selected(index: int) -> void:
 	if path_note_label == null or index < 0 or index >= PATHS.size():
@@ -499,47 +859,9 @@ func _on_path_selected(index: int) -> void:
 		"Sigilbinder": "Sigil magic • balanced arcana attuned to ancient wards and relics."
 	}
 	path_note_label.text = descriptions.get(PATHS[index], "Your path shapes your legend. Your choices shape the Realm.")
-	if class_preview_label != null:
-		class_preview_label.text = _class_title(PATHS[index]) + "\n" + descriptions.get(PATHS[index], "Your path shapes your legend.")
-	if class_preview_symbol != null:
-		class_preview_symbol.text = _class_symbol(PATHS[index])
-	if class_buttons.size() == PATHS.size():
-		for i in range(class_buttons.size()):
-			var selected := i == index
-			var accent := _class_accent(PATHS[i])
-			var bg := Color(accent.r * 0.30, accent.g * 0.22, accent.b * 0.34, 0.98) if selected else Color(0.045, 0.025, 0.075, 0.98)
-			class_buttons[i].add_theme_stylebox_override("normal", _panel_style(bg, accent if selected else Color(0.26, 0.18, 0.34)))
-			class_buttons[i].add_theme_stylebox_override("hover", _panel_style(Color(0.16, 0.08, 0.22, 0.98), accent))
-
-func _select_class(index: int) -> void:
-	if index < 0 or index >= PATHS.size():
-		return
-	path_select.select(index)
-	_on_path_selected(index)
-
-func _class_symbol(path_name: String) -> String:
-	return {"Ember Mage": "✹", "Frostweaver": "❄", "Verdant Warden": "❧", "Storm Herald": "ϟ", "Voidcaller": "◉", "Sigilbinder": "✧"}.get(path_name, "✧")
-
-func _class_title(path_name: String) -> String:
-	return {"Ember Mage": "KEEPER OF THE LIVING FLAME", "Frostweaver": "WEAVER OF SILENT WINTER", "Verdant Warden": "OATHBOUND TO THE WILD", "Storm Herald": "VOICE OF THE TEMPEST", "Voidcaller": "WALKER BEYOND THE VEIL", "Sigilbinder": "BEARER OF THE ANCIENT SIGILS"}.get(path_name, "YOUR LEGEND BEGINS")
-
-func _class_accent(path_name: String) -> Color:
-	return {"Ember Mage": Color(1.0, 0.31, 0.12), "Frostweaver": Color(0.30, 0.78, 1.0), "Verdant Warden": Color(0.36, 0.88, 0.46), "Storm Herald": Color(0.74, 0.55, 1.0), "Voidcaller": Color(0.83, 0.28, 0.95), "Sigilbinder": Color(1.0, 0.75, 0.35)}.get(path_name, Color(0.75, 0.55, 1.0))
-
-func _layout_main_menu() -> void:
-	if menu_columns == null or menu_margin == null:
-		return
-	var compact := get_viewport().get_visible_rect().size.x < 850.0
-	menu_columns.vertical = compact
-	menu_columns.add_theme_constant_override("separation", 18 if compact else 32)
-	menu_margin.add_theme_constant_override("margin_left", 14 if compact else 42)
-	menu_margin.add_theme_constant_override("margin_right", 14 if compact else 42)
-	menu_margin.add_theme_constant_override("margin_top", 12 if compact else 30)
-	menu_margin.add_theme_constant_override("margin_bottom", 12 if compact else 30)
 
 func _show_menu() -> void:
 	menu_root.visible = true
-	_layout_main_menu()
 	hud_root.visible = false
 	if continue_button != null:
 		continue_button.disabled = not has_save
@@ -576,11 +898,16 @@ func _enter_game(show_intro: bool) -> void:
 	sanctuary_gate = null
 	archive_wisp = null
 	menu_root.visible = false
-	hud_root.visible = true
-	started = true
+	hud_root.visible = false
+	started = false
+	await _show_loading()
 	_build_world()
 	_build_player()
 	_refresh_objective()
+	_refresh_player_panel()
+	hud_root.visible = true
+	await _hide_loading()
+	started = true
 	if show_intro:
 		_show_dialogue("THE BELLS OF GLOAMWICK", "“Awaken, " + player_name + "… You have reached Gloamwick beneath a violet sky that grows dimmer by the hour. The market stalls stand abandoned, the rune well has begun to whisper, and every lantern burns as though it fears the dark. Beyond the square, a Battle Mage named Mathias is holding the southern ward against the riftbound. If it falls, the town will be swallowed before dawn. Follow the lamps through the market and help him.”", "Enter Gloamwick • Reach Mathias beyond the market")
 	else:
@@ -592,101 +919,129 @@ func _build_world() -> void:
 			continue
 		child.queue_free()
 
-	var environment_node := WorldEnvironment.new()
-	var environment := Environment.new()
-	environment.background_mode = Environment.BG_SKY
-	var sky := Sky.new()
-	var sky_material := ProceduralSkyMaterial.new()
-	sky_material.sky_top_color = Color(0.018, 0.008, 0.045)
-	sky_material.sky_horizon_color = Color(0.16, 0.055, 0.23)
-	sky_material.ground_bottom_color = Color(0.018, 0.012, 0.03)
-	sky_material.ground_horizon_color = Color(0.07, 0.035, 0.095)
-	sky.sky_material = sky_material
-	environment.sky = sky
-	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	environment.ambient_light_color = Color(0.55, 0.44, 0.7)
-	environment.ambient_light_energy = 0.8
-	environment.fog_enabled = true
-	environment.fog_light_color = Color(0.12, 0.055, 0.17)
-	environment.fog_density = 0.009
-	# Subtle cinematic grading and bloom make rune lights readable without
-	# washing out the dark-fantasy palette or relying on high-end renderers.
-	environment.tonemap_mode = Environment.TONE_MAPPER_FILMIC
-	environment.adjustment_enabled = true
-	environment.adjustment_brightness = 1.04
-	environment.adjustment_contrast = 1.08
-	environment.adjustment_saturation = 1.12
-	environment.glow_enabled = true
-	environment.glow_intensity = 0.55
-	environment.glow_strength = 0.65
-	environment.glow_bloom = 0.04
-	environment_node.environment = environment
-	add_child(environment_node)
+	# The whole settlement environment is assembled by the Gloamwick builder,
+	# which reports the anchor points the encounter is placed on.
+	var gloamwick := GloamwickBuilder.new()
+	gloamwick.name = "Gloamwick"
+	add_child(gloamwick)
+	gloamwick.build()
+	var anchors: Dictionary = gloamwick.get_anchors()
+	player_spawn = anchors.get("player_spawn", Vector3(0.0, 0.0, 17.0))
+	if minimap != null:
+		var marks: Array[Dictionary] = [
+			{"pos": anchors.get("mathias", Vector3.ZERO), "color": Color(0.95, 0.6, 0.2)},
+			{"pos": anchors.get("well", Vector3.ZERO), "color": Color(0.35, 0.8, 1.0)},
+			{"pos": anchors.get("gate_sigil", Vector3.ZERO), "color": Color(0.65, 0.35, 1.0)},
+			{"pos": anchors.get("tower", Vector3(0.0, 0.0, -116.0)), "color": Color(0.95, 0.25, 0.6)},
+		]
+		minimap.set_pois(marks)
 
-	var sun := DirectionalLight3D.new()
-	sun.rotation_degrees = Vector3(-52, -28, 0)
-	sun.light_energy = 1.2
-	sun.shadow_enabled = true
-	add_child(sun)
-
-	_add_box("Gloamwood and Gloamwick Ground", Vector3(0, -0.5, -70), Vector3(180, 1, 260), Color(0.035, 0.045, 0.045), true)
-	_add_box("Gloamwick Road", Vector3(0, -0.02, -16), Vector3(6.5, 0.12, 112), Color(0.09, 0.075, 0.085), false)
-	# A wooded ridge frames the settlement while leaving the town streets open.
-	for i in range(18):
-		var z := 25.0 - float(i) * 5.1
-		var side_offset := 27.0 + float((i * 7) % 5) * 1.8
-		_place_imported_asset("res://OBJ/CommonTree_" + str((i % 5) + 1) + ".obj", Vector3(-side_offset, 0, z), Vector3.ONE * 1.1, float(i) * 0.41)
-		_place_imported_asset("res://OBJ/CommonTree_" + str(((i + 2) % 5) + 1) + ".obj", Vector3(side_offset + 2.0, 0, z - 2.2), Vector3.ONE * 1.25, float(i) * -0.33)
-	# Broken stones and a forgotten shrine mark the old road into the settlement.
-	_add_box("Fallen Blackwood", Vector3(-24.9, 0.55, -8.5), Vector3(3.7, 0.45, 0.55), Color(0.055, 0.03, 0.04), false).rotation.z = -0.22
-	_add_box("Mossy Standing Stone", Vector3(23.5, 1.0, -18), Vector3(0.85, 2.0, 0.8), Color(0.11, 0.075, 0.15), false)
-	_add_box("Broken Wardstone", Vector3(-8.8, 0.75, -44), Vector3(0.65, 1.5, 0.65), Color(0.18, 0.09, 0.28), false)
-	_add_box("Forgotten Shrine", Vector3(10.5, 0.7, -45), Vector3(1.4, 1.4, 1.1), Color(0.09, 0.055, 0.16), false)
-	archive_wisp = _make_sigil(Vector3(10.5, 2.0, -45), Color(0.36, 0.86, 0.95), 0.42)
+	# Interactable lore wisp at the forgotten shrine.
+	archive_wisp = _make_sigil(anchors.get("archive_wisp", Vector3(10.5, 2.0, -45)), Color(0.36, 0.86, 0.95), 0.42)
 	archive_wisp.name = "Archive Wisp"
 	archive_wisp.visible = not lore_discovered
 	add_child(archive_wisp)
-	_add_box("Sanctuary Gate", Vector3(0, 3.0, -62), Vector3(10, 6, 0.8), Color(0.12, 0.075, 0.19), false)
-	sanctuary_gate = _make_sigil(Vector3(0, 2.4, -61.45), Color(0.38, 0.12, 0.75), 2.1)
+
+	# The sanctuary gate rune.
+	sanctuary_gate = _make_sigil(anchors.get("gate_sigil", Vector3(0.0, 2.4, -61.45)), Color(0.38, 0.12, 0.75), 2.1)
 	sanctuary_gate.name = "Sigil Sanctuary Gate"
 	add_child(sanctuary_gate)
 
-	# Gloamwick surrounds the starting road; the sanctuary lies beyond its southern ward.
-	_build_gloamwick_town()
+	# The rune well's glowing heart (its stonework is part of the environment).
+	var well_rune := _make_sigil(anchors.get("well", Vector3(0.0, 1.15, -16.5)), Color(0.34, 0.76, 0.98), 0.42, false)
+	well_rune.name = "Gloamwick Rune Well"
+	add_child(well_rune)
 
-	# Violet wisps act as subtle wayfinding lights from the waking place to the clearing.
-	for i in range(9):
-		var wisp_z := -3.0 - float(i) * 4.0
-		var wisp_x := -1.4 if i % 2 == 0 else 1.35
-		var wisp := _make_sigil(Vector3(wisp_x, 0.8 + float(i % 3) * 0.35, wisp_z), Color(0.52, 0.27, 0.92), 0.22)
-		wisp.name = "Violet Forest Wisp " + str(i + 1)
-		add_child(wisp)
-
-	# At the southern end of town, Mathias is holding the failing ward against the riftbound.
-	_add_box("Battle Clearing", Vector3(0, -0.02, -39), Vector3(22, 0.14, 19), Color(0.075, 0.06, 0.085), false)
-	mathias = _build_person("Mathias", Vector3(0, 0, -35), Color(0.16, 0.11, 0.28), Color(0.8, 0.72, 0.92), true)
+	# Mathias holds the southern ward, modelled with his own 3D asset.
+	mathias = _spawn_character(MATHIAS_MODEL, "Mathias", anchors.get("mathias", Vector3(0.0, 0.0, -35.0)), 2.15, 0.0)
 	if not battle_cleared:
-		for i in range(3):
-			var x := -3.2 + float(i) * 3.2
-			var enemy := _build_person("Riftbound " + str(i + 1), Vector3(x, 0, -40.5), Color(0.035, 0.02, 0.07), Color(0.56, 0.18, 0.75), false)
+		var enemy_positions: Array = anchors.get("enemies", [])
+		# These creature models are ~1.9M triangles each, so only two are active
+		# to stay within this GPU's budget.
+		var enemy_count: int = mini(enemy_positions.size(), 2)
+		for i in range(enemy_count):
+			var enemy := _spawn_character(SPIRIT_MODEL, "Riftbound " + str(i + 1), enemy_positions[i], 2.4, PI)
 			enemy_nodes.append(enemy)
 			enemy_hp[enemy.get_instance_id()] = 2
 
-	var sigil_positions := [Vector3(-8.0, 0.0, -48.0), Vector3(8.0, 0.0, -48.0), Vector3(0.0, 0.0, -54.0)]
+	# The three seals of the Sigil Sanctuary.
+	var sigil_positions: Array = anchors.get("sigils", [Vector3(-8.0, 1.1, -48.0), Vector3(8.0, 1.1, -48.0), Vector3(0.0, 1.1, -54.0)])
 	var sigil_names := ["Dawn", "Dusk", "Heart"]
 	var sigil_colors := [Color(0.98, 0.66, 0.24), Color(0.52, 0.35, 0.95), Color(0.28, 0.85, 0.72)]
 	for i in range(3):
-		var shrine := _make_sigil(sigil_positions[i] + Vector3(0, 1.1, 0), sigil_colors[i], 0.75)
+		var shrine := _make_sigil(sigil_positions[i], sigil_colors[i], 0.75)
 		shrine.name = sigil_names[i] + " Sigil"
 		shrine.set_meta("sigil_name", sigil_names[i])
 		shrine.visible = not collected_sigil_names.has(sigil_names[i])
 		sigil_nodes.append(shrine)
 		add_child(shrine)
 
+	# Scattered quest items and gear to discover.
+	collectibles.clear()
+	_build_collectibles()
+	_refresh_inventory()
+
+	# Register everything that should gently spin/float, and every omni light
+	# that should flicker, so the world reads as alive without baked animation.
+	spin_nodes.clear()
+	flicker_lights.clear()
+	_register_spin(archive_wisp)
+	_register_spin(sanctuary_gate)
+	_register_spin(well_rune)
+	for sigil_node in sigil_nodes:
+		_register_spin(sigil_node)
+	for item_node in collectibles:
+		_register_spin(item_node)
+	_collect_lights(gloamwick)
+
+func _build_collectibles() -> void:
+	var items := [
+		{"name": "Gold Key", "kind": "relic", "obj": "Key_Gold", "pos": Vector3(-9.0, 0.7, -6.5)},
+		{"name": "Silver Chalice", "kind": "relic", "obj": "Chalice", "pos": Vector3(9.0, 0.9, -6.5)},
+		{"name": "Violet Potion", "kind": "relic", "obj": "Potion_2", "pos": Vector3(0.0, 0.7, -21.0)},
+		{"name": "Bronze Sword", "kind": "gear", "obj": "Sword_Bronze", "pos": Vector3(5.0, 0.7, 3.0)},
+		{"name": "Wooden Shield", "kind": "gear", "obj": "Shield_Wooden", "pos": Vector3(-5.0, 0.7, 3.0)},
+	]
+	for entry in items:
+		var node := _make_collectible(PROPS_OBJ + str(entry["obj"]) + ".obj", entry["pos"], str(entry["name"]), str(entry["kind"]))
+		collectibles.append(node)
+		add_child(node)
+
+func _make_collectible(obj_path: String, pos: Vector3, item_name: String, kind: String) -> Node3D:
+	var root := Node3D.new()
+	root.name = "Item_" + item_name
+	root.position = pos
+	root.set_meta("item_name", item_name)
+	root.set_meta("item_kind", kind)
+	if ResourceLoader.exists(obj_path):
+		var mesh := load(obj_path) as Mesh
+		if mesh != null:
+			Materials.apply_to_mesh(mesh)
+			var mi := MeshInstance3D.new()
+			mi.mesh = mesh
+			root.add_child(mi)
+	var tint := Color(1.0, 0.85, 0.4) if kind == "gear" else Color(0.55, 0.9, 1.0)
+	var glow := _make_sigil(Vector3.ZERO, tint, 0.26, false)
+	root.add_child(glow)
+	return root
+
+func _nearest_collectible() -> Node3D:
+	return _nearest_node(collectibles)
+
+func _refresh_inventory() -> void:
+	if inventory_label != null:
+		if collected_items.is_empty():
+			inventory_label.text = "SATCHEL  •  nothing gathered yet"
+		else:
+			inventory_label.text = "SATCHEL  •  " + ", ".join(collected_items)
+	for i in satchel_icons.size():
+		var has_item: bool = collected_items.has(satchel_keys[i])
+		satchel_icons[i].modulate = Color(1, 1, 1, 1) if has_item else Color(0.6, 0.6, 0.65, 0.16)
+
 func _build_player() -> void:
 	player = CharacterBody3D.new()
 	player.name = "PlayerWizard"
-	player.position = Vector3(0, 0, 12.0)
+	player.position = player_spawn
 	player.floor_snap_length = 0.35
 	var collision := CollisionShape3D.new()
 	var capsule := CapsuleShape3D.new()
@@ -696,19 +1051,28 @@ func _build_player() -> void:
 	collision.position.y = 0.93
 	player.add_child(collision)
 
+	# The player must be in the tree before the rig resolves its animation paths.
+	add_child(player)
 	player_visual = Node3D.new()
 	player_visual.name = "WizardVisual"
 	player.add_child(player_visual)
-	var path_colors := {
-		"Ember Mage": Color(0.48, 0.12, 0.09),
-		"Frostweaver": Color(0.12, 0.3, 0.48),
-		"Verdant Warden": Color(0.12, 0.34, 0.2),
-		"Storm Herald": Color(0.27, 0.2, 0.52),
-		"Voidcaller": Color(0.12, 0.055, 0.2),
-		"Sigilbinder": Color(0.22, 0.12, 0.42)
-	}
-	_add_person_visual(player_visual, path_colors.get(player_path, Color(0.22, 0.12, 0.42)), Color(0.83, 0.75, 0.96), true, player_path)
-	add_child(player)
+	player_char_vis = null
+	player_anim = null
+	# The player is the addon's real rigged human (real human mesh, real walk/
+	# run/jump animations), dressed with the wizard's hat and staff.
+	player_char_vis = null
+	player_anim = null
+	var rig: AnimatedCharacter = AnimatedCharacterScript.new()
+	player_visual.add_child(rig)
+	if rig.setup(player):
+		player_anim = rig
+		rig.set_tint(appearance.skin)
+		_attach_wizard_extras(rig)
+	else:
+		rig.queue_free()
+		player_visual.add_child(appearance.build())
+	if minimap != null:
+		minimap.target = player
 
 	camera_pivot = Node3D.new()
 	camera_pivot.position = Vector3(0, 1.5, 0)
@@ -721,196 +1085,50 @@ func _build_player() -> void:
 	camera_pivot.add_child(game_camera)
 	camera_pivot.rotation.x = pitch
 
-func _build_gloamwick_town() -> void:
-	# Gloamwick is the opening map, not a distant prop cluster: the player enters
-	# through the north road, passes the market, and reaches Mathias at the south ward.
-	_add_box("Gloamwick North Road", Vector3(0, -0.015, -15), Vector3(7.0, 0.12, 62), Color(0.105, 0.082, 0.095), false)
-	_add_box("West Lane", Vector3(-13.0, -0.01, -19), Vector3(3.0, 0.1, 49), Color(0.085, 0.068, 0.08), false)
-	_add_box("East Lane", Vector3(13.0, -0.01, -19), Vector3(3.0, 0.1, 49), Color(0.085, 0.068, 0.08), false)
-	_add_box("Market Square", Vector3(0, 0.015, -15), Vector3(28, 0.16, 22), Color(0.13, 0.105, 0.13), false)
-	_add_box("Square Stone Inlay", Vector3(0, 0.105, -15), Vector3(11, 0.035, 11), Color(0.19, 0.15, 0.2), false)
-
-	# Modeled stone arches frame the north entrance and the damaged ward road.
-	_place_imported_asset("res://OBJ/Wall_Arch.obj", Vector3(0.0, 0.0, 13.0), Vector3.ONE * 1.7, 0.0)
-	_place_imported_asset("res://OBJ/Wall_Arch.obj", Vector3(0.0, 0.0, -43.0), Vector3.ONE * 1.7, 0.0)
-	# The Hollow Lantern is the town's landmark, with a gabled roof, chimney,
-	# warm windows, a readable sign, and an open approach from the road.
-	_build_house(Vector3(0, 0, -2.5), Color(0.13, 0.065, 0.105))
-	_add_box("Hollow Lantern Signboard", Vector3(0, 2.55, -5.18), Vector3(3.4, 0.72, 0.16), Color(0.22, 0.11, 0.31), false)
-	_add_box("Inn Sign Rune", Vector3(0, 2.56, -5.29), Vector3(0.34, 0.42, 0.08), Color(0.65, 0.36, 0.95), false)
-	_add_box("Inn Chimney", Vector3(2.15, 4.1, -1.5), Vector3(0.65, 1.7, 0.7), Color(0.16, 0.09, 0.12), true)
-
-	# Eight homes form two distinct streets, with small front gardens and lanes.
-	var house_colors: Array[Color] = [
-		Color(0.13, 0.075, 0.105), Color(0.09, 0.075, 0.13),
-		Color(0.12, 0.085, 0.07), Color(0.08, 0.09, 0.13),
-		Color(0.11, 0.065, 0.09), Color(0.12, 0.095, 0.065),
-		Color(0.095, 0.08, 0.12), Color(0.14, 0.075, 0.075)
-	]
-	var house_positions: Array[Vector3] = [
-		Vector3(-18, 0, -5), Vector3(18, 0, -5),
-		Vector3(-18, 0, -17), Vector3(18, 0, -17),
-		Vector3(-18, 0, -29), Vector3(18, 0, -29),
-		Vector3(-18, 0, -40), Vector3(18, 0, -40)
-	]
-	for i in range(house_positions.size()):
-		_build_house(house_positions[i], house_colors[i])
-		var front_lantern_z: float = house_positions[i].z - 2.8
-		_place_imported_asset("res://Exports/OBJ/Lantern_Wall.obj", house_positions[i] + Vector3(-2.35, 2.15, front_lantern_z - house_positions[i].z), Vector3.ONE * 0.32, 0.0)
-
-	# The market has actual imported stalls and cargo props rather than empty cubes.
-	for i in range(4):
-		var stall_x: float = -9.0 + float(i) * 6.0
-		_place_imported_asset("res://Exports/OBJ/Stall_Empty.obj", Vector3(stall_x, 0.0, -8.5), Vector3.ONE * 0.9, 0.0)
-		_place_imported_asset("res://OBJ/Prop_Crate.obj", Vector3(stall_x + 1.0, 0.0, -6.5), Vector3.ONE * 0.55, float(i) * 0.4)
-		if i % 2 == 0:
-			_place_imported_asset("res://OBJ/Prop_Wagon.obj", Vector3(stall_x, 0.0, -23.0), Vector3.ONE * 0.7, 1.57)
-
-	# A rune well gives the square a central landmark and a natural meeting point.
-	_add_box("Rune Well Foundation", Vector3(0, 0.24, -16.5), Vector3(3.4, 0.48, 3.4), Color(0.16, 0.12, 0.2), true)
-	_add_box("Rune Well Inner Pool", Vector3(0, 0.51, -16.5), Vector3(2.0, 0.1, 2.0), Color(0.035, 0.13, 0.18), false)
-	var well_rune := _make_sigil(Vector3(0, 1.15, -16.5), Color(0.34, 0.76, 0.98), 0.42)
-	well_rune.name = "Gloamwick Rune Well"
-	add_child(well_rune)
-
-	# Benches, fences, plants, flowers, mushrooms, stones and trees add scale
-	# around the homes without obstructing the streets or combat approach.
-	for side in [-1.0, 1.0]:
-		for garden_index in range(4):
-			var garden_z: float = -3.0 - float(garden_index) * 11.0
-			_place_imported_asset("res://OBJ/Prop_WoodenFence_Single.obj", Vector3(side * 22.0, 0.0, garden_z), Vector3.ONE * 0.8, 0.0)
-			_place_imported_asset("res://OBJ/Bush_Common_Flowers.obj", Vector3(side * 21.0, 0.0, garden_z - 2.0), Vector3.ONE * 0.55, float(garden_index) * 0.8)
-			_place_imported_asset("res://OBJ/Flower_3_Group.obj", Vector3(side * 15.3, 0.0, garden_z - 1.5), Vector3.ONE * 0.5, float(garden_index) * 0.6)
-	for i in range(12):
-		var tree_side: float = -1.0 if i % 2 == 0 else 1.0
-		var tree_z: float = 20.0 - float(i) * 6.2
-		var tree_x: float = tree_side * (29.0 + float(i % 3) * 2.5)
-		_place_imported_asset("res://OBJ/CommonTree_" + str((i % 5) + 1) + ".obj", Vector3(tree_x, 0.0, tree_z), Vector3.ONE * 1.1, float(i) * 0.53)
-	for i in range(8):
-		var plant_side: float = -1.0 if i % 2 == 0 else 1.0
-		var plant_pos := Vector3(plant_side * (9.0 + float(i % 3)), 0.0, -4.0 - float(i) * 4.4)
-		var plant_path: String = "res://OBJ/Bush_Common.obj" if i % 2 == 0 else "res://OBJ/Plant_1_Big.obj"
-		_place_imported_asset(plant_path, plant_pos, Vector3.ONE * 0.55, float(i) * 0.61)
-	_place_imported_asset("res://OBJ/Mushroom_Common.obj", Vector3(-6.5, 0.0, -35.5), Vector3.ONE * 0.55, 0.0)
-	_place_imported_asset("res://OBJ/Mushroom_Laetiporus.obj", Vector3(7.0, 0.0, -37.0), Vector3.ONE * 0.4, 0.0)
-	_place_imported_asset("res://OBJ/Rock_Medium_1.obj", Vector3(-9.0, 0.0, -44.5), Vector3.ONE * 0.55, 0.3)
-	_place_imported_asset("res://OBJ/Rock_Medium_2.obj", Vector3(9.5, 0.0, -44.0), Vector3.ONE * 0.6, -0.4)
-
-	# Tall rune lamps lead from the market to Mathias and the damaged southern ward.
-	for lamp_index in range(7):
-		var lamp_z: float = -24.0 - float(lamp_index) * 3.1
-		for side in [-1.0, 1.0]:
-			var lamp_x: float = float(side) * (6.0 if lamp_index < 4 else 8.0)
-			_add_box("Gloamwick Rune Lamp Post", Vector3(lamp_x, 1.65, lamp_z), Vector3(0.16, 3.3, 0.16), Color(0.055, 0.035, 0.065), false)
-			var lantern := _make_sigil(Vector3(lamp_x, 3.25, lamp_z), Color(0.98, 0.58, 0.24), 0.2)
-			lantern.name = "Gloamwick Lantern"
-			add_child(lantern)
-	_place_imported_asset("res://OBJ/Prop_Wagon.obj", Vector3(22.0, 0.0, -34.0), Vector3.ONE * 0.85, -0.3)
-	_place_imported_asset("res://OBJ/Prop_Crate.obj", Vector3(20.5, 0.0, -33.0), Vector3.ONE * 0.7, 0.2)
-
-func _place_imported_asset(asset_path: String, world_position: Vector3, asset_scale: Vector3, yaw_radians: float = 0.0) -> Node3D:
-	# OBJ imports may resolve as a PackedScene or a Mesh depending on importer settings.
-	# Handle both so one missing optional import never breaks world generation.
-	if not ResourceLoader.exists(asset_path):
-		return null
-	var resource: Resource = load(asset_path)
-	if resource == null:
-		push_warning("Optional world asset could not be loaded: " + asset_path)
-		return null
-	var instance: Node3D
-	if resource is PackedScene:
-		var spawned: Node = (resource as PackedScene).instantiate()
-		if spawned is Node3D:
-			instance = spawned as Node3D
-		else:
-			spawned.free()
-			return null
-	elif resource is Mesh:
-		var mesh_instance := MeshInstance3D.new()
-		mesh_instance.mesh = resource as Mesh
-		instance = mesh_instance
+## Spawn a character driven by an imported 3D model, falling back to the
+## procedural figure if the model is unavailable.
+func _spawn_character(scene_path: String, char_name: String, pos: Vector3, height: float, face_yaw: float) -> Node3D:
+	var root := Node3D.new()
+	root.name = char_name
+	root.position = pos
+	root.rotation.y = face_yaw
+	var vis: CharacterVisual = CharacterVisualScript.new()
+	var modeled := vis.setup(scene_path, height, PI)
+	if modeled:
+		root.add_child(vis)
+		root.set_meta("visual", vis)
 	else:
-		push_warning("Unsupported imported world asset type: " + asset_path)
-		return null
-	instance.name = asset_path.get_file().get_basename()
-	instance.position = world_position
-	instance.scale = asset_scale
-	instance.rotation.y = yaw_radians
-	add_child(instance)
-	return instance
+		_add_person_visual(root, Color(0.16, 0.11, 0.28), Color(0.8, 0.72, 0.92), true)
+	add_child(root)
+	return root
 
-func _build_house(pos: Vector3, color: Color) -> void:
-	# Low-fantasy timber-and-plaster home with a pitched roof, recessed doorway,
-	# glowing leaded windows, and chimney; collision stays on the solid walls.
-	_add_box("Gloamwick Plaster House", pos + Vector3(0, 1.55, 0), Vector3(6.0, 3.1, 5.0), color, true)
-	_add_box("House Timber Beam", pos + Vector3(0, 2.75, -2.54), Vector3(5.8, 0.18, 0.12), Color(0.07, 0.035, 0.04), false)
-	_add_box("House Door", pos + Vector3(0, 0.92, -2.58), Vector3(1.0, 1.84, 0.14), Color(0.045, 0.025, 0.04), false)
-	_add_box("Door Handle", pos + Vector3(0.32, 0.95, -2.68), Vector3(0.08, 0.08, 0.05), Color(0.75, 0.48, 0.19), false)
-	for side in [-1.0, 1.0]:
-		var front_window_x: float = float(side) * 1.72
-		_add_box("House Window Frame", pos + Vector3(front_window_x, 1.9, -2.59), Vector3(0.95, 1.05, 0.12), Color(0.045, 0.025, 0.055), false)
-		_add_box("House Warm Window", pos + Vector3(front_window_x, 1.9, -2.67), Vector3(0.7, 0.8, 0.06), Color(0.95, 0.48, 0.19), false)
-		_add_box("House Window Mullion", pos + Vector3(front_window_x, 1.9, -2.72), Vector3(0.08, 0.82, 0.04), Color(0.12, 0.06, 0.07), false)
-		# Side doors and windows face the narrow lanes between each row of homes.
-		var side_door: Node3D = _add_box("House Side Door", pos + Vector3(float(side) * 3.06, 0.92, 0.0), Vector3(0.14, 1.84, 1.0), Color(0.045, 0.025, 0.04), false)
-		side_door.rotation.y = PI * 0.5
-		_add_box("House Side Window Frame", pos + Vector3(float(side) * 3.06, 1.95, 1.55), Vector3(0.12, 0.92, 0.8), Color(0.045, 0.025, 0.055), false)
-		_add_box("House Side Warm Window", pos + Vector3(float(side) * 3.13, 1.95, 1.55), Vector3(0.06, 0.68, 0.56), Color(0.95, 0.48, 0.19), false)
-		_add_box("House Side Window Frame", pos + Vector3(float(side) * 3.06, 1.95, -1.55), Vector3(0.12, 0.92, 0.8), Color(0.045, 0.025, 0.055), false)
-		_add_box("House Side Warm Window", pos + Vector3(float(side) * 3.13, 1.95, -1.55), Vector3(0.06, 0.68, 0.56), Color(0.95, 0.48, 0.19), false)
-	# Two sloped roof planes create a visible gable instead of a flat slab.
-	var roof_left := _add_box("House Pitched Roof Left", pos + Vector3(-1.55, 3.45, 0), Vector3(3.55, 0.28, 5.8), Color(0.055, 0.028, 0.075), false)
-	roof_left.rotation.z = -0.48
-	var roof_right := _add_box("House Pitched Roof Right", pos + Vector3(1.55, 3.45, 0), Vector3(3.55, 0.28, 5.8), Color(0.075, 0.035, 0.065), false)
-	roof_right.rotation.z = 0.48
-	_add_box("House Ridge Beam", pos + Vector3(0, 4.18, 0), Vector3(0.22, 0.22, 6.0), Color(0.12, 0.055, 0.07), false)
-	_add_box("House Chimney", pos + Vector3(2.0, 4.05, 1.0), Vector3(0.55, 1.2, 0.55), Color(0.16, 0.075, 0.095), true)
-	_place_imported_asset("res://OBJ/Prop_Vine1.obj", pos + Vector3(-2.7, 1.8, -2.62), Vector3.ONE * 0.55, 0.0)
+## Play a sound through the Any Audio Manager autoload, if present.
+func _play(key: StringName, volume_db: float = 0.0, pitch_scale: float = 1.0) -> void:
+	var am := get_node_or_null("/root/AudioManager")
+	if am != null and am.has_method("play_sfx"):
+		am.play_sfx(key, volume_db, pitch_scale)
 
-func _build_tree(pos: Vector3, height: float) -> void:
-	var trunk := MeshInstance3D.new()
-	var trunk_mesh := CylinderMesh.new()
-	trunk_mesh.top_radius = 0.18
-	trunk_mesh.bottom_radius = 0.42
-	trunk_mesh.height = height
-	trunk.mesh = trunk_mesh
-	trunk.position = pos + Vector3(0, height * 0.5, 0)
-	trunk.material_override = _material(Color(0.065, 0.032, 0.04))
-	add_child(trunk)
+func _play_music(key: StringName, volume_db: float = -18.0) -> void:
+	var am := get_node_or_null("/root/AudioManager")
+	if am != null and am.has_method("play_music"):
+		am.play_music(key, true, volume_db)
 
-	# Angular boughs break up the old lollipop-tree silhouette.
-	for branch_index in range(3):
-		var branch := MeshInstance3D.new()
-		var branch_mesh := CylinderMesh.new()
-		branch_mesh.top_radius = 0.055
-		branch_mesh.bottom_radius = 0.13
-		branch_mesh.height = 2.1
-		branch.mesh = branch_mesh
-		branch.position = pos + Vector3(0, height * (0.52 + float(branch_index) * 0.12), 0)
-		branch.rotation_degrees = Vector3(0, float(branch_index) * 67.0, -42.0 + float(branch_index) * 19.0)
-		branch.material_override = _material(Color(0.055, 0.027, 0.04))
-		add_child(branch)
-
-	for canopy_index in range(4):
-		var crown := MeshInstance3D.new()
-		var crown_mesh := SphereMesh.new()
-		crown_mesh.radius = 1.35 if canopy_index == 0 else 1.05
-		crown_mesh.height = crown_mesh.radius * 1.9
-		crown.mesh = crown_mesh
-		crown.position = pos + Vector3(
-			sin(float(canopy_index) * 1.8) * 0.95,
-			height + 0.2 + float(canopy_index % 2) * 0.9,
-			cos(float(canopy_index) * 1.7) * 0.8
-		)
-		crown.scale = Vector3(1.0, 1.25, 0.9)
-		crown.material_override = _material(Color(0.022 + float(canopy_index) * 0.004, 0.045, 0.038))
-		add_child(crown)
-
-	# Tiny bioluminescent mushrooms and spores give the ground depth cues.
-	for spore_index in range(2):
-		var spore := _make_sphere(pos + Vector3(-0.42 + float(spore_index) * 0.84, 0.16, 0.25), 0.09, Color(0.36, 0.13, 0.62))
-		spore.scale = Vector3(1.0, 0.65, 1.0)
-		add_child(spore)
+func _update_skirmish(delta: float) -> void:
+	skirmish_timer -= delta
+	if skirmish_timer > 0.0:
+		return
+	skirmish_timer = randf_range(0.8, 1.6)
+	if mathias.has_meta("visual"):
+		var m_vis = mathias.get_meta("visual")
+		if m_vis != null and m_vis.has_method("attack"):
+			m_vis.attack()
+	if not enemy_nodes.is_empty():
+		var enemy: Node3D = enemy_nodes[randi() % enemy_nodes.size()]
+		if is_instance_valid(enemy) and enemy.has_meta("visual"):
+			var e_vis = enemy.get_meta("visual")
+			if e_vis != null and e_vis.has_method("attack"):
+				e_vis.attack()
+	_play(&"ui_confirm", -16.0, randf_range(0.9, 1.15))
 
 func _build_person(person_name: String, pos: Vector3, robe_color: Color, glow_color: Color, is_mage: bool) -> Node3D:
 	var person := Node3D.new()
@@ -920,7 +1138,7 @@ func _build_person(person_name: String, pos: Vector3, robe_color: Color, glow_co
 	add_child(person)
 	return person
 
-func _add_person_visual(parent: Node3D, robe_color: Color, face_color: Color, is_mage: bool, path_name: String = "") -> void:
+func _add_person_visual(parent: Node3D, robe_color: Color, face_color: Color, is_mage: bool) -> void:
 	# Layered silhouette: broad hem, fitted torso, sleeves, sash and a compact hat.
 	# Keeping the character built from low-poly meshes avoids missing external model imports.
 	var robe := MeshInstance3D.new()
@@ -1025,10 +1243,8 @@ func _add_person_visual(parent: Node3D, robe_color: Color, face_color: Color, is
 		band_mesh.outer_radius = 0.245
 		hat_band.mesh = band_mesh
 		hat_band.position.y = 1.91
-		hat_band.material_override = _material(_class_accent(path_name) if path_name != "" else face_color, true)
+		hat_band.material_override = _material(face_color, true)
 		parent.add_child(hat_band)
-		if path_name != "":
-			_add_class_details(parent, path_name)
 	else:
 		# Mathias' shadowed hood and bright eyes give him a distinct battle-mage shape.
 		var hood := MeshInstance3D.new()
@@ -1048,7 +1264,7 @@ func _add_person_visual(parent: Node3D, robe_color: Color, face_color: Color, is
 	pendant.scale = Vector3(0.72, 1.0, 0.5)
 	parent.add_child(pendant)
 
-func _make_sigil(pos: Vector3, color: Color, size: float) -> Node3D:
+func _make_sigil(pos: Vector3, color: Color, size: float, with_light: bool = true) -> Node3D:
 	var root := Node3D.new()
 	root.position = pos
 	var ring := MeshInstance3D.new()
@@ -1065,34 +1281,12 @@ func _make_sigil(pos: Vector3, color: Color, size: float) -> Node3D:
 	crystal.mesh = crystal_mesh
 	crystal.material_override = _material(color, true)
 	root.add_child(crystal)
-	var light := OmniLight3D.new()
-	light.light_color = color
-	light.light_energy = 1.2
-	light.omni_range = size * 5.0
-	root.add_child(light)
-	return root
-
-func _add_box(object_name: String, pos: Vector3, size: Vector3, color: Color, collision: bool) -> Node3D:
-	var root: Node3D
-	if collision:
-		root = StaticBody3D.new()
-		var shape_node := CollisionShape3D.new()
-		var shape := BoxShape3D.new()
-		shape.size = size
-		shape_node.shape = shape
-		root.add_child(shape_node)
-	else:
-		root = Node3D.new()
-	root.name = object_name
-	root.position = pos
-	var mesh_node := MeshInstance3D.new()
-	var mesh := BoxMesh.new()
-	mesh.size = size
-	mesh_node.mesh = mesh
-	var emissive_prop := object_name.contains("Window") or object_name.contains("Lantern") or object_name.contains("Sign Rune") or object_name.contains("Rune Well Inner Pool") or object_name.contains("Wardstone")
-	mesh_node.material_override = _material(color, emissive_prop)
-	root.add_child(mesh_node)
-	add_child(root)
+	if with_light:
+		var light := OmniLight3D.new()
+		light.light_color = color
+		light.light_energy = 1.2
+		light.omni_range = size * 5.0
+		root.add_child(light)
 	return root
 
 func _make_sphere(pos: Vector3, radius: float, color: Color) -> MeshInstance3D:
@@ -1115,80 +1309,17 @@ func _material(color: Color, glow: bool = false) -> StandardMaterial3D:
 		material.emission_energy_multiplier = 1.4
 	return material
 
-func _add_class_details(parent: Node3D, path_name: String) -> void:
-	var accent := _class_accent(path_name)
-	# Distinct magical focuses and shoulder pieces give each path a readable silhouette.
-	var focus := MeshInstance3D.new()
-	focus.name = "ClassFocus_" + path_name.replace(" ", "")
-	focus.position = Vector3(0.48, 1.02, -0.04)
-	match path_name:
-		"Ember Mage":
-			var flame := SphereMesh.new()
-			flame.radius = 0.22
-			flame.height = 0.58
-			focus.mesh = flame
-			focus.position = Vector3(0.52, 1.05, -0.04)
-			focus.scale = Vector3(0.72, 1.25, 0.72)
-		"Frostweaver":
-			var crystal := PrismMesh.new()
-			crystal.size = Vector3(0.32, 0.62, 0.32)
-			focus.mesh = crystal
-			focus.rotation_degrees = Vector3(0, 0, 28)
-			focus.position = Vector3(0.48, 1.12, -0.04)
-		"Verdant Warden":
-			var leaf := CylinderMesh.new()
-			leaf.top_radius = 0.0
-			leaf.bottom_radius = 0.24
-			leaf.height = 0.72
-			focus.mesh = leaf
-			focus.rotation_degrees = Vector3(0, 0, -34)
-			focus.position = Vector3(0.48, 1.08, -0.04)
-		"Storm Herald":
-			var storm := PrismMesh.new()
-			storm.size = Vector3(0.22, 0.68, 0.22)
-			focus.mesh = storm
-			focus.rotation_degrees = Vector3(0, 0, 24)
-			focus.position = Vector3(0.48, 1.08, -0.04)
-		"Voidcaller":
-			var void_orb := SphereMesh.new()
-			void_orb.radius = 0.22
-			void_orb.height = 0.44
-			focus.mesh = void_orb
-			focus.position = Vector3(0.48, 1.03, -0.04)
-		"Sigilbinder":
-			var sigil := TorusMesh.new()
-			sigil.inner_radius = 0.12
-			sigil.outer_radius = 0.23
-			focus.mesh = sigil
-			focus.position = Vector3(0.48, 1.03, -0.04)
-	focus.material_override = _material(accent, true)
-	parent.add_child(focus)
+func _on_button_hover() -> void:
+	_play(&"ui_hover", -9.0)
 
-	var shoulder := MeshInstance3D.new()
-	var shoulder_mesh := SphereMesh.new()
-	shoulder_mesh.radius = 0.24
-	shoulder_mesh.height = 0.32
-	shoulder.mesh = shoulder_mesh
-	shoulder.position = Vector3(-0.34, 1.35, 0.0)
-	shoulder.scale = Vector3(1.0, 0.78, 0.7)
-	shoulder.material_override = _material(accent.darkened(0.22))
-	parent.add_child(shoulder)
-
-	if path_name == "Ember Mage" or path_name == "Storm Herald":
-		var crest := MeshInstance3D.new()
-		var crest_mesh := CylinderMesh.new()
-		crest_mesh.top_radius = 0.0
-		crest_mesh.bottom_radius = 0.17
-		crest_mesh.height = 0.48
-		crest.mesh = crest_mesh
-		crest.position = Vector3(0, 1.91, 0)
-		crest.rotation.z = -0.2 if path_name == "Ember Mage" else 0.2
-		crest.material_override = _material(accent)
-		parent.add_child(crest)
+func _on_button_click() -> void:
+	_play(&"ui_click", -6.0)
 
 func _make_button(label_text: String, color: Color) -> Button:
 	var button := Button.new()
 	button.text = label_text
+	button.mouse_entered.connect(_on_button_hover)
+	button.pressed.connect(_on_button_click)
 	button.custom_minimum_size = Vector2(0, 44)
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	button.add_theme_font_size_override("font_size", 16)
@@ -1242,6 +1373,23 @@ func _choose_question_mathias() -> void:
 	dialogue_hint.text = "Quest started • Mathias now knows you doubt him"
 	_save_game()
 
+func _face_mathias_for_conversation() -> void:
+	# Turn both characters toward one another before the dialogue appears, so the
+	# conversation reads as a shared moment instead of two models facing away.
+	if player == null or mathias == null or not is_instance_valid(mathias):
+		return
+	var toward_mathias := mathias.global_position - player.global_position
+	toward_mathias.y = 0.0
+	if toward_mathias.length_squared() < 0.01:
+		return
+	var toward_player := -toward_mathias
+	var player_yaw := atan2(-toward_mathias.x, -toward_mathias.z)
+	var mathias_yaw := atan2(-toward_player.x, -toward_player.z)
+	yaw = player_yaw
+	var turn_tween := create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	turn_tween.tween_property(player, "rotation:y", player_yaw, 0.28)
+	turn_tween.parallel().tween_property(mathias, "rotation:y", mathias_yaw, 0.28)
+
 func _show_dialogue(title_text: String, body_text: String, hint_text: String) -> void:
 	if dialogue_choice_trust != null:
 		dialogue_choice_trust.visible = false
@@ -1249,7 +1397,11 @@ func _show_dialogue(title_text: String, body_text: String, hint_text: String) ->
 		dialogue_choice_question.visible = false
 	dialogue_open = true
 	dialogue_title.text = title_text
-	dialogue_body.text = body_text
+	dialogue_full_text = body_text
+	dialogue_reveal = 0.0
+	dialogue_typing = true
+	_letter_timer = 0.0
+	dialogue_body.text = ""
 	dialogue_hint.text = hint_text
 	dialogue_panel.visible = true
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -1257,6 +1409,16 @@ func _show_dialogue(title_text: String, body_text: String, hint_text: String) ->
 func _advance_dialogue() -> void:
 	if not dialogue_open:
 		return
+	# The post-battle conversation offers an explicit trust/doubt choice.
+	# E/click should finish the spoken line without hiding the buttons underneath it.
+	if story_stage == 0 and enemy_nodes.is_empty() and dialogue_choice_trust.visible:
+		dialogue_typing = false
+		dialogue_body.text = dialogue_full_text
+		dialogue_hint.text = "Choose how you answer Mathias"
+		return
+	# A single click finishes the line and advances in the same press.
+	dialogue_typing = false
+	dialogue_body.text = dialogue_full_text
 	dialogue_panel.visible = false
 	dialogue_open = false
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -1268,10 +1430,12 @@ func _advance_dialogue() -> void:
 	if story_stage == 1 and collected_sigils >= 3:
 		story_stage = 2
 		_save_game()
+		_play_music(&"music_dark_heart", -17.0)
 		var revelation := "Mathias admits that he feared the Council would repeat its oldest mistake." if trust_mathias else "Mathias sees that you still doubt him. He gives you one truth anyway: the Council erased a name to keep the Hollow Crown from claiming it."
 		_show_dialogue("THE SANCTUARY OPENS", "The three sigils circle the gate and settle into its stonework. The violet sky clears for a heartbeat. " + revelation + " The Realm's Archivists speak of a page that never was, an Archive Wisp, and a crown erased from every record. If this corruption reaches that secret, Gloamwick is only the beginning. The trail leads beyond this valley—and into the Saga of the Hollow Crown.", "Enter the Sigil Sanctuary")
 		return
 	if story_stage >= 2:
+		_play_music(&"music_after_dark", -18.0)
 		_show_dialogue("CHAPTER I COMPLETE", "Your Chronicle now carries the first record of the failing wards. The Council's saga continues beyond Gloamwick: forbidden pages, familiars born from memory, rival paths, ancient relics, and the Hollow Crown. Future chapters will build on this journey.", "Return to the Realm")
 		return
 	_refresh_objective()
@@ -1290,6 +1454,20 @@ func _interact() -> void:
 			_set_status("The square is dangerous. Find Mathias near the broken ward.")
 		return
 
+	var item := _nearest_collectible()
+	if item != null and _distance_to(item) < 2.6:
+		var item_name := str(item.get_meta("item_name", "Item"))
+		var item_kind := str(item.get_meta("item_kind", "relic"))
+		collectibles.erase(item)
+		item.queue_free()
+		if not collected_items.has(item_name):
+			collected_items.append(item_name)
+		_refresh_inventory()
+		_save_game()
+		_play(&"ui_confirm", -8.0)
+		_set_status(("New gear: " if item_kind == "gear" else "Quest item: ") + item_name)
+		return
+
 	if archive_wisp != null and is_instance_valid(archive_wisp) and archive_wisp.visible and _distance_to(archive_wisp) < 3.0:
 		archive_wisp.visible = false
 		lore_discovered = true
@@ -1298,6 +1476,7 @@ func _interact() -> void:
 		return
 
 	if story_stage == 0 and _distance_to(mathias) < 4.0:
+		_face_mathias_for_conversation()
 		_show_dialogue("MATHIAS • BATTLE MAGE", "“The first wave is gone, but the ward is still bleeding light. I have served the Council for decades, and I have never seen a seal answer to something outside the Realm. Gather the three Sigils. Dawn, Dusk, Heart—remember their names. They are not keys alone; they are promises the Council made.”", "Choose how you answer Mathias")
 		dialogue_choice_trust.visible = true
 		dialogue_choice_question.visible = true
@@ -1324,6 +1503,7 @@ func _interact() -> void:
 		return
 
 	if _distance_to(mathias) < 4.0:
+		_face_mathias_for_conversation()
 		_show_dialogue("MATHIAS", "“The Sigils remember more than we do. Let the Codex guide your next step.”", "Continue")
 		return
 	_set_status("Nothing answers here. Move closer to Mathias, a Sigil, or the sanctuary gate.")
@@ -1337,6 +1517,7 @@ func _cast_arcane_pulse() -> void:
 	if player.global_position.distance_to(target.global_position) > 18.0:
 		_set_status("Too far away. Move closer to the riftbound.")
 		return
+	_play_music(&"music_reinforcements", -16.0)
 	var spell_names := {
 		"Ember Mage": "Cinder Lance",
 		"Frostweaver": "Glacial Shard",
@@ -1357,6 +1538,7 @@ func _cast_arcane_pulse() -> void:
 		_set_status(str(spell_names.get(player_path, "Arcane Pulse")) + " disperses a riftbound shade. " + str(enemy_nodes.size()) + " remain.")
 		if enemy_nodes.is_empty():
 			battle_cleared = true
+			_play_music(&"music_voices_of_mire", -19.0)
 			_set_status("The last shade dissolves. Mathias is safe—speak with him using E.")
 			_save_game()
 	else:
@@ -1437,6 +1619,12 @@ func _load_save() -> void:
 		player_path = str(save_data.get_value("player", "path", "Sigilbinder"))
 		story_stage = int(save_data.get_value("progress", "stage", 0))
 		collected_sigils = int(save_data.get_value("progress", "sigils", 0))
+		appearance.robe = save_data.get_value("appearance", "robe", appearance.robe)
+		appearance.accent = save_data.get_value("appearance", "accent", appearance.accent)
+		appearance.skin = save_data.get_value("appearance", "skin", appearance.skin)
+		appearance.hat = int(save_data.get_value("appearance", "hat", appearance.hat))
+		appearance.staff = bool(save_data.get_value("appearance", "staff", appearance.staff))
+		_refresh_preview()
 
 func _save_game() -> void:
 	save_data.set_value("player", "name", player_name)
@@ -1448,7 +1636,155 @@ func _save_game() -> void:
 	save_data.set_value("progress", "lore_discovered", lore_discovered)
 	save_data.set_value("story", "trust_mathias", trust_mathias)
 	save_data.set_value("world", "seed", WORLD_SEED)
+	save_data.set_value("appearance", "robe", appearance.robe)
+	save_data.set_value("appearance", "accent", appearance.accent)
+	save_data.set_value("appearance", "skin", appearance.skin)
+	save_data.set_value("appearance", "hat", appearance.hat)
+	save_data.set_value("appearance", "staff", appearance.staff)
 	var err := save_data.save(SAVE_PATH)
 	has_save = err == OK
 	if continue_button != null:
 		continue_button.disabled = not has_save
+
+# ---------------------------------------------------------------------------
+# Loading screen, ambient animation and HUD helpers
+# ---------------------------------------------------------------------------
+
+func _show_loading() -> void:
+	if loading_root == null:
+		return
+	loading_root.visible = true
+	loading_root.modulate.a = 1.0
+	loading_bar.value = 0.0
+	loading_status.text = "Awakening the wards…"
+	var elapsed := 0.0
+	while elapsed < 1.25:
+		elapsed += get_process_delta_time()
+		loading_bar.value = minf(88.0, elapsed / 1.25 * 88.0)
+		loading_spinner.pivot_offset = loading_spinner.size * 0.5
+		loading_spinner.rotation += 0.16
+		await get_tree().process_frame
+	loading_status.text = "Raising Gloamwick from the mist…"
+
+func _hide_loading() -> void:
+	if loading_root == null:
+		return
+	loading_bar.value = 100.0
+	loading_status.text = "Enter the realm"
+	await get_tree().create_timer(0.3).timeout
+	var tw := create_tween()
+	tw.tween_property(loading_root, "modulate:a", 0.0, 0.5)
+	await tw.finished
+	loading_root.visible = false
+	loading_root.modulate.a = 1.0
+
+## Slow spin + float for sigils, wisps and collectibles, plus a warm flicker for
+## every omni light — procedural life for a world with no baked animation.
+func _animate_world(delta: float) -> void:
+	if spin_nodes.is_empty() and flicker_lights.is_empty():
+		return
+	_world_time += delta
+	for node in spin_nodes:
+		if not is_instance_valid(node):
+			continue
+		node.rotation.y += delta * 0.7
+		var base_y: float = node.get_meta("base_y", node.position.y)
+		var phase: float = node.get_meta("phase", 0.0)
+		node.position.y = base_y + sin(_world_time * 1.6 + phase) * 0.11
+	for light in flicker_lights:
+		if not is_instance_valid(light):
+			continue
+		var base_energy: float = light.get_meta("base_energy", 1.0)
+		var flicker: float = light.get_meta("flicker_seed", 0.0)
+		light.light_energy = base_energy * (0.85 + sin(_world_time * 8.5 + flicker) * 0.11 + sin(_world_time * 23.0 + flicker) * 0.05)
+
+func _register_spin(node: Node3D) -> void:
+	if node == null or not is_instance_valid(node):
+		return
+	node.set_meta("base_y", node.position.y)
+	node.set_meta("phase", randf() * TAU)
+	spin_nodes.append(node)
+
+func _collect_lights(node: Node) -> void:
+	if node is OmniLight3D:
+		var light := node as OmniLight3D
+		if not light.has_meta("base_energy"):
+			light.set_meta("base_energy", light.light_energy)
+			light.set_meta("flicker_seed", randf() * 12.0)
+			flicker_lights.append(light)
+	for child in node.get_children():
+		_collect_lights(child)
+
+## A labelled row of colour swatches; picking one calls `on_pick` with the colour.
+func _make_swatch_row(parent: Control, title_text: String, colors: Array, on_pick: Callable) -> void:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 6)
+	var title := Label.new()
+	title.text = title_text
+	title.custom_minimum_size = Vector2(110, 0)
+	title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	title.add_theme_font_size_override("font_size", 12)
+	title.add_theme_color_override("font_color", Color(0.81, 0.69, 0.94))
+	row.add_child(title)
+	for color in colors:
+		var swatch := Button.new()
+		swatch.custom_minimum_size = Vector2(34, 34)
+		var sb := StyleBoxFlat.new()
+		sb.bg_color = color
+		sb.corner_radius_top_left = 6
+		sb.corner_radius_top_right = 6
+		sb.corner_radius_bottom_left = 6
+		sb.corner_radius_bottom_right = 6
+		sb.set_border_width_all(2)
+		sb.border_color = Color(1, 1, 1, 0.18)
+		swatch.add_theme_stylebox_override("normal", sb)
+		swatch.add_theme_stylebox_override("hover", sb)
+		swatch.add_theme_stylebox_override("pressed", sb)
+		swatch.pressed.connect(func() -> void: on_pick.call(color))
+		row.add_child(swatch)
+	parent.add_child(row)
+
+## Rebuild the creator's 3D preview from the current appearance, using the same
+## rigged human the game uses so the preview matches the final character.
+func _refresh_preview() -> void:
+	if preview_pivot == null or not is_instance_valid(preview_pivot):
+		return
+	for child in preview_pivot.get_children():
+		preview_pivot.remove_child(child)
+		child.queue_free()
+	var dummy := CharacterBody3D.new()
+	dummy.collision_layer = 0
+	dummy.collision_mask = 0
+	preview_pivot.add_child(dummy)
+	var rig: AnimatedCharacter = AnimatedCharacterScript.new()
+	preview_pivot.add_child(rig)
+	if rig.setup(dummy):
+		rig.use_simple_idle()
+		rig.set_tint(appearance.skin)
+		_attach_wizard_extras(rig)
+	else:
+		rig.queue_free()
+		preview_pivot.add_child(appearance.build())
+
+## Dress the rigged human with the creator's hat/hood and staff on its bones.
+func _attach_wizard_extras(rig: AnimatedCharacter) -> void:
+	if appearance.staff:
+		var staff_node := appearance.build_staff()
+		staff_node.rotation = Vector3(0.0, 0.0, -PI * 0.5)
+		staff_node.position = Vector3(0.0, 0.0, 0.0)
+		rig.attach_to_bone("B-handProp.R", staff_node)
+	match appearance.hat:
+		0:
+			rig.attach_to_bone("Head", appearance.build_hat(), Vector3(0, 0.18, 0))
+		1:
+			rig.attach_to_bone("Head", appearance.build_hood(), Vector3(0, 0.13, 0))
+
+func _refresh_player_panel() -> void:
+	if hud_root == null:
+		return
+	var name_line := hud_root.find_child("PlayerNameLine", true, false) as Label
+	if name_line != null:
+		name_line.text = player_name
+	var path_line := hud_root.find_child("PlayerPathLine", true, false) as Label
+	if path_line != null:
+		path_line.text = "Path of the " + player_path + "  •  Chapter I"

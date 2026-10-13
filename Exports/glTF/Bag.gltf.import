@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bmld361syform"
-path="res://.godot/imported/Bag.gltf-59745344c9132da266a07c106675de4c.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Bag.gltf"
-dest_files=["res://.godot/imported/Bag.gltf-59745344c9132da266a07c106675de4c.scn"]
 
 [params]
 

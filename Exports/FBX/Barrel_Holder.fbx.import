@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bsm70m62dj5gi"
-path="res://.godot/imported/Barrel_Holder.fbx-5da8412c82eaf5ed10138751ee2f11c7.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Barrel_Holder.fbx"
-dest_files=["res://.godot/imported/Barrel_Holder.fbx-5da8412c82eaf5ed10138751ee2f11c7.scn"]
 
 [params]
 

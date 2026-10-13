@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://c7p1pbf6uh3oq"
-path="res://.godot/imported/Window_Roof_Wide.fbx-2e429130747c7f00b4c1f91254307da3.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Window_Roof_Wide.fbx"
-dest_files=["res://.godot/imported/Window_Roof_Wide.fbx-2e429130747c7f00b4c1f91254307da3.scn"]
 
 [params]
 

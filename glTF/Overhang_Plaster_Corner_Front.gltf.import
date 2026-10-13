@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://n02lchlc51pq"
-path="res://.godot/imported/Overhang_Plaster_Corner_Front.gltf-ef6388639fc19837ea7113f582957fbe.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Overhang_Plaster_Corner_Front.gltf"
-dest_files=["res://.godot/imported/Overhang_Plaster_Corner_Front.gltf-ef6388639fc19837ea7113f582957fbe.scn"]
 
 [params]
 

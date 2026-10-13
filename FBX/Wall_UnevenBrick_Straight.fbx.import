@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://r7bqiaads5sb"
-path="res://.godot/imported/Wall_UnevenBrick_Straight.fbx-e3bffaf633d43c24febd5f7b60b6223c.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Wall_UnevenBrick_Straight.fbx"
-dest_files=["res://.godot/imported/Wall_UnevenBrick_Straight.fbx-e3bffaf633d43c24febd5f7b60b6223c.scn"]
 
 [params]
 

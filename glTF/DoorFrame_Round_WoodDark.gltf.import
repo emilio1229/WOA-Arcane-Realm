@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://tc8q5ueqxjm"
-path="res://.godot/imported/DoorFrame_Round_WoodDark.gltf-55371172279aff17cedf80c37fd9e7bd.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/DoorFrame_Round_WoodDark.gltf"
-dest_files=["res://.godot/imported/DoorFrame_Round_WoodDark.gltf-55371172279aff17cedf80c37fd9e7bd.scn"]
 
 [params]
 

@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://daeg17rutna8t"
-path="res://.godot/imported/dark_fantasy_boss_3d_model.fbx-d36ec1039b481b3cf45e313a0431eccc.scn"
+valid=false
 
 [deps]
 
 source_file="res://TripoModels/dark_fantasy_boss_3d_model/dark_fantasy_boss_3d_model.fbx"
-dest_files=["res://.godot/imported/dark_fantasy_boss_3d_model.fbx-d36ec1039b481b3cf45e313a0431eccc.scn"]
 
 [params]
 

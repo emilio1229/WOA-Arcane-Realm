@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://c2v8k468ucdrk"
-path="res://.godot/imported/Chalice.fbx-051e35ab0b51cc36de7bd2c183a4b9c7.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Chalice.fbx"
-dest_files=["res://.godot/imported/Chalice.fbx-051e35ab0b51cc36de7bd2c183a4b9c7.scn"]
 
 [params]
 

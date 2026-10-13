@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://c5rndccmhhgg1"
-path="res://.godot/imported/Bucket_Wooden_1.gltf-deb97a73314fde4d96f14615b86d5fb5.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Bucket_Wooden_1.gltf"
-dest_files=["res://.godot/imported/Bucket_Wooden_1.gltf-deb97a73314fde4d96f14615b86d5fb5.scn"]
 
 [params]
 

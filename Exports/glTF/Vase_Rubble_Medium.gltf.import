@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://gx8p2oxo1j74"
-path="res://.godot/imported/Vase_Rubble_Medium.gltf-40479b12238e845c48d2f36d8be859b2.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Vase_Rubble_Medium.gltf"
-dest_files=["res://.godot/imported/Vase_Rubble_Medium.gltf-40479b12238e845c48d2f36d8be859b2.scn"]
 
 [params]
 

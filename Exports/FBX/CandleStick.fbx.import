@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bj6s8ea7x8eab"
-path="res://.godot/imported/CandleStick.fbx-aba5156c3b02d1de4adffa7441649a28.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/CandleStick.fbx"
-dest_files=["res://.godot/imported/CandleStick.fbx-aba5156c3b02d1de4adffa7441649a28.scn"]
 
 [params]
 

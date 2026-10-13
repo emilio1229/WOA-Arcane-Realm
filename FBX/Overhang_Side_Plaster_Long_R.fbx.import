@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://blxadnbmpxvng"
-path="res://.godot/imported/Overhang_Side_Plaster_Long_R.fbx-8a720f196b0e414d737326a6e1cc503c.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Overhang_Side_Plaster_Long_R.fbx"
-dest_files=["res://.godot/imported/Overhang_Side_Plaster_Long_R.fbx-8a720f196b0e414d737326a6e1cc503c.scn"]
 
 [params]
 

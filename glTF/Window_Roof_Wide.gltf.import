@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://ygfex3jx8pu5"
-path="res://.godot/imported/Window_Roof_Wide.gltf-b4341a03d9e06e258cb2b2c813429998.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Window_Roof_Wide.gltf"
-dest_files=["res://.godot/imported/Window_Roof_Wide.gltf-b4341a03d9e06e258cb2b2c813429998.scn"]
 
 [params]
 

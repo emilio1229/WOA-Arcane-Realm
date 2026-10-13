@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://01j7ec64dbch"
-path="res://.godot/imported/FarmCrate_Apple.gltf-946d049c38c0fc484162bafca8995c13.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/FarmCrate_Apple.gltf"
-dest_files=["res://.godot/imported/FarmCrate_Apple.gltf-946d049c38c0fc484162bafca8995c13.scn"]
 
 [params]
 

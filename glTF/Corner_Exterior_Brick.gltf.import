@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dgcv6r04i5sco"
-path="res://.godot/imported/Corner_Exterior_Brick.gltf-3b9dc2f95ae3589c90db17f02c6a79f2.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Corner_Exterior_Brick.gltf"
-dest_files=["res://.godot/imported/Corner_Exterior_Brick.gltf-3b9dc2f95ae3589c90db17f02c6a79f2.scn"]
 
 [params]
 

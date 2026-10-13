@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://mmewyk8hb2pa"
-path="res://.godot/imported/Prop_WoodenFence_Extension1.fbx-4064015820a91e0608b92fc79da8ad9a.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Prop_WoodenFence_Extension1.fbx"
-dest_files=["res://.godot/imported/Prop_WoodenFence_Extension1.fbx-4064015820a91e0608b92fc79da8ad9a.scn"]
 
 [params]
 

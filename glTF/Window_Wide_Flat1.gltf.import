@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dufowagus72op"
-path="res://.godot/imported/Window_Wide_Flat1.gltf-d39862c1d29803c01c6e8beb2d05c8fa.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Window_Wide_Flat1.gltf"
-dest_files=["res://.godot/imported/Window_Wide_Flat1.gltf-d39862c1d29803c01c6e8beb2d05c8fa.scn"]
 
 [params]
 

@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bogr1agdjt5xi"
-path="res://.godot/imported/Shelf_Simple.gltf-923d2ca320d5dfa088e081bd3775ac84.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Shelf_Simple.gltf"
-dest_files=["res://.godot/imported/Shelf_Simple.gltf-923d2ca320d5dfa088e081bd3775ac84.scn"]
 
 [params]
 

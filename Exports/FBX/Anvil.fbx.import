@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://3rbphkn10e3w"
-path="res://.godot/imported/Anvil.fbx-34719f4413c38e71df334eb49dcbd863.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Anvil.fbx"
-dest_files=["res://.godot/imported/Anvil.fbx-34719f4413c38e71df334eb49dcbd863.scn"]
 
 [params]
 

@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bloh7smg764qd"
-path="res://.godot/imported/Vase_2.gltf-9c57313f6139a1ed102d450cc2ccb712.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Vase_2.gltf"
-dest_files=["res://.godot/imported/Vase_2.gltf-9c57313f6139a1ed102d450cc2ccb712.scn"]
 
 [params]
 

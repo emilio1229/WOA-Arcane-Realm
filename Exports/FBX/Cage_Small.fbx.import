@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://sm1lvo2ahlbp"
-path="res://.godot/imported/Cage_Small.fbx-dd14ddd7ae42155b02576bd532da49b5.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Cage_Small.fbx"
-dest_files=["res://.godot/imported/Cage_Small.fbx-dd14ddd7ae42155b02576bd532da49b5.scn"]
 
 [params]
 

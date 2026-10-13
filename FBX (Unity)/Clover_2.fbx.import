@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://do6fwolcjkd2k"
-path="res://.godot/imported/Clover_2.fbx-82dbda398f40c1327985677aa3913419.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX (Unity)/Clover_2.fbx"
-dest_files=["res://.godot/imported/Clover_2.fbx-82dbda398f40c1327985677aa3913419.scn"]
 
 [params]
 

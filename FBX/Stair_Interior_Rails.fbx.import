@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://b8kq6abpsdyt3"
-path="res://.godot/imported/Stair_Interior_Rails.fbx-e744c2b387abca50eb68c56e5e697272.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Stair_Interior_Rails.fbx"
-dest_files=["res://.godot/imported/Stair_Interior_Rails.fbx-e744c2b387abca50eb68c56e5e697272.scn"]
 
 [params]
 

@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://rxbvt22uycon"
-path="res://.godot/imported/SmallBottle.gltf-51927c15c6cc88d7edae77f353248ad7.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/SmallBottle.gltf"
-dest_files=["res://.godot/imported/SmallBottle.gltf-51927c15c6cc88d7edae77f353248ad7.scn"]
 
 [params]
 

@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bjsuv43sruvye"
-path="res://.godot/imported/Mug.fbx-d5b733d96ef99be29054c6d87668d0ab.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Mug.fbx"
-dest_files=["res://.godot/imported/Mug.fbx-d5b733d96ef99be29054c6d87668d0ab.scn"]
 
 [params]
 

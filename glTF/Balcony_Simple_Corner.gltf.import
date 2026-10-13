@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dxigxwvuuat80"
-path="res://.godot/imported/Balcony_Simple_Corner.gltf-28ac19e07033e3ac461697eb137ebbd6.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Balcony_Simple_Corner.gltf"
-dest_files=["res://.godot/imported/Balcony_Simple_Corner.gltf-28ac19e07033e3ac461697eb137ebbd6.scn"]
 
 [params]
 

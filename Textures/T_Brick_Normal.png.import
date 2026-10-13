@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cj5ottgh813jq"
-path.s3tc="res://.godot/imported/T_Brick_Normal.png-2f380a8ef5d1d366066e9aaa196197a0.s3tc.ctex"
+path.s3tc="res://.godot/imported/T_Brick_Normal.png-4178916c44009f87220fb9a9a9b124a3.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://textures/T_Brick_Normal.png"
-dest_files=["res://.godot/imported/T_Brick_Normal.png-2f380a8ef5d1d366066e9aaa196197a0.s3tc.ctex"]
+source_file="res://Textures/T_Brick_Normal.png"
+dest_files=["res://.godot/imported/T_Brick_Normal.png-4178916c44009f87220fb9a9a9b124a3.s3tc.ctex"]
 
 [params]
 

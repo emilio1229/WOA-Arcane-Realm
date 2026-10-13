@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://baan3gxvhr4sx"
-path="res://.godot/imported/Flower_3_Single.gltf-94c1e52c951ba0dd5f1cb2eac52e3e77.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Flower_3_Single.gltf"
-dest_files=["res://.godot/imported/Flower_3_Single.gltf-94c1e52c951ba0dd5f1cb2eac52e3e77.scn"]
 
 [params]
 

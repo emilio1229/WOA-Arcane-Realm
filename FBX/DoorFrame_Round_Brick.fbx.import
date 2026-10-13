@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://cijt8vngugu87"
-path="res://.godot/imported/DoorFrame_Round_Brick.fbx-0f56546488456dc5107bb75278079da5.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/DoorFrame_Round_Brick.fbx"
-dest_files=["res://.godot/imported/DoorFrame_Round_Brick.fbx-0f56546488456dc5107bb75278079da5.scn"]
 
 [params]
 

@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://djs45af35q6n5"
-path="res://.godot/imported/Fern_1.fbx-c0bd4cde22daedfde8f480660b3522f2.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX (Unity)/Fern_1.fbx"
-dest_files=["res://.godot/imported/Fern_1.fbx-c0bd4cde22daedfde8f480660b3522f2.scn"]
 
 [params]
 

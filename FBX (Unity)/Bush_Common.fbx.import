@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bnps13657o1pg"
-path="res://.godot/imported/Bush_Common.fbx-c64b48aaa769c594513248b92447ee67.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX (Unity)/Bush_Common.fbx"
-dest_files=["res://.godot/imported/Bush_Common.fbx-c64b48aaa769c594513248b92447ee67.scn"]
 
 [params]
 

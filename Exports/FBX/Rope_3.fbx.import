@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://cqs8ahvfabloe"
-path="res://.godot/imported/Rope_3.fbx-ef062423cdb62f86bf220346b40d064b.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Rope_3.fbx"
-dest_files=["res://.godot/imported/Rope_3.fbx-ef062423cdb62f86bf220346b40d064b.scn"]
 
 [params]
 

@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bxq8rn1yvtbf8"
-path="res://.godot/imported/Plant_7_Big.fbx-1dc27b22606b74316805e2f4c93d7f93.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX (Unity)/Plant_7_Big.fbx"
-dest_files=["res://.godot/imported/Plant_7_Big.fbx-1dc27b22606b74316805e2f4c93d7f93.scn"]
 
 [params]
 

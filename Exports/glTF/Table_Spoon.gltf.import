@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://b0rafulny7f2q"
-path="res://.godot/imported/Table_Spoon.gltf-c5afd3a9c6bd04550e13459bf390532b.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Table_Spoon.gltf"
-dest_files=["res://.godot/imported/Table_Spoon.gltf-c5afd3a9c6bd04550e13459bf390532b.scn"]
 
 [params]
 

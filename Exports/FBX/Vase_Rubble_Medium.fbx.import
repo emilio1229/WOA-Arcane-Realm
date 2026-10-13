@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bekglks4nomud"
-path="res://.godot/imported/Vase_Rubble_Medium.fbx-d24501e7dc1f4c0c0d45b34aec0e2bd2.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/FBX/Vase_Rubble_Medium.fbx"
-dest_files=["res://.godot/imported/Vase_Rubble_Medium.fbx-d24501e7dc1f4c0c0d45b34aec0e2bd2.scn"]
 
 [params]
 

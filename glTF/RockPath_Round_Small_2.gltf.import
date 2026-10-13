@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://c7kosvq3pjlrc"
-path="res://.godot/imported/RockPath_Round_Small_2.gltf-5c32fa2e692c0d7db2db12a7d9fa321d.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/RockPath_Round_Small_2.gltf"
-dest_files=["res://.godot/imported/RockPath_Round_Small_2.gltf-5c32fa2e692c0d7db2db12a7d9fa321d.scn"]
 
 [params]
 

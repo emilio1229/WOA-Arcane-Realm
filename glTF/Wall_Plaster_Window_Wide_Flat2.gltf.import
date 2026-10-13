@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://8ha0vgmp8tch"
-path="res://.godot/imported/Wall_Plaster_Window_Wide_Flat2.gltf-2e327cca3a263afa6913cd371d27f79a.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Wall_Plaster_Window_Wide_Flat2.gltf"
-dest_files=["res://.godot/imported/Wall_Plaster_Window_Wide_Flat2.gltf-2e327cca3a263afa6913cd371d27f79a.scn"]
 
 [params]
 

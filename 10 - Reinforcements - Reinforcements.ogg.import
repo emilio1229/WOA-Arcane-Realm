@@ -1,0 +1,19 @@
+[remap]
+
+importer="oggvorbisstr"
+type="AudioStreamOggVorbis"
+uid="uid://b47ppaws72jbm"
+path="res://.godot/imported/10 - Reinforcements - Reinforcements.ogg-bcc8412a74bcb8a360aac83af0f04dc0.oggvorbisstr"
+
+[deps]
+
+source_file="res://10 - Reinforcements - Reinforcements.ogg"
+dest_files=["res://.godot/imported/10 - Reinforcements - Reinforcements.ogg-bcc8412a74bcb8a360aac83af0f04dc0.oggvorbisstr"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

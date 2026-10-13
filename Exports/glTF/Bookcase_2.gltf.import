@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://diyhbod6iwn2a"
-path="res://.godot/imported/Bookcase_2.gltf-7faeceb631f058f2df6ab3bfd1e9e860.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Bookcase_2.gltf"
-dest_files=["res://.godot/imported/Bookcase_2.gltf-7faeceb631f058f2df6ab3bfd1e9e860.scn"]
 
 [params]
 

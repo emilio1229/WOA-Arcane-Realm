@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://d0jjuscrtx5tu"
-path="res://.godot/imported/Mushroom_Laetiporus.gltf-b7e0a41d4cc61e86b1e48caa727dfa7b.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Mushroom_Laetiporus.gltf"
-dest_files=["res://.godot/imported/Mushroom_Laetiporus.gltf-b7e0a41d4cc61e86b1e48caa727dfa7b.scn"]
 
 [params]
 

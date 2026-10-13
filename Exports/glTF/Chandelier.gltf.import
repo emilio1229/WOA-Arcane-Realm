@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://c6hrorut2flk6"
-path="res://.godot/imported/Chandelier.gltf-38388acbc721dc487143e26c9415c937.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Chandelier.gltf"
-dest_files=["res://.godot/imported/Chandelier.gltf-38388acbc721dc487143e26c9415c937.scn"]
 
 [params]
 

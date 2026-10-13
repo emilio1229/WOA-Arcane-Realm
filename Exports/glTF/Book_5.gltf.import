@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://c1fqooru5lbi"
-path="res://.godot/imported/Book_5.gltf-0583da1dcdce111f9fa20964498c7a34.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Book_5.gltf"
-dest_files=["res://.godot/imported/Book_5.gltf-0583da1dcdce111f9fa20964498c7a34.scn"]
 
 [params]
 

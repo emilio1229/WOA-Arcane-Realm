@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://wvef27vfouxb"
-path="res://.godot/imported/Wall_UnevenBrick_Window_Wide_Round.gltf-5404c58b856625cf6dacff9dbc297ff9.scn"
+valid=false
 
 [deps]
 
 source_file="res://glTF/Wall_UnevenBrick_Window_Wide_Round.gltf"
-dest_files=["res://.godot/imported/Wall_UnevenBrick_Window_Wide_Round.gltf-5404c58b856625cf6dacff9dbc297ff9.scn"]
 
 [params]
 

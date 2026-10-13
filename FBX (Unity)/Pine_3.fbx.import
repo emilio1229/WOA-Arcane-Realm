@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://3bn4uea7n1d7"
-path="res://.godot/imported/Pine_3.fbx-9db77450fc029107e7ed58a83ce380f2.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX (Unity)/Pine_3.fbx"
-dest_files=["res://.godot/imported/Pine_3.fbx-9db77450fc029107e7ed58a83ce380f2.scn"]
 
 [params]
 

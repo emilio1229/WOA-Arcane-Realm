@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dv2ns0ret22vp"
-path="res://.godot/imported/Whetstone.gltf-ba152246d3416fb96a4cb53b26bf4720.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Whetstone.gltf"
-dest_files=["res://.godot/imported/Whetstone.gltf-ba152246d3416fb96a4cb53b26bf4720.scn"]
 
 [params]
 

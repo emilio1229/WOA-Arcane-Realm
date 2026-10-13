@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://b51cg7sb1dtom"
-path="res://.godot/imported/Chain_Coil.gltf-163c775ba16a145f37760dd07509d556.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Chain_Coil.gltf"
-dest_files=["res://.godot/imported/Chain_Coil.gltf-163c775ba16a145f37760dd07509d556.scn"]
 
 [params]
 

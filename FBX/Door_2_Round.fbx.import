@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dal1s37gbj45b"
-path="res://.godot/imported/Door_2_Round.fbx-8be9bcaa64ad0b4b9750c20387123e86.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Door_2_Round.fbx"
-dest_files=["res://.godot/imported/Door_2_Round.fbx-8be9bcaa64ad0b4b9750c20387123e86.scn"]
 
 [params]
 

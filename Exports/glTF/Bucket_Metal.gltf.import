@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://clli5r1a2uaae"
-path="res://.godot/imported/Bucket_Metal.gltf-50727806e834ce773b5c6ee9b0535e59.scn"
+valid=false
 
 [deps]
 
 source_file="res://Exports/glTF/Bucket_Metal.gltf"
-dest_files=["res://.godot/imported/Bucket_Metal.gltf-50727806e834ce773b5c6ee9b0535e59.scn"]
 
 [params]
 

@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://ctd8qj5yvmeli"
-path="res://.godot/imported/HoleCover_90Angle.fbx-4bb0053c808a2acfde43df1b464cad2f.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/HoleCover_90Angle.fbx"
-dest_files=["res://.godot/imported/HoleCover_90Angle.fbx-4bb0053c808a2acfde43df1b464cad2f.scn"]
 
 [params]
 

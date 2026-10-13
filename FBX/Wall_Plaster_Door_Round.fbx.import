@@ -4,12 +4,11 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dq6rbi7384xr4"
-path="res://.godot/imported/Wall_Plaster_Door_Round.fbx-452076e514fc5d97420c2cd6b956a4c3.scn"
+valid=false
 
 [deps]
 
 source_file="res://FBX/Wall_Plaster_Door_Round.fbx"
-dest_files=["res://.godot/imported/Wall_Plaster_Door_Round.fbx-452076e514fc5d97420c2cd6b956a4c3.scn"]
 
 [params]
 
