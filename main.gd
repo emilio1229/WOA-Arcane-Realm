@@ -86,6 +86,8 @@ var touch_up := false
 var touch_down := false
 var touch_run := false
 var loading_root: Control
+var loading_panel: PanelContainer
+var loading_column: VBoxContainer
 var loading_bar: ProgressBar
 var loading_status: Label
 var loading_spinner: Label
@@ -682,23 +684,24 @@ func _build_ui() -> void:
 	lcenter.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	loading_root.add_child(lcenter)
 
-	var lpanel := PanelContainer.new()
-	lpanel.custom_minimum_size = Vector2(620, 0)
-	lpanel.add_theme_stylebox_override("panel", _panel_style(Color(0.025, 0.012, 0.055, 0.82), Color(0.52, 0.34, 0.72, 0.78)))
-	lcenter.add_child(lpanel)
+	loading_panel = PanelContainer.new()
+	loading_panel.custom_minimum_size = Vector2(620, 0)
+	loading_panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	loading_panel.add_theme_stylebox_override("panel", _panel_style(Color(0.025, 0.012, 0.055, 0.82), Color(0.52, 0.34, 0.72, 0.78)))
+	lcenter.add_child(loading_panel)
 
-	var lcol := VBoxContainer.new()
-	lcol.add_theme_constant_override("separation", 12)
-	lcol.alignment = BoxContainer.ALIGNMENT_CENTER
-	lcol.custom_minimum_size = Vector2(560, 0)
-	lpanel.add_child(lcol)
+	loading_column = VBoxContainer.new()
+	loading_column.add_theme_constant_override("separation", 12)
+	loading_column.alignment = BoxContainer.ALIGNMENT_CENTER
+	loading_column.custom_minimum_size = Vector2(560, 0)
+	loading_panel.add_child(loading_column)
 
 	loading_spinner = Label.new()
 	loading_spinner.text = "✧"
 	loading_spinner.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	loading_spinner.add_theme_font_size_override("font_size", 52)
 	loading_spinner.add_theme_color_override("font_color", Color(0.84, 0.64, 1.0))
-	lcol.add_child(loading_spinner)
+	loading_column.add_child(loading_spinner)
 
 	var ltitle := Label.new()
 	ltitle.text = "ARCANE REALM"
@@ -707,17 +710,17 @@ func _build_ui() -> void:
 	ltitle.add_theme_color_override("font_color", Color(0.97, 0.91, 1.0))
 	ltitle.add_theme_constant_override("outline_size", 2)
 	ltitle.add_theme_color_override("font_outline_color", Color(0.08, 0.025, 0.12, 0.9))
-	lcol.add_child(ltitle)
+	loading_column.add_child(ltitle)
 
 	var lsubtitle := Label.new()
 	lsubtitle.text = "CHRONICLES OF THE HOLLOW CROWN"
 	lsubtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	lsubtitle.add_theme_font_size_override("font_size", 12)
 	lsubtitle.add_theme_color_override("font_color", Color(0.77, 0.63, 0.91))
-	lcol.add_child(lsubtitle)
+	loading_column.add_child(lsubtitle)
 
 	var ldivider_wrap := CenterContainer.new()
-	lcol.add_child(ldivider_wrap)
+	loading_column.add_child(ldivider_wrap)
 	var ldivider := ColorRect.new()
 	ldivider.custom_minimum_size = Vector2(150, 2)
 	ldivider.color = Color(0.66, 0.42, 0.92, 0.9)
@@ -728,10 +731,10 @@ func _build_ui() -> void:
 	lchapter.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	lchapter.add_theme_font_size_override("font_size", 13)
 	lchapter.add_theme_color_override("font_color", Color(0.92, 0.83, 1.0))
-	lcol.add_child(lchapter)
+	loading_column.add_child(lchapter)
 
 	var lbar_wrap := CenterContainer.new()
-	lcol.add_child(lbar_wrap)
+	loading_column.add_child(lbar_wrap)
 	loading_bar = ProgressBar.new()
 	loading_bar.custom_minimum_size = Vector2(500, 12)
 	loading_bar.min_value = 0.0
@@ -747,7 +750,7 @@ func _build_ui() -> void:
 	loading_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	loading_status.add_theme_font_size_override("font_size", 13)
 	loading_status.add_theme_color_override("font_color", Color(0.79, 0.72, 0.88))
-	lcol.add_child(loading_status)
+	loading_column.add_child(loading_status)
 
 	var lfooter := Label.new()
 	lfooter.text = "THE REALM REMEMBERS EVERY CHOICE"
@@ -761,6 +764,17 @@ func _build_ui() -> void:
 	lfooter.add_theme_color_override("font_color", Color(0.72, 0.62, 0.83, 0.9))
 	lfooter.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	loading_root.add_child(lfooter)
+	get_viewport().size_changed.connect(_fit_loading_screen)
+	_fit_loading_screen()
+
+func _fit_loading_screen() -> void:
+	if loading_panel == null or loading_column == null or loading_bar == null:
+		return
+	var viewport_width := get_viewport().get_visible_rect().size.x
+	var panel_width := clampf(viewport_width - 32.0, 280.0, 620.0)
+	loading_panel.custom_minimum_size = Vector2(panel_width, 0.0)
+	loading_column.custom_minimum_size = Vector2(maxf(240.0, panel_width - 60.0), 0.0)
+	loading_bar.custom_minimum_size = Vector2(maxf(200.0, panel_width - 120.0), 12.0)
 
 func _build_touch_controls() -> void:
 	touch_controls_root = Control.new()
@@ -1662,7 +1676,7 @@ func _show_loading() -> void:
 		elapsed += get_process_delta_time()
 		loading_bar.value = minf(88.0, elapsed / 1.25 * 88.0)
 		loading_spinner.pivot_offset = loading_spinner.size * 0.5
-		loading_spinner.rotation += 0.16
+		loading_spinner.rotation += get_process_delta_time() * 3.2
 		await get_tree().process_frame
 	loading_status.text = "Raising Gloamwick from the mist…"
 
