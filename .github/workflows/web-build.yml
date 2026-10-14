@@ -19,7 +19,7 @@ jobs:
       - name: Build Railway web image
         run: docker build --tag woa-arcane-realm-web .
 
-      - name: Smoke-test the actual web server and exported assets
+      - name: Smoke-test the 2D pixel-art game
         shell: bash
         run: |
           set -euo pipefail
@@ -34,16 +34,11 @@ jobs:
           done
 
           test -s /tmp/woa-index.html
-          grep -q 'WOA: Arcane Realm' /tmp/woa-index.html
+          grep -q 'WOA · ARCANE REALM' /tmp/woa-index.html
+          grep -q 'Create Your Hero' /tmp/woa-index.html
+          grep -q 'heroName' /tmp/woa-index.html
+          grep -q 'Begin Your Adventure' /tmp/woa-index.html
+          grep -q 'Mathias' /tmp/woa-index.html
+          grep -q 'getContext.*2d' /tmp/woa-index.html
 
-          mkdir -p /tmp/woa-web-assets
-          docker cp woa-web-smoke:/usr/share/nginx/html/. /tmp/woa-web-assets/
-          asset_count=0
-          while IFS= read -r -d '' asset; do
-            relative="${asset#/tmp/woa-web-assets/}"
-            curl --fail --silent --show-error "http://127.0.0.1:8080/${relative}" --output /dev/null
-            asset_count=$((asset_count + 1))
-          done < <(find /tmp/woa-web-assets -maxdepth 1 -type f \( -name '*.js' -o -name '*.wasm' -o -name '*.pck' \) -print0)
-
-          test "$asset_count" -ge 3
-          echo "Web server returned the game page and $asset_count Godot runtime assets."
+          echo "2D pixel-art game served successfully: character creation, name entry, start button, Mathias encounter, and 2D canvas are present."
