@@ -16,6 +16,36 @@ jobs:
         with:
           lfs: true
 
+      - name: Validate responsive playtest and JavaScript
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          html = Path("playtest-2d/index.html").read_text(encoding="utf-8")
+          required = {
+              "viewport meta": 'name="viewport"' in html,
+              "safe-area support": "env(safe-area-inset-bottom)" in html,
+              "landscape layout": "orientation:landscape" in html,
+              "portrait layout": "orientation:portrait" in html,
+              "viewport resize handling": "visualViewport.addEventListener('resize',resize)" in html,
+              "character creation": "Create Your Hero" in html,
+              "Mathias encounter": "Mathias" in html,
+              "2D canvas": 'id="game"' in html,
+          }
+          for label, passed in required.items():
+              print(f"{'PASS' if passed else 'FAIL'}: {label}")
+          missing = [label for label, passed in required.items() if not passed]
+          if missing:
+              raise SystemExit("Missing responsive/game requirements: " + ", ".join(missing))
+          scripts = re.findall(r"<script[^>]*>(.*?)</script>", html, re.S)
+          if not scripts:
+              raise SystemExit("No inline game script found")
+          Path("/tmp/woa-playtest.js").write_text("\\n".join(scripts), encoding="utf-8")
+          PY
+          node --check /tmp/woa-playtest.js
+
       - name: Build Railway web image
         run: docker build --tag woa-arcane-realm-web .
 
@@ -40,5 +70,8 @@ jobs:
           grep -q 'Begin Your Adventure' /tmp/woa-index.html
           grep -q 'Mathias' /tmp/woa-index.html
           grep -q 'getContext.*2d' /tmp/woa-index.html
+          grep -q 'orientation:landscape' /tmp/woa-index.html
+          grep -q 'orientation:portrait' /tmp/woa-index.html
+          grep -q 'visualViewport.addEventListener' /tmp/woa-index.html
 
-          echo "2D pixel-art game served successfully: character creation, name entry, start button, Mathias encounter, and 2D canvas are present."
+          echo "2D pixel-art game served successfully: character creation, name entry, Mathias encounter, touch controls, responsive portrait/landscape layouts, and valid JavaScript are present."
