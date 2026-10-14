@@ -1,69 +1,33 @@
 # WOA: Arcane Realm
 
-A browser-playable third-person fantasy adventure set in The Wizards of Ark universe. The current build is the opening playable chapter, **The Sigil Sanctuary**. The game is built in Godot 4 and served as a web export through Railway.
+**Current direction: 2D pixel-art RPG only.** The deployed browser game uses the lightweight 2D playtest in `playtest-2d/index.html`. The previous 3D/Godot build is not built, served, or loaded by the active deployment.
 
 ## Play
 
-Open the deployed game: https://woa-arcane-realm-production.up.railway.app
+https://woa-arcane-realm-production.up.railway.app
 
-## Chapter One: The Sigil Sanctuary
+## Current 2D prototype
 
-- Create your wizard by entering a name on the title screen, then use **Continue Journey** to resume saved sigil and trial progress.
-- Meet Mathias, keeper of the first sigil, and learn why the sanctuary wards are failing.
-- Explore the sanctuary and recover the three ancient crystals: **Dawn**, **Dusk**, and **Heart**.
-- Watch the ward change when all three sigils are recovered.
-- Return to the monumental gate and enter the First Trial arena.
-- Fight the Sanctuary Guardian: use **F** for close staff strikes and **Q** for ranged arcane bolts. Dodge its approach and survive to win the chapter.
+- Character creation appears before gameplay.
+- Players choose a male or female hero, enter a name, and select a starting path: Arcanist, Spellblade, or Warden.
+- Pixel-style characters are drawn locally; no 3D models, external model downloads, or game APIs are used.
+- Explore the village using mobile touch controls or desktop keyboard controls.
+- Meet Mathias, the Battle Mage, and help fight hostile creatures with arcane magic.
+- The HUD shows health and experience.
 
-This is an early playable vertical slice, not the finished full game. The world is assembled procedurally and uses categorized GLB assets where they are wired into gameplay; missing or invalid models fall back to procedural visuals. Rigged animation, sound, more levels, richer progression, and Discord Activity integration remain planned development work.
+This is an early playtest. Progress is temporary, and richer sprite sheets, polished animations, deeper combat, persistent saves, quests, and additional areas remain future work.
 
 ## Controls
 
 - **WASD / Arrow keys** — move
-- **Mouse** — look around (click the game to capture the cursor)
-- **Space** — jump
-- **Shift** — run
-- **E** — talk, collect a sigil, or interact with the gate
-- **F** — staff strike during the guardian trial (close range)
-- **Q** — cast an arcane bolt during the guardian trial (ranged)
-- **Esc** — release the cursor
+- **E** — interact / talk / close-range help
+- **F** — cast arcane magic
+- On mobile, use the on-screen directional pad and action buttons.
 
-The game automatically saves your wizard name and major quest progress in the browser. Browser storage settings or clearing site data can affect local saves.
+## Deployment
 
-## Project structure and local development
+Railway serves the static 2D game through Nginx. The Dockerfile intentionally does not invoke Godot, compile a WebAssembly/WebGL export, or copy the old 3D project into the deployed website.
 
-1. Open Godot 4.7.2.
-2. Import `project.godot`.
-3. Press **F6** or **F5** to run the game.
+## Legacy files
 
-`main.tscn` contains only the game root and its script. `main.gd` builds the world and loads models at their intended locations. Source models are grouped under `assets/models/characters`, `creatures`, `environment`, `architecture`, and `props`. The generated `.godot/` cache is intentionally excluded from Git; Godot recreates it on import.
-
-## Browser build and deployment
-
-- `export_presets.cfg` — Godot Web export preset targeting `build/index.html`
-- `Dockerfile` — exports the game and serves the result with Nginx
-- `deploy/nginx.conf` — web server configuration, including WebAssembly MIME support
-- `.github/workflows/web-build.yml` — validates the container build on pushes and pull requests
-
-The web export uses Godot's Compatibility renderer and disables web thread support for simpler hosting. Players need a modern browser with WebAssembly and WebGL 2.0 support.
-
-Railway is currently hosting the public test build. Keep the current public URL working while improving the game; only configure the custom domain after the current build is verified.
-
-## Roadmap
-
-1. **Opening chapter** — movement, Mathias dialogue, three collectible sigils, gate activation, and the first guardian boss fight.
-2. **Core adventure systems** — real character model and animations, camera polish, sound, spell casting, inventory, and save data.
-3. **World expansion** — additional realms, story quests, puzzles, enemies, and boss encounters.
-4. **Player experience** — settings, accessibility, responsive UI, controller support, and performance optimization.
-5. **Community launch** — Discord Activity integration and connection to WOA community features.
-
-## Procedural world
-
-The overworld now expands into a seeded 1,200 × 1,200 metre wilderness around the handcrafted starting town and Sigil Sanctuary. Explore four fixed arcane landmarks and enter **The Shifting Hollow** to generate a new winding dungeon layout. The overworld layout seed is saved with story progress. The first procedural pass focuses on exploration geometry and landmarks; biome terrain, combat/loot dungeon rooms, and chunk streaming are planned next.
-
-See [`docs/PROCEDURAL_WORLD_GENERATION.md`](docs/PROCEDURAL_WORLD_GENERATION.md) for the implementation notes and roadmap.
-
-
-## Licensing and third-party notices
-
-WOA: Arcane Realm does not declare a blanket open-source license for its original game code or original content. The Godot Engine license and the third-party add-ons currently present in the repository are documented in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md); each add-on's own license file remains with that component. Asset provenance for the bundled OBJ/texture packs and the redistribution terms of two editor add-ons still require verification, so the repository has not yet been fully cleared for redistribution.
+Older Godot scripts, project files, and imported 3D assets are still present in the repository history/worktree as legacy material, but they are not part of the current build or active game. The live game is the 2D pixel-art prototype above.
