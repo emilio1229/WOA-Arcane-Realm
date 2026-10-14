@@ -1,8 +1,0 @@
-[gd_scene format=3 uid="uid://dngiuhq5ehbk6"]
-
-[ext_resource type="Script" uid="uid://cx04q44t4hl2w" path="res://addons/any_audio_manager/Scripts/audio_manager.gd" id="1_je6gq"]
-[ext_resource type="Resource" path="res://audio/gloamwick_audio_library.tres" id="2_lib"]
-
-[node name="AudioManager" type="Node" unique_id=86541453]
-script = ExtResource("1_je6gq")
-audio_library = ExtResource("2_lib")

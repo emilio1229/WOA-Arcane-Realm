@@ -1,6 +1,0 @@
-[gd_scene format=3 uid="uid://bt0tifrgo2bxg"]
-
-[ext_resource type="Script" uid="uid://6cpk07nytb1p" path="res://main.gd" id="1_main"]
-
-[node name="ArcaneRealm" type="Node3D" unique_id=339899406]
-script = ExtResource("1_main")

@@ -1,33 +1,29 @@
-# WOA: Arcane Realm
+# WOA: Arcane Realm — Fresh 2D Foundation
 
-**Current direction: 2D pixel-art RPG only.** The deployed browser game uses the lightweight 2D playtest in `playtest-2d/index.html`. The previous 3D/Godot build is not built, served, or loaded by the active deployment.
+This branch is a clean restart of the **2D pixel-art RPG**. It preserves the agreed story and art direction, not the previous prototype implementation or third-party asset collections.
 
-## Play
+## Non-negotiable direction
+- Pure 2D pixel-art game. No 3D engine, models, FBX, or 3D asset pipeline.
+- Dark fantasy: near-black and deep violet environments, magenta arcane light, restrained gold trim, glowing runes, ornate readable UI.
+- Production-quality authored character art; no circles, primitive-shape characters, or temporary geometric stand-ins presented as finished art.
+- Character creation before the story: player chooses male/female presentation, name, class/path, and compatible appearance options.
+- Opening story: the player arrives in a small town, finds Mathias (a battle mage) fighting enemies, helps him, then begins the WOA: Arcane Realm mystery.
+- Mobile browser and desktop support are both required.
+- Keep original source art separate from optimized game-ready sprites.
 
-https://woa-arcane-realm-production.up.railway.app
+## Project structure
+- `game/` — game scenes and scripts
+- `assets/art-source/` — approved original reference images and source art
+- `assets/sprites/` — transparent PNG sprites and animation sheets
+- `assets/tilesets/` — world tiles and environment atlases
+- `assets/effects/` — spell and combat effects
+- `assets/ui/` — menus, frames, icons, portraits
+- `docs/` — story, design, and asset specifications
+- `web/` — browser build entry point and mobile shell
+- `tests/` — validation and playtest checklist
 
-## Current 2D prototype
+## Art workflow
+Upload approved artwork into `assets/art-source/` first. Do not crop, resize, or overwrite originals. Production sheets go into the matching `assets/` folder only after frame dimensions, transparency, pivots, and animation order are verified.
 
-- Character creation appears before gameplay.
-- Players choose a male or female hero, enter a name, and select a starting path: Arcanist, Spellblade, or Warden.
-- Pixel-style characters are drawn locally; no 3D models, external model downloads, or game APIs are used.
-- Explore the village using mobile touch controls or desktop keyboard controls.
-- Meet Mathias, the Battle Mage, and help fight hostile creatures with arcane magic.
-- The HUD shows health and experience.
-
-This is an early playtest. Progress is temporary, and richer sprite sheets, polished animations, deeper combat, persistent saves, quests, and additional areas remain future work.
-
-## Controls
-
-- **WASD / Arrow keys** — move
-- **E** — interact / talk / close-range help
-- **F** — cast arcane magic
-- On mobile, use the on-screen directional pad and action buttons.
-
-## Deployment
-
-Railway serves the static 2D game through Nginx. The Dockerfile intentionally does not invoke Godot, compile a WebAssembly/WebGL export, or copy the old 3D project into the deployed website.
-
-## Legacy files
-
-Older Godot scripts, project files, and imported 3D assets are still present in the repository history/worktree as legacy material, but they are not part of the current build or active game. The live game is the 2D pixel-art prototype above.
+## Important
+This is a clean foundation branch. The existing `main` branch remains untouched as a safety copy until the new foundation is reviewed and intentionally promoted. No artwork is claimed to be complete until actual image files have been added and checked in-game.
