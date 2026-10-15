@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="480" viewBox="0 0 256 240" shape-rendering="crispEdges">
+<title>WOA Arcane Realm wizard sprite atlas — 4 columns × 3 rows</title>
+<desc>12 64 by 80 transparent cells. Character source art is the dedicated in-game astral wizard sprite. Frame poses are composed for integration and refinement.</desc>
+<defs>
+ <g id="base"><image href="hero-male-astral.svg" x="16" y="0" width="32" height="40" preserveAspectRatio="none"/></g>
+ <g id="spark"><path d="M49 7h2v-5h2v5h5v2h-5v5h-2V9h-5V7z" fill="#f4c8ff"/><path d="M53 16h2v2h-2zM47 18h2v2h-2z" fill="#a65de8"/></g>
+</defs>
+<!-- row 1: idle, walk A, walk B, run -->
+<g transform="translate(0 0)"><use href="#base"/></g>
+<g transform="translate(64 0)"><use href="#base" transform="translate(0 1)"/><path d="M26 35h5v2h-5zM35 34h5v2h-5z" fill="#9a69b8"/></g>
+<g transform="translate(128 0)"><use href="#base" transform="translate(0 -1)"/><path d="M24 34h5v2h-5zM37 35h5v2h-5z" fill="#9a69b8"/></g>
+<g transform="translate(192 0)"><use href="#base" transform="translate(2 0) skewX(-4)"/><path d="M22 22l-5 3 2 2 5-2M40 29l5 2-2 2-5-2" fill="#572579"/></g>
+<!-- row 2: cast, melee, jump, hurt -->
+<g transform="translate(0 80)"><use href="#base"/><use href="#spark" transform="translate(0 0)"/><circle cx="53" cy="22" r="6" fill="none" stroke="#d77cff" stroke-width="1.5"/><path d="M53 14v16M45 22h16M47 16l12 12M59 16L47 28" stroke="#a65de8" stroke-width=".8"/></g>
+<g transform="translate(64 80)"><use href="#base" transform="rotate(-7 32 20)"/><path d="M39 13l12 -7 2 2-10 9z" fill="#d9c6f5"/><path d="M46 7l7 -4 2 2-6 5z" fill="#c27bff"/></g>
+<g transform="translate(128 80)"><use href="#base" transform="translate(0 -5)"/><path d="M25 37h5v2h-5zM35 37h5v2h-5z" fill="#a65de8"/><path d="M21 17l-3-4M41 17l3-4" stroke="#d9c6f5" stroke-width="2"/></g>
+<g transform="translate(192 80)"><use href="#base" transform="translate(-2 1) skewX(5)"/><path d="M10 16l-5 -3M13 21l-6 1M47 16l5 -3" stroke="#c27bff" stroke-width="1.5"/></g>
+<!-- row 3: left, right, away, ready -->
+<g transform="translate(0 160)"><use href="#base" transform="translate(64 0) scale(-1 1)"/></g>
+<g transform="translate(64 160)"><use href="#base"/></g>
+<g transform="translate(128 160)"><path d="M24 15h16v17H24z" fill="#32113f"/><path d="M22 14h20v5H22z" fill="#572579"/><path d="M27 8h10v7H27z" fill="#c7c9df"/><path d="M25 32h5v5h-5zM34 32h5v5h-5z" fill="#100b19"/><path d="M30 20h4v5h-4z" fill="#a65de8"/><path d="M47 12h2v24h-2zM45 9h6v4h-6z" fill="#c27bff"/></g>
+<g transform="translate(192 160)"><use href="#base"/><path d="M10 15l5 -3 2 3-5 3zM40 15l5 -3 2 3-5 3z" fill="#c27bff"/><use href="#spark" transform="translate(-1 1)"/></g>
+</svg>
