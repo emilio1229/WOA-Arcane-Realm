@@ -93,8 +93,14 @@ if(casting){ctx.fillStyle='#b955ff';ctx.fillRect(13,sy-5,3,3);ctx.fillStyle='#f4
 ctx.restore()}
 const spriteImages={};
 function loadSprite(key,path){const img=new Image();img.onload=()=>{spriteImages[key]=img};img.src=path;}
-for(const g of ['male','female'])for(const v of ['Astral','Ember','Moonveil','Storm'])loadSprite(g+'-'+v,'/assets/sprites/hero-'+g+'-'+v.toLowerCase()+'.svg');
-loadSprite('mathias','/assets/sprites/mathias.svg');loadSprite('enemy','/assets/sprites/shadow-creature.svg');
+// Use the uploaded, high-detail PNG character artwork wherever supplied.
+// The PNGs are real in-game sprites, not character-creator reference previews.
+loadSprite('male-Astral','/assets/sprites/hero-male-astral.png');
+for(const v of ['Ember','Moonveil','Storm'])loadSprite('male-'+v,'/assets/sprites/hero-male-'+v.toLowerCase()+'.svg');
+loadSprite('female-Astral','/assets/sprites/hero-female-astral.svg');
+for(const v of ['Ember','Moonveil','Storm'])loadSprite('female-'+v,'/assets/sprites/hero-female-'+v.toLowerCase()+'.svg');
+loadSprite('mathias','/assets/sprites/mathias.png');
+loadSprite('enemy','/assets/sprites/shadow-creature.svg');
 function drawAsset(ctx,key,x,y,w,h){const img=spriteImages[key];if(img&&img.complete&&img.naturalWidth){ctx.drawImage(img,Math.round(x-w/2),Math.round(y-h/2),w,h);return true}return false}
 function sprite(ctx,x,y,g='male',pose='idle',scale=1){const key=g+'-'+robeVariant;const bob=pose==='walk'?(Math.floor(Date.now()/130)%2)*1.5:0;if(drawAsset(ctx,key,x,y-bob,32*scale,40*scale)){if(pose==='cast'){ctx.fillStyle='#f4c8ff';ctx.fillRect(Math.round(x+13*scale),Math.round(y-22*scale),2*scale,2*scale)}return;}spriteFallback(ctx,x,y,g,pose,scale)}
 function drawPreview(){let c=$('preview').getContext('2d');c.clearRect(0,0,64,100);sprite(c,32,50,gender,'idle',2.2)}drawPreview();
