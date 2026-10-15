@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="160" viewBox="0 0 64 80">
+<defs>
+ <linearGradient id="robe" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#170c2d"/><stop offset=".48" stop-color="#482064"/><stop offset="1" stop-color="#10091f"/></linearGradient>
+ <linearGradient id="cloth" x1="0" y1="0" x2="0.8" y2="1"><stop stop-color="#9c54d6"/><stop offset=".5" stop-color="#482064"/><stop offset="1" stop-color="#211033"/></linearGradient>
+ <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f8d5b8"/><stop offset="1" stop-color="#b87568"/></linearGradient>
+ <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff0ae"/><stop offset=".5" stop-color="#d4a64f"/><stop offset="1" stop-color="#815126"/></linearGradient>
+ <radialGradient id="orb"><stop stop-color="#fff"/><stop offset=".25" stop-color="#e8baff"/><stop offset=".65" stop-color="#b84cff"/><stop offset="1" stop-color="#7025d4" stop-opacity="0"/></radialGradient>
+ <filter id="glow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="2.2"/></filter>
+</defs>
+<ellipse cx="31" cy="75" rx="19" ry="3" fill="#090513" opacity=".7"/>
+<!-- staff and arcane crystal -->
+<path d="M53 23 L55 72" stroke="#392247" stroke-width="4" stroke-linecap="round"/><path d="M53 23 L55 72" stroke="#c7a15b" stroke-width="1.2" stroke-linecap="round"/>
+<circle cx="52" cy="19" r="10" fill="#b64aff" opacity=".28" filter="url(#glow)"/><path d="M52 9 L57 16 L55 24 L49 27 L45 19 L47 12Z" fill="url(#orb)"/><path d="M52 10 L55 17 L51 22 L48 17Z" fill="#f6dfff"/><path d="M45 18 L42 16 M58 12 L61 9 M58 24 L61 27" stroke="#df9aff" stroke-width="1.4" stroke-linecap="round"/>
+<!-- cloak silhouette -->
+<path d="M21 27 Q12 31 10 43 L4 68 Q17 74 31 72 Q45 74 57 67 L49 42 Q47 32 39 27Z" fill="url(#robe)" stroke="#10091c" stroke-width="1.6"/>
+<path d="M21 31 L13 45 L10 65 L20 69 L27 40Z" fill="#321547"/><path d="M39 31 L48 45 L52 65 L43 69 L35 40Z" fill="#26113a"/>
+<path d="M25 33 L20 68 L31 73 L42 68 L37 33Z" fill="url(#cloth)"/>
+<!-- robe folds -->
+<path d="M15 45 L13 63 M20 43 L18 68 M45 43 L49 63 M40 43 L44 68 M28 43 L26 67 M34 43 L37 68" fill="none" stroke="#7c3fa0" stroke-width="1.2" opacity=".75"/>
+<!-- gold hem and filigree -->
+<path d="M6 66 Q18 72 31 70 Q45 72 55 65 L57 68 Q44 76 31 74 Q16 76 4 70Z" fill="url(#gold)"/>
+<path d="M11 52 Q16 55 14 60 Q18 62 20 57 M44 51 Q39 55 42 60 Q38 62 36 57" fill="none" stroke="url(#gold)" stroke-width="1.3"/>
+<path d="M23 46 L27 50 L24 54 L28 58 L25 63 M39 46 L35 50 L38 54 L34 58 L37 63" fill="none" stroke="#e6bf75" stroke-width="1.2"/>
+<!-- shoulders -->
+<path d="M19 31 Q14 31 11 37 L17 43 L25 36Z" fill="#5d2b78" stroke="#c49a58" stroke-width="1"/>
+<path d="M41 31 Q46 31 49 37 L43 43 L35 36Z" fill="#5d2b78" stroke="#c49a58" stroke-width="1"/>
+<circle cx="17" cy="39" r="2" fill="#f3d891"/><circle cx="43" cy="39" r="2" fill="#f3d891"/>
+<!-- neck -->
+<path d="M27 25 L27 32 Q32 36 37 32 L37 25Z" fill="url(#skin)"/>
+<!-- hair back -->
+<path d="M21 12 Q18 22 21 32 L25 37 L27 25 L38 25 L41 36 Q47 29 44 17Z" fill="#17101f" stroke="#08070d" stroke-width="1.2"/>
+<!-- face -->
+<path d="M23 12 Q24 5 32 6 Q41 6 41 14 L39 25 Q36 31 32 31 Q26 29 24 24Z" fill="url(#skin)" stroke="#70423f" stroke-width=".7"/>
+<!-- hair cap and locks -->
+<path d="M22 17 Q17 9 25 4 Q34 0 41 6 Q46 10 41 19 L38 13 L33 10 L27 14 L25 22Z" fill="#1b1026" stroke="#08070d" stroke-width="1.2"/>
+<path d="M23 12 Q19 21 23 31 L27 35 L28 23 L26 16 M39 11 Q44 20 40 30 L37 34 L37 20" fill="#24122e" stroke="#5e3475" stroke-width="1.1"/>
+<path d="M26 15 Q31 11 36 14" fill="none" stroke="#5d426e" stroke-width="1"/>
+<!-- eyes / brows -->
+<path d="M25 17 L30 16 M34 16 L39 17" stroke="#37202c" stroke-width="1.2"/><path d="M26 19 L30 19 M34 19 L38 19" stroke="#4d284a" stroke-width="1.4"/><circle cx="28" cy="19" r=".9" fill="#dbaaff"/><circle cx="36" cy="19" r=".9" fill="#dbaaff"/>
+<path d="M32 19 L31 23 L33 23" fill="none" stroke="#a76560" stroke-width=".7"/><path d="M29 26 Q32 28 35 26" fill="none" stroke="#7b3945" stroke-width=".8"/>
+<!-- collar -->
+<path d="M24 29 L31 35 L27 38 L21 31Z" fill="#c8a05b"/><path d="M40 29 L33 35 L37 38 L43 31Z" fill="#c8a05b"/><path d="M31 34 L33 34 L35 41 L32 45 L29 41Z" fill="#f0d4ff" stroke="#a64fe0" stroke-width="1"/><circle cx="32" cy="39" r="2.3" fill="#d95cff"/><circle cx="32" cy="39" r="5" fill="#bc4dff" opacity=".25" filter="url(#glow)"/>
+<!-- belt -->
+<path d="M20 54 Q31 58 43 54 L44 59 Q31 63 19 59Z" fill="#100b18" stroke="#c79b51" stroke-width="1.2"/><path d="M29 56 L32 54 L35 56 L35 60 L32 62 L29 60Z" fill="url(#gold)"/><path d="M32 56 L33 58 L32 60 L31 58Z" fill="#a34de0"/>
+<!-- hands -->
+<path d="M13 43 Q9 46 12 50 L16 49 L17 44Z" fill="url(#skin)"/><path d="M46 43 Q50 46 47 50 L43 49 L42 44Z" fill="url(#skin)"/>
+<!-- spell motes -->
+<circle cx="7" cy="42" r="1.4" fill="#e2a4ff"/><circle cx="9" cy="35" r=".9" fill="#bb62ff"/><circle cx="49" cy="32" r="1.1" fill="#e9bdff"/><path d="M8 45 l1 -2 l1 2 l-1 2Z M47 40 l1 -2 l1 2 l-1 2Z" fill="#f1d6ff"/>
+<!-- boots -->
+<path d="M19 68 L28 69 L27 76 L16 76Z M36 69 L44 68 L48 76 L37 76Z" fill="#17101f" stroke="#9b6bba" stroke-width="1"/><path d="M17 74 L27 74 M38 74 L47 74" stroke="#d2a75a" stroke-width="1.2"/>
+</svg>
