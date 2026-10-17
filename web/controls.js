@@ -23,7 +23,9 @@
   window.addEventListener("keyup",e=>{keys[e.key.toLowerCase()]=false;setKeyboardVector();});
   window.addEventListener("blur",()=>{keys={};window.arcaneMove.x=0;window.arcaneMove.y=0;if(dragPointer!==null){dragPointer=null;stick.style.left="50%";stick.style.top="50%";pad.classList.remove("dragging");}});
   function setKeyboardVector(){const x=(keys.a||keys.arrowleft?-1:0)+(keys.d||keys.arrowright?1:0);const y=(keys.w||keys.arrowup?-1:0)+(keys.s||keys.arrowdown?1:0);window.arcaneMove.x=x;window.arcaneMove.y=y;}
-  $("arcane-interact").addEventListener("click",()=>{if(window.arcaneSceneInteract)window.arcaneSceneInteract();else {const target=$("story-talk");if(target)target.click();}});\n  $("arcane-attack").addEventListener("click",()=>{if(window.arcaneSceneAction)window.arcaneSceneAction("attack");});\n  $("arcane-spell").addEventListener("click",()=>{if(window.arcaneSceneAction)window.arcaneSceneAction("spell");});
+  $("arcane-interact").addEventListener("click",()=>{if(window.arcaneSceneInteract)window.arcaneSceneInteract();else {const target=$("story-talk");if(target)target.click();}});
+  $("arcane-attack").addEventListener("click",()=>{if(window.arcaneSceneAction)window.arcaneSceneAction("attack");});
+  $("arcane-spell").addEventListener("click",()=>{if(window.arcaneSceneAction)window.arcaneSceneAction("spell");});
   function pulse(id){const b=$(id);b.animate([{transform:"scale(1)",filter:"brightness(1)"},{transform:"scale(.9)",filter:"brightness(1.8)"},{transform:"scale(1)",filter:"brightness(1)"}],{duration:220});}
   if($("town-hud"))new MutationObserver(sync).observe($("town-hud"),{attributes:true,attributeFilter:["class"]});
   sync();
