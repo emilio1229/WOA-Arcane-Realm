@@ -112,7 +112,7 @@
     return;
   }
   class RealmScene extends Phaser.Scene {
-    constructor(){ super("realm"); this.mode = "menu"; this.stars = []; }
+    constructor(){ super("realm"); this.mode = "menu"; this.stars = []; this.walkTime = 0; this.playerPos = {x:0,y:0}; this.worldShift = {x:0,y:0}; }
     create(){
       this.bg = this.add.graphics();
       this.world = this.add.container(0,0);
@@ -126,7 +126,20 @@
       });
       this.time.addEvent({delay:1200,loop:true,callback:()=>this.twinkle()});
     }
-    setMode(mode){this.mode = mode; this.drawBackdrop();}
+    setMode(mode){this.mode = mode; this.drawBackdrop(); if(mode === "town"){this.worldShift={x:0,y:0};this.world.setPosition(0,0);this.playerPos={x:this.scale.width*.5,y:this.scale.height*.76};}}
+    update(time, delta){
+      if(this.mode!=="town"||!this.world)return;
+      const move=window.arcaneMove||{x:0,y:0};
+      const len=Math.hypot(move.x,move.y);
+      if(len>0){
+        const step=Math.min(delta/16,2.2)*2.1/Math.max(len,1);
+        this.worldShift.x=Math.max(-100,Math.min(100,this.worldShift.x-move.x*step));
+        this.worldShift.y=Math.max(-65,Math.min(65,this.worldShift.y-move.y*step));
+        this.world.setPosition(this.worldShift.x,this.worldShift.y);
+        this.walkTime+=delta;
+        if(this.playerCloak)this.playerCloak.y=this.playerBaseY+Math.sin(this.walkTime/75)*2.2;
+      }
+    }
     drawBackdrop(){
       const w=this.scale.width,h=this.scale.height;
       this.bg.clear();
@@ -199,5 +212,6 @@
 })();
 </script>
   <script src="./story-layer.js"></script>
+  <script src="./controls.js"></script>
 </body>
 </html>
