@@ -100,6 +100,7 @@
     heroName = $("hero-name").value.trim().slice(0,18) || "Wayfarer";
     $("hud-name").textContent = heroName;
     $("hud-class").textContent = chosenClass;
+    try { const key="woa-preview-profile-v1"; const prior=JSON.parse(localStorage.getItem(key)||"{}"); localStorage.setItem(key,JSON.stringify({...prior,name:heroName,className:chosenClass,presentation:chosenPresentation})); } catch (_) {}
     showScreen("town");
   });
   $("hud-home").addEventListener("click", () => showScreen("start-screen"));
@@ -217,5 +218,6 @@
   <script src="./canonical-story.js"></script>
   <script src="./player-systems.js"></script>
   <script src="./controls.js"></script>
+  <script src="./world-systems.js"></script>
 </body>
 </html>
