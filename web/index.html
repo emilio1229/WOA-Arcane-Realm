@@ -132,14 +132,20 @@
       if(this.mode!=="town"||!this.world)return;
       const move=window.arcaneMove||{x:0,y:0};
       const len=Math.hypot(move.x,move.y);
-      if(len>0){
-        const step=Math.min(delta/16,2.2)*2.1/Math.max(len,1);
-        this.worldShift.x=Math.max(-100,Math.min(100,this.worldShift.x-move.x*step));
-        this.worldShift.y=Math.max(-65,Math.min(65,this.worldShift.y-move.y*step));
+      if(len>.08){
+        const nx=move.x/Math.max(1,len),ny=move.y/Math.max(1,len);
+        const speed=Math.min(delta/16,2.2)*2.7;
+        const boundsX=Math.max(130,Math.min(300,this.scale.width*.34));
+        const boundsY=Math.max(75,Math.min(190,this.scale.height*.22));
+        this.worldShift.x=Math.max(-boundsX,Math.min(boundsX,this.worldShift.x-nx*speed));
+        this.worldShift.y=Math.max(-boundsY,Math.min(boundsY,this.worldShift.y-ny*speed));
         this.world.setPosition(this.worldShift.x,this.worldShift.y);
-        if(this.playerSprite)this.playerSprite.setPosition(-this.worldShift.x,-this.worldShift.y);
         this.walkTime+=delta;
-        if(this.playerCloak)this.playerCloak.y=this.playerBaseY+Math.sin(this.walkTime/75)*2.2;
+        if(this.playerCloak)this.playerCloak.y=this.playerBaseY+Math.sin(this.walkTime/65)*2.5;
+        if(this.playerShadow)this.playerShadow.setScale(1+Math.sin(this.walkTime/65)*.035,1);
+      } else {
+        if(this.playerCloak)this.playerCloak.y=this.playerBaseY;
+        if(this.playerShadow)this.playerShadow.setScale(1,1);
       }
     }
     drawBackdrop(){
@@ -184,11 +190,11 @@
       g.fillStyle(0x9b63c4,.22);g.fillTriangle(w*.44,h,w*.5,horizon+55,w*.56,h);
       this.world.add(g);
       const x=w*.5,y=h*.76;
-      const shadow=this.add.ellipse(x,y+26,48,15,0x000000,.55);
-      const cloak=this.add.graphics();cloak.fillStyle(0x28143e,1);cloak.fillTriangle(x-17,y+17,x,y-10,x+17,y+17);cloak.fillTriangle(x-17,y+10,x-10,y+37,x+10,y+37);cloak.fillTriangle(x+17,y+10,x+10,y+37,x-10,y+37);
-      cloak.fillStyle(0xe2c0ff,1);cloak.fillCircle(x,y-14,9);cloak.fillStyle(0x120a20,1);cloak.fillTriangle(x-12,y-15,x,y-35,x+12,y-15);cloak.fillStyle(0xe6bdff,.8);cloak.fillRect(x-2,y+1,4,20);
-      this.world.add([shadow,cloak]);
-      this.tweens.add({targets:cloak,y:y+3,duration:1500,yoyo:true,repeat:-1,ease:"Sine.InOut"});
+      this.playerBaseY=y;
+      this.playerShadow=this.add.ellipse(x,y+26,48,15,0x000000,.55).setDepth(10);
+      this.playerCloak=this.add.graphics().setDepth(11);this.playerCloak.fillStyle(0x28143e,1);this.playerCloak.fillTriangle(x-17,y+17,x,y-10,x+17,y+17);this.playerCloak.fillTriangle(x-17,y+10,x-10,y+37,x+10,y+37);this.playerCloak.fillTriangle(x+17,y+10,x+10,y+37,x-10,y+37);
+      this.playerCloak.fillStyle(0xe2c0ff,1);this.playerCloak.fillCircle(x,y-14,9);this.playerCloak.fillStyle(0x120a20,1);this.playerCloak.fillTriangle(x-12,y-15,x,y-35,x+12,y-15);this.playerCloak.fillStyle(0xe6bdff,.8);this.playerCloak.fillRect(x-2,y+1,4,20);
+      this.tweens.add({targets:this.playerCloak,y:y+3,duration:1500,yoyo:true,repeat:-1,ease:"Sine.InOut"});
       this.add.text(w*.5,h*.9,"THE OUTER WARD", {fontFamily:"Georgia",fontSize:Math.max(10,Math.min(15,w*.014))+"px",color:"#d7b6ef",letterSpacing:4}).setOrigin(.5);
     }
     twinkle(){
