@@ -62,3 +62,15 @@ css.textContent += `#woa-world-hud{backdrop-filter:blur(14px);box-shadow:0 10px 
 @media(max-width:600px){#woa-mini-map{display:none!important}#woa-world-hud{left:50%;right:auto;top:max(58px,calc(env(safe-area-inset-top) + 50px));bottom:auto;transform:translateX(-50%);width:max-content;max-width:62vw;padding:7px 11px;border-radius:999px;font-size:10px;line-height:1.35;background:#0b0714d9;white-space:nowrap}#woa-world-hud strong{font-size:9px;letter-spacing:.06em}#woa-world-hud i{height:3px;margin:4px 0 0}#woa-quest-reward{display:none}#woa-world-modal{padding:10px}#woa-world-modal .card{max-height:calc(100dvh - 20px);padding:20px 16px}#woa-world-modal h2{font-size:25px}#woa-world-modal p{font-size:13px;line-height:1.55}#woa-world-modal .buttons{gap:7px}#woa-world-modal .buttons button{flex-basis:100%;padding:12px}}
 @media(prefers-reduced-motion:reduce){#woa-world-modal .card{scroll-behavior:auto}}`;
 })();
+/* Character sprites use the bundled original SVG art; keep motion subtle on touch screens. */
+.woa-npc span{transform-origin:50% 90%;animation:npc-idle 3.2s ease-in-out infinite;}
+.woa-npc[data-npc="archivist"] span{animation-delay:-1.1s;}
+.woa-npc[data-npc="rift"] span{animation:rift-breathe 2.4s ease-in-out infinite;}
+.woa-npc small{transition:color .2s,border-color .2s,background .2s;}
+.woa-npc:focus-visible{outline:2px solid #e4c2ff;outline-offset:5px;border-radius:12px;}
+.woa-npc:focus-visible small{border-color:#e1bdff;color:#fff}
+#woa-world-modal .card{position:relative;overflow:auto;}
+#woa-world-modal .card:before{content:"";position:sticky;display:block;top:0;float:right;width:36px;height:36px;margin:-8px -8px 0 0;border:1px solid #c69be633;border-radius:50%;pointer-events:none;box-shadow:0 0 24px #a95cff16;}
+@keyframes npc-idle{0%,100%{translate:0 0}50%{translate:0 -4px}}
+@keyframes rift-breathe{0%,100%{transform:scale(.96);filter:drop-shadow(0 0 8px #a452e899)}50%{transform:scale(1.08);filter:drop-shadow(0 0 18px #d57bffdd)}}
+@media(prefers-reduced-motion:reduce){.woa-npc span{animation:none!important}}
