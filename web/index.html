@@ -136,6 +136,9 @@
       this.load.image("woa-mathias","./assets/isometric/mathias.svg");
       this.load.image("woa-archivist","./assets/isometric/archivist.svg");
       this.load.image("woa-familiar","./assets/isometric/familiar-wisp.svg");
+      this.load.image("woa-cottage","./assets/isometric/outer-ward-cottage.svg");
+      this.load.image("woa-crystal-tree","./assets/isometric/crystal-tree.svg");
+      this.load.image("woa-ward-gate","./assets/isometric/ward-gate.svg");
     }
     create(){
       this.bg = this.add.graphics();
@@ -252,13 +255,9 @@
         diamond(w*.77-Math.sin(i*.4)*w*.03,y+tileH*.3,tileW*1.25,tileH*.75,0x493256,.95,0x8d689e);
       }
       const tree=(x,y,s=1)=>{
-        // Shadow, layered canopy, trunk and tiny arcane lights.
-        g.fillStyle(0x09070e,.55);g.fillEllipse(x,y+tileH*.18,30*s,11*s);
-        g.fillStyle(0x171020,1);g.fillRect(x-4*s,y-7*s,8*s,20*s);
-        g.fillStyle(0x302043,1);g.fillTriangle(x-17*s,y+2*s,x,y-37*s,x+17*s,y+2*s);
-        g.fillStyle(0x49305e,1);g.fillTriangle(x-14*s,y-7*s,x,y-45*s,x+14*s,y-7*s);
-        g.fillStyle(0x6c4388,.8);g.fillTriangle(x-9*s,y-18*s,x,y-52*s,x+9*s,y-18*s);
-        g.fillStyle(0xd8a3ff,.65);g.fillCircle(x+3*s,y-29*s,2*s);
+        g.fillStyle(0x09070e,.55);g.fillEllipse(x,y+tileH*.18,34*s,12*s);
+        if(this.textures.exists("woa-crystal-tree")){const im=this.add.image(x,y-25*s,"woa-crystal-tree").setDisplaySize(70*s,98*s).setDepth(y);this.world.add(im);}
+        else {g.fillStyle(0x171020,1);g.fillRect(x-4*s,y-7*s,8*s,20*s);g.fillStyle(0x49305e,1);g.fillTriangle(x-17*s,y+2*s,x,y-45*s,x+17*s,y+2*s);}
       };
       const building=(x,y,s,wall,roof)=>{
         const bw=43*s,bh=35*s,depth=19*s;
@@ -273,11 +272,12 @@
         g.fillStyle(0x4d2e68,.9);g.fillRect(x-bw*.28,y-22*s,6*s,8*s);
         g.fillRect(x+bw*.18,y-22*s,6*s,8*s);
       };
-      // Cottage clusters frame a central ward instead of blocking the road.
-      building(w*.17,horizon+tileH*3.1,1.05,0x49304b,0x59376f);
-      building(w*.82,horizon+tileH*3.5,.98,0x382744,0x6a3c78);
-      building(w*.30,horizon+tileH*5.4,.8,0x3e2b49,0x49305e);
-      building(w*.70,horizon+tileH*6.2,.82,0x4b3049,0x704080);
+      // Illustrated cottages with dimensional SVG shading and glowing windows.
+      const cottage=(x,y,s)=>{if(this.textures.exists("woa-cottage")){const im=this.add.image(x,y-12*s,"woa-cottage").setDisplaySize(112*s,112*s).setDepth(y);this.world.add(im);}else building(x,y,s,0x49304b,0x59376f)};
+      cottage(w*.17,horizon+tileH*3.1,1.0);
+      cottage(w*.82,horizon+tileH*3.5,.94);
+      cottage(w*.30,horizon+tileH*5.4,.76);
+      cottage(w*.70,horizon+tileH*6.2,.8);
       // Trees and glowing ward-lanterns are placed behind the playable path.
       for(let i=0;i<12;i++){
         const side=i%2===0?-1:1;
