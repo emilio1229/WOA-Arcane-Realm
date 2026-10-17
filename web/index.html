@@ -114,6 +114,11 @@
   }
   class RealmScene extends Phaser.Scene {
     constructor(){ super("realm"); this.mode = "menu"; this.stars = []; this.walkTime = 0; this.playerPos = {x:0,y:0}; this.worldShift = {x:0,y:0}; }
+    preload(){
+      this.load.image("woa-player-wizard","./assets/isometric/player-wizard.svg");
+      this.load.image("woa-mathias","./assets/isometric/mathias.svg");
+      this.load.image("woa-archivist","./assets/isometric/archivist.svg");
+    }
     create(){
       this.bg = this.add.graphics();
       this.world = this.add.container(0,0);
@@ -265,13 +270,24 @@
         if(Math.abs(x-w*.5)<tileW*1.25)continue;
         diamond(x,y,tileW*.22,tileH*.14,i%2?0xb08bc6:0x8b65aa,.5);
       }
+      // Town NPC sprites are part of the world layer so they travel with the map.
+      if(this.textures.exists("woa-mathias")){
+        const mathias=this.add.image(w*.28,horizon+tileH*4.1,"woa-mathias").setDisplaySize(48,56);
+        const archivist=this.add.image(w*.72,horizon+tileH*5.1,"woa-archivist").setDisplaySize(45,53);
+        this.world.add([mathias,archivist]);
+      }
       this.world.add(g);
+      // Keep the player anchored on screen while the isometric environment scrolls around them.
       const x=w*.5,y=h*.76;
       this.playerBaseY=y;
       this.playerShadow=this.add.ellipse(x,y+26,48,15,0x000000,.55).setDepth(10);
-      this.playerCloak=this.add.graphics().setDepth(11);
-      this.playerCloak.fillStyle(0x28143e,1);this.playerCloak.fillTriangle(x-17,y+17,x,y-10,x+17,y+17);this.playerCloak.fillTriangle(x-17,y+10,x-10,y+37,x+10,y+37);this.playerCloak.fillTriangle(x+17,y+10,x+10,y+37,x-10,y+37);
-      this.playerCloak.fillStyle(0xe2c0ff,1);this.playerCloak.fillCircle(x,y-14,9);this.playerCloak.fillStyle(0x120a20,1);this.playerCloak.fillTriangle(x-12,y-15,x,y-35,x+12,y-15);this.playerCloak.fillStyle(0xe6bdff,.8);this.playerCloak.fillRect(x-2,y+1,4,20);
+      if(this.textures.exists("woa-player-wizard")){
+        this.playerCloak=this.add.image(x,y,"woa-player-wizard").setDisplaySize(66,78).setDepth(11);
+      } else {
+        this.playerCloak=this.add.graphics().setDepth(11);
+        this.playerCloak.fillStyle(0x28143e,1);this.playerCloak.fillTriangle(x-17,y+17,x,y-10,x+17,y+17);this.playerCloak.fillTriangle(x-17,y+10,x-10,y+37,x+10,y+37);this.playerCloak.fillTriangle(x+17,y+10,x+10,y+37,x-10,y+37);
+        this.playerCloak.fillStyle(0xe2c0ff,1);this.playerCloak.fillCircle(x,y-14,9);this.playerCloak.fillStyle(0x120a20,1);this.playerCloak.fillTriangle(x-12,y-15,x,y-35,x+12,y-15);this.playerCloak.fillStyle(0xe6bdff,.8);this.playerCloak.fillRect(x-2,y+1,4,20);
+      }
       this.tweens.add({targets:this.playerCloak,y:y+3,duration:1500,yoyo:true,repeat:-1,ease:"Sine.InOut"});
       this.add.text(w*.5,h*.9,"THE OUTER WARD",{fontFamily:"Georgia",fontSize:Math.max(10,Math.min(15,w*.014))+"px",color:"#d7b6ef",letterSpacing:4}).setOrigin(.5);
     }
