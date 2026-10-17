@@ -136,6 +136,7 @@
         this.worldShift.x=Math.max(-100,Math.min(100,this.worldShift.x-move.x*step));
         this.worldShift.y=Math.max(-65,Math.min(65,this.worldShift.y-move.y*step));
         this.world.setPosition(this.worldShift.x,this.worldShift.y);
+        if(this.playerSprite)this.playerSprite.setPosition(-this.worldShift.x,-this.worldShift.y);
         this.walkTime+=delta;
         if(this.playerCloak)this.playerCloak.y=this.playerBaseY+Math.sin(this.walkTime/75)*2.2;
       }
