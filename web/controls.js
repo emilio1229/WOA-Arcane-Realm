@@ -25,6 +25,7 @@
   function setKeyboardVector(){const x=(keys.a||keys.arrowleft?-1:0)+(keys.d||keys.arrowright?1:0);const y=(keys.w||keys.arrowup?-1:0)+(keys.s||keys.arrowdown?1:0);window.arcaneMove.x=x;window.arcaneMove.y=y;}
   $("arcane-interact").addEventListener("click",()=>{if(window.arcaneSceneInteract)window.arcaneSceneInteract();else {const target=$("story-talk");if(target)target.click();}});
   function useAction(action){
+    if(window.arcaneSceneAction)window.arcaneSceneAction(action);
     const battle=document.getElementById("woa-battle");
     if(battle){const buttons=battle.querySelectorAll("#woa-battle-actions button");const index=action==="attack"?0:action==="spell"?1:-1;if(index>=0&&buttons[index]){buttons[index].click();return;}return;}
     if(window.arcaneSceneAction)window.arcaneSceneAction(action);
