@@ -171,7 +171,7 @@
       this.scale.on("resize", () => this.drawBackdrop());
       this.input.on("pointerdown", (pointer) => {
         if (this.mode === "town" && pointer.y > this.scale.height * .45) {
-          this.add.circle(pointer.x,pointer.y,4,0xe9ce91,.9).setDepth(20);
+          // Touches are input only: never leave a decorative marker on the playfield.
           this.tweens.add({targets:this.world,x:this.world.x + (pointer.x < this.scale.width/2 ? 4 : -4),duration:100,yoyo:true});
         }
       });
