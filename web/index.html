@@ -363,16 +363,31 @@
         g.fillRect(x+bw*.18,y-22*s,6*s,8*s);
       };
       // Illustrated cottages with dimensional SVG shading and glowing windows.
-      const cottage=(x,y,s)=>{
+      const cottage=(x,y,s,tint=0xffffff)=>{
         // Keep collision at the cottage foundation, not the wide roof silhouette.
         this.solidObstacles.push({x,y:y+35*s,rx:31*s,ry:12*s,kind:"building"});
-        if(this.textures.exists("woa-cottage")){const im=this.add.image(x,y-12*s,"woa-cottage").setDisplaySize(112*s,112*s).setDepth(y);this.world.add(im);}
-        else building(x,y,s,0x49304b,0x59376f);
+        if(this.textures.exists("woa-cottage")){
+          const im=this.add.image(x,y-12*s,"woa-cottage").setDisplaySize(112*s,112*s).setTint(tint).setDepth(y);
+          this.world.add(im);
+        } else building(x,y,s,0x49304b,0x59376f);
       };
-      cottage(w*.17,horizon+tileH*3.1,1.0);
-      cottage(w*.82,horizon+tileH*3.5,.94);
-      cottage(w*.30,horizon+tileH*5.4,.76);
-      cottage(w*.70,horizon+tileH*6.2,.8);
+      // The ward is a lived-in settlement: varied roof hues and sizes imply distinct shops and homes.
+      cottage(w*.17,horizon+tileH*3.1,1.0,0xd9c1ff);
+      cottage(w*.82,horizon+tileH*3.5,.94,0xffd6b2);
+      cottage(w*.30,horizon+tileH*5.4,.76,0xb8d8ff);
+      cottage(w*.70,horizon+tileH*6.2,.8,0xd0f0d0);
+      cottage(w*.105,horizon+tileH*6.9,.63,0xe5baff);
+      cottage(w*.895,horizon+tileH*5.9,.66,0xffd0e5);
+      cottage(w*.22,horizon+tileH*8.5,.59,0xc4b7ff);
+      cottage(w*.78,horizon+tileH*9.0,.62,0xffdfaa);
+      // Hanging ward lanterns mark the little street between the buildings.
+      for(const side of [-1,1]){
+        const lx=w*.5+side*w*.205,ly=horizon+tileH*4.1;
+        g.lineStyle(2,0x342344,.95);g.lineBetween(lx,ly-18,lx,ly+2);
+        g.fillStyle(0x10091a,1);g.fillRoundedRect(lx-5,ly-18,10,15,3);
+        g.fillStyle(0xc68bff,.95);g.fillRoundedRect(lx-2,ly-14,4,8,2);
+        g.fillStyle(0xb76bff,.12);g.fillCircle(lx,ly-8,16);
+      }
       // Small crystal growths and rune stones break up the empty ground beside the lane.
       for(let i=0;i<10;i++){
         const side=i%2===0?-1:1;
