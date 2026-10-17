@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "policy": {
+    "requireAttributionNotRequired": true,
+    "requireExactSourceLicenseCheck": true,
+    "rejectUnreviewedBundles": true
+  },
+  "approvedSources": [
+    {
+      "id": "kenney-fantasy-ui-borders",
+      "title": "Fantasy UI Borders",
+      "sourceUrl": "https://kenney.nl/assets/fantasy-ui-borders",
+      "license": "CC0 1.0",
+      "attributionRequired": false,
+      "files": [
+        "assets/cc0/fantasy-panel-frame.png"
+      ],
+      "allowedIntendedUse": [
+        "decorative-panel-frame"
+      ],
+      "status": "one-panel-frame-imported"
+    },
+    {
+      "id": "kenney-roguelike-rpg-pack",
+      "title": "Roguelike/RPG Pack",
+      "sourceUrl": "https://kenney.nl/assets/roguelike-rpg-pack",
+      "license": "CC0 1.0",
+      "attributionRequired": false,
+      "allowedIntendedUse": [
+        "world-tiles",
+        "town-buildings",
+        "interior-props",
+        "items"
+      ],
+      "status": "license-verified-not-yet-imported"
+    }
+  ]
+}
