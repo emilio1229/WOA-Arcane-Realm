@@ -274,6 +274,26 @@
       g.fillStyle(0x241633,.95);g.fillTriangle(0,horizon+24,w*.18,horizon-38,w*.39,horizon+24);
       g.fillStyle(0x1b112b,.95);g.fillTriangle(w*.28,horizon+25,w*.56,horizon-62,w*.83,horizon+25);
       g.fillStyle(0x130d21,1);g.fillTriangle(w*.61,horizon+30,w*.83,horizon-28,w,horizon+30);
+      // Moonlit skyline: layered ridges, a distant citadel, drifting fog, and stars.
+      const moonX=w*.78,moonY=h*.15,moonR=Math.max(22,Math.min(48,w*.065));
+      g.fillStyle(0xd6b6ff,.055);g.fillCircle(moonX,moonY,moonR*1.75);
+      g.fillStyle(0xe7d7ff,.88);g.fillCircle(moonX,moonY,moonR);
+      g.fillStyle(0xbda0df,.65);g.fillCircle(moonX-moonR*.28,moonY-moonR*.16,moonR*.72);
+      g.fillStyle(0x241638,.98);g.fillTriangle(0,horizon+10,w*.13,horizon-66,w*.29,horizon+10);
+      g.fillStyle(0x1e142f,.98);g.fillTriangle(w*.16,horizon+12,w*.38,horizon-92,w*.59,horizon+12);
+      g.fillStyle(0x27183a,.98);g.fillTriangle(w*.43,horizon+12,w*.69,horizon-76,w*.94,horizon+12);
+      g.fillStyle(0x160f25,1);g.fillTriangle(w*.02,horizon+12,w*.24,horizon-30,w*.46,horizon+12);
+      // Distant citadel towers rise above the ridge with small rune-lit windows.
+      const towerX=w*.39,towerBase=horizon-26;
+      g.fillStyle(0x100b1c,1);g.fillRect(towerX-22,towerBase-74,44,80);
+      g.fillPoints([{x:towerX-29,y:towerBase-73},{x:towerX,y:towerBase-104},{x:towerX+29,y:towerBase-73}],true);
+      g.fillStyle(0x0b0815,1);g.fillRect(towerX-48,towerBase-49,25,55);g.fillRect(towerX+23,towerBase-56,25,62);
+      g.fillPoints([{x:towerX-51,y:towerBase-48},{x:towerX-35,y:towerBase-70},{x:towerX-20,y:towerBase-48}],true);
+      g.fillPoints([{x:towerX+20,y:towerBase-55},{x:towerX+35,y:towerBase-78},{x:towerX+51,y:towerBase-55}],true);
+      g.fillStyle(0xc68bff,.72);g.fillRect(towerX-3,towerBase-61,6,10);g.fillRect(towerX-38,towerBase-38,4,7);g.fillRect(towerX+33,towerBase-42,4,7);
+      // Soft horizontal fog layers add distance without obscuring the walkable path.
+      g.fillStyle(0x9c65c9,.055);g.fillEllipse(w*.28,horizon-3,w*.7,18);
+      g.fillStyle(0x9870b8,.045);g.fillEllipse(w*.75,horizon+18,w*.62,24);
       g.fillStyle(0x181027,1);g.fillRect(0,horizon,w,h-horizon);
       // A hand-drawn 3/4 isometric ground plane, built from diamond tiles.
       const tileW=Math.max(42,Math.min(76,w*.075)),tileH=tileW*.48;
@@ -298,6 +318,15 @@
             g.lineBetween(x,y-tileH*.09,x,y+tileH*.09);
             g.fillStyle(0xd9b4ff,.52);g.fillCircle(x,y,1.1);
           }
+        }
+      }
+      // Subtle violet lantern pools and path-edge runes make the road feel enchanted.
+      for(let i=0;i<8;i++){
+        const ly=horizon+tileH*(2.1+i*1.45),lx=w*.5+Math.sin(i*.42)*w*.025;
+        for(const side of [-1,1]){
+          const px=lx+side*tileW*1.48;
+          g.fillStyle(0xb56dff,.045);g.fillEllipse(px,ly,24,13);
+          g.fillStyle(0xd8a4ff,.62);g.fillCircle(px,ly-3,1.5);
         }
       }
       // Main pale cobblestone lane and branching side paths.
