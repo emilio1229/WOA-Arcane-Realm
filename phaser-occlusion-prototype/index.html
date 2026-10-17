@@ -100,7 +100,7 @@
    this.obstacles.forEach(o=>{
     // Test uses simple 2D proximity and depth ordering as a stand-in for raycast occlusion.
     const close=Math.abs(this.player.x-o.x)<(o.type==='wall'?100:48)&&Math.abs(this.player.y-o.y)<(o.type==='wall'?100:58);
-    const inFront=o.y < this.player.y && this.player.y-o.y<115;
+    const inFront=o.y > this.player.y && o.y-this.player.y<115;
     const fade=close&&inFront;
     const target=fade?.26:1;
     o.container.setAlpha(Phaser.Math.Linear(o.container.alpha,target,.13));
