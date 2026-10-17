@@ -178,26 +178,102 @@
     }
     drawTown(w,h){
       const g=this.add.graphics();
-      const horizon=h*.52;
-      g.fillStyle(0x171026,1);g.fillRect(0,horizon,w,h-horizon);
-      g.fillStyle(0x241633,1);g.fillTriangle(0,horizon+30,w*.5,horizon-65,w,horizon+30);
-      g.fillStyle(0x100b1a,1);g.fillRect(0,horizon+40,w,h*.3);
-      const building=(x,y,bw,bh,color)=>{g.fillStyle(0x08070d,1);g.fillRect(x-5,y-5,bw+10,bh+10);g.fillStyle(color,1);g.fillRect(x,y,bw,bh);g.fillStyle(0x30203c,1);g.fillTriangle(x-10,y,x+bw/2,y-bh*.35,x+bw+10,y);g.fillStyle(0x6e3d83,.8);g.fillRect(x+bw*.25,y+bh*.3,bw*.13,bh*.18);g.fillRect(x+bw*.62,y+bh*.3,bw*.13,bh*.18);};
-      building(w*.08,horizon-35,w*.16,h*.24,0x21162a);building(w*.73,horizon-25,w*.17,h*.27,0x1d1427);building(w*.39,horizon-58,w*.22,h*.34,0x281a35);
-      g.fillStyle(0x100a18,1);g.fillRect(w*.47,horizon+15,w*.06,h*.21);
-      g.lineStyle(2,0x7c4ba6,.55);g.strokeRect(w*.47,horizon+15,w*.06,h*.21);
-      g.fillStyle(0x9b5ad5,.5);g.fillCircle(w*.5,horizon+10,8);
-      for(let i=0;i<11;i++){const x=(i*91+30)%Math.max(w,1),y=horizon+40+(i%4)*23;g.fillStyle(0x31203c,.8);g.fillTriangle(x-14,y,x,y-25,x+14,y);g.fillRect(x-8,y,16,20);}
-      g.fillStyle(0x4a2c64,.8);g.fillTriangle(w*.35,h,w*.5,horizon+30,w*.65,h);
-      g.fillStyle(0x9b63c4,.22);g.fillTriangle(w*.44,h,w*.5,horizon+55,w*.56,h);
+      const horizon=h*.43;
+      // Layered dusk sky and distant silhouettes.
+      g.fillStyle(0x0d0917,1);g.fillRect(0,0,w,h);
+      g.fillStyle(0x241633,.95);g.fillTriangle(0,horizon+24,w*.18,horizon-38,w*.39,horizon+24);
+      g.fillStyle(0x1b112b,.95);g.fillTriangle(w*.28,horizon+25,w*.56,horizon-62,w*.83,horizon+25);
+      g.fillStyle(0x130d21,1);g.fillTriangle(w*.61,horizon+30,w*.83,horizon-28,w,horizon+30);
+      g.fillStyle(0x181027,1);g.fillRect(0,horizon,w,h-horizon);
+      // A hand-drawn 3/4 isometric ground plane, built from diamond tiles.
+      const tileW=Math.max(42,Math.min(76,w*.075)),tileH=tileW*.48;
+      const cols=Math.ceil(w/(tileW*.5))+4,rows=Math.ceil((h-horizon)/tileH)+5;
+      const originX=-tileW,originY=horizon+tileH*.1;
+      const diamond=(cx,cy,tw,th,color,alpha=1,stroke=null)=>{
+        g.fillStyle(color,alpha);g.fillPoints([{x:cx,y:cy-th/2},{x:cx+tw/2,y:cy},{x:cx,y:cy+th/2},{x:cx-tw/2,y:cy}],true);
+        if(stroke!==null){g.lineStyle(1,stroke,.34);g.strokePoints([{x:cx,y:cy-th/2},{x:cx+tw/2,y:cy},{x:cx,y:cy+th/2},{x:cx-tw/2,y:cy}],true);}
+      };
+      for(let row=0;row<rows;row++){
+        for(let col=0;col<cols;col++){
+          const x=originX+(col-row)*tileW*.5+w*.5;
+          const y=originY+(col+row)*tileH*.5;
+          if(y<horizon-tileH)continue;
+          const n=(row*7+col*11)%9;
+          diamond(x,y,tileW,tileH,[0x251a34,0x2b1d39,0x30203f,0x281a36,0x332143,0x241a32,0x2d203a,0x281b36,0x352246][n],.97,0x6c4c83);
+        }
+      }
+      // Main pale cobblestone lane and branching side paths.
+      for(let i=0;i<16;i++){
+        const y=horizon+tileH*1.2+i*tileH*.68;
+        const x=w*.5+Math.sin(i*.22)*w*.025;
+        diamond(x,y,tileW*2.35,tileH*1.12,i%3===0?0x574064:0x493357,.95,0x9a76b0);
+        diamond(x-tileW*.43,y+tileH*.04,tileW*.26,tileH*.18,0xb89ac9,.26);
+        diamond(x+tileW*.38,y-tileH*.05,tileW*.22,tileH*.16,0xc4a1d8,.2);
+      }
+      for(let i=0;i<7;i++){
+        const y=horizon+tileH*3+i*tileH*1.2;
+        diamond(w*.23+Math.sin(i*.45)*w*.035,y,tileW*1.2,tileH*.72,0x493256,.95,0x8d689e);
+        diamond(w*.77-Math.sin(i*.4)*w*.03,y+tileH*.3,tileW*1.25,tileH*.75,0x493256,.95,0x8d689e);
+      }
+      const tree=(x,y,s=1)=>{
+        // Shadow, layered canopy, trunk and tiny arcane lights.
+        g.fillStyle(0x09070e,.55);g.fillEllipse(x,y+tileH*.18,30*s,11*s);
+        g.fillStyle(0x171020,1);g.fillRect(x-4*s,y-7*s,8*s,20*s);
+        g.fillStyle(0x302043,1);g.fillTriangle(x-17*s,y+2*s,x,y-37*s,x+17*s,y+2*s);
+        g.fillStyle(0x49305e,1);g.fillTriangle(x-14*s,y-7*s,x,y-45*s,x+14*s,y-7*s);
+        g.fillStyle(0x6c4388,.8);g.fillTriangle(x-9*s,y-18*s,x,y-52*s,x+9*s,y-18*s);
+        g.fillStyle(0xd8a3ff,.65);g.fillCircle(x+3*s,y-29*s,2*s);
+      };
+      const building=(x,y,s,wall,roof)=>{
+        const bw=43*s,bh=35*s,depth=19*s;
+        g.fillStyle(0x0a0710,.7);g.fillEllipse(x,y+8*s,78*s,24*s);
+        // Side walls give each cottage a readable isometric volume.
+        g.fillStyle(0x21162e,1);g.fillPoints([{x:x-bw/2,y:y-bh},{x:x,y:y-bh+depth},{x:x,y:y+depth},{x:x-bw/2,y:y}],true);
+        g.fillStyle(wall,1);g.fillPoints([{x:x,y:y-bh+depth},{x:x+bw/2,y:y-bh},{x:x+bw/2,y:y},{x:x,y:y+depth}],true);
+        g.fillStyle(roof,1);g.fillPoints([{x:x-bw/2-5*s,y:y-bh},{x:x,y:y-bh-depth},{x:x+bw/2+5*s,y:y-bh},{x:x,y:y-bh+depth}],true);
+        g.lineStyle(1,0xe3b6ff,.32);g.strokePoints([{x:x-bw/2-5*s,y:y-bh},{x:x,y:y-bh-depth},{x:x+bw/2+5*s,y:y-bh},{x:x,y:y-bh+depth}],true);
+        g.fillStyle(0x0a0810,1);g.fillRect(x-5*s,y-18*s,10*s,18*s);
+        g.fillStyle(0xd5a0ff,.75);g.fillRect(x-2*s,y-15*s,3*s,7*s);
+        g.fillStyle(0x4d2e68,.9);g.fillRect(x-bw*.28,y-22*s,6*s,8*s);
+        g.fillRect(x+bw*.18,y-22*s,6*s,8*s);
+      };
+      // Cottage clusters frame a central ward instead of blocking the road.
+      building(w*.17,horizon+tileH*3.1,1.05,0x49304b,0x59376f);
+      building(w*.82,horizon+tileH*3.5,.98,0x382744,0x6a3c78);
+      building(w*.30,horizon+tileH*5.4,.8,0x3e2b49,0x49305e);
+      building(w*.70,horizon+tileH*6.2,.82,0x4b3049,0x704080);
+      // Trees and glowing ward-lanterns are placed behind the playable path.
+      for(let i=0;i<12;i++){
+        const side=i%2===0?-1:1;
+        const y=horizon+tileH*(1.4+(i%6)*1.55);
+        const x=w*.5+side*(w*(.28+(i%3)*.045));
+        tree(x,y,.62+(i%3)*.12);
+        if(i%3===0){
+          g.lineStyle(2,0x9d61d1,.65);g.strokeCircle(x+12,y-21,5);
+          g.fillStyle(0xc58aff,.75);g.fillCircle(x+12,y-21,2.5);
+        }
+      }
+      // Central wardstone and the distant gate.
+      const gateX=w*.5,gateY=horizon+tileH*2.1;
+      g.fillStyle(0x171021,1);g.fillPoints([{x:gateX-tileW*.46,y:gateY},{x:gateX-tileW*.46,y:gateY-tileH*1.8},{x:gateX-tileW*.2,y:gateY-tileH*2.35},{x:gateX+tileW*.2,y:gateY-tileH*2.35},{x:gateX+tileW*.46,y:gateY-tileH*1.8},{x:gateX+tileW*.46,y:gateY}],true);
+      g.lineStyle(2,0x9864c3,.75);g.strokePoints([{x:gateX-tileW*.46,y:gateY},{x:gateX-tileW*.46,y:gateY-tileH*1.8},{x:gateX-tileW*.2,y:gateY-tileH*2.35},{x:gateX+tileW*.2,y:gateY-tileH*2.35},{x:gateX+tileW*.46,y:gateY-tileH*1.8},{x:gateX+tileW*.46,y:gateY}],true);
+      g.fillStyle(0xb46dff,.2);g.fillEllipse(gateX,gateY-tileH*.8,tileW*.38,tileH*.9);
+      g.fillStyle(0x9b5ad5,.85);g.fillCircle(gateX,gateY-tileH*1.2,4);
+      // Small stepping stones and scattered magical motes add depth.
+      for(let i=0;i<20;i++){
+        const x=(i*137+41)%Math.max(w,1),y=horizon+tileH*(2+(i*3%12));
+        if(Math.abs(x-w*.5)<tileW*1.25)continue;
+        diamond(x,y,tileW*.22,tileH*.14,i%2?0xb08bc6:0x8b65aa,.5);
+      }
       this.world.add(g);
       const x=w*.5,y=h*.76;
       this.playerBaseY=y;
       this.playerShadow=this.add.ellipse(x,y+26,48,15,0x000000,.55).setDepth(10);
-      this.playerCloak=this.add.graphics().setDepth(11);this.playerCloak.fillStyle(0x28143e,1);this.playerCloak.fillTriangle(x-17,y+17,x,y-10,x+17,y+17);this.playerCloak.fillTriangle(x-17,y+10,x-10,y+37,x+10,y+37);this.playerCloak.fillTriangle(x+17,y+10,x+10,y+37,x-10,y+37);
+      this.playerCloak=this.add.graphics().setDepth(11);
+      this.playerCloak.fillStyle(0x28143e,1);this.playerCloak.fillTriangle(x-17,y+17,x,y-10,x+17,y+17);this.playerCloak.fillTriangle(x-17,y+10,x-10,y+37,x+10,y+37);this.playerCloak.fillTriangle(x+17,y+10,x+10,y+37,x-10,y+37);
       this.playerCloak.fillStyle(0xe2c0ff,1);this.playerCloak.fillCircle(x,y-14,9);this.playerCloak.fillStyle(0x120a20,1);this.playerCloak.fillTriangle(x-12,y-15,x,y-35,x+12,y-15);this.playerCloak.fillStyle(0xe6bdff,.8);this.playerCloak.fillRect(x-2,y+1,4,20);
       this.tweens.add({targets:this.playerCloak,y:y+3,duration:1500,yoyo:true,repeat:-1,ease:"Sine.InOut"});
-      this.add.text(w*.5,h*.9,"THE OUTER WARD", {fontFamily:"Georgia",fontSize:Math.max(10,Math.min(15,w*.014))+"px",color:"#d7b6ef",letterSpacing:4}).setOrigin(.5);
+      this.add.text(w*.5,h*.9,"THE OUTER WARD",{fontFamily:"Georgia",fontSize:Math.max(10,Math.min(15,w*.014))+"px",color:"#d7b6ef",letterSpacing:4}).setOrigin(.5);
     }
     twinkle(){
       if(this.mode==="town") return;
