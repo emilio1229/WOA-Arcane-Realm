@@ -119,12 +119,39 @@
         canvas.getContext("2d").drawImage(image, rect.x, rect.y, rect.w, rect.h, 0, 0, rect.w, rect.h);
         return canvas.toDataURL("image/png");
       };
+      const makeTransparentSprite = (image, rect, keyColor = "purple") => {
+        if (!image) return null;
+        const canvas = document.createElement("canvas");
+        canvas.width = rect.w; canvas.height = rect.h;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        ctx.drawImage(image, rect.x, rect.y, rect.w, rect.h, 0, 0, rect.w, rect.h);
+        const frame = ctx.getImageData(0, 0, rect.w, rect.h);
+        const px = frame.data;
+        for (let i = 0; i < px.length; i += 4) {
+          const r = px[i], g = px[i+1], b = px[i+2];
+          // These sheets use a saturated violet presentation background. Remove only
+          // background-like pixels; retain near-black outlines and bright magenta highlights.
+          const violetBackground = b > 75 && r > 35 && b > g * 1.28 && r > g * 1.18 && (b-r) < 105;
+          const deepVioletBackground = b > 45 && r > 25 && b > g * 1.35 && r > g * 1.22 && r < 115 && g < 65;
+          if (violetBackground || deepVioletBackground) px[i+3] = 0;
+        }
+        ctx.putImageData(frame, 0, 0);
+        return canvas.toDataURL("image/png");
+      };
       const portraits = await getImage("04_portraits_and_class_outfits.png");
       if (portraits) {
         window.woaArtPortraits = {
           masculine: crop(portraits, {x:18,y:46,w:136,h:108}),
           feminine: crop(portraits, {x:176,y:46,w:135,h:108})
         };
+      }
+      // Convert one clearly isolated familiar pose into a transparent PNG at runtime.
+      // The source is a concept sheet, not a true animation atlas; this is a usable
+      // static gameplay sprite while hand-cleaned frame art is being produced.
+      const familiarSheet = await getImage("08_familiars_and_pets.png");
+      if (familiarSheet) {
+        window.woaRuntimeSprites = window.woaRuntimeSprites || {};
+        window.woaRuntimeSprites.familiarWolf = makeTransparentSprite(familiarSheet, {x:8,y:104,w:48,h:34});
       }
       // Keep the categorized concept panels available to future scene/UI integrations.
       window.woaConceptArt = {};
@@ -279,6 +306,20 @@
       });
       this.time.addEvent({delay:1200,loop:true,callback:()=>this.twinkle()});
       window.arcaneSceneVisualAction=(action)=>this.playArcaneAction(action);
+      // When the concept archive has loaded, install its transparent familiar sprite
+      // into Phaser without delaying the initial game boot.
+      const installFamiliarArt = () => {
+        const data = window.woaRuntimeSprites && window.woaRuntimeSprites.familiarWolf;
+        if (!data || this.textures.exists("woa-familiar-art")) return;
+        this.textures.addBase64("woa-familiar-art", data);
+        this.textures.once("addtexture-woa-familiar-art", () => {
+          if (this.familiarSprite && this.textures.exists("woa-familiar-art")) {
+            this.familiarSprite.setTexture("woa-familiar-art").clearTint().setDisplaySize(44, 34);
+          }
+        });
+      };
+      if (window.woaArtReady) window.woaArtReady.then(installFamiliarArt);
+      installFamiliarArt();
     }
     setMode(mode){this.mode = mode; this.drawBackdrop(); if(mode === "town"){this.worldShift={x:0,y:0};this.world.setPosition(0,0);document.documentElement.style.setProperty("--woa-world-x","0px");document.documentElement.style.setProperty("--woa-world-y","0px");this.playerPos={x:this.scale.width*.5,y:this.scale.height*.76};}}
     update(time, delta){
@@ -553,7 +594,8 @@
         const familiarTint=familiarTints[familiarName]||familiarTints["Archive Wisp"];
         this.familiarAura=this.add.circle(x+47,y-25,22,familiarTint,.10).setDepth(11);
         this.tweens.add({targets:this.familiarAura,alpha:.22,scale:1.18,duration:1500,yoyo:true,repeat:-1,ease:"Sine.InOut"});
-        this.familiarSprite=this.add.image(x+47,y-25,"woa-familiar").setDisplaySize(44,50).setTint(familiarTint).setDepth(12);
+        const familiarTexture=this.textures.exists("woa-familiar-art")?"woa-familiar-art":"woa-familiar";
+        this.familiarSprite=this.add.image(x+47,y-25,familiarTexture).setDisplaySize(44,familiarTexture==="woa-familiar-art"?34:50).setTint(familiarTexture==="woa-familiar-art"?0xffffff:familiarTint).setDepth(12);
         this.tweens.add({targets:this.familiarSprite,y:y-30,duration:1200,yoyo:true,repeat:-1,ease:"Sine.InOut"});
       }
       this.townLabel=this.add.text(w*.5,h*.9,"THE OUTER WARD",{fontFamily:"Georgia",fontSize:Math.max(10,Math.min(15,w*.014))+"px",color:"#d7b6ef",letterSpacing:4}).setOrigin(.5);
