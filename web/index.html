@@ -126,6 +126,9 @@
     $("hud-name").textContent = heroName;
     $("hud-class").textContent = chosenClass;
     try { const key="woa-preview-profile-v1"; const prior=JSON.parse(localStorage.getItem(key)||"{}"); localStorage.setItem(key,JSON.stringify({...prior,name:heroName,className:chosenClass,presentation:chosenPresentation,robeColor:$("robe-color").value,headwear:$("headwear").value})); } catch (_) {}
+    // The first explicit "Enter the Realm" gesture can unlock browser audio.
+    // Respect a saved On/Off choice; only auto-enable when the player has never chosen.
+    try { if(localStorage.getItem("woa-music-enabled-v1")===null && window.arcaneMusic) window.arcaneMusic.setEnabled(true); } catch (_) {}
     showScreen("town");
   });
   const realmMenu=$("realm-menu");
@@ -254,6 +257,14 @@
           if(y<horizon-tileH)continue;
           const n=(row*7+col*11)%9;
           diamond(x,y,tileW,tileH,[0x251a34,0x2b1d39,0x30203f,0x281a36,0x332143,0x241a32,0x2d203a,0x281b36,0x352246][n],.97,0x6c4c83);
+          // Occasional inset rune-stones make the paving feel hand-laid, not a flat grid.
+          if((row*13+col*5)%23===0 && y>horizon+tileH*2){
+            g.lineStyle(1,0xb98bdd,.48);
+            g.strokeCircle(x,y,tileW*.075);
+            g.lineBetween(x-tileW*.045,y,x+tileW*.045,y);
+            g.lineBetween(x,y-tileH*.09,x,y+tileH*.09);
+            g.fillStyle(0xd9b4ff,.52);g.fillCircle(x,y,1.1);
+          }
         }
       }
       // Main pale cobblestone lane and branching side paths.
