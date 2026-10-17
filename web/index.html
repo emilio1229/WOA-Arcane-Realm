@@ -157,6 +157,7 @@
   let chosenClass = "Storm Herald";
   let heroName = "";
   let gameScene;
+  window.woaArtReady.then((loaded) => { if (loaded) updatePreview(); });
   function showScreen(id) {
     screens.forEach(key => $(key).classList.toggle("hidden", key !== id));
     $("town-hud").classList.toggle("hidden", id !== "town");
