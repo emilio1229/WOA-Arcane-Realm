@@ -7,7 +7,7 @@
   const controls=document.createElement("div");controls.id="arcane-controls";
   controls.innerHTML='<div id="arcane-pad"><button data-dir="up" aria-label="Move up">▲</button><button data-dir="left" aria-label="Move left">◀</button><button data-dir="right" aria-label="Move right">▶</button><button data-dir="down" aria-label="Move down">▼</button></div><div id="arcane-actions"><button id="arcane-interact"><strong>✦</strong>INTERACT</button><button id="arcane-dodge"><strong>➤</strong>DODGE</button><button id="arcane-spell"><strong>✧</strong>SPELL</button></div>';
   document.body.appendChild(controls);
-  const help=document.createElement("div");help.id="arcane-help";help.textContent="WASD / arrows to move · E to interact · Space to cast";document.body.appendChild(help);
+  const help=document.createElement("div");help.id="arcane-help";help.textContent="WASD / arrows to move · E to interact · Space to cast · Shift to dodge";document.body.appendChild(help);
   window.arcaneMove={x:0,y:0};
   let keys={};
   function sync(){const visible=$("town-hud")&&!$("town-hud").classList.contains("hidden");controls.style.display=visible?"flex":"none";help.style.display=visible&&!matchMedia("(pointer:coarse)").matches?"block":"none";}
@@ -18,11 +18,11 @@
     const up=e=>{e.preventDefault();window.arcaneMove.x=0;window.arcaneMove.y=0;btn.classList.remove("selected");};
     btn.addEventListener("pointerdown",down);["pointerup","pointercancel","lostpointercapture"].forEach(ev=>btn.addEventListener(ev,up));
   });
-  window.addEventListener("keydown",e=>{const key=e.key.toLowerCase();if(["arrowup","arrowdown","arrowleft","arrowright"," "].includes(key))e.preventDefault();if(!e.repeat&&key==="e"&&$("town-hud")&&!$("town-hud").classList.contains("hidden")){const target=$("story-talk");if(target)target.click();else if(window.arcaneSceneInteract)window.arcaneSceneInteract();}if(!e.repeat&&key===" "&&$("town-hud")&&!$("town-hud").classList.contains("hidden")){if(window.arcaneSceneAction)window.arcaneSceneAction("spell");}if(!e.repeat&&key==="d"&&$("town-hud")&&!$("town-hud").classList.contains("hidden")){if(window.arcaneSceneAction)window.arcaneSceneAction("dodge");}keys[key]=true;setKeyboardVector();});
+  window.addEventListener("keydown",e=>{const key=e.key.toLowerCase();if(["arrowup","arrowdown","arrowleft","arrowright"," "].includes(key))e.preventDefault();if(!e.repeat&&key==="e"&&$("town-hud")&&!$("town-hud").classList.contains("hidden")){if(window.arcaneSceneInteract)window.arcaneSceneInteract();else {const target=$("story-talk");if(target)target.click();}}if(!e.repeat&&key===" "&&$("town-hud")&&!$("town-hud").classList.contains("hidden")){if(window.arcaneSceneAction)window.arcaneSceneAction("spell");}if(!e.repeat&&key==="shift"&&$("town-hud")&&!$("town-hud").classList.contains("hidden")){if(window.arcaneSceneAction)window.arcaneSceneAction("dodge");}keys[key]=true;setKeyboardVector();});
   window.addEventListener("keyup",e=>{keys[e.key.toLowerCase()]=false;setKeyboardVector();});
   window.addEventListener("blur",()=>{keys={};window.arcaneMove.x=0;window.arcaneMove.y=0;});
   function setKeyboardVector(){const x=(keys.a||keys.arrowleft?-1:0)+(keys.d||keys.arrowright?1:0);const y=(keys.w||keys.arrowup?-1:0)+(keys.s||keys.arrowdown?1:0);window.arcaneMove.x=x;window.arcaneMove.y=y;}
-  $("arcane-interact").addEventListener("click",()=>{const target=$("story-talk");if(target)target.click();else if(window.arcaneSceneInteract)window.arcaneSceneInteract();});
+  $("arcane-interact").addEventListener("click",()=>{if(window.arcaneSceneInteract)window.arcaneSceneInteract();else {const target=$("story-talk");if(target)target.click();}});
   $("arcane-dodge").addEventListener("click",()=>{if(window.arcaneSceneAction)window.arcaneSceneAction("dodge");else pulse("arcane-dodge");});
   $("arcane-spell").addEventListener("click",()=>{if(window.arcaneSceneAction)window.arcaneSceneAction("spell");else pulse("arcane-spell");});
   function pulse(id){const b=$(id);b.animate([{transform:"scale(1)",filter:"brightness(1)"},{transform:"scale(.9)",filter:"brightness(1.8)"},{transform:"scale(1)",filter:"brightness(1)"}],{duration:220});}
