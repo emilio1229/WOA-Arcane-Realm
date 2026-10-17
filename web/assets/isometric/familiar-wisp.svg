@@ -1,9 +1,39 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80">
-<defs><radialGradient id="orb"><stop stop-color="#fff4ff"/><stop offset=".32" stop-color="#d9a4ff"/><stop offset="1" stop-color="#7334bd" stop-opacity=".08"/></radialGradient></defs>
-<circle cx="40" cy="39" r="27" fill="url(#orb)" opacity=".35"/>
-<path d="M40 9 48 27 67 20 58 39 70 51 50 54 40 72 30 54 10 51 22 39 13 20 32 27Z" fill="#8e4ac7" stroke="#e5c4ff" stroke-width="2"/>
-<path d="M40 19 45 34 58 31 51 42 57 49 43 47 40 61 35 47 23 49 29 41 22 31 35 34Z" fill="#f1d8ff"/>
-<circle cx="35" cy="39" r="2.3" fill="#21102e"/><circle cx="46" cy="39" r="2.3" fill="#21102e"/>
-<path d="M36 46Q40 50 44 46" fill="none" stroke="#51216e" stroke-width="2" stroke-linecap="round"/>
-<circle cx="40" cy="39" r="34" fill="none" stroke="#c98bff" stroke-width="1" stroke-dasharray="3 5" opacity=".65"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="144" viewBox="0 0 128 144">
+<defs>
+ <radialGradient id="aura"><stop stop-color="#f8eaff" stop-opacity=".95"/><stop offset=".42" stop-color="#bd72ff" stop-opacity=".46"/><stop offset="1" stop-color="#7435c9" stop-opacity="0"/></radialGradient>
+ <linearGradient id="body" x1=".2" y1="0" x2=".8" y2="1"><stop stop-color="#fff7ff"/><stop offset=".32" stop-color="#dcb0ff"/><stop offset=".7" stop-color="#9c56e8"/><stop offset="1" stop-color="#55238e"/></linearGradient>
+ <linearGradient id="wing" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f5dfff" stop-opacity=".88"/><stop offset="1" stop-color="#a75cff" stop-opacity=".08"/></linearGradient>
+ <filter id="glow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<ellipse cx="64" cy="72" rx="53" ry="57" fill="url(#aura)"/>
+<g opacity=".9" stroke="#dcb2ff" stroke-width="1.5" fill="url(#wing)">
+ <path d="M49 59Q22 25 12 48Q7 65 34 76L48 79Z"/>
+ <path d="M79 59Q106 25 116 48Q121 65 94 76L80 79Z"/>
+ <path d="M47 73Q21 64 20 84Q23 98 48 91Z" opacity=".55"/>
+ <path d="M81 73Q107 64 108 84Q105 98 80 91Z" opacity=".55"/>
+</g>
+<g fill="none" stroke="#f2d9ff" stroke-linecap="round" opacity=".7">
+ <path d="M27 48Q37 57 43 69"/><path d="M101 48Q91 57 85 69"/>
+ <path d="M31 81Q39 83 45 80"/><path d="M97 81Q89 83 83 80"/>
+</g>
+<g filter="url(#glow)">
+ <path d="M64 29C48 39 39 55 42 75C44 92 54 102 64 113C74 102 84 92 86 75C89 55 80 39 64 29Z" fill="url(#body)" stroke="#f7eaff" stroke-width="2.5"/>
+ <path d="M47 72Q40 92 56 105L64 115 72 105Q88 92 81 72Q73 84 64 85Q55 84 47 72Z" fill="#a45be8" opacity=".9"/>
+ <path d="M54 49Q64 40 74 49" fill="none" stroke="#fff" stroke-width="2" opacity=".8"/>
+ <path d="M52 62Q56 58 60 62M68 62Q72 58 76 62" fill="none" stroke="#4b246d" stroke-width="3" stroke-linecap="round"/>
+ <ellipse cx="56" cy="65" rx="3.1" ry="4.5" fill="#301747"/><ellipse cx="72" cy="65" rx="3.1" ry="4.5" fill="#301747"/>
+ <circle cx="57" cy="63.5" r="1.1" fill="#fff"/><circle cx="73" cy="63.5" r="1.1" fill="#fff"/>
+ <path d="M59 74Q64 79 69 74" fill="none" stroke="#68358c" stroke-width="2" stroke-linecap="round"/>
+ <path d="M58 88L64 94 70 88" fill="none" stroke="#f7dfff" stroke-width="2" opacity=".9"/>
+</g>
+<g fill="#fff2ff" filter="url(#glow)">
+ <path d="M25 30l2.5 6.5L34 39l-6.5 2.5L25 48l-2.5-6.5L16 39l6.5-2.5Z"/>
+ <path d="M100 24l2 5 5 2-5 2-2 5-2-5-5-2 5-2Z"/>
+ <circle cx="34" cy="105" r="2.5"/><circle cx="95" cy="100" r="2"/>
+ <circle cx="89" cy="43" r="1.8"/><circle cx="40" cy="28" r="1.6"/>
+</g>
+<g fill="none" stroke="#d9a5ff" opacity=".8">
+ <ellipse cx="64" cy="73" rx="45" ry="16" transform="rotate(-25 64 73)" stroke-dasharray="3 7"/>
+ <ellipse cx="64" cy="73" rx="45" ry="16" transform="rotate(35 64 73)" stroke-dasharray="2 8"/>
+</g>
 </svg>
