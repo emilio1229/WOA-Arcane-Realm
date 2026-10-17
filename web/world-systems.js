@@ -54,4 +54,12 @@ window.arcaneSceneInteract=()=>{
 };
 window.arcaneSceneAction=a=>a==="spell"?open("Class Spell","Your class spell is ready for combat. Approach the unstable rift and interact with it to begin the encounter; spells can then be cast from the battle panel.",[{label:"Understood",primary:true,run:close}],"ABILITY"):open("Quick Step","You slip sideways in a flash of violet light. Combat dodging will be available inside future battle encounters.",[{label:"Return",primary:true,run:close}],"ABILITY");
 if($("town-hud"))new MutationObserver(sync).observe($("town-hud"),{attributes:true,attributeFilter:["class"]});sync();
+
+/* Compact exploration overlays: no overlapping panels on phones. */
+#woa-world-hud{backdrop-filter:blur(14px);box-shadow:0 10px 30px #0006}
+#woa-world-modal .card{border-radius:20px;box-shadow:0 18px 70px #0008,0 0 36px #9a4bd622;backdrop-filter:blur(18px)}
+#woa-world-modal .buttons button{border-radius:12px;min-height:44px}
+#woa-world-modal h2{line-height:1.15}
+@media(max-width:600px){#woa-mini-map{display:none!important}#woa-world-hud{left:50%;right:auto;top:max(58px,calc(env(safe-area-inset-top) + 50px));bottom:auto;transform:translateX(-50%);width:max-content;max-width:62vw;padding:7px 11px;border-radius:999px;font-size:10px;line-height:1.35;background:#0b0714d9;white-space:nowrap}#woa-world-hud strong{font-size:9px;letter-spacing:.06em}#woa-world-hud i{height:3px;margin:4px 0 0}#woa-quest-reward{display:none}#woa-world-modal{padding:10px}#woa-world-modal .card{max-height:calc(100dvh - 20px);padding:20px 16px}#woa-world-modal h2{font-size:25px}#woa-world-modal p{font-size:13px;line-height:1.55}#woa-world-modal .buttons{gap:7px}#woa-world-modal .buttons button{flex-basis:100%;padding:12px}}
+@media(prefers-reduced-motion:reduce){#woa-world-modal .card{scroll-behavior:auto}}
 })();
