@@ -85,10 +85,74 @@
 <div id="town-hud" class="town-hud hidden"><div class="hud-card profile-pill"><span class="profile-orb">✦</span><span><strong id="hud-name">Adventurer</strong><small><span id="hud-class">Storm Herald</span> · Level 1</small></span></div><button id="hud-menu" class="menu-trigger" aria-label="Open realm menu" aria-expanded="false">☰</button></div><section id="realm-menu" class="realm-menu hidden" aria-label="Realm menu"><button class="menu-close" id="realm-menu-close" aria-label="Close menu">×</button><div class="eyebrow">ARCANE REALM</div><h2>Where to?</h2><p>Your journey, your pace.</p><button class="menu-option" id="hud-codex"><span>✧</span><span><b>Chronicles</b><small>Read the lore of the Realm</small></span><span>›</span></button><button class="menu-option" id="hud-character"><span>◈</span><span><b>Character</b><small>Change your adventurer</small></span><span>›</span></button><button class="menu-option" id="hud-home"><span>⌂</span><span><b>Return to title</b><small>Leave the Outer Ward</small></span><span>›</span></button><button class="menu-option" id="music-toggle"><span>♫</span><span><b>Soundtrack</b><small>Turn the original ambient music on or off</small></span><span id="music-status">›</span></button></section>
 <div id="bottom-hint" class="bottom-hint hidden">The path ahead is veiled. Mathias awaits beyond the town gate.</div>
 <script src="https://cdn.jsdelivr.net/npm/phaser@4.2.1/dist/phaser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script>
 (() => {
   const $ = (id) => document.getElementById(id);
   const screens = ["start-screen","creator-screen","chronicles-screen"];
+  // Load the approved art starter ZIP directly from the repository and extract it in-browser.
+  // The ZIP contains concept panels, not animation-ready sprite atlases, so only the portrait crops
+  // are used as character portraits; the existing SVGs remain safe fallbacks.
+  window.woaArtReady = (async () => {
+    const archiveUrl = "https://raw.githubusercontent.com/emilio1229/WOA-Arcane-Realm/main/assets/art-source/woa_arcane_realm_asset_starter.zip";
+    try {
+      if (!window.JSZip) throw new Error("ZIP reader unavailable");
+      const response = await fetch(archiveUrl, { cache: "force-cache" });
+      if (!response.ok) throw new Error("Art ZIP returned " + response.status);
+      const zip = await JSZip.loadAsync(await response.arrayBuffer());
+      const getImage = async (name) => {
+        const entry = Object.values(zip.files).find(file => !file.dir && file.name.endsWith(name));
+        if (!entry) return null;
+        const blob = await entry.async("blob");
+        return await new Promise((resolve, reject) => {
+          const image = new Image();
+          image.onload = () => resolve(image);
+          image.onerror = reject;
+          image.src = URL.createObjectURL(blob);
+        });
+      };
+      const crop = (image, rect) => {
+        if (!image) return null;
+        const canvas = document.createElement("canvas");
+        canvas.width = rect.w; canvas.height = rect.h;
+        canvas.getContext("2d").drawImage(image, rect.x, rect.y, rect.w, rect.h, 0, 0, rect.w, rect.h);
+        return canvas.toDataURL("image/png");
+      };
+      const portraits = await getImage("04_portraits_and_class_outfits.png");
+      if (portraits) {
+        window.woaArtPortraits = {
+          masculine: crop(portraits, {x:18,y:46,w:136,h:108}),
+          feminine: crop(portraits, {x:176,y:46,w:135,h:108})
+        };
+      }
+      // Keep the categorized concept panels available to future scene/UI integrations.
+      window.woaConceptArt = {};
+      const categories = [
+        ["characters","01_player_characters_and_classes.png"],
+        ["animations","02_player_animations.png"],
+        ["directions","03_directional_facing_and_actions.png"],
+        ["portraits","04_portraits_and_class_outfits.png"],
+        ["spells","05_spell_and_combat_effects.png"],
+        ["mathias","06_mathias_supporting_character.png"],
+        ["enemies","07_enemies.png"],
+        ["familiars","08_familiars_and_pets.png"],
+        ["equipment","09_equipment_and_items.png"],
+        ["world","10_world_environment.png"],
+        ["ui","11_ui_elements_and_palette.png"],
+        ["branding","12_woa_branding.png"]
+      ];
+      for (const [key, filename] of categories) {
+        const entry = Object.values(zip.files).find(file => !file.dir && file.name.endsWith(filename));
+        if (entry) window.woaConceptArt[key] = URL.createObjectURL(await entry.async("blob"));
+      }
+      document.documentElement.dataset.woaArtLoaded = "true";
+      return true;
+    } catch (error) {
+      console.warn("WoA concept art archive could not be loaded; using built-in game sprites.", error);
+      return false;
+    }
+  })();
+
   let chosenPresentation = "masculine";
   let chosenClass = "Storm Herald";
   let heroName = "";
@@ -105,7 +169,8 @@
     const palette = {"violet":"none","ember":"hue-rotate(285deg) saturate(1.35)","frost":"hue-rotate(155deg) saturate(1.1)","verdant":"hue-rotate(85deg) saturate(1.2)","void":"grayscale(.65) brightness(.7)","gold":"hue-rotate(225deg) saturate(1.35)"};
     const color = $("robe-color") ? $("robe-color").value : "violet";
     const hat = $("headwear") ? $("headwear").value : "hood";
-    $("hero-sigil").src = chosenPresentation === "feminine" ? "./assets/sprites/arcane-wizard-female.svg" : "./assets/sprites/arcane-wizard-male.svg";
+    const artPortrait = window.woaArtPortraits && window.woaArtPortraits[chosenPresentation];
+    $("hero-sigil").src = artPortrait || (chosenPresentation === "feminine" ? "./assets/sprites/arcane-wizard-female.svg" : "./assets/sprites/arcane-wizard-male.svg");
     $("hero-sigil").style.filter = (palette[color] || "none") + " drop-shadow(0 0 12px #a95be888)";
     $("hero-headwear").textContent = hat === "crown" ? "♕" : hat === "widehat" ? "♠" : "⌃";
     $("hero-headwear").style.color = hat === "crown" ? "#ffe6a8" : hat === "widehat" ? "#d8b3ff" : "#f5dca1";
