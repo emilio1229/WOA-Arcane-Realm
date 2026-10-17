@@ -295,6 +295,7 @@
       g.lineStyle(2,0x9864c3,.75);g.strokePoints([{x:gateX-tileW*.46,y:gateY},{x:gateX-tileW*.46,y:gateY-tileH*1.8},{x:gateX-tileW*.2,y:gateY-tileH*2.35},{x:gateX+tileW*.2,y:gateY-tileH*2.35},{x:gateX+tileW*.46,y:gateY-tileH*1.8},{x:gateX+tileW*.46,y:gateY}],true);
       g.fillStyle(0xb46dff,.2);g.fillEllipse(gateX,gateY-tileH*.8,tileW*.38,tileH*.9);
       g.fillStyle(0x9b5ad5,.85);g.fillCircle(gateX,gateY-tileH*1.2,4);
+      if(this.textures.exists("woa-ward-gate")){const portal=this.add.image(gateX,gateY-tileH*.95,"woa-ward-gate").setDisplaySize(tileW*2.4,tileH*4.9).setDepth(gateY-tileH*.95);this.world.add(portal);this.tweens.add({targets:portal,alpha:.88,duration:1800,yoyo:true,repeat:-1,ease:"Sine.InOut"});}
       // Small stepping stones and scattered magical motes add depth.
       for(let i=0;i<20;i++){
         const x=(i*137+41)%Math.max(w,1),y=horizon+tileH*(2+(i*3%12));
