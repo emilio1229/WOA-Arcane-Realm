@@ -157,6 +157,10 @@
     }
     drawBackdrop(){
       const w=this.scale.width,h=this.scale.height;
+      // Resize/mode changes rebuild the scene; clean up anchored UI sprites first.
+      if(this.playerCloak){this.playerCloak.destroy();this.playerCloak=null;}
+      if(this.playerShadow){this.playerShadow.destroy();this.playerShadow=null;}
+      if(this.townLabel){this.townLabel.destroy();this.townLabel=null;}
       this.bg.clear();
       this.bg.fillGradientStyle(0x080610,0x10091d,0x080610,0x05040b,1);
       this.bg.fillRect(0,0,w,h);
@@ -290,7 +294,7 @@
         this.playerCloak.fillStyle(0xe2c0ff,1);this.playerCloak.fillCircle(x,y-14,9);this.playerCloak.fillStyle(0x120a20,1);this.playerCloak.fillTriangle(x-12,y-15,x,y-35,x+12,y-15);this.playerCloak.fillStyle(0xe6bdff,.8);this.playerCloak.fillRect(x-2,y+1,4,20);
       }
       this.tweens.add({targets:this.playerCloak,y:y+3,duration:1500,yoyo:true,repeat:-1,ease:"Sine.InOut"});
-      this.add.text(w*.5,h*.9,"THE OUTER WARD",{fontFamily:"Georgia",fontSize:Math.max(10,Math.min(15,w*.014))+"px",color:"#d7b6ef",letterSpacing:4}).setOrigin(.5);
+      this.townLabel=this.add.text(w*.5,h*.9,"THE OUTER WARD",{fontFamily:"Georgia",fontSize:Math.max(10,Math.min(15,w*.014))+"px",color:"#d7b6ef",letterSpacing:4}).setOrigin(.5);
     }
     twinkle(){
       if(this.mode==="town") return;
