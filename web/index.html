@@ -19,6 +19,10 @@
 .town-hud{align-items:center;gap:8px;pointer-events:none}.profile-pill{display:flex;align-items:center;gap:10px;min-width:0;padding:8px 13px;border:1px solid #a57ac866;border-radius:999px;background:linear-gradient(120deg,#110a20eF,#090611df);backdrop-filter:blur(14px);box-shadow:0 8px 28px #0006}.profile-orb{display:grid;place-items:center;width:30px;height:30px;flex:0 0 30px;border-radius:50%;background:radial-gradient(circle at 35% 25%,#c997ff,#522b78 70%);color:#fff0ff;font-size:16px;box-shadow:0 0 18px #a85aff55}.profile-pill strong{display:block;max-width:42vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}.profile-pill small{display:block;color:#bda8d1;font-size:10px}.menu-trigger{pointer-events:auto;width:42px;height:42px;display:grid;place-items:center;padding:0;border-radius:50%;font:20px system-ui;background:#10091cce;border-color:#8d68aa88;backdrop-filter:blur(14px);box-shadow:0 5px 20px #0005}.realm-menu{position:fixed;z-index:40;top:max(64px,calc(env(safe-area-inset-top) + 54px));right:12px;width:min(320px,calc(100vw - 24px));padding:24px 16px 16px;border:1px solid #9468b7;border-radius:20px;background:linear-gradient(150deg,#21122fF7,#090610F5);backdrop-filter:blur(22px);box-shadow:0 22px 80px #000b,0 0 45px #8d39c822;transform-origin:top right;animation:menu-in .18s ease-out}.realm-menu h2{margin:4px 0;color:#f0d5ff;font:28px Georgia,serif}.realm-menu>p{margin:0 0 16px;color:#bca9ce;font:12px system-ui}.realm-menu .eyebrow{font-size:9px;letter-spacing:.2em}.menu-close{position:absolute;right:10px;top:10px;width:34px;height:34px;padding:0;border-radius:50%;font:22px system-ui;background:#ffffff08;border-color:#ffffff18}.menu-option{width:100%;display:flex;align-items:center;gap:12px;text-align:left;margin-top:8px;padding:12px;border-radius:12px;border:1px solid #65458066;background:linear-gradient(110deg,#ffffff08,#ffffff02);box-shadow:none}.menu-option>span:first-child{display:grid;place-items:center;width:38px;height:38px;flex:0 0 38px;border-radius:11px;background:#a85cff1c;color:#e5c3ff;font-size:20px}.menu-option>span:nth-child(2){flex:1;min-width:0}.menu-option b,.menu-option small{display:block}.menu-option b{font-size:13px}.menu-option small{margin-top:3px;color:#b9a5cb;font:10px system-ui}.menu-option>span:last-child{color:#b995d6;font-size:22px}.menu-option:active{transform:scale(.985)}@keyframes menu-in{from{opacity:0;transform:translateY(-5px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
 @media(max-width:650px){.town-hud{top:max(8px,env(safe-area-inset-top));left:9px;right:9px}.profile-pill{padding:6px 11px;gap:8px}.profile-orb{width:27px;height:27px;flex-basis:27px}.menu-trigger{width:40px;height:40px}.realm-menu{right:9px;top:max(58px,calc(env(safe-area-inset-top) + 50px))}}
 @media(prefers-reduced-motion:reduce){.realm-menu{animation:none}button{transition:none}}
+
+#music-toggle-title{width:min(330px,100%);margin:0 auto;font:11px system-ui,sans-serif;color:#e4d1f5;background:linear-gradient(100deg,#251435,#100a1a);border-color:#76539a}
+#music-toggle[aria-pressed="true"]{border-color:#d7a5ff;background:linear-gradient(100deg,#45245e,#1c1029)}
+#music-toggle-title[aria-pressed="true"]{border-color:#d7a5ff;color:#f2dfff}
 </style>
 </head>
 <body>
@@ -33,6 +37,7 @@
       <button class="primary" id="begin-btn">✦ &nbsp; Begin Your Journey</button>
       <button class="ghost" id="continue-btn">Open the Realm</button>
       <button class="ghost" id="about-btn">The Chronicles</button>
+      <button class="ghost" id="music-toggle-title" aria-pressed="false">♫ Music off</button>
     </div>
     <p class="tiny">A living fantasy realm · Designed for desktop, mobile, and Discord</p>
   </div>
@@ -70,7 +75,7 @@
 <section id="chronicles-screen" class="screen hidden">
   <div class="panel"><div class="eyebrow">From the Codex of Worlds</div><h2 class="panel-heading">The Chronicles</h2><div class="rule"></div><p class="lead">The old wards are weakening. In a town at the edge of the known lands, Mathias — a battle mage of the old order — faces a danger he cannot contain alone. Your arrival will change what happens next.</p><p class="lead">This is the visual foundation for the Arcane Realm. The live story, saved characters, PvP/PvE, familiars, and inventory still need to be connected to the existing game services before this screen becomes the production game.</p><div class="actions"><button class="primary" id="chronicles-back">Return</button></div></div>
 </section>
-<div id="town-hud" class="town-hud hidden"><div class="hud-card profile-pill"><span class="profile-orb">✦</span><span><strong id="hud-name">Adventurer</strong><small><span id="hud-class">Storm Herald</span> · Level 1</small></span></div><button id="hud-menu" class="menu-trigger" aria-label="Open realm menu" aria-expanded="false">☰</button></div><section id="realm-menu" class="realm-menu hidden" aria-label="Realm menu"><button class="menu-close" id="realm-menu-close" aria-label="Close menu">×</button><div class="eyebrow">ARCANE REALM</div><h2>Where to?</h2><p>Your journey, your pace.</p><button class="menu-option" id="hud-codex"><span>✧</span><span><b>Chronicles</b><small>Read the lore of the Realm</small></span><span>›</span></button><button class="menu-option" id="hud-character"><span>◈</span><span><b>Character</b><small>Change your adventurer</small></span><span>›</span></button><button class="menu-option" id="hud-home"><span>⌂</span><span><b>Return to title</b><small>Leave the Outer Ward</small></span><span>›</span></button></section>
+<div id="town-hud" class="town-hud hidden"><div class="hud-card profile-pill"><span class="profile-orb">✦</span><span><strong id="hud-name">Adventurer</strong><small><span id="hud-class">Storm Herald</span> · Level 1</small></span></div><button id="hud-menu" class="menu-trigger" aria-label="Open realm menu" aria-expanded="false">☰</button></div><section id="realm-menu" class="realm-menu hidden" aria-label="Realm menu"><button class="menu-close" id="realm-menu-close" aria-label="Close menu">×</button><div class="eyebrow">ARCANE REALM</div><h2>Where to?</h2><p>Your journey, your pace.</p><button class="menu-option" id="hud-codex"><span>✧</span><span><b>Chronicles</b><small>Read the lore of the Realm</small></span><span>›</span></button><button class="menu-option" id="hud-character"><span>◈</span><span><b>Character</b><small>Change your adventurer</small></span><span>›</span></button><button class="menu-option" id="hud-home"><span>⌂</span><span><b>Return to title</b><small>Leave the Outer Ward</small></span><span>›</span></button><button class="menu-option" id="music-toggle"><span>♫</span><span><b>Soundtrack</b><small>Turn the original ambient music on or off</small></span><span id="music-status">›</span></button></section>
 <div id="bottom-hint" class="bottom-hint hidden">The path ahead is veiled. Mathias awaits beyond the town gate.</div>
 <script src="https://cdn.jsdelivr.net/npm/phaser@4.2.1/dist/phaser.min.js"></script>
 <script>
@@ -86,6 +91,7 @@
     $("town-hud").classList.toggle("hidden", id !== "town");
     $("bottom-hint").classList.toggle("hidden", id !== "town");
     if (gameScene) gameScene.setMode(id === "town" ? "town" : "menu");
+    if (window.arcaneMusic) window.arcaneMusic.setMode(id === "town" ? "town" : "menu");
   }
   function updatePreview() {
     const glyph = {"Storm Herald":"ϟ","Spellblade":"✧","Warden":"❖"}[chosenClass] || "✦";
@@ -337,5 +343,6 @@
   <script src="./player-systems.js"></script>
   <script src="./controls.js"></script>
   <script src="./world-systems.js"></script>
+  <script src="./audio.js"></script>
 </body>
 </html>
