@@ -187,8 +187,20 @@
         const speed=Math.min(delta/16,2.2)*2.7;
         const boundsX=Math.max(130,Math.min(300,this.scale.width*.34));
         const boundsY=Math.max(75,Math.min(190,this.scale.height*.22));
-        this.worldShift.x=Math.max(-boundsX,Math.min(boundsX,this.worldShift.x-nx*speed));
-        this.worldShift.y=Math.max(-boundsY,Math.min(boundsY,this.worldShift.y-ny*speed));
+        let nextX=Math.max(-boundsX,Math.min(boundsX,this.worldShift.x-nx*speed));
+        let nextY=Math.max(-boundsY,Math.min(boundsY,this.worldShift.y-ny*speed));
+        // The player stays screen-anchored while the world scrolls; block scrolling when a solid prop would overlap their feet.
+        const footX=this.scale.width*.5,footY=this.playerBaseY+27;
+        const blockedAt=(sx,sy)=>(this.solidObstacles||[]).some(o=>
+          Math.abs(o.x+sx-footX)<o.rx+10 && Math.abs(o.y+sy-footY)<o.ry+7
+        );
+        if(blockedAt(nextX,nextY)){
+          if(!blockedAt(nextX,this.worldShift.y))nextY=this.worldShift.y;
+          if(!blockedAt(this.worldShift.x,nextY))nextX=this.worldShift.x;
+          if(blockedAt(nextX,nextY)){nextX=this.worldShift.x;nextY=this.worldShift.y;}
+        }
+        this.worldShift.x=nextX;
+        this.worldShift.y=nextY;
         this.world.setPosition(this.worldShift.x,this.worldShift.y);
         document.documentElement.style.setProperty("--woa-world-x",this.worldShift.x+"px");
         document.documentElement.style.setProperty("--woa-world-y",this.worldShift.y+"px");window.arcaneWorldShift={x:this.worldShift.x,y:this.worldShift.y};
@@ -243,6 +255,7 @@
       const g=this.add.graphics();
       // Render the terrain/ground layer first; props and character art are added above it.
       this.world.add(g);
+      this.solidObstacles=[];
       const horizon=h*.43;
       // Layered dusk sky and distant silhouettes.
       g.fillStyle(0x0d0917,1);g.fillRect(0,0,w,h);
@@ -289,6 +302,7 @@
         diamond(w*.77-Math.sin(i*.4)*w*.03,y+tileH*.3,tileW*1.25,tileH*.75,0x493256,.95,0x8d689e);
       }
       const tree=(x,y,s=1)=>{
+        this.solidObstacles.push({x,y,rx:14*s,ry:12*s,kind:"tree"});
         g.fillStyle(0x09070e,.55);g.fillEllipse(x,y+tileH*.18,34*s,12*s);
         if(this.textures.exists("woa-crystal-tree")){const im=this.add.image(x,y-25*s,"woa-crystal-tree").setDisplaySize(70*s,98*s).setDepth(y);this.world.add(im);}
         else {g.fillStyle(0x171020,1);g.fillRect(x-4*s,y-7*s,8*s,20*s);g.fillStyle(0x49305e,1);g.fillTriangle(x-17*s,y+2*s,x,y-45*s,x+17*s,y+2*s);}
@@ -307,7 +321,11 @@
         g.fillRect(x+bw*.18,y-22*s,6*s,8*s);
       };
       // Illustrated cottages with dimensional SVG shading and glowing windows.
-      const cottage=(x,y,s)=>{if(this.textures.exists("woa-cottage")){const im=this.add.image(x,y-12*s,"woa-cottage").setDisplaySize(112*s,112*s).setDepth(y);this.world.add(im);}else building(x,y,s,0x49304b,0x59376f)};
+      const cottage=(x,y,s)=>{
+        this.solidObstacles.push({x,y,rx:34*s,ry:19*s,kind:"building"});
+        if(this.textures.exists("woa-cottage")){const im=this.add.image(x,y-12*s,"woa-cottage").setDisplaySize(112*s,112*s).setDepth(y);this.world.add(im);}
+        else building(x,y,s,0x49304b,0x59376f);
+      };
       cottage(w*.17,horizon+tileH*3.1,1.0);
       cottage(w*.82,horizon+tileH*3.5,.94);
       cottage(w*.30,horizon+tileH*5.4,.76);
