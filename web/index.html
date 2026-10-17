@@ -118,6 +118,7 @@
       this.load.image("woa-player-wizard","./assets/isometric/player-wizard.svg");
       this.load.image("woa-mathias","./assets/isometric/mathias.svg");
       this.load.image("woa-archivist","./assets/isometric/archivist.svg");
+      this.load.image("woa-familiar","./assets/isometric/familiar-wisp.svg");
     }
     create(){
       this.bg = this.add.graphics();
@@ -149,9 +150,11 @@
         document.documentElement.style.setProperty("--woa-world-y",this.worldShift.y+"px");window.arcaneWorldShift={x:this.worldShift.x,y:this.worldShift.y};
         this.walkTime+=delta;
         if(this.playerCloak)this.playerCloak.y=this.playerBaseY+Math.sin(this.walkTime/65)*2.5;
+        if(this.familiarSprite){this.familiarSprite.x=this.scale.width*.5+45+Math.sin(this.walkTime/210)*5;this.familiarSprite.y=this.playerBaseY-25+Math.sin(this.walkTime/85)*3;}
         if(this.playerShadow)this.playerShadow.setScale(1+Math.sin(this.walkTime/65)*.035,1);
       } else {
         if(this.playerCloak)this.playerCloak.y=this.playerBaseY;
+        if(this.familiarSprite){this.familiarSprite.x=this.scale.width*.5+45;this.familiarSprite.y=this.playerBaseY-25;}
         if(this.playerShadow)this.playerShadow.setScale(1,1);
       }
     }
@@ -160,6 +163,7 @@
       // Resize/mode changes rebuild the scene; clean up anchored UI sprites first.
       if(this.playerCloak){this.playerCloak.destroy();this.playerCloak=null;}
       if(this.playerShadow){this.playerShadow.destroy();this.playerShadow=null;}
+      if(this.familiarSprite){this.familiarSprite.destroy();this.familiarSprite=null;}
       if(this.townLabel){this.townLabel.destroy();this.townLabel=null;}
       this.bg.clear();
       this.bg.fillGradientStyle(0x080610,0x10091d,0x080610,0x05040b,1);
@@ -276,12 +280,7 @@
       }
       // Draw terrain first; characters are layered above it.
       this.world.add(g);
-      // Town NPC sprites are part of the world layer so they travel with the map.
-      if(this.textures.exists("woa-mathias")){
-        const mathias=this.add.image(w*.28,horizon+tileH*4.1,"woa-mathias").setDisplaySize(48,56);
-        const archivist=this.add.image(w*.72,horizon+tileH*5.1,"woa-archivist").setDisplaySize(45,53);
-        this.world.add([mathias,archivist]);
-      }
+      // NPC portraits live in the interactive DOM layer, avoiding duplicate characters.
       // Keep the player anchored on screen while the isometric environment scrolls around them.
       const x=w*.5,y=h*.76;
       this.playerBaseY=y;
@@ -294,6 +293,10 @@
         this.playerCloak.fillStyle(0xe2c0ff,1);this.playerCloak.fillCircle(x,y-14,9);this.playerCloak.fillStyle(0x120a20,1);this.playerCloak.fillTriangle(x-12,y-15,x,y-35,x+12,y-15);this.playerCloak.fillStyle(0xe6bdff,.8);this.playerCloak.fillRect(x-2,y+1,4,20);
       }
       this.tweens.add({targets:this.playerCloak,y:y+3,duration:1500,yoyo:true,repeat:-1,ease:"Sine.InOut"});
+      if(this.textures.exists("woa-familiar")){
+        this.familiarSprite=this.add.image(x+45,y-17,"woa-familiar").setDisplaySize(35,35).setDepth(12);
+        this.tweens.add({targets:this.familiarSprite,y:y-25,duration:900,yoyo:true,repeat:-1,ease:"Sine.InOut"});
+      }
       this.townLabel=this.add.text(w*.5,h*.9,"THE OUTER WARD",{fontFamily:"Georgia",fontSize:Math.max(10,Math.min(15,w*.014))+"px",color:"#d7b6ef",letterSpacing:4}).setOrigin(.5);
     }
     twinkle(){
