@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "policy": {
+    "requireAttributionNotRequired": true,
+    "requireExactSourceLicenseCheck": true,
+    "rejectUnreviewedBundles": true
+  },
+  "approvedSources": [
+    {
+      "id": "kenney-ui-pack",
+      "title": "Kenney UI Pack",
+      "sourceUrl": "https://kenney.nl/assets/ui-pack",
+      "license": "CC0 1.0",
+      "attributionRequired": false,
+      "allowedIntendedUse": [
+        "ui-panels",
+        "buttons",
+        "sliders",
+        "interface-framing"
+      ],
+      "status": "license-verified-files-not-yet-imported"
+    }
+  ]
+}
