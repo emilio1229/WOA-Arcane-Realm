@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090611">
+<meta name="description" content="WOA: Arcane Realm — a dark fantasy pixel-art RPG by Wizards of Ark.">
+<title>WOA: Arcane Realm</title>
+<style>
+:root{color-scheme:dark;--void:#08060f;--panel:#100b1b;--panel2:#191027;--violet:#a967ff;--pink:#e4a3ff;--gold:#e9ce91;--muted:#c1b2d6;--line:#61417e}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--void);color:#f8f0ff;font-family:Georgia,"Times New Roman",serif}button,input{font:inherit}button{cursor:pointer;color:#fff6ff;background:linear-gradient(180deg,#39204f,#170e25);border:1px solid #9867bd;border-radius:8px;padding:12px 16px;box-shadow:inset 0 1px #ffffff12;transition:transform .12s,border-color .12s,filter .12s}button:hover{filter:brightness(1.18);border-color:#e3b2ff}button:active{transform:translateY(1px)}button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:3px}button.primary{background:linear-gradient(180deg,#8249b5,#3a1856);border-color:#e0a6ff;font-weight:bold;letter-spacing:.06em;box-shadow:0 0 24px #a14dff22,inset 0 1px #ffffff20}button.ghost{background:#0c0814;border-color:#54376c;color:#dfcbed}button.selected{border-color:#f0c0ff;box-shadow:0 0 0 1px #ad63f6,0 0 18px #9c48ff38}.hidden{display:none!important}
+#world{position:fixed;inset:0;z-index:0}#world canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
+.vignette{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at 50% 45%,transparent 15%,#08060f35 63%,#05040bd9 100%)}.grain{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.12;background-image:radial-gradient(#fff 0.5px,transparent .7px);background-size:5px 5px;mask-image:linear-gradient(transparent,#000)}
+.screen{position:fixed;inset:0;z-index:3;display:grid;place-items:center;padding:max(16px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));overflow:auto}.panel{width:min(900px,100%);max-height:calc(100dvh - 28px);overflow:auto;position:relative;padding:clamp(20px,4vw,42px);background:linear-gradient(145deg,#171023f5,#090710f5);border:1px solid #79509b;border-radius:14px;box-shadow:0 0 0 4px #10091a,0 18px 70px #000b,0 0 70px #8f39ce20,inset 0 0 30px #a64aff08}
+.panel:before{content:"";position:absolute;inset:8px;border:1px solid #8e5db64d;border-radius:8px;pointer-events:none}.panel>*{position:relative}.title{text-align:center;margin:0;color:#f0d1ff;text-shadow:0 0 12px #b65cff,0 0 34px #8d38df;letter-spacing:.06em;font-size:clamp(30px,6vw,62px);line-height:1.05}.subtitle{text-align:center;color:#d7b9eb;font:11px/1.7 system-ui,sans-serif;letter-spacing:.24em;text-transform:uppercase;margin-top:13px}.rule{height:1px;width:min(520px,90%);margin:22px auto;background:linear-gradient(90deg,transparent,#9865c5,#f1ceff,#9865c5,transparent)}.lead{max-width:570px;margin:0 auto 22px;text-align:center;line-height:1.65;color:#d4c4e3}.actions{display:grid;gap:10px;width:min(330px,100%);margin:0 auto}.tiny{text-align:center;color:#a998bd;font:11px/1.6 system-ui,sans-serif;margin-top:18px}.eyebrow{font:11px/1.6 system-ui,sans-serif;text-transform:uppercase;letter-spacing:.16em;color:var(--gold)}.panel-heading{font-size:clamp(24px,4vw,36px);text-align:center;color:#f0d5ff;margin:4px 0 8px}.section-label{font:11px/1.6 system-ui,sans-serif;color:#d7b4f4;letter-spacing:.16em;text-transform:uppercase;margin:18px 0 9px}.creator-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}.field{display:grid;gap:7px;margin:12px 0}.field label{font:12px system-ui,sans-serif;color:#dfcdec}.field input{width:100%;min-width:0;padding:13px;background:#08060e;color:#fff;border:1px solid #654780;border-radius:7px}.choice-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.class-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.choice{min-height:58px;padding:10px 6px;font-size:12px}.choice b{display:block;font-size:20px;margin-bottom:5px}.portrait{min-height:245px;border:1px solid #634281;border-radius:10px;background:radial-gradient(ellipse at 50% 70%,#813bb94d,transparent 60%),linear-gradient(180deg,#120a20,#08060e);display:grid;place-items:center;position:relative;overflow:hidden}.sigil{font-size:90px;color:#e4c0ff;text-shadow:0 0 18px #b44cff,0 0 45px #8c39f6;animation:float 3.2s ease-in-out infinite}.portrait-caption{position:absolute;bottom:13px;left:10px;right:10px;text-align:center;font:10px system-ui,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#dcb8f8}.helper{font:11px/1.6 system-ui,sans-serif;color:#ad9cbe}.footer-row{display:flex;justify-content:space-between;gap:10px;margin-top:20px;align-items:center}.notice{margin-top:14px;padding:10px 12px;border:1px solid #5c3b76;border-radius:7px;background:#0b0812;color:#d6c4e5;font:11px/1.55 system-ui,sans-serif}.town-hud{position:fixed;z-index:4;top:max(12px,env(safe-area-inset-top));left:12px;right:12px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px;pointer-events:none}.hud-card{padding:10px 13px;background:#0c0815eF;border:1px solid #634580;border-radius:9px;box-shadow:0 8px 25px #0007;font:12px/1.6 system-ui,sans-serif}.hud-card strong{color:#f0d1ff}.hud-actions{pointer-events:auto;display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}.hud-actions button{font:11px system-ui,sans-serif;padding:9px 11px}.bottom-hint{position:fixed;z-index:4;bottom:max(12px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);max-width:calc(100vw - 24px);text-align:center;white-space:nowrap;padding:9px 13px;border:1px solid #61417d;border-radius:24px;background:#0c0815eF;color:#e4d1f5;font:11px system-ui,sans-serif}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}@media(max-width:650px){.creator-grid{grid-template-columns:1fr}.portrait{min-height:150px}.sigil{font-size:65px}.creator-grid .preview-col{order:-1}.panel{padding:22px 18px}.town-hud{flex-wrap:wrap}.hud-card{max-width:55vw}.bottom-hint{font-size:10px;white-space:normal;width:max-content}.class-grid button{font-size:11px}.footer-row{flex-wrap:wrap}.footer-row button{flex:1}}@media(max-height:650px) and (min-width:651px){.panel{padding:20px 28px}.portrait{min-height:170px}.sigil{font-size:68px}.section-label{margin-top:10px}.field{margin:8px 0}}
+</style>
+</head>
+<body>
+<div id="world" aria-label="Arcane Realm magical background"></div><div class="vignette"></div><div class="grain"></div>
+<section id="start-screen" class="screen">
+  <div class="panel">
+    <div class="subtitle">Wizards of Ark presents</div>
+    <h1 class="title">ARCANE<br>REALM</h1>
+    <div class="rule"></div>
+    <p class="lead">Beyond the veil of the known world, ancient magic stirs. Your name has not yet been written into the Codex. The realm awaits its next legend.</p>
+    <div class="actions">
+      <button class="primary" id="begin-btn">✦ &nbsp; Begin Your Journey</button>
+      <button class="ghost" id="continue-btn">Open the Realm</button>
+      <button class="ghost" id="about-btn">The Chronicles</button>
+    </div>
+    <p class="tiny">A living fantasy realm · Designed for desktop, mobile, and Discord</p>
+  </div>
+</section>
+<section id="creator-screen" class="screen hidden">
+  <div class="panel">
+    <div class="eyebrow">Character creation · Chapter 0</div><h2 class="panel-heading">Who enters the Realm?</h2>
+    <p class="lead">Choose your identity and calling. You can refine your look as your journey unfolds.</p>
+    <div class="creator-grid">
+      <div>
+        <div class="section-label">Your name</div>
+        <div class="field"><label for="hero-name">Adventurer name</label><input id="hero-name" maxlength="18" autocomplete="nickname" placeholder="Enter your name"></div>
+        <div class="section-label">Presentation</div>
+        <div class="choice-grid" id="presentation-options">
+          <button class="choice selected" data-presentation="masculine"><b>♟</b>Masculine</button>
+          <button class="choice" data-presentation="feminine"><b>♙</b>Feminine</button>
+        </div>
+        <div class="section-label">Choose your path</div>
+        <div class="class-grid" id="class-options">
+          <button class="choice selected" data-class="Storm Herald"><b>ϟ</b>Storm Herald</button>
+          <button class="choice" data-class="Spellblade"><b>⚔</b>Spellblade</button>
+          <button class="choice" data-class="Warden"><b>✧</b>Warden</button>
+        </div>
+        <div class="helper">Your path shapes your opening abilities. This preview does not yet write to your Discord player profile.</div>
+      </div>
+      <div class="preview-col">
+        <div class="section-label">Your first sigil</div>
+        <div class="portrait"><div id="hero-sigil" class="sigil">ϟ</div><div id="portrait-caption" class="portrait-caption">Storm Herald · Masculine</div></div>
+        <div class="notice">Your adventure begins in a quiet town, where battle mage Mathias is holding the line against a threat from beyond the veil.</div>
+      </div>
+    </div>
+    <div class="footer-row"><button id="back-btn" class="ghost">← Back</button><button id="create-btn" class="primary">Enter the Realm &nbsp; ✦</button></div>
+  </div>
+</section>
+<section id="chronicles-screen" class="screen hidden">
+  <div class="panel"><div class="eyebrow">From the Codex of Worlds</div><h2 class="panel-heading">The Chronicles</h2><div class="rule"></div><p class="lead">The old wards are weakening. In a town at the edge of the known lands, Mathias — a battle mage of the old order — faces a danger he cannot contain alone. Your arrival will change what happens next.</p><p class="lead">This is the visual foundation for the Arcane Realm. The live story, saved characters, PvP/PvE, familiars, and inventory still need to be connected to the existing game services before this screen becomes the production game.</p><div class="actions"><button class="primary" id="chronicles-back">Return</button></div></div>
+</section>
+<div id="town-hud" class="town-hud hidden"><div class="hud-card"><strong id="hud-name">Adventurer</strong><br><span id="hud-class">Storm Herald</span> · <span>Level 1</span></div><div class="hud-actions"><button id="hud-codex">Codex</button><button id="hud-character">Character</button><button id="hud-home">Main Menu</button></div></div>
+<div id="bottom-hint" class="bottom-hint hidden">The path ahead is veiled. Mathias awaits beyond the town gate.</div>
+<script src="https://cdn.jsdelivr.net/npm/phaser@4.2.1/dist/phaser.min.js"></script>
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const screens = ["start-screen","creator-screen","chronicles-screen"];
+  let chosenPresentation = "masculine";
+  let chosenClass = "Storm Herald";
+  let heroName = "";
+  let gameScene;
+  function showScreen(id) {
+    screens.forEach(key => $(key).classList.toggle("hidden", key !== id));
+    $("town-hud").classList.toggle("hidden", id !== "town");
+    $("bottom-hint").classList.toggle("hidden", id !== "town");
+    if (gameScene) gameScene.setMode(id === "town" ? "town" : "menu");
+  }
+  function updatePreview() {
+    const glyph = {"Storm Herald":"ϟ","Spellblade":"✧","Warden":"❖"}[chosenClass] || "✦";
+    $("hero-sigil").textContent = glyph;
+    $("portrait-caption").textContent = chosenClass + " · " + (chosenPresentation === "masculine" ? "Masculine" : "Feminine");
+    document.querySelectorAll("[data-presentation]").forEach(b => b.classList.toggle("selected", b.dataset.presentation === chosenPresentation));
+    document.querySelectorAll("[data-class]").forEach(b => b.classList.toggle("selected", b.dataset.class === chosenClass));
+  }
+  document.querySelectorAll("[data-presentation]").forEach(b => b.addEventListener("click", () => { chosenPresentation = b.dataset.presentation; updatePreview(); }));
+  document.querySelectorAll("[data-class]").forEach(b => b.addEventListener("click", () => { chosenClass = b.dataset.class; updatePreview(); }));
+  $("begin-btn").addEventListener("click", () => { showScreen("creator-screen"); $("hero-name").focus({preventScroll:true}); });
+  $("continue-btn").addEventListener("click", () => { showScreen("creator-screen"); $("hero-name").focus({preventScroll:true}); });
+  $("about-btn").addEventListener("click", () => showScreen("chronicles-screen"));
+  $("chronicles-back").addEventListener("click", () => showScreen("start-screen"));
+  $("back-btn").addEventListener("click", () => showScreen("start-screen"));
+  $("create-btn").addEventListener("click", () => {
+    heroName = $("hero-name").value.trim().slice(0,18) || "Wayfarer";
+    $("hud-name").textContent = heroName;
+    $("hud-class").textContent = chosenClass;
+    showScreen("town");
+  });
+  $("hud-home").addEventListener("click", () => showScreen("start-screen"));
+  $("hud-character").addEventListener("click", () => { $("hero-name").value = heroName === "Wayfarer" ? "" : heroName; showScreen("creator-screen"); });
+  $("hud-codex").addEventListener("click", () => showScreen("chronicles-screen"));
+  updatePreview();
+
+  if (!window.Phaser) {
+    document.querySelector(".lead").textContent = "The Arcane Realm could not load its game engine. Check your connection and refresh to try again.";
+    return;
+  }
+  class RealmScene extends Phaser.Scene {
+    constructor(){ super("realm"); this.mode = "menu"; this.stars = []; }
+    create(){
+      this.bg = this.add.graphics();
+      this.world = this.add.container(0,0);
+      this.drawBackdrop();
+      this.scale.on("resize", () => this.drawBackdrop());
+      this.input.on("pointerdown", (pointer) => {
+        if (this.mode === "town" && pointer.y > this.scale.height * .45) {
+          this.add.circle(pointer.x,pointer.y,4,0xe9ce91,.9).setDepth(20);
+          this.tweens.add({targets:this.world,x:this.world.x + (pointer.x < this.scale.width/2 ? 4 : -4),duration:100,yoyo:true});
+        }
+      });
+      this.time.addEvent({delay:1200,loop:true,callback:()=>this.twinkle()});
+    }
+    setMode(mode){this.mode = mode; this.drawBackdrop();}
+    drawBackdrop(){
+      const w=this.scale.width,h=this.scale.height;
+      this.bg.clear();
+      this.bg.fillGradientStyle(0x080610,0x10091d,0x080610,0x05040b,1);
+      this.bg.fillRect(0,0,w,h);
+      for(let i=0;i<95;i++){
+        const x=((i*127.7)%Math.max(w,1)), y=((i*71.3)%Math.max(h,1));
+        const r=(i%7===0)?1.8:0.8;
+        this.bg.fillStyle(i%5===0?0xd5a5ff:0x9477c7,0.18+(i%4)*0.13);
+        this.bg.fillCircle(x,y,r);
+      }
+      this.world.removeAll(true);
+      if(this.mode==="town") this.drawTown(w,h);
+      else this.drawArcaneSigil(w,h);
+    }
+    drawArcaneSigil(w,h){
+      const cx=w/2,cy=h*.48,r=Math.min(w,h)*.24;
+      const ring=this.add.graphics();
+      ring.lineStyle(2,0x7b43b4,.34);ring.strokeCircle(cx,cy,r);ring.lineStyle(1,0xc28aff,.55);ring.strokeCircle(cx,cy,r*.82);
+      ring.lineStyle(1,0xe1b4ff,.32);ring.strokeCircle(cx,cy,r*1.16);
+      ring.lineBetween(cx-r*1.3,cy,cx+r*1.3,cy);ring.lineBetween(cx,cy-r*1.3,cx,cy+r*1.3);
+      for(let i=0;i<8;i++){const a=i*Math.PI/4;ring.fillStyle(0xd7a5ff,.7);ring.fillCircle(cx+Math.cos(a)*r,cy+Math.sin(a)*r,2.3);}
+      this.world.add(ring);this.tweens.add({targets:ring,angle:360,duration:95000,repeat:-1});
+      const glow=this.add.circle(cx,cy,Math.max(25,r*.2),0x9a44ff,.045);this.world.add(glow);
+      this.tweens.add({targets:glow,alpha:.12,scale:1.22,duration:2400,yoyo:true,repeat:-1});
+    }
+    drawTown(w,h){
+      const g=this.add.graphics();
+      const horizon=h*.52;
+      g.fillStyle(0x171026,1);g.fillRect(0,horizon,w,h-horizon);
+      g.fillStyle(0x241633,1);g.fillTriangle(0,horizon+30,w*.5,horizon-65,w,horizon+30);
+      g.fillStyle(0x100b1a,1);g.fillRect(0,horizon+40,w,h*.3);
+      const building=(x,y,bw,bh,color)=>{g.fillStyle(0x08070d,1);g.fillRect(x-5,y-5,bw+10,bh+10);g.fillStyle(color,1);g.fillRect(x,y,bw,bh);g.fillStyle(0x30203c,1);g.fillTriangle(x-10,y,x+bw/2,y-bh*.35,x+bw+10,y);g.fillStyle(0x6e3d83,.8);g.fillRect(x+bw*.25,y+bh*.3,bw*.13,bh*.18);g.fillRect(x+bw*.62,y+bh*.3,bw*.13,bh*.18);};
+      building(w*.08,horizon-35,w*.16,h*.24,0x21162a);building(w*.73,horizon-25,w*.17,h*.27,0x1d1427);building(w*.39,horizon-58,w*.22,h*.34,0x281a35);
+      g.fillStyle(0x100a18,1);g.fillRect(w*.47,horizon+15,w*.06,h*.21);
+      g.lineStyle(2,0x7c4ba6,.55);g.strokeRect(w*.47,horizon+15,w*.06,h*.21);
+      g.fillStyle(0x9b5ad5,.5);g.fillCircle(w*.5,horizon+10,8);
+      for(let i=0;i<11;i++){const x=(i*91+30)%Math.max(w,1),y=horizon+40+(i%4)*23;g.fillStyle(0x31203c,.8);g.fillTriangle(x-14,y,x,y-25,x+14,y);g.fillRect(x-8,y,16,20);}
+      g.fillStyle(0x4a2c64,.8);g.fillTriangle(w*.35,h,w*.5,horizon+30,w*.65,h);
+      g.fillStyle(0x9b63c4,.22);g.fillTriangle(w*.44,h,w*.5,horizon+55,w*.56,h);
+      this.world.add(g);
+      const x=w*.5,y=h*.76;
+      const shadow=this.add.ellipse(x,y+26,48,15,0x000000,.55);
+      const cloak=this.add.graphics();cloak.fillStyle(0x28143e,1);cloak.fillTriangle(x-17,y+17,x,y-10,x+17,y+17);cloak.fillTriangle(x-17,y+10,x-10,y+37,x+10,y+37);cloak.fillTriangle(x+17,y+10,x+10,y+37,x-10,y+37);
+      cloak.fillStyle(0xe2c0ff,1);cloak.fillCircle(x,y-14,9);cloak.fillStyle(0x120a20,1);cloak.fillTriangle(x-12,y-15,x,y-35,x+12,y-15);cloak.fillStyle(0xe6bdff,.8);cloak.fillRect(x-2,y+1,4,20);
+      this.world.add([shadow,cloak]);
+      this.tweens.add({targets:cloak,y:y+3,duration:1500,yoyo:true,repeat:-1,ease:"Sine.InOut"});
+      this.add.text(w*.5,h*.9,"THE OUTER WARD", {fontFamily:"Georgia",fontSize:Math.max(10,Math.min(15,w*.014))+"px",color:"#d7b6ef",letterSpacing:4}).setOrigin(.5);
+    }
+    twinkle(){
+      if(this.mode==="town") return;
+      const w=this.scale.width,h=this.scale.height;
+      const star=this.add.circle(Math.random()*w,Math.random()*h,1+Math.random()*2,0xe3bdff,.75);
+      this.tweens.add({targets:star,alpha:0,scale:.1,duration:1800,onComplete:()=>star.destroy()});
+    }
+  }
+  const config = {
+    type: Phaser.WEBGL,
+    parent: "world",
+    backgroundColor: "#080610",
+    pixelArt: true,
+    roundPixels: true,
+    scale: { mode: Phaser.Scale.RESIZE, width: window.innerWidth, height: window.innerHeight },
+    render: { antialias: false, pixelArt: true, roundPixels: true },
+    scene: [RealmScene]
+  };
+  const game = new Phaser.Game(config);
+  game.events.once("ready", () => { gameScene = game.scene.getScene("realm"); });
+  window.addEventListener("beforeunload", () => game.destroy(true));
+})();
+</script>
+</body>
+</html>
