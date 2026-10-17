@@ -149,10 +149,18 @@
       // The source is a concept sheet, not a true animation atlas; this is a usable
       // static gameplay sprite while hand-cleaned frame art is being produced.
       const familiarSheet = await getImage("08_familiars_and_pets.png");
+      const enemySheet = await getImage("07_enemies.png");
+      const mathiasSheet = await getImage("06_mathias_supporting_character.png");
+      const spellSheet = await getImage("05_spell_and_combat_effects.png");
+      window.woaRuntimeSprites = window.woaRuntimeSprites || {};
       if (familiarSheet) {
-        window.woaRuntimeSprites = window.woaRuntimeSprites || {};
         window.woaRuntimeSprites.familiarWolf = makeTransparentSprite(familiarSheet, {x:8,y:104,w:48,h:34});
       }
+      // Isolated reference poses/effects are exported as transparent single-frame PNGs.
+      // They are not advertised as complete animations; the game animates them with Phaser tweens.
+      if (enemySheet) window.woaRuntimeSprites.shadowWraith = makeTransparentSprite(enemySheet, {x:4,y:43,w:47,h:48});
+      if (mathiasSheet) window.woaRuntimeSprites.mathias = makeTransparentSprite(mathiasSheet, {x:18,y:43,w:37,h:52});
+      if (spellSheet) window.woaRuntimeSprites.arcaneBlast = makeTransparentSprite(spellSheet, {x:98,y:40,w:86,h:68});
       // Keep the categorized concept panels available to future scene/UI integrations.
       window.woaConceptArt = {};
       const categories = [
@@ -308,18 +316,22 @@
       window.arcaneSceneVisualAction=(action)=>this.playArcaneAction(action);
       // When the concept archive has loaded, install its transparent familiar sprite
       // into Phaser without delaying the initial game boot.
-      const installFamiliarArt = () => {
-        const data = window.woaRuntimeSprites && window.woaRuntimeSprites.familiarWolf;
-        if (!data || this.textures.exists("woa-familiar-art")) return;
-        this.textures.addBase64("woa-familiar-art", data);
-        this.textures.once("addtexture-woa-familiar-art", () => {
-          if (this.familiarSprite && this.textures.exists("woa-familiar-art")) {
-            this.familiarSprite.setTexture("woa-familiar-art").clearTint().setDisplaySize(44, 34);
-          }
-        });
+      const installRuntimeArt = () => {
+        const assets = window.woaRuntimeSprites || {};
+        const keys = {familiarWolf:"woa-familiar-art",shadowWraith:"woa-enemy-art",mathias:"woa-mathias-art",arcaneBlast:"woa-spell-art"};
+        for (const [name,key] of Object.entries(keys)) {
+          const data = assets[name];
+          if (!data || this.textures.exists(key)) continue;
+          this.textures.addBase64(key, data);
+          this.textures.once("addtexture-" + key, () => {
+            if (name === "familiarWolf" && this.familiarSprite && this.textures.exists(key)) {
+              this.familiarSprite.setTexture(key).clearTint().setDisplaySize(44, 34);
+            }
+          });
+        }
       };
-      if (window.woaArtReady) window.woaArtReady.then(installFamiliarArt);
-      installFamiliarArt();
+      if (window.woaArtReady) window.woaArtReady.then(installRuntimeArt);
+      installRuntimeArt();
     }
     setMode(mode){this.mode = mode; this.drawBackdrop(); if(mode === "town"){this.worldShift={x:0,y:0};this.world.setPosition(0,0);document.documentElement.style.setProperty("--woa-world-x","0px");document.documentElement.style.setProperty("--woa-world-y","0px");this.playerPos={x:this.scale.width*.5,y:this.scale.height*.76};}}
     update(time, delta){
@@ -361,6 +373,10 @@
       const x=this.scale.width*.5, y=(this.playerBaseY||this.scale.height*.76)-12;
       const spell=action==="spell"||action==="magic";
       if(spell){
+        if(this.textures.exists("woa-spell-art")){
+          const blast=this.add.image(x,y-34,"woa-spell-art").setDisplaySize(66,52).setDepth(19);
+          this.tweens.add({targets:blast,x:x+Math.sin((this.walkTime||0)/300)*22,y:y-112,scale:.28,alpha:0,duration:480,ease:"Cubic.Out",onComplete:()=>blast.destroy()});
+        }
         const ring=this.add.circle(x,y,13,0xd8a0ff,.12).setStrokeStyle(2,0xf1d8ff,.95).setDepth(18);
         const core=this.add.circle(x,y,7,0xf4dcff,.92).setDepth(19);
         this.tweens.add({targets:ring,radius:58,alpha:0,scale:1.25,duration:440,ease:"Cubic.Out",onComplete:()=>ring.destroy()});
