@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80">
+<defs><radialGradient id="orb"><stop stop-color="#fff4ff"/><stop offset=".32" stop-color="#d9a4ff"/><stop offset="1" stop-color="#7334bd" stop-opacity=".08"/></radialGradient></defs>
+<circle cx="40" cy="39" r="27" fill="url(#orb)" opacity=".35"/>
+<path d="M40 9 48 27 67 20 58 39 70 51 50 54 40 72 30 54 10 51 22 39 13 20 32 27Z" fill="#8e4ac7" stroke="#e5c4ff" stroke-width="2"/>
+<path d="M40 19 45 34 58 31 51 42 57 49 43 47 40 61 35 47 23 49 29 41 22 31 35 34Z" fill="#f1d8ff"/>
+<circle cx="35" cy="39" r="2.3" fill="#21102e"/><circle cx="46" cy="39" r="2.3" fill="#21102e"/>
+<path d="M36 46Q40 50 44 46" fill="none" stroke="#51216e" stroke-width="2" stroke-linecap="round"/>
+<circle cx="40" cy="39" r="34" fill="none" stroke="#c98bff" stroke-width="1" stroke-dasharray="3 5" opacity=".65"/>
+</svg>
