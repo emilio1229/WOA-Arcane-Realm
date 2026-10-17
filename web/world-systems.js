@@ -50,6 +50,6 @@ window.arcaneSceneInteract=()=>{
  if(target&&target.d<=125){interactWith(target.id);return;}
  open("Explore the Outer Ward","Move close to Mathias, the Archivist, or the unstable rift before interacting. The nearest point of interest is about "+Math.round(target?.d||0)+" pixels away.",[{label:"Continue exploring",primary:true,run:close}],"EXPLORATION");
 };
-window.arcaneSceneAction=a=>a==="spell"?battle():open("Quick Step","You slip sideways in a flash of violet light. Dodging will become a combat action in later encounters.",[{label:"Return",primary:true,run:close}],"ABILITY");
+window.arcaneSceneAction=a=>a==="spell"?open("Class Spell","Your class spell is ready for combat. Approach the unstable rift and interact with it to begin the encounter; spells can then be cast from the battle panel.",[{label:"Understood",primary:true,run:close}],"ABILITY"):open("Quick Step","You slip sideways in a flash of violet light. Combat dodging will be available inside future battle encounters.",[{label:"Return",primary:true,run:close}],"ABILITY");
 if($("town-hud"))new MutationObserver(sync).observe($("town-hud"),{attributes:true,attributeFilter:["class"]});sync();
 })();
