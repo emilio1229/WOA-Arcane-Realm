@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090714">
+<title>WOA: Arcane Realm — Activity Preview</title>
+<style>
+:root{color-scheme:dark;--bg:#090714;--panel:#120d20;--panel2:#1b112b;--line:#593775;--violet:#a85cff;--pink:#f0a4ff;--gold:#e8c77e;--text:#f8efff;--muted:#c2afd5;--green:#b9f2d0}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(ellipse at 50% 0,#321849 0,transparent 50%),var(--bg);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button{font:inherit;color:inherit;cursor:pointer;border:1px solid #8053a4;border-radius:10px;background:linear-gradient(180deg,#38204f,#1b102b);padding:11px 14px;transition:transform .15s,border-color .15s,filter .15s}button:hover{filter:brightness(1.16);border-color:var(--pink)}button:active{transform:translateY(1px)}button:focus-visible{outline:2px solid var(--pink);outline-offset:3px}
+.app{width:min(1120px,100%);margin:auto;padding:max(14px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(22px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left))}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0 18px;border-bottom:1px solid #55336c}.brand{display:flex;align-items:center;gap:11px}.sigil{display:grid;place-items:center;width:44px;height:44px;border:1px solid #b77ce3;border-radius:13px;background:radial-gradient(circle,#66338d,#180e29);font-size:24px;box-shadow:0 0 28px #9e4cff32}.eyebrow{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--pink)}h1{font-family:Georgia,serif;font-size:clamp(19px,4vw,27px);margin:2px 0;letter-spacing:.04em}.status{font-size:11px;color:var(--green);border:1px solid #477b68;border-radius:999px;padding:6px 9px;white-space:nowrap}
+.layout{display:grid;grid-template-columns:270px minmax(0,1fr);gap:16px;padding-top:16px}.card{background:linear-gradient(145deg,#191126f2,#0e0a18f5);border:1px solid var(--line);border-radius:15px;box-shadow:0 12px 35px #0003}.profile{padding:17px;align-self:start}.avatar{height:170px;border-radius:11px;display:grid;place-items:center;position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% 70%,#a347f555,transparent 54%),linear-gradient(160deg,#241032,#0a0813);border:1px solid #654080;margin-bottom:14px}.avatar:before,.avatar:after{content:"";position:absolute;border:1px solid #b26be54a;border-radius:50%;width:130px;height:130px;transform:rotateX(62deg)}.avatar:after{width:170px;height:170px}.wizard{font-size:76px;filter:drop-shadow(0 0 15px #d18aff70);z-index:1}.avatar-label{position:absolute;bottom:9px;font-size:9px;letter-spacing:.2em;color:#e7c9ff;text-transform:uppercase}.profile h2{font:20px Georgia,serif;margin:0 0 4px}.muted{color:var(--muted);font-size:12px}.stats{display:grid;gap:9px;margin-top:16px}.stathead{display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px;color:#e9d9f6}.bar{height:7px;background:#38263f;border-radius:99px;overflow:hidden}.bar span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#8c38d4,#e4a0ff)}.bar.mana span{background:linear-gradient(90deg,#4379e5,#9bd6ff)}.sigils{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding:10px 11px;border-radius:9px;background:#2a1b32;border:1px solid #5e3b71;font-size:12px}.sigils strong{color:var(--gold)}
+main{min-width:0}.hero{padding:clamp(17px,3vw,28px);position:relative;overflow:hidden;min-height:230px;background:radial-gradient(ellipse at 80% 30%,#823eb04a,transparent 42%),linear-gradient(130deg,#1e1031,#0d0a18 70%)}.hero:after{content:"✧  ·  ✦  ·  ✧";position:absolute;right:20px;top:20px;color:#d5a0ff55;letter-spacing:.6em}.hero .eyebrow{margin-bottom:9px}.hero h2{font:clamp(25px,4.5vw,40px) Georgia,serif;line-height:1.1;max-width:540px;margin:0 0 12px}.hero p{max-width:540px;line-height:1.65;color:#d0bfdc;font-size:13px;margin:0 0 19px}.primary{background:linear-gradient(180deg,#9d50ce,#5c287f);border-color:#e3a8ff;font-weight:700}.section-head{display:flex;align-items:end;justify-content:space-between;gap:10px;margin:22px 2px 11px}.section-head h3{font:20px Georgia,serif;margin:0}.section-head span{font-size:10px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase}.portals{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.portal{padding:15px;text-align:left;min-height:126px;position:relative;overflow:hidden;background:linear-gradient(145deg,#211431,#100b1b)}.portal:after{content:"";position:absolute;right:-16px;bottom:-27px;width:100px;height:100px;border:1px solid #b477dd28;border-radius:50%;box-shadow:0 0 0 12px #a65bff08,0 0 0 24px #a65bff05}.portal-icon{font-size:25px;margin-bottom:10px}.portal strong{display:block;font:18px Georgia,serif;margin-bottom:4px}.portal small{color:var(--muted);font-size:11px;line-height:1.45}.lower{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.mini{padding:15px}.mini h3{font:17px Georgia,serif;margin:0 0 7px}.mini p{font-size:12px;line-height:1.55;color:var(--muted);margin:0 0 12px}.screen{display:none;padding:clamp(17px,3vw,26px);min-height:420px}.screen.active{display:block}.back{margin-bottom:18px;padding:8px 11px;font-size:12px}.screen h2{font:clamp(25px,4vw,36px) Georgia,serif;margin:0 0 8px}.screen-intro{font-size:13px;color:var(--muted);line-height:1.65;max-width:650px}.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:20px}.tile{padding:15px;border:1px solid #563773;border-radius:11px;background:#150d22}.tile b{display:block;margin-bottom:6px;color:#f0d4ff}.tile p{font-size:12px;color:var(--muted);line-height:1.5;margin:0}.notice{margin-top:18px;border:1px dashed #765096;border-radius:10px;padding:12px;color:#d5c2e7;font-size:11px;line-height:1.55}.footer{padding:16px 4px 0;text-align:center;color:#8d789e;font-size:10px}
+@media(max-width:720px){.layout{grid-template-columns:1fr}.profile{display:grid;grid-template-columns:95px 1fr;gap:0 13px;padding:12px}.avatar{height:105px;grid-row:span 3;margin:0}.wizard{font-size:50px}.avatar:before,.avatar:after{width:76px;height:76px}.avatar:after{width:95px;height:95px}.avatar-label{font-size:7px}.profile h2{align-self:end;font-size:18px}.stats{grid-column:1/-1;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.sigils{grid-column:1/-1;margin-top:9px}.hero{min-height:0}.status{font-size:9px}.portals{gap:8px}.portal{padding:12px;min-height:120px}.portal strong{font-size:16px}.lower{gap:8px}.mini{padding:12px}.screen{min-height:380px}}
+@media(max-width:390px){.portals,.tiles,.lower{grid-template-columns:1fr}.topbar{align-items:flex-start}.status{max-width:110px;white-space:normal;text-align:center}.hero h2{font-size:27px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="topbar">
+  <div class="brand"><div class="sigil" aria-hidden="true">✧</div><div><div class="eyebrow">The Wizards of Ark</div><h1>ARCANE REALM</h1></div></div>
+  <div class="status" id="connectionStatus">✦ Visual prototype</div>
+</header>
+<div class="layout">
+  <aside class="card profile" aria-label="Character preview">
+    <div class="avatar"><div class="wizard" aria-hidden="true">🧙🏻‍♂️</div><div class="avatar-label">The Unwritten Path</div></div>
+    <h2 id="heroName">Your Wizard</h2><div class="muted" id="heroClass">Level 1 · Initiate</div>
+    <div class="stats">
+      <div><div class="stathead"><span>Vitality</span><span>90 / 100</span></div><div class="bar"><span style="width:90%"></span></div></div>
+      <div><div class="stathead"><span>Mana</span><span>75 / 75</span></div><div class="bar mana"><span style="width:100%"></span></div></div>
+    </div>
+    <div class="sigils"><span>✧ Sigils</span><strong>— Not connected —</strong></div>
+  </aside>
+  <main>
+    <section class="card hero" id="hubScreen">
+      <div class="eyebrow">A realm waiting to remember you</div>
+      <h2>Every legend begins with a spark.</h2>
+      <p>Beyond the veil, forgotten powers stir. Choose a portal, uncover the truth behind the Six Sigils, and write your name into the Chronicle.</p>
+      <button class="primary" data-open="story">✦ Continue the Chronicle</button>
+    </section>
+    <section class="section-head" id="portalHeader"><h3>Choose Your Path</h3><span>Four portals · One realm</span></section>
+    <section class="portals" id="portalGrid">
+      <button class="portal" data-open="story"><div class="portal-icon">📜</div><strong>The Chronicle</strong><small>Story chapters, choices, discoveries and boss encounters.</small></button>
+      <button class="portal" data-open="pve"><div class="portal-icon">🛡️</div><strong>Trials of the Realm</strong><small>Explore PvE encounters and test your growing power.</small></button>
+      <button class="portal" data-open="pvp"><div class="portal-icon">⚔️</div><strong>Wizards' Duel</strong><small>Challenge another wizard when the PvP system is connected.</small></button>
+      <button class="portal" data-open="familiars"><div class="portal-icon">🦉</div><strong>Familiars</strong><small>Meet, name and equip the companions who travel beside you.</small></button>
+    </section>
+    <section class="lower" id="hubLower">
+      <article class="card mini"><h3>Grand Sigil Exchange</h3><p>Browse spells, relics, robes and magical cosmetics.</p><button data-open="shop">Visit Exchange ↗</button></article>
+      <article class="card mini"><h3>Arcane Codex</h3><p>Discover classes, creatures, items and forgotten lore.</p><button data-open="codex">Open Codex ↗</button></article>
+    </section>
+    <section class="card screen" id="detailScreen" aria-live="polite">
+      <button class="back" id="backButton">← Return to the Realm</button>
+      <div class="eyebrow" id="detailEyebrow">Your Chronicle</div><h2 id="detailTitle">The Chronicle</h2><p class="screen-intro" id="detailIntro"></p>
+      <div class="tiles" id="detailTiles"></div><div class="notice" id="detailNotice"></div>
+    </section>
+  </main>
+</div>
+<div class="footer">ACTIVITY UI PROTOTYPE · GAME DATA IS NOT CONNECTED YET · WIZARDS, WARLOCKS & WITCHES</div>
+</div>
+<script>
+(() => {
+ const pages = {
+  story:{eyebrow:"The Chronicle",title:"The Hollow Crown",intro:"Your story belongs here: chapter progress, meaningful choices, encounters and rewards will be loaded from the existing Arcane Realm game service.",tiles:[["Chapter I · The Page That Never Was","A name appears in a book that was sealed before your birth."],["Chapter II · The Unquiet Sigil","Follow the strange light beneath the Hall."],["Chapter III · The Council’s Silence","Discover why the Six Sigils were hidden."]],notice:"Integration target: read and save the player's existing ArcaneQuestProgress. This preview does not create or change progress."},
+  pve:{eyebrow:"Trials of the Realm",title:"PvE Expeditions",intro:"A home for turn-based encounters, increasingly challenging bosses, earned Sigils and chapter-linked rewards.",tiles:[["Story Encounters","Continue battles associated with your current chapter."],["Realm Expeditions","Replay unlocked challenges and earn progression rewards."]],notice:"Integration target: preserve the existing battle rules, rewards and saved encounter state."},
+  pvp:{eyebrow:"Wizards’ Duel",title:"A Duel Worth Remembering",intro:"A future matchmaking space for fair wizard-versus-wizard combat, with clear turn order and familiar support.",tiles:[["Find a Rival","Invite or match with another eligible player."],["Duel Record","Review results and earned rewards."]],notice:"PvP is a preview only. No matchmaking, combat or rewards are active in this prototype."},
+  familiars:{eyebrow:"Familiar Sanctum",title:"Never Journey Alone",intro:"Your familiar should feel like a companion, not just an inventory item: give it a name, choose an active companion and see it react in battle.",tiles:[["Archive Wisp","A curious spark drawn to forgotten pages."],["Familiar Bond","Future view for naming, equipping and tracking companion progress."]],notice:"Integration target: use existing familiar definitions and saved ownership. No familiar data is changed here."},
+  shop:{eyebrow:"Grand Sigil Exchange",title:"Treasures of the Exchange",intro:"A visual storefront for class spells, armor, focus items, relics and cosmetics, backed by the existing Sigil economy.",tiles:[["Spellbook","Class-compatible spells and new abilities."],["Relics & Robes","Equipment with clear stats and useful effects."]],notice:"Integration target: show live prices and balances, then route purchases through the existing server-side store. This preview cannot spend Sigils."},
+  codex:{eyebrow:"Arcane Codex",title:"Knowledge Is Power",intro:"A browsable field guide for classes, spells, enemies, equipment and the rules of the Arcane Realm.",tiles:[["Classes & Spells","Learn abilities, mana costs and class paths."],["Enemies & Relics","Discover encounters, drops and item effects."]],notice:"The Codex preview is informational only; it does not change your character."}
+ };
+ const hubIds=["hubScreen","portalHeader","portalGrid","hubLower"];
+ const detail=document.getElementById("detailScreen");
+ function openPage(key){const p=pages[key];if(!p)return;hubIds.forEach(id=>document.getElementById(id).style.display="none");detail.classList.add("active");document.getElementById("detailEyebrow").textContent=p.eyebrow;document.getElementById("detailTitle").textContent=p.title;document.getElementById("detailIntro").textContent=p.intro;document.getElementById("detailTiles").replaceChildren(...p.tiles.map(([title,body])=>{const el=document.createElement("article");el.className="tile";const b=document.createElement("b");b.textContent=title;const para=document.createElement("p");para.textContent=body;el.append(b,para);return el;}));document.getElementById("detailNotice").textContent=p.notice;window.scrollTo({top:0,behavior:"smooth"});}
+ function home(){detail.classList.remove("active");hubIds.forEach(id=>document.getElementById(id).style.display="");window.scrollTo({top:0,behavior:"smooth"});}
+ document.querySelectorAll("[data-open]").forEach(button=>button.addEventListener("click",()=>openPage(button.dataset.open)));
+ document.getElementById("backButton").addEventListener("click",home);
+ // Browser preview only. Discord SDK authentication and live game APIs are deliberately not faked.
+})();
+</script>
+</body>
+</html>
