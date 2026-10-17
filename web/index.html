@@ -354,8 +354,21 @@
         if(Math.abs(x-w*.5)<tileW*1.25)continue;
         diamond(x,y,tileW*.22,tileH*.14,i%2?0xb08bc6:0x8b65aa,.5);
       }
+      // Story NPCs are visible in the world itself, not only in menus.
+      const storyNpc=(texture,label,x,y,scale=1)=>{
+        if(!this.textures.exists(texture))return;
+        this.solidObstacles.push({x,y,rx:13*scale,ry:10*scale,kind:"npc"});
+        const shadow=this.add.ellipse(x,y+15*scale,29*scale,9*scale,0x000000,.48).setDepth(y-1);
+        this.world.add(shadow);
+        const sprite=this.add.image(x,y,texture).setDisplaySize(48*scale,58*scale).setDepth(y+1);
+        this.world.add(sprite);
+        const name=this.add.text(x,y-37*scale,label,{fontFamily:"Arial",fontSize:Math.max(9,Math.min(12,w*.012))+"px",fontStyle:"bold",color:"#f3ddff",stroke:"#100817",strokeThickness:3,align:"center"}).setOrigin(.5,1).setDepth(y+2);
+        this.world.add(name);
+        this.tweens.add({targets:sprite,y:y-2*scale,duration:1700+Math.random()*400,yoyo:true,repeat:-1,ease:"Sine.InOut"});
+      };
+      storyNpc("woa-mathias","MATHIAS",w*.36,horizon+tileH*4.4,.9);
+      storyNpc("woa-archivist","THE ARCHIVIST",w*.65,horizon+tileH*4.8,.9);
       // Terrain is already the first child of the world container; props render above it.
-      // NPC portraits live in the interactive DOM layer, avoiding duplicate characters.
       // Keep the player anchored on screen while the isometric environment scrolls around them.
       const x=w*.5,y=h*.76;
       this.playerBaseY=y;
