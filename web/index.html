@@ -146,6 +146,8 @@
     constructor(){ super("realm"); this.mode = "menu"; this.stars = []; this.walkTime = 0; this.playerPos = {x:0,y:0}; this.worldShift = {x:0,y:0}; }
     preload(){
       this.load.image("woa-player-wizard","./assets/isometric/player-wizard.svg");
+      this.load.image("woa-player-male","./assets/sprites/arcane-wizard-male.svg");
+      this.load.image("woa-player-female","./assets/sprites/arcane-wizard-female.svg");
       this.load.image("woa-mathias","./assets/isometric/mathias.svg");
       this.load.image("woa-archivist","./assets/isometric/archivist.svg");
       this.load.image("woa-familiar","./assets/isometric/familiar-wisp.svg");
@@ -324,8 +326,12 @@
       this.playerShadow=this.add.ellipse(x,y+26,48,15,0x000000,.55).setDepth(10);
       this.playerAura=this.add.ellipse(x,y+10,58,24,0x9b55df,.10).setDepth(10);
       this.tweens.add({targets:this.playerAura,alpha:.23,scaleX:1.16,scaleY:1.22,duration:1900,yoyo:true,repeat:-1,ease:"Sine.InOut"});
-      if(this.textures.exists("woa-player-wizard")){
-        this.playerCloak=this.add.image(x,y,"woa-player-wizard").setDisplaySize(66,78).setDepth(11);
+      let profile={};try{profile=JSON.parse(localStorage.getItem("woa-preview-profile-v1")||"{}")}catch(_){}
+      const heroTexture=profile.presentation==="feminine"?"woa-player-female":profile.presentation==="masculine"?"woa-player-male":"woa-player-wizard";
+      if(this.textures.exists(heroTexture)){
+        this.playerCloak=this.add.image(x,y,heroTexture).setDisplaySize(66,78).setDepth(11);
+        const robeTints={ember:0xffb2a0,frost:0x9fdfff,verdant:0x9df2bd,void:0xaaa0bf,gold:0xffdf91};
+        if(profile.robeColor&&robeTints[profile.robeColor])this.playerCloak.setTint(robeTints[profile.robeColor]);
       } else {
         this.playerCloak=this.add.graphics().setDepth(11);
         this.playerCloak.fillStyle(0x28143e,1);this.playerCloak.fillTriangle(x-17,y+17,x,y-10,x+17,y+17);this.playerCloak.fillTriangle(x-17,y+10,x-10,y+37,x+10,y+37);this.playerCloak.fillTriangle(x+17,y+10,x+10,y+37,x-10,y+37);
