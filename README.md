@@ -26,4 +26,4 @@ This branch is a clean restart of the **2D pixel-art RPG**. It preserves the agr
 Upload approved artwork into `assets/art-source/` first. Do not crop, resize, or overwrite originals. Production sheets go into the matching `assets/` folder only after frame dimensions, transparency, pivots, and animation order are verified.
 
 ## Important
-This is a clean foundation branch. The existing `main` branch remains untouched as a safety copy until the new foundation is reviewed and intentionally promoted. No artwork is claimed to be complete until actual image files have been added and checked in-game.
+The Phaser-based browser RPG is now the intended main game base and is served at `/`. Godot is no longer the active runtime target; its legacy files may remain in the repository as an archival safety copy, but the main Docker image does not serve the old prototype. The browser build is still in active development. No artwork or feature is claimed complete until the real assets are integrated and tested in-game.
