@@ -29,8 +29,8 @@ function tick(){
 }
 function setMode(next){mode=next||"menu";if(timer){clearTimeout(timer);timer=null}step=0;if(enabled&&ctx&&ctx.state==="running")tick()}
 function syncButtons(){
- const text=enabled?"♫ Music on":"♫ Music off";
- ["music-toggle","music-toggle-title"].forEach(id=>{const b=$(id);if(b){b.textContent=text;b.setAttribute("aria-pressed",String(enabled))}});
+ const title=$("music-toggle-title");if(title){title.textContent=enabled?"♫ Music on":"♫ Music off";title.setAttribute("aria-pressed",String(enabled))}
+ const menu=$("music-toggle");if(menu){menu.setAttribute("aria-pressed",String(enabled));const label=menu.querySelector("b"),small=menu.querySelector("small"),status=$("music-status");if(label)label.textContent=enabled?"Soundtrack · On":"Soundtrack · Off";if(small)small.textContent=enabled?"Original ambient score is playing":"Turn the original ambient music on";if(status)status.textContent=enabled?"♪":"›"}
 }
 async function setEnabled(value){
  enabled=!!value;
