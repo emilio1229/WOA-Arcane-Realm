@@ -314,7 +314,8 @@
         diamond(w*.77-Math.sin(i*.4)*w*.03,y+tileH*.3,tileW*1.25,tileH*.75,0x493256,.95,0x8d689e);
       }
       const tree=(x,y,s=1)=>{
-        this.solidObstacles.push({x,y:y+24*s,rx:20*s,ry:12*s,kind:"tree"});
+        // Collision uses the visible trunk/foot anchor rather than the canopy center.
+        this.solidObstacles.push({x,y:y+25*s,rx:13*s,ry:8*s,kind:"tree"});
         g.fillStyle(0x09070e,.55);g.fillEllipse(x,y+tileH*.18,34*s,12*s);
         if(this.textures.exists("woa-crystal-tree")){const im=this.add.image(x,y-25*s,"woa-crystal-tree").setDisplaySize(70*s,98*s).setDepth(y);this.world.add(im);}
         else {g.fillStyle(0x171020,1);g.fillRect(x-4*s,y-7*s,8*s,20*s);g.fillStyle(0x49305e,1);g.fillTriangle(x-17*s,y+2*s,x,y-45*s,x+17*s,y+2*s);}
@@ -334,7 +335,8 @@
       };
       // Illustrated cottages with dimensional SVG shading and glowing windows.
       const cottage=(x,y,s)=>{
-        this.solidObstacles.push({x,y:y+36*s,rx:43*s,ry:19*s,kind:"building"});
+        // Keep collision at the cottage foundation, not the wide roof silhouette.
+        this.solidObstacles.push({x,y:y+35*s,rx:31*s,ry:12*s,kind:"building"});
         if(this.textures.exists("woa-cottage")){const im=this.add.image(x,y-12*s,"woa-cottage").setDisplaySize(112*s,112*s).setDepth(y);this.world.add(im);}
         else building(x,y,s,0x49304b,0x59376f);
       };
@@ -385,11 +387,17 @@
         this.playerCloak.fillStyle(0xe2c0ff,1);this.playerCloak.fillCircle(x,y-14,9);this.playerCloak.fillStyle(0x120a20,1);this.playerCloak.fillTriangle(x-12,y-15,x,y-35,x+12,y-15);this.playerCloak.fillStyle(0xe6bdff,.8);this.playerCloak.fillRect(x-2,y+1,4,20);
       }
       this.tweens.add({targets:this.playerCloak,y:y+3,duration:1500,yoyo:true,repeat:-1,ease:"Sine.InOut"});
+      // The bonded familiar is driven by the saved character profile; do not create a
+      // second decorative "star" sprite. Until unique familiar art is supplied, reuse
+      // the approved Wisp sprite and distinguish bonds with restrained elemental tints.
       if(this.textures.exists("woa-familiar")){
-        this.familiarAura=this.add.circle(x+48,y-24,25,0x9b4fff,.12).setDepth(11);
-        this.tweens.add({targets:this.familiarAura,alpha:.28,scale:1.3,duration:1200,yoyo:true,repeat:-1,ease:"Sine.InOut"});
-        this.familiarSprite=this.add.image(x+48,y-24,"woa-familiar").setDisplaySize(48,54).setDepth(12);
-        this.tweens.add({targets:this.familiarSprite,y:y-31,duration:900,yoyo:true,repeat:-1,ease:"Sine.InOut"});
+        const familiarName=String(profile.familiar||"Archive Wisp");
+        const familiarTints={"Archive Wisp":0xdcc6ff,"Ember Fox":0xffa06a,"Moon Moth":0xb9e5ff,"Mossling":0x9de6ae};
+        const familiarTint=familiarTints[familiarName]||familiarTints["Archive Wisp"];
+        this.familiarAura=this.add.circle(x+47,y-25,22,familiarTint,.10).setDepth(11);
+        this.tweens.add({targets:this.familiarAura,alpha:.22,scale:1.18,duration:1500,yoyo:true,repeat:-1,ease:"Sine.InOut"});
+        this.familiarSprite=this.add.image(x+47,y-25,"woa-familiar").setDisplaySize(44,50).setTint(familiarTint).setDepth(12);
+        this.tweens.add({targets:this.familiarSprite,y:y-30,duration:1200,yoyo:true,repeat:-1,ease:"Sine.InOut"});
       }
       this.townLabel=this.add.text(w*.5,h*.9,"THE OUTER WARD",{fontFamily:"Georgia",fontSize:Math.max(10,Math.min(15,w*.014))+"px",color:"#d7b6ef",letterSpacing:4}).setOrigin(.5);
     }
