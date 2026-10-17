@@ -291,10 +291,10 @@
       g.fillPoints([{x:towerX-51,y:towerBase-48},{x:towerX-35,y:towerBase-70},{x:towerX-20,y:towerBase-48}],true);
       g.fillPoints([{x:towerX+20,y:towerBase-55},{x:towerX+35,y:towerBase-78},{x:towerX+51,y:towerBase-55}],true);
       g.fillStyle(0xc68bff,.72);g.fillRect(towerX-3,towerBase-61,6,10);g.fillRect(towerX-38,towerBase-38,4,7);g.fillRect(towerX+33,towerBase-42,4,7);
-      // Soft horizontal fog layers add distance without obscuring the walkable path.
-      g.fillStyle(0x9c65c9,.055);g.fillEllipse(w*.28,horizon-3,w*.7,18);
-      g.fillStyle(0x9870b8,.045);g.fillEllipse(w*.75,horizon+18,w*.62,24);
       g.fillStyle(0x181027,1);g.fillRect(0,horizon,w,h-horizon);
+      // Fog is drawn after the terrain base so it reads as atmosphere, not hidden paint.
+      g.fillStyle(0x9c65c9,.055);g.fillEllipse(w*.28,horizon+5,w*.7,18);
+      g.fillStyle(0x9870b8,.045);g.fillEllipse(w*.75,horizon+22,w*.62,24);
       // A hand-drawn 3/4 isometric ground plane, built from diamond tiles.
       const tileW=Math.max(42,Math.min(76,w*.075)),tileH=tileW*.48;
       const cols=Math.ceil(w/(tileW*.5))+4,rows=Math.ceil((h-horizon)/tileH)+5;
@@ -373,6 +373,17 @@
       cottage(w*.82,horizon+tileH*3.5,.94);
       cottage(w*.30,horizon+tileH*5.4,.76);
       cottage(w*.70,horizon+tileH*6.2,.8);
+      // Small crystal growths and rune stones break up the empty ground beside the lane.
+      for(let i=0;i<10;i++){
+        const side=i%2===0?-1:1;
+        const cy=horizon+tileH*(2.7+(i%5)*2.05);
+        const cx=w*.5+side*(w*(.19+(i%3)*.055));
+        g.fillStyle(0x080611,.4);g.fillEllipse(cx,cy+5,22,8);
+        g.fillStyle(i%3===0?0x9d63d8:0x5c3a88,.9);
+        g.fillPoints([{x:cx-7,y:cy+5},{x:cx-4,y:cy-8-(i%3)*3},{x:cx,y:cy-14-(i%3)*4},{x:cx+3,y:cy+4}],true);
+        g.fillStyle(0xd8b4ff,.75);g.fillPoints([{x:cx,y:cy-12-(i%3)*4},{x:cx+1,y:cy+2},{x:cx-2,y:cy+1}],true);
+        g.fillStyle(0xc59aff,.16);g.fillCircle(cx,cy-4,10);
+      }
       // Trees and glowing ward-lanterns are placed behind the playable path.
       for(let i=0;i<12;i++){
         const side=i%2===0?-1:1;
