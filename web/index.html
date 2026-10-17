@@ -270,13 +270,14 @@
         if(Math.abs(x-w*.5)<tileW*1.25)continue;
         diamond(x,y,tileW*.22,tileH*.14,i%2?0xb08bc6:0x8b65aa,.5);
       }
+      // Draw terrain first; characters are layered above it.
+      this.world.add(g);
       // Town NPC sprites are part of the world layer so they travel with the map.
       if(this.textures.exists("woa-mathias")){
         const mathias=this.add.image(w*.28,horizon+tileH*4.1,"woa-mathias").setDisplaySize(48,56);
         const archivist=this.add.image(w*.72,horizon+tileH*5.1,"woa-archivist").setDisplaySize(45,53);
         this.world.add([mathias,archivist]);
       }
-      this.world.add(g);
       // Keep the player anchored on screen while the isometric environment scrolls around them.
       const x=w*.5,y=h*.76;
       this.playerBaseY=y;
