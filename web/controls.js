@@ -19,7 +19,7 @@
   pad.addEventListener("pointerdown",e=>{e.preventDefault();if(dragPointer!==null)return;dragPointer=e.pointerId;try{pad.setPointerCapture(e.pointerId)}catch(_){}pad.classList.add("dragging");moveStick(e);});
   pad.addEventListener("pointermove",e=>{if(dragPointer===e.pointerId){e.preventDefault();moveStick(e);}});
   ["pointerup","pointercancel","lostpointercapture"].forEach(ev=>pad.addEventListener(ev,releaseStick));
-  window.addEventListener("keydown",e=>{const key=e.key.toLowerCase();if(["arrowup","arrowdown","arrowleft","arrowright"," "].includes(key))e.preventDefault();if(!e.repeat&&key==="e"&&$("town-hud")&&!$("town-hud").classList.contains("hidden")){if(window.arcaneSceneInteract)window.arcaneSceneInteract();else {const target=$("story-talk");if(target)target.click();}}if(!e.repeat&&key===" "&&$("town-hud")&&!$("town-hud").classList.contains("hidden")){if(window.arcaneSceneVisualAction)window.arcaneSceneVisualAction("spell");if(window.arcaneSceneAction)window.arcaneSceneAction("spell");}if(!e.repeat&&key==="shift"&&$("town-hud")&&!$("town-hud").classList.contains("hidden")){if(window.arcaneSceneVisualAction)window.arcaneSceneVisualAction("dodge");if(window.arcaneSceneAction)window.arcaneSceneAction("dodge");}keys[key]=true;setKeyboardVector();});
+  window.addEventListener("keydown",e=>{const key=e.key.toLowerCase();if(["arrowup","arrowdown","arrowleft","arrowright"," "].includes(key))e.preventDefault();if(!e.repeat&&key==="e"&&$("town-hud")&&!$("town-hud").classList.contains("hidden")){if(window.arcaneSceneInteract)window.arcaneSceneInteract();else {const target=$("story-talk");if(target)target.click();}}if(!e.repeat&&key===" "&&$("town-hud")&&!$("town-hud").classList.contains("hidden")){if(window.arcaneSceneVisualAction)window.arcaneSceneVisualAction("spell");}if(!e.repeat&&key==="shift"&&$("town-hud")&&!$("town-hud").classList.contains("hidden")){if(window.arcaneSceneVisualAction)window.arcaneSceneVisualAction("dodge");}keys[key]=true;setKeyboardVector();});
   window.addEventListener("keyup",e=>{keys[e.key.toLowerCase()]=false;setKeyboardVector();});
   window.addEventListener("blur",()=>{keys={};window.arcaneMove.x=0;window.arcaneMove.y=0;if(dragPointer!==null){dragPointer=null;stick.style.left="50%";stick.style.top="50%";pad.classList.remove("dragging");}});
   function setKeyboardVector(){const x=(keys.a||keys.arrowleft?-1:0)+(keys.d||keys.arrowright?1:0);const y=(keys.w||keys.arrowup?-1:0)+(keys.s||keys.arrowdown?1:0);window.arcaneMove.x=x;window.arcaneMove.y=y;}
@@ -28,8 +28,6 @@
     if(window.arcaneSceneVisualAction)window.arcaneSceneVisualAction(action);
     const battle=document.getElementById("woa-battle");
     if(battle){const buttons=battle.querySelectorAll("#woa-battle-actions button");const index=action==="attack"?0:action==="spell"?1:-1;if(index>=0&&buttons[index]){buttons[index].click();return;}return;}
-    if(window.arcaneSceneVisualAction)window.arcaneSceneVisualAction(action);
-    if(window.arcaneSceneAction)window.arcaneSceneAction(action);
   }
   $("arcane-attack").addEventListener("click",()=>useAction("attack"));
   $("arcane-spell").addEventListener("click",()=>useAction("spell"));
