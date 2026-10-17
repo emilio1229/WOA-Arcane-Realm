@@ -163,6 +163,14 @@
       this.load.image("woa-cottage","./assets/isometric/outer-ward-cottage.svg");
       this.load.image("woa-crystal-tree","./assets/isometric/crystal-tree.svg");
       this.load.image("woa-ward-gate","./assets/isometric/ward-gate.svg");
+      // Piskel-exported sprite sheets are loaded when present; SVG fallbacks keep the
+      // current preview playable until the finished animation sheets are added.
+      this.load.on("filecomplete-spritesheet-woa-player-walk",()=>{
+        this.piskelPlayerReady=true;
+      });
+      this.load.on("loaderror",(file)=>{
+        if(file && file.key && file.key.startsWith("piskel-")) console.warn("Optional Piskel art not loaded:",file.key);
+      });
     }
     create(){
       this.bg = this.add.graphics();
