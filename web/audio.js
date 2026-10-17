@@ -33,18 +33,43 @@ function syncButtons(){
  const menu=$("music-toggle");if(menu){menu.setAttribute("aria-pressed",String(enabled));const label=menu.querySelector("b"),small=menu.querySelector("small"),status=$("music-status");if(label)label.textContent=enabled?"Soundtrack · On":"Soundtrack · Off";if(small)small.textContent=enabled?"Original ambient score is playing":"Turn the original ambient music on";if(status)status.textContent=enabled?"♪":"›"}
 }
 async function setEnabled(value){
- enabled=!!value;
- try{localStorage.setItem(STORE,enabled?"1":"0")}catch(_){}
- syncButtons();
- if(!enabled){if(timer){clearTimeout(timer);timer=null}if(ctx&&master)master.gain.setTargetAtTime(.0001,ctx.currentTime,.18);return}
- build();if(!ctx||!master){enabled=false;syncButtons();return}
- try{await ctx.resume();master.gain.cancelScheduledValues(ctx.currentTime);master.gain.setTargetAtTime(.22,ctx.currentTime,.9);setMode(mode)}catch(_){enabled=false;syncButtons()}
+ const requested=!!value;
+ if(!requested){
+  enabled=false;
+  try{localStorage.setItem(STORE,"0")}catch(_){}
+  if(timer){clearTimeout(timer);timer=null}
+  if(ctx&&master)master.gain.setTargetAtTime(.0001,ctx.currentTime,.12);
+  syncButtons();
+  return;
+ }
+ // Create/resume audio directly inside the user's button gesture for mobile Safari.
+ try{
+  build();
+  if(!ctx||!master)throw new Error("Web Audio is unavailable in this browser");
+  await ctx.resume();
+  if(ctx.state!=="running")throw new Error("Audio is waiting for browser permission");
+  enabled=true;
+  try{localStorage.setItem(STORE,"1")}catch(_){}
+  master.gain.cancelScheduledValues(ctx.currentTime);
+  master.gain.setValueAtTime(Math.max(.0001,master.gain.value),ctx.currentTime);
+  master.gain.setTargetAtTime(.22,ctx.currentTime,.22);
+  syncButtons();
+  setMode(mode);
+ }catch(_){
+  enabled=false;
+  try{localStorage.setItem(STORE,"0")}catch(__){}
+  syncButtons();
+ }
 }
-function toggle(){setEnabled(!enabled)}
+function toggle(event){
+ if(event){event.preventDefault();event.stopPropagation()}
+ void setEnabled(!enabled);
+}
 window.arcaneMusic={setMode,toggle,setEnabled,isEnabled:()=>enabled};
 document.addEventListener("DOMContentLoaded",()=>{
  const title=$("music-toggle-title"),menu=$("music-toggle");
- if(title)title.addEventListener("click",toggle);if(menu)menu.addEventListener("click",toggle);
+ if(title)title.addEventListener("click",toggle);
+ if(menu)menu.addEventListener("click",toggle);
  syncButtons();
  // Browsers require a user gesture before audio can begin. Start only if previously enabled.
  document.addEventListener("pointerdown",()=>{if(enabled){build();if(ctx&&ctx.state==="suspended")ctx.resume().then(()=>{if(master){master.gain.setTargetAtTime(.22,ctx.currentTime,.9);setMode(mode)}})}},{once:true,passive:true});
