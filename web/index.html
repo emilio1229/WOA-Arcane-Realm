@@ -163,12 +163,30 @@
       this.load.image("woa-cottage","./assets/isometric/outer-ward-cottage.svg");
       this.load.image("woa-crystal-tree","./assets/isometric/crystal-tree.svg");
       this.load.image("woa-ward-gate","./assets/isometric/ward-gate.svg");
-      // Piskel-exported sprite sheets are loaded when present; SVG fallbacks keep the
-      // current preview playable until the finished animation sheets are added.
+      // WoA concept-art panels are optional presentation assets (not animation atlases).
+      // Keep the current SVG gameplay sprites as fallbacks until clean Piskel sheets exist.
+      const artBase = "./assets/art-source/";
+      [
+        ["woa-art-classes", "01_player_characters_and_classes.png"],
+        ["woa-art-animations", "02_player_animations.png"],
+        ["woa-art-portraits", "04_portraits_and_class_outfits.png"],
+        ["woa-art-spells", "05_spell_and_combat_effects.png"],
+        ["woa-art-mathias", "06_mathias_supporting_character.png"],
+        ["woa-art-enemies", "07_enemies.png"],
+        ["woa-art-familiars", "08_familiars_and_pets.png"],
+        ["woa-art-equipment", "09_equipment_and_items.png"],
+        ["woa-art-world", "10_world_environment.png"],
+        ["woa-art-ui", "11_ui_elements_and_palette.png"],
+        ["woa-art-branding", "12_woa_branding.png"],
+        ["woa-art-full-sheet", "arcane_realm_full_concept_sheet.png"]
+      ].forEach(([key, file]) => this.load.image(key, artBase + file));
       this.load.on("filecomplete-spritesheet-woa-player-walk",()=>{
         this.piskelPlayerReady=true;
       });
       this.load.on("loaderror",(file)=>{
+        if(file && file.key && file.key.startsWith("woa-art-")) {
+          console.info("Optional WoA concept art not present yet:", file.src);
+        }
         if(file && file.key && file.key.startsWith("piskel-")) console.warn("Optional Piskel art not loaded:",file.key);
       });
     }
