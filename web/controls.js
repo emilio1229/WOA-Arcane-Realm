@@ -18,10 +18,10 @@
     const up=e=>{e.preventDefault();window.arcaneMove.x=0;window.arcaneMove.y=0;btn.classList.remove("selected");};
     btn.addEventListener("pointerdown",down);["pointerup","pointercancel","lostpointercapture"].forEach(ev=>btn.addEventListener(ev,up));
   });
-  window.addEventListener("keydown",e=>{if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," "].includes(e.key))e.preventDefault();keys[e.key.toLowerCase()]=true;setKeyboardVector();});
+  window.addEventListener("keydown",e=>{const key=e.key.toLowerCase();if(["arrowup","arrowdown","arrowleft","arrowright"," "].includes(key))e.preventDefault();if(!e.repeat&&key==="e"&&$("town-hud")&&!$("town-hud").classList.contains("hidden")){const target=$("story-talk");if(target)target.click();else if(window.arcaneSceneInteract)window.arcaneSceneInteract();}if(!e.repeat&&key===" "&&$("town-hud")&&!$("town-hud").classList.contains("hidden")){if(window.arcaneSceneAction)window.arcaneSceneAction("spell");}if(!e.repeat&&key==="d"&&$("town-hud")&&!$("town-hud").classList.contains("hidden")){if(window.arcaneSceneAction)window.arcaneSceneAction("dodge");}keys[key]=true;setKeyboardVector();});
   window.addEventListener("keyup",e=>{keys[e.key.toLowerCase()]=false;setKeyboardVector();});
   window.addEventListener("blur",()=>{keys={};window.arcaneMove.x=0;window.arcaneMove.y=0;});
-  function setKeyboardVector(){const x=(keys.a||keys.arrowleft?-1:0)+(keys.d||keys.arrowright?1:0);const y=(keys.w||keys.arrowup?-1:0)+(keys.s||keys.arrowdown?1:0);if(x||y){window.arcaneMove.x=x;window.arcaneMove.y=y;}}
+  function setKeyboardVector(){const x=(keys.a||keys.arrowleft?-1:0)+(keys.d||keys.arrowright?1:0);const y=(keys.w||keys.arrowup?-1:0)+(keys.s||keys.arrowdown?1:0);window.arcaneMove.x=x;window.arcaneMove.y=y;}
   $("arcane-interact").addEventListener("click",()=>{const target=$("story-talk");if(target)target.click();else if(window.arcaneSceneInteract)window.arcaneSceneInteract();});
   $("arcane-dodge").addEventListener("click",()=>{if(window.arcaneSceneAction)window.arcaneSceneAction("dodge");else pulse("arcane-dodge");});
   $("arcane-spell").addEventListener("click",()=>{if(window.arcaneSceneAction)window.arcaneSceneAction("spell");else pulse("arcane-spell");});
