@@ -12,6 +12,7 @@ COPY web/player-systems.js /usr/share/nginx/html/player-systems.js
 COPY web/world-systems.js /usr/share/nginx/html/world-systems.js
 COPY web/controls.js /usr/share/nginx/html/controls.js
 COPY assets/ /usr/share/nginx/html/assets/
+COPY web/assets/ /usr/share/nginx/html/assets/
 # Separate UI-only preview; the existing game entry point remains unchanged.
 COPY activity-preview/ /usr/share/nginx/html/activity-preview/
 EXPOSE 8080
