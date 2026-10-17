@@ -141,7 +141,7 @@
         this.worldShift.y=Math.max(-boundsY,Math.min(boundsY,this.worldShift.y-ny*speed));
         this.world.setPosition(this.worldShift.x,this.worldShift.y);
         document.documentElement.style.setProperty("--woa-world-x",this.worldShift.x+"px");
-        document.documentElement.style.setProperty("--woa-world-y",this.worldShift.y+"px");
+        document.documentElement.style.setProperty("--woa-world-y",this.worldShift.y+"px");window.arcaneWorldShift={x:this.worldShift.x,y:this.worldShift.y};
         this.walkTime+=delta;
         if(this.playerCloak)this.playerCloak.y=this.playerBaseY+Math.sin(this.walkTime/65)*2.5;
         if(this.playerShadow)this.playerShadow.setScale(1+Math.sin(this.walkTime/65)*.035,1);
