@@ -114,8 +114,14 @@
     document.querySelectorAll("[data-class]").forEach(b => b.classList.toggle("selected", b.dataset.class === chosenClass));
   }
   document.querySelectorAll("[data-presentation]").forEach(b => b.addEventListener("click", () => { chosenPresentation = b.dataset.presentation; updatePreview(); }));
-  document.querySelectorAll("[data-class]").forEach(b => b.addEventListener("click", () => { chosenClass = b.dataset.class; updatePreview(); }));
-  ["robe-color","headwear"].forEach(id => $(id).addEventListener("change", updatePreview));
+  document.querySelectorAll("[data-class]").forEach(b => b.addEventListener("click", () => {
+    chosenClass = b.dataset.class;
+    const traditionColor = {"Storm Herald":"violet","Ember Mage":"ember","Frostweaver":"frost","Verdant Warden":"verdant","Voidcaller":"void","Sigilbinder":"gold"}[chosenClass] || "violet";
+    if (!$("robe-color").dataset.userChosen) $("robe-color").value = traditionColor;
+    updatePreview();
+  }));
+  $("robe-color").addEventListener("change", () => { $("robe-color").dataset.userChosen = "true"; updatePreview(); });
+  $("headwear").addEventListener("change", updatePreview);
   $("begin-btn").addEventListener("click", () => { showScreen("creator-screen"); $("hero-name").focus({preventScroll:true}); });
   $("continue-btn").addEventListener("click", () => { showScreen("creator-screen"); $("hero-name").focus({preventScroll:true}); });
   $("about-btn").addEventListener("click", () => showScreen("chronicles-screen"));
