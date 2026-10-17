@@ -53,7 +53,10 @@ window.arcaneSceneInteract=()=>{
  if(target&&target.d<=125){interactWith(target.id);return;}
  open("Explore the Outer Ward","Move close to Mathias, the Archivist, or the unstable rift before interacting. The nearest point of interest is about "+Math.round(target?.d||0)+" pixels away.",[{label:"Continue exploring",primary:true,run:close}],"EXPLORATION");
 };
-window.arcaneSceneAction=a=>{\n if(a==="attack"||a==="spell"){const riftDistance=npcDistance("rift");if(riftDistance<=150){interactWith("rift");return;}const title=a==="attack"?"No foe in reach":"Your class spell";const body=a==="attack"?"There is no enemy close enough to attack. Find the unstable rift in the Outer Ward and interact with it to begin a battle.":"Your class spell is ready. Find the unstable rift and interact with it to enter combat; the battle panel will provide the actual spell-casting action and mana cost.";open(title,body,[{label:"Keep exploring",primary:true,run:close}],"ABILITY");return;}\n open("Quick Step","You slip sideways in a flash of violet light. Dodge is a combat action; it will be available in the battle panel when the encounter supports it.",[{label:"Return",primary:true,run:close}],"ABILITY");\n};
+window.arcaneSceneAction=a=>{
+ if(a==="attack"||a==="spell"){const riftDistance=npcDistance("rift");if(riftDistance<=150){interactWith("rift");return;}const title=a==="attack"?"No foe in reach":"Your class spell";const body=a==="attack"?"There is no enemy close enough to attack. Find the unstable rift in the Outer Ward and interact with it to begin a battle.":"Your class spell is ready. Find the unstable rift and interact with it to enter combat; the battle panel will provide the actual spell-casting action and mana cost.";open(title,body,[{label:"Keep exploring",primary:true,run:close}],"ABILITY");return;}
+ open("Quick Step","You slip sideways in a flash of violet light. Dodge is a combat action; it will be available in the battle panel when the encounter supports it.",[{label:"Return",primary:true,run:close}],"ABILITY");
+};
 s.discoveredAreas=Array.isArray(s.discoveredAreas)?s.discoveredAreas:["Outer Ward"];
 if(s.quests.rift&&!s.discoveredAreas.includes("Arcane Archive"))s.discoveredAreas.push("Arcane Archive");
 window.arcaneRealmAtlas=atlas;
