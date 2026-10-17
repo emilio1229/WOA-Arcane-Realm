@@ -16,6 +16,14 @@
 .drag-stick:after{content:"";position:absolute;inset:15px;border-radius:50%;background:#b98ae8;border:1px solid #f0dcff}
 .drag-label{position:fixed;z-index:14;left:16px;bottom:calc(126px + env(safe-area-inset-bottom));padding:7px 10px;border-radius:10px;background:#10091de8;border:1px solid #7951a8;color:#e9d8fa;font-size:11px;pointer-events:none}
 @media(min-width:760px){.drag-zone,.drag-stick,.drag-label{display:none!important}}
+/* Last-resort dark UI normalization for every visible HTML control and box. */
+:root,html,body{color-scheme:dark!important;background:#090714!important}
+button,.key,.reset,[role="button"],.panel,.hint,.drag-label,.drag-stick,input,select,textarea,option,fieldset,dialog,details,summary{color:#f7efff!important;background-color:#10091d!important;border-color:#7951a8!important}
+button,.key,.reset,.controls button{background-color:#211333!important;background-image:none!important;color:#fff7ff!important;border:2px solid #b58be4!important}
+.panel{background:#10091d!important;background-image:linear-gradient(135deg,#1b1030,#0b0919)!important}
+.hint,.drag-label{background:#10091d!important;background-image:none!important;color:#e9d8fa!important}
+.drag-stick{background:#211333e8!important}
+button:active,.key:active,.reset:active{background:#68408f!important;color:#fff7ff!important}
 /* Hard override: every interface surface stays dark; never fall back to browser-white boxes. */
 html,body{background-color:#090714!important;color:#f7efff!important;color-scheme:dark!important}
 .hud,.controls,.pad{background:transparent!important;background-color:transparent!important}
