@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090714">
+<title>WoA — Follow Camera & Occlusion Test</title>
+<style>
+:root{color-scheme:dark;--violet:#bb83ff;--gold:#e9ce91}
+*{box-sizing:border-box}html,body,#game{margin:0;width:100%;height:100%;overflow:hidden}body{background:#090714;color:#f7efff;font-family:Georgia,serif;touch-action:none}#game{position:fixed;inset:0}
+.hud{position:fixed;z-index:2;inset:env(safe-area-inset-top) 0 auto;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;padding:12px;pointer-events:none}.panel{background:linear-gradient(135deg,#1b1030ed,#0b0919ed);border:1px solid #7951a8;border-radius:12px;padding:10px 13px;box-shadow:0 5px 24px #0008;max-width:70vw}.title{font-size:12px;letter-spacing:1.6px;color:var(--gold);text-transform:uppercase}.small{font-size:12px;color:#d8c7eb;margin-top:4px;line-height:1.4}.status{font-size:11px;color:#cbaaff;letter-spacing:.7px;text-align:right}.controls{position:fixed;z-index:3;bottom:calc(12px + env(safe-area-inset-bottom));left:12px;right:12px;display:flex;justify-content:space-between;align-items:end;pointer-events:none}.pad{display:grid;grid-template-columns:repeat(3,44px);grid-template-rows:repeat(2,44px);gap:4px;pointer-events:auto}.key,.reset{border:1px solid #8e66b5;background:#170e2bdc;color:#f5eaff;border-radius:12px;font-size:18px;box-shadow:0 4px 14px #0007;touch-action:none}.key:active,.reset:active{background:#613a8a}.key[data-dir=up]{grid-column:2}.key[data-dir=left]{grid-column:1;grid-row:2}.key[data-dir=down]{grid-column:2;grid-row:2}.key[data-dir=right]{grid-column:3;grid-row:2}.reset{font-family:Georgia,serif;font-size:12px;padding:12px;pointer-events:auto}.hint{position:fixed;bottom:calc(110px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);z-index:2;background:#100a1bd9;border:1px solid #624587;border-radius:20px;padding:8px 12px;font-size:12px;color:#e5d5f7;white-space:nowrap;pointer-events:none}@media(min-width:760px){.controls{left:20px;right:20px}.pad{opacity:.72}.hint{bottom:20px;left:50%;transform:translateX(-50%)}}
+</style>
+</head>
+<body>
+<div id="game"></div>
+<div class="hud"><div class="panel"><div class="title">Wizards of Ark · Camera Lab</div><div class="small">Follow camera + arcane visibility</div></div><div class="panel"><div class="status" id="state">OCCLUSION TEST</div><div class="small" id="coords">WASD / arrows to move</div></div></div>
+<div class="hint" id="hint">Walk behind the tower or trees to test fade</div>
+<div class="controls"><div class="pad"><button class="key" data-dir="up" aria-label="Move up">▲</button><button class="key" data-dir="left" aria-label="Move left">◀</button><button class="key" data-dir="down" aria-label="Move down">▼</button><button class="key" data-dir="right" aria-label="Move right">▶</button></div><button class="reset" id="reset">↺ Reset position</button></div>
+<script src="https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.min.js"></script>
+<script>
+(() => {
+ const W=1800,H=1400;
+ class RealmScene extends Phaser.Scene {
+  constructor(){super('realm');this.held={};this.obstacles=[];}
+  create(){
+   const g=this.add.graphics();
+   g.fillGradientStyle(0x100c22,0x100c22,0x201038,0x201038,1);g.fillRect(0,0,W,H);
+   // Stylized walkable courtyard and glowing path
+   g.fillStyle(0x211a31,1);g.fillPoints([new Phaser.Geom.Point(150,200),new Phaser.Geom.Point(1620,240),new Phaser.Geom.Point(1680,1180),new Phaser.Geom.Point(180,1230)],true);
+   for(let y=260;y<1200;y+=72){g.lineStyle(1,0x554269,.48);g.lineBetween(170,y,1650,y+8);}
+   for(let x=220;x<1660;x+=90){g.lineStyle(1,0x49375c,.34);g.lineBetween(x,240,x+12,1220);}
+   // glowing path toward the sanctuary
+   g.lineStyle(24,0x8d42ce,.12);g.lineBetween(900,1150,900,390);
+   g.lineStyle(3,0xc98aff,.65);g.lineBetween(900,1150,900,390);
+   for(let i=0;i<9;i++){const y=430+i*78;g.fillStyle(0xcda0ff,.5);g.fillCircle(900,y,3+((i%3)*1.5));}
+   // Far sanctuary
+   this.drawTower(g,900,330,1.35,false);
+   // Trees and pillars become translucent when in front of player
+   this.addObstacle('moon tree',430,560,'tree',1.15);
+   this.addObstacle('moon tree',1300,500,'tree',1.05);
+   this.addObstacle('moon tree',570,960,'tree',1.0);
+   this.addObstacle('moon tree',1230,950,'tree',1.15);
+   this.addObstacle('sanctuary pillar',760,590,'pillar',1);
+   this.addObstacle('sanctuary pillar',1040,590,'pillar',1);
+   this.addObstacle('ruined wall',900,760,'wall',1);
+   this.addObstacle('moon tree',870,890,'tree',.92);
+   // stones
+   for(let i=0;i<22;i++){const x=250+(i*173)%1300,y=300+(i*97)%850;g.fillStyle(0x7d6297,.32);g.fillEllipse(x,y,18,7);}
+   // player wizard, drawn as layered sprite-like container
+   this.player=this.add.container(900,1080);
+   const shadow=this.add.ellipse(0,22,34,14,0x05030a,.6);
+   const robe=this.add.graphics();robe.fillStyle(0x392057,1);robe.fillPoints([new Phaser.Geom.Point(-15,-5),new Phaser.Geom.Point(15,-5),new Phaser.Geom.Point(21,25),new Phaser.Geom.Point(-21,25)],true);robe.lineStyle(2,0xb58ae8,1);robe.strokePoints([new Phaser.Geom.Point(-15,-5),new Phaser.Geom.Point(15,-5),new Phaser.Geom.Point(21,25),new Phaser.Geom.Point(-21,25)],true);
+   robe.fillStyle(0xe4c67e,1);robe.fillRect(-2,0,4,24);
+   const head=this.add.ellipse(0,-15,19,23,0xe2bfa5);head.setStrokeStyle(2,0x5d3b72);
+   const hair=this.add.triangle(0,-29,0,-6,-14,-21,14,-21,0xaaa1d6);
+   const hat=this.add.graphics();hat.fillStyle(0x261439,1);hat.fillPoints([new Phaser.Geom.Point(-15,-24),new Phaser.Geom.Point(15,-24),new Phaser.Geom.Point(1,-53)],true);hat.lineStyle(2,0xd8bb82,1);hat.strokePoints([new Phaser.Geom.Point(-15,-24),new Phaser.Geom.Point(15,-24),new Phaser.Geom.Point(1,-53)],true);
+   const staff=this.add.graphics();staff.lineStyle(3,0xb6a0d9,1);staff.lineBetween(20,-5,25,25);staff.fillStyle(0xd8aaff,1);staff.fillCircle(20,-9,5);staff.fillStyle(0xf2d4ff,.45);staff.fillCircle(20,-9,10);
+   this.player.add([shadow,robe,head,hair,hat,staff]);this.player.setDepth(this.player.y);
+   this.cameras.main.setBounds(0,0,W,H);this.cameras.main.startFollow(this.player,false,.09,.09,0,85);this.cameras.main.setZoom(Math.min(window.innerWidth/900,window.innerHeight/620,1.2));
+   this.input.keyboard.on('keydown',e=>{this.held[e.code]=true;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();});
+   this.input.keyboard.on('keyup',e=>{this.held[e.code]=false;});
+   this.scale.on('resize',s=>this.cameras.main.setZoom(Math.min(s.width/900,s.height/620,1.2)));
+   document.querySelectorAll('.key').forEach(b=>{const d=b.dataset.dir;const codes={up:'ArrowUp',down:'ArrowDown',left:'ArrowLeft',right:'ArrowRight'};const code=codes[d];const on=e=>{e.preventDefault();this.held[code]=true;};const off=e=>{e.preventDefault();this.held[code]=false;};b.addEventListener('pointerdown',on);b.addEventListener('pointerup',off);b.addEventListener('pointercancel',off);b.addEventListener('pointerleave',off);});
+   document.getElementById('reset').addEventListener('click',()=>{this.player.setPosition(900,1080);});
+   this.label=this.add.text(0,0,'YOU',{fontFamily:'Georgia',fontSize:'12px',color:'#efd8ff',stroke:'#170b27',strokeThickness:3}).setOrigin(.5,1).setDepth(9999);
+   this.add.text(900,220,'THE MOONLIT SANCTUARY',{fontFamily:'Georgia',fontSize:'22px',color:'#e7d0ff',stroke:'#1a0d29',strokeThickness:5}).setOrigin(.5).setDepth(220);
+   this.add.text(900,253,'A small camera experiment',{fontFamily:'Georgia',fontSize:'13px',color:'#bca4d4'}).setOrigin(.5).setDepth(221);
+   this.tweens.add({targets:this.player,alpha:1,duration:500});
+  }
+  drawTower(g,x,y,s,front){
+   g.fillStyle(0x10091b,.9);g.fillEllipse(x,y+65*s,180*s,35*s);
+   g.fillStyle(0x46305e,1);g.fillPoints([new Phaser.Geom.Point(x-70*s,y),new Phaser.Geom.Point(x+70*s,y),new Phaser.Geom.Point(x+55*s,y+85*s),new Phaser.Geom.Point(x-55*s,y+85*s)],true);
+   g.lineStyle(3,0xa17ac2,1);g.strokePoints([new Phaser.Geom.Point(x-70*s,y),new Phaser.Geom.Point(x+70*s,y),new Phaser.Geom.Point(x+55*s,y+85*s),new Phaser.Geom.Point(x-55*s,y+85*s)],true);
+   g.fillStyle(0x2b1a40,1);g.fillPoints([new Phaser.Geom.Point(x-82*s,y+4*s),new Phaser.Geom.Point(x,y-100*s),new Phaser.Geom.Point(x+82*s,y+4*s)],true);
+   g.lineStyle(3,0xc7a3ee,1);g.strokePoints([new Phaser.Geom.Point(x-82*s,y+4*s),new Phaser.Geom.Point(x,y-100*s),new Phaser.Geom.Point(x+82*s,y+4*s)],true);
+   g.fillStyle(0xd5a2ff,.85);g.fillRoundedRect(x-8*s,y+20*s,16*s,35*s,8*s);
+   g.fillStyle(0xb66cff,.18);g.fillCircle(x,y+35*s,34*s);
+  }
+  addObstacle(name,x,y,type,s){
+   const c=this.add.container(x,y);const g=this.add.graphics();
+   if(type==='tree'){
+    g.fillStyle(0x0c0714,.7);g.fillEllipse(0,24*s,74*s,22*s);
+    g.fillStyle(0x49335a,1);g.fillRect(-7*s,-10*s,14*s,37*s);g.lineStyle(2,0x9b7ab2,1);g.strokeRect(-7*s,-10*s,14*s,37*s);
+    g.fillStyle(0x302042,1);g.fillPoints([new Phaser.Geom.Point(0,-95*s),new Phaser.Geom.Point(-47*s,-20*s),new Phaser.Geom.Point(0,-31*s),new Phaser.Geom.Point(45*s,-20*s)],true);
+    g.lineStyle(2,0x80659c,1);g.strokePoints([new Phaser.Geom.Point(0,-95*s),new Phaser.Geom.Point(-47*s,-20*s),new Phaser.Geom.Point(0,-31*s),new Phaser.Geom.Point(45*s,-20*s)],true);
+    g.fillStyle(0xb978e7,.6);g.fillCircle(0,-45*s,4*s);
+   }else if(type==='pillar'){
+    g.fillStyle(0x0b0712,.65);g.fillEllipse(0,20*s,48*s,13*s);g.fillStyle(0x5c4770,1);g.fillRect(-15*s,-48*s,30*s,67*s);g.fillStyle(0x9b7bb8,1);g.fillRect(-21*s,-52*s,42*s,9*s);g.fillRect(-19*s,16*s,38*s,8*s);g.lineStyle(2,0xc0a2d7,1);g.strokeRect(-15*s,-48*s,30*s,67*s);
+   }else{
+    g.fillStyle(0x0b0712,.6);g.fillEllipse(0,18*s,120*s,17*s);g.fillStyle(0x574269,1);g.fillRoundedRect(-60*s,-48*s,120*s,66*s,4);g.lineStyle(2,0xb18bce,1);g.strokeRoundedRect(-60*s,-48*s,120*s,66*s,4);g.fillStyle(0x251633,1);g.fillRect(-43*s,-34*s,86*s,12*s);
+   }
+   c.add(g);c.setDepth(y);this.obstacles.push({name,x,y,type,container:c,baseAlpha:1});
+  }
+  update(_,delta){
+   const speed=delta*.24;let dx=0,dy=0;
+   if(this.held.ArrowUp||this.held.KeyW)dy-=1;if(this.held.ArrowDown||this.held.KeyS)dy+=1;if(this.held.ArrowLeft||this.held.KeyA)dx-=1;if(this.held.ArrowRight||this.held.KeyD)dx+=1;
+   if(dx||dy){const len=Math.hypot(dx,dy);dx/=len;dy/=len;this.player.x=Phaser.Math.Clamp(this.player.x+dx*speed,170,1640);this.player.y=Phaser.Math.Clamp(this.player.y+dy*speed,250,1210);}
+   this.player.setDepth(this.player.y+10);
+   let hidden=false;
+   this.obstacles.forEach(o=>{
+    // Test uses simple 2D proximity and depth ordering as a stand-in for raycast occlusion.
+    const close=Math.abs(this.player.x-o.x)<(o.type==='wall'?100:48)&&Math.abs(this.player.y-o.y)<(o.type==='wall'?100:58);
+    const inFront=o.y < this.player.y && this.player.y-o.y<115;
+    const fade=close&&inFront;
+    const target=fade?.26:1;
+    o.container.setAlpha(Phaser.Math.Linear(o.container.alpha,target,.13));
+    if(fade)hidden=true;
+   });
+   this.label.setPosition(this.player.x,this.player.y-64);
+   document.getElementById('state').textContent=hidden?'ARCANE VEIL ACTIVE':'OCCLUSION TEST';
+   document.getElementById('coords').textContent='x '+Math.round(this.player.x)+' · y '+Math.round(this.player.y);
+  }
+ }
+ const game=new Phaser.Game({type:Phaser.AUTO,parent:'game',backgroundColor:'#100b1c',scale:{mode:Phaser.Scale.RESIZE,width:'100%',height:'100%'},render:{antialias:true},scene:[RealmScene]});
+})();
+</script>
+</body></html>
