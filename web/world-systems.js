@@ -23,7 +23,33 @@ function update(){$("woa-fight-stats").textContent="Health "+hp+"/100 · Mana "+
 function end(win){done=true;b.replaceChildren();let x=document.createElement("button");x.className="primary";x.textContent=win?"Claim reward":"Retreat to Mathias";x.onclick=()=>{if(win){s.quests.rift=true;s.defeated.push("Rift-Touched Shade");let p=profile();p.xp=(+p.xp||0)+25;p.sigils=(+p.sigils||0)+10;while(p.xp>=100){p.xp-=100;p.level=(+p.level||1)+1}try{localStorage.setItem(PROFILE,JSON.stringify(p))}catch(_){} }save();close()};b.appendChild(x);$("woa-fight-log").textContent=win?"The Shade dissolves into sparks. The ward-stones glow again.":"Mathias pulls you out of danger. Rest, then try again."}
 function act(k){if(done)return;let d=0,msg="";if(k==="spell"){if(mana<12){$("woa-fight-log").textContent="Not enough mana. Try an attack or ward.";return}mana-=12;d=22;msg="Your class sigil tears through the Shade."}else if(k==="familiar"){d=12;msg="Your familiar strikes with memory-light."}else if(k==="guard"){hp=Math.min(100,hp+15);guard=true;msg="A ward restores 15 health and braces the next hit."}else{d=13;msg="You land a focused strike."}enemy=Math.max(0,enemy-d);turn++;update();if(!enemy){$("woa-fight-log").textContent=msg+" Victory!";end(true);return}let incoming=7+(turn>3?2:0);if(guard){incoming=Math.max(1,Math.floor(incoming*.25));guard=false}hp=Math.max(0,hp-incoming);$("woa-fight-log").textContent=msg+" The Shade hits for "+incoming+".";update();if(!hp)end(false)}
 [["Attack","attack"],["Class Spell · 12 mana","spell"],["Familiar","familiar"],["Ward / Recover","guard"]].forEach(([label,key])=>{let x=document.createElement("button");x.textContent=label;x.onclick=()=>act(key);b.appendChild(x)});update()}
-npcs.querySelectorAll("[data-npc]").forEach(b=>b.onclick=()=>({mathias,archivist,rift:battle}[b.dataset.npc]||mathias)());
-window.arcaneSceneInteract=mathias;window.arcaneSceneAction=a=>a==="spell"?battle():open("Quick Step","You slip sideways in a flash of violet light. Dodging will become a combat action in later encounters.",[{label:"Return",primary:true,run:close}],"ABILITY");
+const npcHandlers={mathias,archivist,rift:battle};
+function npcDistance(id){
+ const positions={mathias:[.28,.56],archivist:[.72,.61],rift:[.51,.39]},p=positions[id];
+ if(!p)return Infinity;
+ const shift=window.arcaneWorldShift||{x:0,y:0};
+ const dx=window.innerWidth*p[0]+shift.x-window.innerWidth*.5;
+ const dy=window.innerHeight*p[1]+shift.y-window.innerHeight*.76;
+ return Math.hypot(dx,dy);
+}
+function nearestNpc(){
+ return Object.keys(npcHandlers).map(id=>({id,d:npcDistance(id)})).sort((a,b)=>a.d-b.d)[0];
+}
+function interactWith(id){
+ const d=npcDistance(id);
+ if(d>125){
+  const npc=document.querySelector('[data-npc="'+id+'"] small')?.textContent||"That character";
+  open("A little farther…",npc+" is still too far away to reach. Move closer, then interact again.",[{label:"Keep exploring",primary:true,run:close}],"EXPLORATION");
+  return false;
+ }
+ npcHandlers[id]();return true;
+}
+npcs.querySelectorAll("[data-npc]").forEach(b=>b.onclick=()=>interactWith(b.dataset.npc));
+window.arcaneSceneInteract=()=>{
+ const target=nearestNpc();
+ if(target&&target.d<=125){interactWith(target.id);return;}
+ open("Explore the Outer Ward","Move close to Mathias, the Archivist, or the unstable rift before interacting. The nearest point of interest is about "+Math.round(target?.d||0)+" pixels away.",[{label:"Continue exploring",primary:true,run:close}],"EXPLORATION");
+};
+window.arcaneSceneAction=a=>a==="spell"?battle():open("Quick Step","You slip sideways in a flash of violet light. Dodging will become a combat action in later encounters.",[{label:"Return",primary:true,run:close}],"ABILITY");
 if($("town-hud"))new MutationObserver(sync).observe($("town-hud"),{attributes:true,attributeFilter:["class"]});sync();
 })();
