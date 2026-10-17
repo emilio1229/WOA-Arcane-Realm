@@ -241,6 +241,8 @@
     }
     drawTown(w,h){
       const g=this.add.graphics();
+      // Render the terrain/ground layer first; props and character art are added above it.
+      this.world.add(g);
       const horizon=h*.43;
       // Layered dusk sky and distant silhouettes.
       g.fillStyle(0x0d0917,1);g.fillRect(0,0,w,h);
@@ -334,8 +336,7 @@
         if(Math.abs(x-w*.5)<tileW*1.25)continue;
         diamond(x,y,tileW*.22,tileH*.14,i%2?0xb08bc6:0x8b65aa,.5);
       }
-      // Draw terrain first; characters are layered above it.
-      this.world.add(g);
+      // Terrain is already the first child of the world container; props render above it.
       // NPC portraits live in the interactive DOM layer, avoiding duplicate characters.
       // Keep the player anchored on screen while the isometric environment scrolls around them.
       const x=w*.5,y=h*.76;
