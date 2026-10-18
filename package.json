@@ -1,0 +1,14 @@
+{
+  "name": "woa-arcane-realm-web",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Typed build tooling for the WOA Arcane Realm browser game",
+  "scripts": {
+    "build": "npm run typecheck && esbuild web/src/arcane-art.ts --bundle --format=iife --target=es2020 --outfile=web/runtime/arcane-art.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "typescript": "^5.8.3"
+  }
+}
