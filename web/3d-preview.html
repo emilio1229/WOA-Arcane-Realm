@@ -55,6 +55,31 @@ function generate(s){seed=s>>>0;document.querySelector('#seedLabel').textContent
  const stone=mat(0x51445e),glow=mat(0x5e3e91,.45,0x27104b);
  for(let i=0;i<15;i++){const a=rand()*Math.PI*2,r=8+rand()*20,x=Math.cos(a)*r,z=Math.sin(a)*r;const rock=addMesh(new THREE.Group(),new THREE.DodecahedronGeometry(.5+rand()*.9,0),stone,[x,.25,z],[1,.7,1]);rock.rotation.set(rand(),rand()*3,rand());world.add(rock);worldObjects.push(rock)}
  for(let i=0;i<7;i++){const a=i/7*Math.PI*2,r=4.5,x=Math.cos(a)*r,z=Math.sin(a)*r;const pillar=new THREE.Group();addMesh(pillar,new THREE.CylinderGeometry(.3,.4,2.4,6),stone,[0,1.2,0]);addMesh(pillar,new THREE.OctahedronGeometry(.22),glow,[0,2.55,0]);place(pillar,x,z)}
+ // Central fractured gate: the first memorable landmark in the Realm.
+ const gateStone=mat(0x66556f),gateGlow=mat(0x8f54e8,.28,0x5524a5);
+ const gate=new THREE.Group();
+ addMesh(gate,new THREE.BoxGeometry(.42,3.2,.5),gateStone,[-1.35,1.6,0]);
+ addMesh(gate,new THREE.BoxGeometry(.42,3.2,.5),gateStone,[1.35,1.6,0]);
+ addMesh(gate,new THREE.BoxGeometry(3.1,.42,.55),gateStone,[0,3.15,0]);
+ const arch=addMesh(gate,new THREE.TorusGeometry(1.12,.11,8,24,Math.PI),gateGlow,[0,2.15,-.03]);arch.rotation.z=Math.PI;
+ addMesh(gate,new THREE.PlaneGeometry(1.95,2.05),new THREE.MeshBasicMaterial({color:0x572d9b,transparent:true,opacity:.38,side:THREE.DoubleSide}),[0,1.95,.04]);
+ place(gate,0,-1.2);
+ // A modest ruined settlement along the trail.
+ const hutMat=mat(0x423047),roofMat=mat(0x2c203c),doorMat=mat(0x171020);
+ for(let i=0;i<4;i++){
+   const x=(i%2?1:-1)*(5.8+rand()*1.5),z=-12-Math.floor(i/2)*3.3;
+   const hut=new THREE.Group();
+   addMesh(hut,new THREE.BoxGeometry(1.8,1.25,1.5),hutMat,[0,.7,0]);
+   addMesh(hut,new THREE.ConeGeometry(1.45,.85,4),roofMat,[0,1.7,0]).rotation.y=Math.PI/4;
+   addMesh(hut,new THREE.BoxGeometry(.38,.78,.08),doorMat,[0,.42,.77]);
+   place(hut,x,z);
+ }
+ // Rune-ring pool, a visual destination beside the path.
+ const waterMat=new THREE.MeshStandardMaterial({color:0x29204e,metalness:.35,roughness:.22,emissive:0x160b35,emissiveIntensity:.6});
+ const pool=addMesh(new THREE.Group(),new THREE.CylinderGeometry(2.7,2.7,.12,24),waterMat,[0,0,0]);
+ pool.position.set(-11,-.01,-19);world.add(pool);worldObjects.push(pool);
+ const runeMat=mat(0xb28bff,.35,0x6335a4);
+ for(let i=0;i<5;i++){const a=i/5*Math.PI*2;const rune=addMesh(new THREE.Group(),new THREE.BoxGeometry(.12,.08,.55),runeMat,[0,0,0]);rune.position.set(Math.cos(a)*2.9,.05,-19+Math.sin(a)*2.9);rune.rotation.y=-a;world.add(rune);worldObjects.push(rune)}
  // A readable path leading out from the ruined ring.
  const pathMat=mat(0x393047);for(let i=0;i<13;i++){const tile=addMesh(new THREE.Group(),new THREE.BoxGeometry(1.2,.07,.75),pathMat,[0,0,0]);tile.position.set((i-6)*.9,-.01,-5-i*1.25);tile.rotation.y=(rand()-.5)*.16;world.add(tile);worldObjects.push(tile)}
  }
