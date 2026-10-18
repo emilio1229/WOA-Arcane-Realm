@@ -260,8 +260,31 @@ function generate(s){seed=s>>>0;document.querySelector('#seedLabel').textContent
    for(const px of [-wide/2+.09,wide/2-.09])for(const pz of [-depth/2+.08,depth/2-.08])
      addMesh(hut,new THREE.BoxGeometry(.12,1.35,.12),timberMat,[px,.72,pz]);
    addMesh(hut,new THREE.BoxGeometry(wide+.18,.14,depth+.18),timberMat,[0,.12,0]);
-   hut.rotation.y=x<0?Math.PI:0;
+   // Doorways face inward toward the shared street, so homes feel connected to the village.
+   hut.rotation.y=x<0?Math.PI/2:-Math.PI/2;
    placeSolid(hut,x,z);
+ });
+ // Small front paths and planted corners make each home feel like a lived-in plot.
+ const cottagePathMat=mat(0x65596a),gardenSoil=mat(0x3b2b35);
+ cottageSites.forEach((site,i)=>{
+   const side=site.x<0?1:-1;
+   for(let step=1;step<=3;step++){
+     const stone=new THREE.Mesh(new THREE.BoxGeometry(.62,.055,.48),cottagePathMat);
+     stone.position.set(site.x+side*(1.35+step*.62),.025,site.z+(step%2?-.06:.08));
+     stone.rotation.y=(i%2?-.06:.05);
+     world.add(stone);worldObjects.push(stone);
+   }
+   // A narrow garden strip sits behind each cottage, away from the doorway and main walking lane.
+   const bed=new THREE.Mesh(new THREE.BoxGeometry(1.45,.06,.62),gardenSoil);
+   bed.position.set(site.x, .015, site.z+(site.z<-20?-1.45:1.45));
+   world.add(bed);worldObjects.push(bed);
+   for(let j=0;j<3;j++){
+     const bush=new THREE.Group();
+     const radius=.19+(j%2)*.035;
+     addMesh(bush,new THREE.IcosahedronGeometry(radius,0),shrubMats[(i+j)%shrubMats.length],[0,.19,0]);
+     addMesh(bush,new THREE.IcosahedronGeometry(radius*.72,0),shrubMats[(i+j+1)%shrubMats.length],[.13,.24,.06]);
+     place(bush,site.x-.48+j*.48,site.z+(site.z<-20?-1.45:1.45));
+   }
  });
  // Use the imported CC0 town kit as a deliberate perimeter, not a pile of overlapping modules.
  // Large buildings are excluded here because the handcrafted cottages already occupy the residential lanes.
