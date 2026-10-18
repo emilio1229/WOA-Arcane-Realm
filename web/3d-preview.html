@@ -251,6 +251,58 @@ function generate(s){seed=s>>>0;document.querySelector('#seedLabel').textContent
    piece.rotation.y+=(rand()-.5)*.06;
    world.add(piece);worldObjects.push(piece);solidObjects.push(piece);
  }
+ // Street dressing: lantern posts, signboard, stacked crates, barrels, and short fence runs.
+ // These small silhouettes break up the empty spaces between imported building modules.
+ const postWood=mat(0x39283a),lanternMetal=mat(0x55415f),warmGlass=new THREE.MeshStandardMaterial({color:0xffd28a,emissive:0xffa53c,emissiveIntensity:1.7});
+ function makeLantern(x,z){
+   const lamp=new THREE.Group();
+   addMesh(lamp,new THREE.CylinderGeometry(.055,.075,1.7,6),postWood,[0,.85,0]);
+   addMesh(lamp,new THREE.BoxGeometry(.42,.09,.42),lanternMetal,[0,1.68,0]);
+   addMesh(lamp,new THREE.BoxGeometry(.28,.34,.28),warmGlass,[0,1.88,0]);
+   addMesh(lamp,new THREE.ConeGeometry(.28,.2,4),lanternMetal,[0,2.14,0]).rotation.y=Math.PI/4;
+   const light=new THREE.PointLight(0xffb968,.8,5);light.position.set(0,1.9,0);lamp.add(light);
+   placeSolid(lamp,x,z);
+ }
+ [[-3.5,-8.5],[3.5,-8.5],[-9,-14],[9,-14],[-3,-20],[4,-20]].forEach(p=>makeLantern(p[0],p[1]));
+ // Low fences define the settlement edge without walling off the exploration routes.
+ function fenceRun(x,z,count,rotation=0){
+   const fence=new THREE.Group();
+   for(let i=0;i<count;i++){
+     const px=i*1.05;
+     addMesh(fence,new THREE.BoxGeometry(.12,.78,.12),postWood,[px,.39,0]);
+     if(i<count-1){
+       addMesh(fence,new THREE.BoxGeometry(1.02,.09,.09),timberMat,[px+.52,.58,0]);
+       addMesh(fence,new THREE.BoxGeometry(1.02,.09,.09),timberMat,[px+.52,.28,0]);
+     }
+   }
+   fence.rotation.y=rotation;placeSolid(fence,x,z);
+ }
+ fenceRun(-9.8,-7.9,4,Math.PI/2);fenceRun(6.9,-7.9,4,Math.PI/2);
+ fenceRun(-5.2,-21.8,8,0);
+ // Market crates and barrels give the village a lived-in scale.
+ function makeCrate(x,z,scale=1){
+   const crate=new THREE.Group(),wood=mat(0x68452f),edge=mat(0x3c2a27);
+   addMesh(crate,new THREE.BoxGeometry(.62*scale,.58*scale,.62*scale),wood,[0,.29*scale,0]);
+   for(const yy of [.08,.5])addMesh(crate,new THREE.BoxGeometry(.66*scale,.055*scale,.66*scale),edge,[0,yy*scale,0]);
+   addMesh(crate,new THREE.BoxGeometry(.055*scale,.6*scale,.66*scale),edge,[-.22*scale,.29*scale,0]);
+   addMesh(crate,new THREE.BoxGeometry(.055*scale,.6*scale,.66*scale),edge,[.22*scale,.29*scale,0]);
+   placeSolid(crate,x,z);
+ }
+ function makeBarrel(x,z){
+   const barrel=new THREE.Group(),staves=mat(0x674a39),hoop=mat(0x443342);
+   addMesh(barrel,new THREE.CylinderGeometry(.28,.31,.62,9),staves,[0,.31,0]);
+   for(const yy of [.13,.48])addMesh(barrel,new THREE.TorusGeometry(.29,.035,5,12),hoop,[0,yy,0]).rotation.x=Math.PI/2;
+   placeSolid(barrel,x,z);
+ }
+ makeCrate(-4.25,-11.8);makeCrate(-3.6,-11.75,.78);makeCrate(4.1,-15.8);
+ makeBarrel(4.5,-15.7);makeBarrel(-4.3,-15.9);
+ // A simple wayfinder sign marks the road leaving the village.
+ const sign=new THREE.Group();
+ addMesh(sign,new THREE.CylinderGeometry(.06,.08,1.7,6),postWood,[0,.85,0]);
+ addMesh(sign,new THREE.BoxGeometry(1.05,.28,.12),timberMat,[.24,1.35,0]);
+ addMesh(sign,new THREE.BoxGeometry(.04,.17,.14),trim,[.24,1.35,.075]);
+ placeSolid(sign,1.6,-7.1);
+
  // Rune-ring pool, a visual destination beside the path.
  const waterMat=new THREE.MeshStandardMaterial({color:0x29204e,metalness:.35,roughness:.22,emissive:0x160b35,emissiveIntensity:.6});
  const pool=addMesh(new THREE.Group(),new THREE.CylinderGeometry(2.7,2.7,.12,24),waterMat,[0,0,0]);
