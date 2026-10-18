@@ -175,10 +175,10 @@ setTimeout(()=>setLoadProgress(58,'Calling the familiars'),1150);
 setTimeout(()=>{if(!menuOpened)setLoadProgress(72,'Binding the chronicle');},1650);
 setTimeout(maybeOpenMenu,2100);
 setTimeout(()=>{if(!menuOpened){assetsReady=true;storyReady=true;setLoadProgress(100,'World ready · optional content can finish in background');maybeOpenMenu();}},6800);
-const importedModels={trees:[],rocks:[],town:[]};
+const importedModels={trees:[],rocks:[],town:[],allTown:[]};
 function makeAssetInstance(category,rand,targetHeight){const list=importedModels[category]||[];if(!list.length)return null;const source=list[Math.floor(rand()*list.length)];const model=source.clone(true);model.updateMatrixWorld(true);const box=new THREE.Box3().setFromObject(model);const size=box.getSize(new THREE.Vector3());const h=Math.max(.001,size.y);const scale=targetHeight/h;model.scale.multiplyScalar(scale);model.updateMatrixWorld(true);const scaledBox=new THREE.Box3().setFromObject(model);model.position.y-=scaledBox.min.y;return model;}
-async function loadImportedModels(){try{const response=await fetch('./assets/3d/imported-assets.json');if(!response.ok)return;const manifest=await response.json();const loader=new GLTFLoader();await Promise.all((manifest.assets||[]).map(async item=>{const path='./'+item.repoPath.replace(/^web\//,'');const gltf=await loader.loadAsync(path);const model=gltf.scene;const name=(item.archivePath||item.repoPath).toLowerCase();const isNature=item.pack.includes('nature'),isTown=item.pack.includes('fantasy-town');if(!isNature&&!isTown)return;if(isNature){if(/tree|oak|pine|birch|bush|plant|fern|flower|grass/.test(name))importedModels.trees.push(model);else if(/rock|stone|boulder|cliff/.test(name))importedModels.rocks.push(model);}else if(isTown&&/gate|wall|fence|house|cottage|building|tower|bridge|balcony/.test(name))importedModels.town.push(model);}));
- if(importedModels.trees.length||importedModels.rocks.length||importedModels.town.length){document.querySelector('#assetStatus').textContent='CC0 models loaded · '+importedModels.trees.length+' trees / '+importedModels.rocks.length+' rocks / '+importedModels.town.length+' town pieces';generate(seed);}assetsReady=true;setLoadProgress(88,'Placing the world');maybeOpenMenu();
+async function loadImportedModels(){try{const response=await fetch('./assets/3d/imported-assets.json');if(!response.ok)return;const manifest=await response.json();const loader=new GLTFLoader();await Promise.all((manifest.assets||[]).map(async item=>{const path='./'+item.repoPath.replace(/^web\//,'');const gltf=await loader.loadAsync(path);const model=gltf.scene;const name=(item.archivePath||item.repoPath).toLowerCase();const isNature=item.pack.includes('nature'),isTown=item.pack.includes('fantasy-town');if(!isNature&&!isTown)return;if(isNature){if(/tree|oak|pine|birch|bush|plant|fern|flower|grass|mushroom|stump|rock|stone|boulder|cliff/.test(name)){if(/rock|stone|boulder|cliff/.test(name))importedModels.rocks.push(model);else importedModels.trees.push(model);}}else if(isTown){importedModels.allTown.push({model,name});if(/gate|wall|fence|house|cottage|building|tower|bridge|balcony|roof|hedge|arch|door|window|well|fountain|shop|market/.test(name))importedModels.town.push(model);}}));
+ if(importedModels.trees.length||importedModels.rocks.length||importedModels.town.length){document.querySelector('#assetStatus').textContent='CC0 models loaded · '+importedModels.trees.length+' nature models / '+importedModels.allTown.length+' town models';generate(seed);}assetsReady=true;setLoadProgress(88,'Placing the world');maybeOpenMenu();
  }catch(error){console.warn('Imported model pack unavailable; procedural world remains active.',error);assetsReady=true;setLoadProgress(82,'Using local world fallback');maybeOpenMenu();}}
 function rngFactory(s){return()=>{s=(Math.imul(1664525,s)+1013904223)>>>0;return s/4294967296}}
 function clearWorld(){for(const o of worldObjects)world.remove(o);worldObjects=[]}
@@ -211,7 +211,21 @@ function generate(s){seed=s>>>0;document.querySelector('#seedLabel').textContent
    place(hut,x,z);
  }
  // Dress the settlement with imported CC0 fence, gate, and wall modules.
- for(let i=0;i<5;i++){const piece=makeAssetInstance('town',rand,1.2+rand()*.6);if(!piece)continue;const side=i%2?1:-1;piece.rotation.y=(rand()-.5)*.35;place(piece,side*(4.5+rand()*2),-10-i*1.7);}
+ // Use every imported Kenney fantasy-town model in the actual village layout.
+ // Modular walls, gates, roof pieces and fences form a broken settlement edge.
+ const townPieces=importedModels.allTown||[];
+ for(let i=0;i<townPieces.length;i++){
+   const entry=townPieces[i],name=entry.name||'',piece=entry.model.clone(true);
+   piece.updateMatrixWorld(true);
+   const box=new THREE.Box3().setFromObject(piece),size=box.getSize(new THREE.Vector3());
+   const h=Math.max(.001,size.y),targetHeight=/wall|arch|gate|roof|balcony/i.test(name)?1.7:/fence|hedge/i.test(name)?1.05:1.35;
+   piece.scale.multiplyScalar(targetHeight/h);piece.updateMatrixWorld(true);
+   const scaled=new THREE.Box3().setFromObject(piece);piece.position.y-=scaled.min.y;
+   const side=i%2===0?-1:1,slot=Math.floor(i/2);
+   if(slot<4){piece.position.x=side*(7.2+(slot%2)*.25);piece.position.z=-8.5-slot*2.15;piece.rotation.y=side<0?Math.PI/2:-Math.PI/2;}
+   else {piece.position.x=-6.5+(slot-4)*2.2;piece.position.z=slot%2===0?-17.4:-8.2;piece.rotation.y=(rand()-.5)*.15;}
+   world.add(piece);worldObjects.push(piece);
+ }
  // Rune-ring pool, a visual destination beside the path.
  const waterMat=new THREE.MeshStandardMaterial({color:0x29204e,metalness:.35,roughness:.22,emissive:0x160b35,emissiveIntensity:.6});
  const pool=addMesh(new THREE.Group(),new THREE.CylinderGeometry(2.7,2.7,.12,24),waterMat,[0,0,0]);
