@@ -68,9 +68,9 @@ func _build_player() -> void:
 	camera.size = 25.0
 	camera.position = Vector3(15, 18, 20)
 	camera.rotation_degrees = Vector3(-38, 36, 0)
-	player.add_child(camera)
-	camera.position = Vector3(14, 17, 18)
-	camera.look_at(Vector3.ZERO, Vector3.UP)
+	add_child(camera)
+	camera.position = player.position + Vector3(14, 17, 18)
+	camera.look_at(player.position, Vector3.UP)
 	camera.current = true
 
 func _build_hud() -> void:
@@ -284,5 +284,8 @@ func _physics_process(delta: float) -> void:
 	player.velocity.z = direction.z * move_speed
 	player.velocity.y = 0
 	player.move_and_slide()
+	if is_instance_valid(camera):
+		camera.position = player.position + Vector3(14, 17, 18)
+		camera.look_at(player.position, Vector3.UP)
 	if player.position.y < -5:
 		player.position = Vector3(0,0,8)
