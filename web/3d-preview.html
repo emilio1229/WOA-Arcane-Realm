@@ -47,11 +47,11 @@ addMesh(familiar,new THREE.ConeGeometry(.08,.28,5),trim,[.65,1.53,.2]);
 let seed=74291, worldObjects=[], keys={}, move={x:0,y:0}, yaw=0, pitch=.22, dragging=false,lastX=0,lastY=0,story=[],storyIndex=0;
 const importedModels={trees:[],rocks:[],town:[]};
 function makeAssetInstance(category,rand,targetHeight){const list=importedModels[category]||[];if(!list.length)return null;const source=list[Math.floor(rand()*list.length)];const model=source.clone(true);model.updateMatrixWorld(true);const box=new THREE.Box3().setFromObject(model);const size=box.getSize(new THREE.Vector3());const h=Math.max(.001,size.y);const scale=targetHeight/h;model.scale.multiplyScalar(scale);model.updateMatrixWorld(true);const scaledBox=new THREE.Box3().setFromObject(model);model.position.y-=scaledBox.min.y;return model;}
-async function loadImportedModels(){try{const response=await fetch('./assets/3d/imported-assets.json');if(!response.ok)return;const manifest=await response.json();const loader=new GLTFLoader();await Promise.all((manifest.assets||[]).map(async item=>{const path='./'+item.repoPath.replace(/^web\\//,'');const gltf=await loader.loadAsync(path);const model=gltf.scene;const name=(item.archivePath||item.repoPath).toLowerCase();const isNature=item.pack.includes('nature'),isTown=item.pack.includes('fantasy-town');if(!isNature&&!isTown)return;if(isNature){if(/tree|oak|pine|birch|bush|plant|fern|flower|grass/.test(name))importedModels.trees.push(model);else if(/rock|stone|boulder|cliff/.test(name))importedModels.rocks.push(model);}else if(isTown)importedModels.town.push(model);}));
+async function loadImportedModels(){try{const response=await fetch('./assets/3d/imported-assets.json');if(!response.ok)return;const manifest=await response.json();const loader=new GLTFLoader();await Promise.all((manifest.assets||[]).map(async item=>{const path='./'+item.repoPath.replace(/^web\\//,'');const gltf=await loader.loadAsync(path);const model=gltf.scene;const name=(item.archivePath||item.repoPath).toLowerCase();const isNature=item.pack.includes('nature'),isTown=item.pack.includes('fantasy-town');if(!isNature&&!isTown)return;if(isNature){if(/tree|oak|pine|birch|bush|plant|fern|flower|grass/.test(name))importedModels.trees.push(model);else if(/rock|stone|boulder|cliff/.test(name))importedModels.rocks.push(model);}else if(isTown&&/gate|wall|fence|house|cottage|building|tower|bridge|balcony/.test(name))importedModels.town.push(model);}));
  if(importedModels.trees.length||importedModels.rocks.length||importedModels.town.length){document.querySelector('#assetStatus').textContent='CC0 models loaded · '+importedModels.trees.length+' trees / '+importedModels.rocks.length+' rocks / '+importedModels.town.length+' town pieces';generate(seed);}
  }catch(error){console.warn('Imported model pack unavailable; procedural world remains active.',error);}}
 function rngFactory(s){return()=>{s=(Math.imul(1664525,s)+1013904223)>>>0;return s/4294967296}}
-function clearWorld(){for(const o of worldObjects){world.remove(o);o.traverse?.(n=>{n.geometry?.dispose();if(n.material&&!Array.isArray(n.material))n.material.dispose()})}worldObjects=[]}
+function clearWorld(){for(const o of worldObjects)world.remove(o);worldObjects=[]}
 function place(o,x,z){o.position.x=x;o.position.z=z;world.add(o);worldObjects.push(o)}
 function generate(s){seed=s>>>0;document.querySelector('#seedLabel').textContent=seed;clearWorld();const rand=rngFactory(seed);
  const grassMats=[mat(0x26352e),mat(0x30352f),mat(0x343044)];
@@ -74,8 +74,11 @@ function generate(s){seed=s>>>0;document.querySelector('#seedLabel').textContent
  const hutMat=mat(0x423047),roofMat=mat(0x2c203c),doorMat=mat(0x171020);
  for(let i=0;i<4;i++){
    const x=(i%2?1:-1)*(5.8+rand()*1.5),z=-12-Math.floor(i/2)*3.3;
-   let hut=makeAssetInstance('town',rand,3.2+rand()*.7);
-   if(!hut){hut=new THREE.Group();addMesh(hut,new THREE.BoxGeometry(1.8,1.25,1.5),hutMat,[0,.7,0]);addMesh(hut,new THREE.ConeGeometry(1.45,.85,4),roofMat,[0,1.7,0]).rotation.y=Math.PI/4;addMesh(hut,new THREE.BoxGeometry(.38,.78,.08),doorMat,[0,.42,.77]);}
+   const hut=new THREE.Group();
+   addMesh(hut,new THREE.BoxGeometry(1.8,1.25,1.5),hutMat,[0,.7,0]);
+   const roofAsset=makeAssetInstance('town',rand,.85);
+   if(roofAsset){roofAsset.position.set(0,1.35,0);hut.add(roofAsset);}else addMesh(hut,new THREE.ConeGeometry(1.45,.85,4),roofMat,[0,1.7,0]).rotation.y=Math.PI/4;
+   addMesh(hut,new THREE.BoxGeometry(.38,.78,.08),doorMat,[0,.42,.77]);
    place(hut,x,z);
  }
  // Rune-ring pool, a visual destination beside the path.
