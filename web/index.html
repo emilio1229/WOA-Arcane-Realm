@@ -223,7 +223,7 @@
       // into Phaser without delaying the initial game boot.
       const installRuntimeArt = () => {
         const assets = window.woaRuntimeSprites || {};
-        const keys = {familiarRaven:"woa-familiar-raven",familiarWolf:"woa-familiar-wolf",familiarDragon:"woa-familiar-dragon",familiarElemental:"woa-familiar-elemental",shadowWraith:"woa-enemy-art",mathias:"woa-mathias-art",mathiasWalk:"woa-mathias-walk",mathiasRun:"woa-mathias-run",mathiasAttack:"woa-mathias-attack",mathiasCast:"woa-mathias-cast",mathiasHurt:"woa-mathias-hurt",mathiasDeath:"woa-mathias-death",arcaneBlast:"woa-spell-art"};
+        const keys = {familiarRaven:"woa-familiar-raven",familiarWolf:"woa-familiar-wolf",familiarDragon:"woa-familiar-dragon",familiarElemental:"woa-familiar-elemental",shadowWraith:"woa-enemy-art",darkAnimus:"woa-enemy-dark-animus",corruptedBeast:"woa-enemy-corrupted-beast",arcaneGolem:"woa-enemy-arcane-golem",mathias:"woa-mathias-art",mathiasWalk:"woa-mathias-walk",mathiasRun:"woa-mathias-run",mathiasAttack:"woa-mathias-attack",mathiasCast:"woa-mathias-cast",mathiasHurt:"woa-mathias-hurt",mathiasDeath:"woa-mathias-death",arcaneBlast:"woa-spell-art"};
         for (const [name,key] of Object.entries(keys)) {
           const data = assets[name];
           if (!data || this.textures.exists(key)) continue;
@@ -305,8 +305,11 @@
         if(this.familiarSprite){this.tweens.add({targets:this.familiarSprite,x:x+80,y:y-65,scale:1.45,angle:18,duration:170,yoyo:true,ease:"Cubic.Out",onComplete:()=>{if(this.familiarSprite){this.familiarSprite.angle=0;this.familiarSprite.setScale(1);}}});}
         // Give the existing attack input a visible creature target using the extracted
         // Shadow Wraith pose. This is a visual training encounter, not a new combat system.
-        if(this.textures.exists("woa-enemy-art")){
-          const target=this.add.image(x+112,y-34,"woa-enemy-art").setDisplaySize(58,62).setDepth(18).setAlpha(0);
+        const enemyKeys=["woa-enemy-art","woa-enemy-dark-animus","woa-enemy-corrupted-beast","woa-enemy-arcane-golem"];
+        this.enemyArtCycle=(this.enemyArtCycle||0)+1;
+        const enemyKey=enemyKeys[(this.enemyArtCycle-1)%enemyKeys.length];
+        if(this.textures.exists(enemyKey)){
+          const target=this.add.image(x+112,y-34,enemyKey).setDisplaySize(58,62).setDepth(18).setAlpha(0);
           this.tweens.add({targets:target,alpha:1,x:x+91,duration:110,ease:"Cubic.Out",onComplete:()=>{
             this.tweens.add({targets:target,x:x+121,alpha:.18,tint:0xffffff,duration:180,yoyo:true,repeat:1,onComplete:()=>{
               if(target.active)target.destroy();
