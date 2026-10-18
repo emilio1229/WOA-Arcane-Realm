@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - ".github/workflows/import-cc0-assets.yml"
+      - "web/3d-preview.html"
   workflow_dispatch:
 
 permissions:
