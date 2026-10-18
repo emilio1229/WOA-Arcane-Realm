@@ -1,0 +1,121 @@
+name: Import CC0 3D starter assets
+
+on:
+  push:
+    paths:
+      - ".github/workflows/import-cc0-assets.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  import-starter-assets:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download original Kenney packs and select mobile-friendly GLBs
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p web/assets/3d/models/nature web/assets/3d/models/town
+          python3 - <<'PY'
+          import hashlib, json, os, re, shutil, urllib.request, zipfile
+          from pathlib import Path
+
+          root = Path(".")
+          temp = Path("/tmp/woa-asset-import")
+          temp.mkdir(parents=True, exist_ok=True)
+          packs = [
+            {
+              "id": "kenney-nature-kit",
+              "page": "https://kenney.nl/assets/nature-kit",
+              "dest": root / "web/assets/3d/models/nature",
+              "terms": ("tree", "rock", "bush", "plant", "grass", "flower", "fern", "stump", "mushroom"),
+              "limit": 14,
+            },
+            {
+              "id": "kenney-fantasy-town-kit",
+              "page": "https://kenney.nl/assets/fantasy-town-kit",
+              "dest": root / "web/assets/3d/models/town",
+              "terms": ("house", "cottage", "wall", "tower", "gate", "well", "fountain", "bridge", "arch", "roof", "building", "shop", "market"),
+              "limit": 14,
+            },
+          ]
+          records = []
+          for pack in packs:
+            req = urllib.request.Request(pack["page"], headers={"User-Agent": "WOA-Arcane-Realm-Asset-Importer/1.0"})
+            with urllib.request.urlopen(req, timeout=45) as response:
+              html = response.read().decode("utf-8", "replace")
+            urls = re.findall(r'https://kenney\.nl/media/pages/assets/[^"\'<> ]+?\.zip', html)
+            if not urls:
+              urls = re.findall(r'//kenney\.nl/media/pages/assets/[^"\'<> ]+?\.zip', html)
+              urls = ["https:" + u if u.startswith("//") else u for u in urls]
+            if not urls:
+              raise RuntimeError("No official ZIP download URL found on " + pack["page"])
+            url = urls[0].replace("&amp;", "&")
+            archive = temp / (pack["id"] + ".zip")
+            req = urllib.request.Request(url, headers={"User-Agent": "WOA-Arcane-Realm-Asset-Importer/1.0"})
+            with urllib.request.urlopen(req, timeout=90) as response, archive.open("wb") as out:
+              shutil.copyfileobj(response, out)
+            with zipfile.ZipFile(archive) as z:
+              names = [n for n in z.namelist() if not n.endswith("/")]
+              glbs = [n for n in names if n.lower().endswith(".glb")]
+              if not glbs:
+                raise RuntimeError("No GLB files found in " + pack["id"])
+              selected = []
+              for name in sorted(glbs, key=lambda n: n.lower()):
+                base = Path(name).stem.lower().replace("-", "_")
+                if any(term in base for term in pack["terms"]):
+                  selected.append(name)
+              # Keep first selected models from the publisher's own GLB files; cap repository weight.
+              selected = selected[:pack["limit"]]
+              if len(selected) < 4:
+                raise RuntimeError(f"Too few matching GLB files for {pack['id']}: {len(selected)}")
+              pack["dest"].mkdir(parents=True, exist_ok=True)
+              for name in selected:
+                filename = Path(name).name
+                target = pack["dest"] / filename
+                target.write_bytes(z.read(name))
+                records.append({
+                  "pack": pack["id"],
+                  "sourcePage": pack["page"],
+                  "archiveUrl": url,
+                  "archivePath": name,
+                  "repoPath": str(target),
+                  "bytes": target.stat().st_size,
+                  "sha256": hashlib.sha256(target.read_bytes()).hexdigest(),
+                  "license": "CC0 1.0",
+                })
+              license_files = [n for n in names if Path(n).name.lower() in ("license.txt", "license", "license.md", "readme.txt")]
+              if license_files:
+                license_text = z.read(license_files[0])
+                (pack["dest"] / "LICENSE-SOURCE.txt").write_bytes(license_text)
+          manifest = {
+            "status": "imported-from-original-publisher-download",
+            "importedAt": "generated-by-github-actions",
+            "policy": "Selected GLB models downloaded from official Kenney asset pages. CC0 1.0; attribution is not required. Keep source license files when present.",
+            "assets": records,
+          }
+          (root / "web/assets/3d/imported-assets.json").write_text(json.dumps(manifest, indent=2) + "\n")
+          print(f"Imported {len(records)} GLB assets totaling {sum(r['bytes'] for r in records):,} bytes.")
+          PY
+
+      - name: Commit imported assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add web/assets/3d/models web/assets/3d/imported-assets.json
+          if git diff --cached --quiet; then
+            echo "No asset changes to commit."
+            exit 0
+          fi
+          git commit -m "Import selected CC0 Kenney 3D starter models"
+          git push origin HEAD:main
