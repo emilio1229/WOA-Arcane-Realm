@@ -53,12 +53,13 @@ body.entered #brand,body.entered #story,body.entered #controls,body.entered #joy
 @media(min-width:651px){#hudToggle,#storyToggle{display:none}}
 @media(max-width:500px){.boot-mark{width:70px;height:70px;font-size:34px}.menu-options{grid-template-columns:1fr}.title-view .subtitle{font-size:12px}.title-view h1{font-size:30px}}
 
-</style>
+#discoveryToast{position:fixed;z-index:6;left:50%;bottom:18px;transform:translate(-50%,18px);opacity:0;pointer-events:none;max-width:min(420px,calc(100vw - 28px));padding:12px 16px;border:1px solid #a77bd7;border-radius:12px;background:#100b1beF;box-shadow:0 8px 30px #0009;text-align:center;transition:opacity .25s,transform .25s}#discoveryToast.visible{opacity:1;transform:translate(-50%,0)}#discoveryToast strong{display:block;color:#ead3ff;font-size:13px;margin-bottom:3px}#discoveryToast span{font-size:12px;color:#d5c5e5}@media(max-width:650px){#discoveryToast{bottom:calc(116px + env(safe-area-inset-bottom));font-size:12px}}</style>
 </head>
 <body>
 <div id="world"></div>
 <button id="storyToggle" type="button" aria-expanded="false">✦ Chronicle</button>
 <button id="hudToggle" type="button" aria-expanded="false">☰ World</button>
+<div id="discoveryToast" role="status" aria-live="polite"><strong id="discoveryTitle"></strong><span id="discoveryText"></span></div>
 
 <div id="boot" aria-live="polite">
  <div class="boot-inner">
@@ -228,6 +229,34 @@ function generate(s){seed=s>>>0;document.querySelector('#seedLabel').textContent
  // Broken standing stones and lanterns create small landmarks for explorers.
  const runeStone=mat(0x544664),lanternGlow=mat(0xe1b4ff,.25,0x9b4cff);
  for(let i=0;i<9;i++){const a=rand()*Math.PI*2,r=12+rand()*24,x=Math.cos(a)*r,z=Math.sin(a)*r,marker=new THREE.Group(),h=1.1+rand()*1.2;addMesh(marker,new THREE.BoxGeometry(.38,h,.34),runeStone,[0,h/2,0]).rotation.z=(rand()-.5)*.18;addMesh(marker,new THREE.OctahedronGeometry(.13),lanternGlow,[0,h+.18,0]);place(marker,x,z);}
+ // A broken watchtower overlooks the valley, giving the settlement a distant silhouette.
+ const tower=new THREE.Group(),towerStone=mat(0x494052),towerShadow=mat(0x241a31);
+ addMesh(tower,new THREE.CylinderGeometry(.72,.92,3.8,7,1),towerStone,[0,1.9,0]);
+ addMesh(tower,new THREE.CylinderGeometry(1.15,1.05,.35,7),towerShadow,[0,3.65,0]);
+ addMesh(tower,new THREE.ConeGeometry(1.18,.9,7),towerShadow,[0,4.25,0]);
+ addMesh(tower,new THREE.BoxGeometry(.12,1.2,.15),lanternGlow,[0,2.35,.76]);
+ place(tower,15,-24);
+ // A moonlit mushroom hollow creates a distinct pocket of color beyond the path.
+ const capMats=[mat(0x7545a0,.5,0x29103f),mat(0x527c83,.5,0x163c43)];
+ for(let i=0;i<13;i++){const x=-19+(rand()-.5)*8,z=-7+(rand()-.5)*10,stemH=.22+rand()*.48,mush=new THREE.Group(),stem=mat(0x9c8caa),cap=capMats[Math.floor(rand()*capMats.length)];addMesh(mush,new THREE.CylinderGeometry(.045,.075,stemH,5),stem,[0,stemH/2,0]);addMesh(mush,new THREE.SphereGeometry(.18+rand()*.16,7,5),cap,[0,stemH,0],[1,.58,1]);place(mush,x,z);}
+ // Fallen columns and scattered blocks suggest an older ruin swallowed by the forest.
+ const ruinStone=mat(0x5b5068);
+ for(let i=0;i<7;i++){const block=new THREE.Group(),w=.45+rand()*.65,h=.35+rand()*.7,d=.4+rand()*.5;addMesh(block,new THREE.BoxGeometry(w,h,d),ruinStone,[0,h/2,0]);block.rotation.y=rand()*Math.PI;block.rotation.z=(rand()-.5)*.2;place(block,21+(rand()-.5)*5,8+(rand()-.5)*6);}
+ // A tiny wayfinder brazier makes the settlement edge feel inhabited.
+ const brazier=new THREE.Group(),ember=mat(0xffa56b,.25,0xff6a26);
+ addMesh(brazier,new THREE.CylinderGeometry(.24,.34,.55,7),towerStone,[0,.3,0]);
+ addMesh(brazier,new THREE.TorusGeometry(.23,.06,5,10),gateStone,[0,.6,0]);
+ addMesh(brazier,new THREE.IcosahedronGeometry(.19,0),ember,[0,.83,0]);
+ const fireLight=new THREE.PointLight(0xff8a4a,1.6,7);fireLight.position.set(0,1,0);brazier.add(fireLight);place(brazier,-5,-10);
+ // Named discovery sites encourage wandering without forcing a story quest.
+ window.arcaneDiscoveries=[
+  {x:0,z:-1.2,r:4,title:'The Fractured Gate',text:'The portal hums with a magic that remembers your name.'},
+  {x:-11,z:-19,r:3.8,title:'The Rune Pool',text:'Five old sigils shimmer beneath the dark water.'},
+  {x:15,z:-24,r:3.8,title:'The Watchtower Ruin',text:'Someone kept watch here long after the village fell silent.'},
+  {x:-19,z:-7,r:4.5,title:'Mooncap Hollow',text:'The mushrooms glow softly where the veil runs thin.'},
+  {x:21,z:8,r:4,title:'The Fallen Observatory',text:'Broken stones point toward stars that no longer exist.'}
+ ];
+ window.arcaneDiscovered=window.arcaneDiscovered||new Set();
  // Soft magical motes float above the valley floor.
  const moteMat=new THREE.MeshBasicMaterial({color:0xc7a1ff,transparent:true,opacity:.72}),moteGeo=new THREE.SphereGeometry(.035,5,4);
  for(let i=0;i<42;i++){const mote=new THREE.Mesh(moteGeo,moteMat);mote.position.set((rand()-.5)*62,.35+rand()*3,(rand()-.5)*62);world.add(mote);worldObjects.push(mote)}
@@ -248,7 +277,7 @@ addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if(['ArrowUp','Arr
 renderer.domElement.addEventListener('pointerdown',e=>{dragging=true;lastX=e.clientX;lastY=e.clientY;renderer.domElement.setPointerCapture?.(e.pointerId)});addEventListener('pointerup',()=>dragging=false);addEventListener('pointermove',e=>{if(!dragging)return;yaw-=(e.clientX-lastX)*.006;pitch=Math.max(-.2,Math.min(.8,pitch+(e.clientY-lastY)*.003));lastX=e.clientX;lastY=e.clientY});
 const joy=document.querySelector('#joy'),nub=document.querySelector('#nub');let joyId=null;function setJoy(e){const r=joy.getBoundingClientRect(),dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2),d=Math.max(1,Math.hypot(dx,dy)),m=Math.min(32,d);move.x=dx/d*m/32;move.y=dy/d*m/32;nub.style.transform='translate('+move.x*32+'px,'+move.y*32+'px)'}joy.addEventListener('pointerdown',e=>{joyId=e.pointerId;joy.setPointerCapture(e.pointerId);setJoy(e)});joy.addEventListener('pointermove',e=>{if(e.pointerId===joyId)setJoy(e)});function endJoy(){joyId=null;move.x=move.y=0;nub.style.transform=''}joy.addEventListener('pointerup',endJoy);joy.addEventListener('pointercancel',endJoy);
 const clock=new THREE.Clock();function frame(){requestAnimationFrame(frame);const dt=Math.min(clock.getDelta(),.04);let f=(keys.w||keys.arrowup?1:0)-(keys.s||keys.arrowdown?1:0)-move.y;let side=(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0)+move.x;const len=Math.hypot(f,side)||1;f/=len;side/=len;hero.position.x+= (Math.cos(yaw)*side+Math.sin(yaw)*f)*dt*4.2;hero.position.z+=(-Math.sin(yaw)*side-Math.cos(yaw)*f)*dt*4.2;hero.position.x=Math.max(-42,Math.min(42,hero.position.x));hero.position.z=Math.max(-42,Math.min(42,hero.position.z));hero.rotation.y=yaw;familiar.position.y=1.3+Math.sin(performance.now()*.003)*.12;
-const target=new THREE.Vector3(hero.position.x,hero.position.y+1,hero.position.z);const offset=new THREE.Vector3(Math.sin(yaw)*Math.cos(pitch)*9,4.5+pitch*2,Math.cos(yaw)*Math.cos(pitch)*9);camera.position.lerp(target.clone().add(offset),1-Math.exp(-dt*5));camera.lookAt(target);renderer.render(scene,camera)}
+if(window.arcaneDiscoveries){for(const site of window.arcaneDiscoveries){const key=site.title;if(!window.arcaneDiscovered.has(key)&&Math.hypot(hero.position.x-site.x,hero.position.z-site.z)<site.r){window.arcaneDiscovered.add(key);const toast=document.querySelector('#discoveryToast');document.querySelector('#discoveryTitle').textContent='✧ Discovered: '+site.title;document.querySelector('#discoveryText').textContent=site.text;toast.classList.add('visible');clearTimeout(window.arcaneToastTimer);window.arcaneToastTimer=setTimeout(()=>toast.classList.remove('visible'),4600);break;}}}const target=new THREE.Vector3(hero.position.x,hero.position.y+1,hero.position.z);const offset=new THREE.Vector3(Math.sin(yaw)*Math.cos(pitch)*9,4.5+pitch*2,Math.cos(yaw)*Math.cos(pitch)*9);camera.position.lerp(target.clone().add(offset),1-Math.exp(-dt*5));camera.lookAt(target);renderer.render(scene,camera)}
 frame();addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.5));renderer.setSize(innerWidth,innerHeight)});
 </script>
 </body></html>
