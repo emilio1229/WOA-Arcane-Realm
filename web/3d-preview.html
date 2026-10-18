@@ -95,8 +95,22 @@ body.entered #brand,body.entered #story,body.entered #controls,body.entered #joy
 })();
 </script>
 <script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js';
-import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/loaders/GLTFLoader.js';
+let THREE,GLTFLoader;
+try {
+  THREE=await import('https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js');
+  ({GLTFLoader}=await import('https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/loaders/GLTFLoader.js'));
+} catch(primaryError) {
+  try {
+    THREE=await import('https://unpkg.com/three@0.180.0/build/three.module.js');
+    ({GLTFLoader}=await import('https://unpkg.com/three@0.180.0/examples/jsm/loaders/GLTFLoader.js'));
+  } catch(fallbackError) {
+    const note=document.querySelector('#menuNote');
+    if(note) note.textContent='The title menu loaded, but the 3D engine could not load from either CDN. Please refresh when connected to a stable network.';
+    const boot=document.querySelector('#boot');
+    if(boot){boot.classList.remove('done');document.querySelector('#loadingView').style.display='none';document.querySelector('#titleView').style.display='block';}
+    throw fallbackError;
+  }
+}
 const root=document.querySelector('#world');
 const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
 renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.5));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=false;renderer.outputColorSpace=THREE.SRGBColorSpace;root.appendChild(renderer.domElement);
