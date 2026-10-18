@@ -395,6 +395,16 @@
         if(this.playerAura)this.tweens.add({targets:this.playerAura,alpha:.65,scale:1.6,duration:140,yoyo:true,ease:"Sine.Out"});
       }else{
         if(this.familiarSprite){this.tweens.add({targets:this.familiarSprite,x:x+80,y:y-65,scale:1.45,angle:18,duration:170,yoyo:true,ease:"Cubic.Out",onComplete:()=>{if(this.familiarSprite){this.familiarSprite.angle=0;this.familiarSprite.setScale(1);}}});}
+        // Give the existing attack input a visible creature target using the extracted
+        // Shadow Wraith pose. This is a visual training encounter, not a new combat system.
+        if(this.textures.exists("woa-enemy-art")){
+          const target=this.add.image(x+112,y-34,"woa-enemy-art").setDisplaySize(58,62).setDepth(18).setAlpha(0);
+          this.tweens.add({targets:target,alpha:1,x:x+91,duration:110,ease:"Cubic.Out",onComplete:()=>{
+            this.tweens.add({targets:target,x:x+121,alpha:.18,tint:0xffffff,duration:180,yoyo:true,repeat:1,onComplete:()=>{
+              if(target.active)target.destroy();
+            }});
+          }});
+        }
         const slash=this.add.arc(x+17,y-20,28,205,335,false,0xf0c5ff,.82).setStrokeStyle(3,0xe6bdff,.95).setDepth(19);
         this.tweens.add({targets:slash,alpha:0,scale:1.55,duration:280,ease:"Cubic.Out",onComplete:()=>slash.destroy()});
       }
