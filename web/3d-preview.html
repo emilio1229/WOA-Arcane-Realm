@@ -200,6 +200,18 @@ function generate(s){seed=s>>>0;document.querySelector('#seedLabel').textContent
  for(let i=0;i<5;i++){const a=i/5*Math.PI*2;const rune=addMesh(new THREE.Group(),new THREE.BoxGeometry(.12,.08,.55),runeMat,[0,0,0]);rune.position.set(Math.cos(a)*2.9,.05,-19+Math.sin(a)*2.9);rune.rotation.y=-a;world.add(rune);worldObjects.push(rune)}
  // A readable path leading out from the ruined ring.
  const pathMat=mat(0x393047);for(let i=0;i<13;i++){const tile=addMesh(new THREE.Group(),new THREE.BoxGeometry(1.2,.07,.75),pathMat,[0,0,0]);tile.position.set((i-6)*.9,-.01,-5-i*1.25);tile.rotation.y=(rand()-.5)*.16;world.add(tile);worldObjects.push(tile)}
+ // Layered distant ridgelines make the starting valley feel like a place, not a flat test floor.
+ const ridgeMats=[mat(0x171525),mat(0x211a31),mat(0x29213a)];
+ for(let i=0;i<18;i++){const a=i/18*Math.PI*2,r=48+rand()*7,h=5+rand()*10,w=5+rand()*8;const ridge=addMesh(new THREE.Group(),new THREE.ConeGeometry(w,h,5),ridgeMats[i%ridgeMats.length],[0,h/2-.1,0]);ridge.rotation.y=rand()*Math.PI;place(ridge,Math.cos(a)*r,Math.sin(a)*r);}
+ // Crystal clusters mark old magic leaking into the wilderness.
+ const crystalMats=[mat(0x6f45ad,.28,0x35115f),mat(0x9b69db,.25,0x4c1c7a),mat(0x3e8f9b,.3,0x12434b)];
+ for(let i=0;i<11;i++){const a=rand()*Math.PI*2,r=10+rand()*25,x=Math.cos(a)*r,z=Math.sin(a)*r,cluster=new THREE.Group(),cm=crystalMats[Math.floor(rand()*crystalMats.length)],count=2+Math.floor(rand()*3);for(let j=0;j<count;j++){const h=.55+rand()*1.25,shard=addMesh(cluster,new THREE.OctahedronGeometry(.3),cm,[0,0,0]);shard.scale.set(.45,h/.6,.45);shard.position.set((rand()-.5)*.65,h*.42,(rand()-.5)*.55);shard.rotation.set(rand()*.25,rand()*Math.PI,rand()*.25);}place(cluster,x,z);}
+ // Broken standing stones and lanterns create small landmarks for explorers.
+ const runeStone=mat(0x544664),lanternGlow=mat(0xe1b4ff,.25,0x9b4cff);
+ for(let i=0;i<9;i++){const a=rand()*Math.PI*2,r=12+rand()*24,x=Math.cos(a)*r,z=Math.sin(a)*r,marker=new THREE.Group(),h=1.1+rand()*1.2;addMesh(marker,new THREE.BoxGeometry(.38,h,.34),runeStone,[0,h/2,0]).rotation.z=(rand()-.5)*.18;addMesh(marker,new THREE.OctahedronGeometry(.13),lanternGlow,[0,h+.18,0]);place(marker,x,z);}
+ // Soft magical motes float above the valley floor.
+ const moteMat=new THREE.MeshBasicMaterial({color:0xc7a1ff,transparent:true,opacity:.72}),moteGeo=new THREE.SphereGeometry(.035,5,4);
+ for(let i=0;i<42;i++){const mote=new THREE.Mesh(moteGeo,moteMat);mote.position.set((rand()-.5)*62,.35+rand()*3,(rand()-.5)*62);world.add(mote);worldObjects.push(mote)}
  }
 generate(seed);
 loadImportedModels();
