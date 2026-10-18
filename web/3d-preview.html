@@ -71,6 +71,29 @@ body.entered #brand,body.entered #story,body.entered #controls,body.entered #joy
 <section id="story" class="panel"><small id="chapter">CANONICAL STORY · LOADING</small><h2 id="title">Opening the Chronicle…</h2><p id="body"></p><p><b>Objective:</b> <span id="objective"></span></p><button id="advance">Continue Chronicle →</button><p class="hint">Narrative scene text mirrored from the event bot. Live bot saves and battle rules are not connected yet.</p></section>
 <section id="controls" class="panel"><label>Seed <input id="seed" value="74291" inputmode="numeric" maxlength="10"></label><button id="generate">Generate world</button><button id="reset">Center hero</button><button id="storyPrev">← Story</button><button id="storyNext">Story →</button><small class="hint">WASD / arrows · drag to look · touch joystick</small></section>
 <div id="joy"><div id="nub"></div></div>
+<script>
+/* Keep the opening UI independent of the 3D module/CDN so a failed import can never strand players at 4%. */
+(function(){
+ const bootStart=Date.now(),bar=document.getElementById('progressBar'),label=document.getElementById('loadLabel');
+ const set=(p,s)=>{if(bar)bar.style.width=p+'%';if(label)label.textContent=s+' · '+p+'%';};
+ const stages=[[8,'Gathering the starlight',100],[24,'Tracing ancient sigils',350],[42,'Opening the forest paths',750],[58,'Calling the familiars',1200],[76,'Binding the chronicle',1700],[100,'Realm awakened',2200]];
+ stages.forEach(([p,s,t])=>setTimeout(()=>{if(!document.body.classList.contains('entered'))set(p,s);},t));
+ function openMenu(){const loading=document.getElementById('loadingView'),title=document.getElementById('titleView');if(loading&&title){loading.style.display='none';title.style.display='block';}}
+ setTimeout(openMenu,2400);
+ document.getElementById('enterRealm').addEventListener('click',function(){
+   document.body.classList.add('entered');
+   document.getElementById('boot').classList.add('done');
+   const name=(document.getElementById('wizardName').value||'').trim()||'Traveler';
+   const path=document.getElementById('wizardPath').value;
+   const brand=document.querySelector('#brand h1');if(brand)brand.textContent='✦ '+name+' · '+path.toUpperCase();
+   document.dispatchEvent(new CustomEvent('arcane-enter',{detail:{name:name,path:path}}));
+ });
+ document.getElementById('menuSettings').addEventListener('click',function(){
+   document.getElementById('menuNote').textContent='Visual quality is balanced for mobile. If the 3D scene does not appear after entering, the world renderer failed to load; the opening menu remains available.';
+ });
+ setTimeout(()=>{if(!document.body.classList.contains('entered')&&Date.now()-bootStart>5500){const note=document.getElementById('menuNote');if(note)note.textContent='The title menu is ready. If the 3D world is blank after entering, a 3D module or asset request failed to load.';}},5600);
+})();
+</script>
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js';
 import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/loaders/GLTFLoader.js';
