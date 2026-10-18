@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090611">
+<title>WOA: Arcane Realm — 3D World Preview</title>
+<style>
+:root{color-scheme:dark;--panel:#100b1bea;--violet:#b47bff;--gold:#e9ce91;--line:#694a83}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080610;color:#f8f0ff;font-family:Georgia,serif}#world{position:fixed;inset:0}canvas{display:block;touch-action:none}
+.panel{position:fixed;z-index:2;background:var(--panel);border:1px solid var(--line);box-shadow:0 12px 40px #0008;backdrop-filter:blur(12px);border-radius:14px;padding:12px 14px;max-width:min(390px,calc(100vw - 24px))}
+#brand{left:12px;top:12px}#story{right:12px;top:12px;width:min(340px,calc(100vw - 24px));max-height:66vh;overflow:auto}#controls{left:12px;bottom:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;max-width:calc(100vw - 24px)}h1{font-size:17px;margin:0 0 4px;color:#e7c8ff}h2{font-size:16px;line-height:1.25;margin:8px 0;color:#f1d8ff}p{font-size:13px;line-height:1.5;color:#e0d3ef;white-space:pre-line;margin:8px 0}small{color:#c9b4df}button{border:1px solid #9d6bc3;border-radius:9px;padding:10px 12px;background:linear-gradient(#42285b,#1a1028);color:#fff;font:inherit;font-size:13px;touch-action:manipulation}button:active{transform:scale(.98)}input{width:100px;max-width:26vw;background:#090611;color:white;border:1px solid #694a83;border-radius:8px;padding:9px}.hint{font-size:11px;color:#b9a6cc}#joy{position:fixed;z-index:3;bottom:82px;left:20px;width:106px;height:106px;border:1px solid #c7a5f266;border-radius:50%;background:#170f2877;touch-action:none;display:none}#nub{position:absolute;left:31px;top:31px;width:42px;height:42px;border-radius:50%;background:#a66eea99;border:1px solid #e1c0ff} @media(max-width:650px){#story{top:auto;bottom:12px;right:12px;max-height:34vh;width:min(310px,calc(100vw - 24px));padding:10px}#brand{max-width:220px}#controls{bottom:auto;top:105px;max-width:calc(100vw - 24px)}#joy{display:block}p{font-size:12px}#story h2{font-size:14px}}
+</style>
+</head>
+<body>
+<div id="world"></div>
+<section id="brand" class="panel"><h1>✦ WOA: ARCANE REALM</h1><small>3D world prototype · world seed <b id="seedLabel">74291</b></small><p class="hint">The 3D path is being built separately so the old game isn't destroyed before the replacement works.</p></section>
+<section id="story" class="panel"><small id="chapter">CANONICAL STORY · LOADING</small><h2 id="title">Opening the Chronicle…</h2><p id="body"></p><p><b>Objective:</b> <span id="objective"></span></p><button id="advance">Continue Chronicle →</button><p class="hint">Narrative scene text mirrored from the event bot. Live bot saves and battle rules are not connected yet.</p></section>
+<section id="controls" class="panel"><label>Seed <input id="seed" value="74291" inputmode="numeric" maxlength="10"></label><button id="generate">Generate world</button><button id="reset">Center hero</button><button id="storyPrev">← Story</button><button id="storyNext">Story →</button><small class="hint">WASD / arrows · drag to look · touch joystick</small></section>
+<div id="joy"><div id="nub"></div></div>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js';
+const root=document.querySelector('#world');
+const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
+renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.5));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=false;renderer.outputColorSpace=THREE.SRGBColorSpace;root.appendChild(renderer.domElement);
+const scene=new THREE.Scene();scene.background=new THREE.Color('#0a0713');scene.fog=new THREE.FogExp2('#0a0713',.023);
+const camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,.1,180);camera.position.set(0,7,11);
+scene.add(new THREE.HemisphereLight(0xbda4ff,0x171022,2.0));
+const moon=new THREE.DirectionalLight(0xe2d8ff,2.1);moon.position.set(-7,12,5);scene.add(moon);
+const groundMat=new THREE.MeshStandardMaterial({color:0x252039,roughness:1});
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(180,180),groundMat);ground.rotation.x=-Math.PI/2;ground.position.y=-.12;scene.add(ground);
+const world=new THREE.Group();scene.add(world);
+const hero=new THREE.Group();scene.add(hero);
+function mat(color,roughness=.8,emissive=0){return new THREE.MeshStandardMaterial({color,roughness,emissive,emissiveIntensity:emissive?0.8:0})}
+const robe=mat(0x4c2271),trim=mat(0xd6b1ff),skin=mat(0xcda6a1),staffMat=mat(0x4b2e25),crystalMat=mat(0x8e57ff,.3,0x6220c7);
+function addMesh(parent,geo,material,pos,scale){const m=new THREE.Mesh(geo,material);m.position.set(...pos);if(scale)m.scale.set(...scale);parent.add(m);return m}
+addMesh(hero,new THREE.CylinderGeometry(.24,.48,1.25,7,1),robe,[0,.8,0]);
+addMesh(hero,new THREE.SphereGeometry(.28,10,8),skin,[0,1.62,0]);
+const hood=addMesh(hero,new THREE.ConeGeometry(.34,.62,7),robe,[0,1.95,0]);hood.rotation.x=.12;
+addMesh(hero,new THREE.CylinderGeometry(.035,.05,1.3,6),staffMat,[.52,.72,0]);
+const crystal=addMesh(hero,new THREE.OctahedronGeometry(.16),crystalMat,[.52,1.42,0]);crystal.rotation.z=.25;
+addMesh(hero,new THREE.TorusGeometry(.48,.025,5,24),trim,[0,.2,0]).rotation.x=Math.PI/2;
+const familiar=new THREE.Group();hero.add(familiar);
+addMesh(familiar,new THREE.SphereGeometry(.18,10,8),mat(0xb9a0ff,.35,0x7e47ff),[.65,1.3,.2],[1,1,.85]);
+addMesh(familiar,new THREE.ConeGeometry(.08,.28,5),trim,[.65,1.53,.2]);
+let seed=74291, worldObjects=[], keys={}, move={x:0,y:0}, yaw=0, pitch=.22, dragging=false,lastX=0,lastY=0,story=[],storyIndex=0;
+function rngFactory(s){return()=>{s=(Math.imul(1664525,s)+1013904223)>>>0;return s/4294967296}}
+function clearWorld(){for(const o of worldObjects){world.remove(o);o.traverse?.(n=>{n.geometry?.dispose();if(n.material&&!Array.isArray(n.material))n.material.dispose()})}worldObjects=[]}
+function place(o,x,z){o.position.x=x;o.position.z=z;world.add(o);worldObjects.push(o)}
+function generate(s){seed=s>>>0;document.querySelector('#seedLabel').textContent=seed;clearWorld();const rand=rngFactory(seed);
+ const grassMats=[mat(0x26352e),mat(0x30352f),mat(0x343044)];
+ for(let i=0;i<250;i++){const x=(rand()-.5)*85,z=(rand()-.5)*85;if(Math.hypot(x,z)<5)continue;const g=addMesh(new THREE.Group(),new THREE.ConeGeometry(.06+rand()*.09,.12+rand()*.3,4),grassMats[Math.floor(rand()*grassMats.length)],[0,0,0]);g.position.set(x,-.03,z);world.add(g);worldObjects.push(g)}
+ const treeTrunk=mat(0x453047),leaves=[mat(0x253a35),mat(0x2c3547),mat(0x382844)];
+ for(let i=0;i<48;i++){const a=rand()*Math.PI*2,r=7+rand()*32,x=Math.cos(a)*r,z=Math.sin(a)*r;const tree=new THREE.Group();addMesh(tree,new THREE.CylinderGeometry(.12,.22,1.4,5),treeTrunk,[0,.7,0]);addMesh(tree,new THREE.ConeGeometry(.75+rand()*.5,2.2+rand(),6),leaves[Math.floor(rand()*leaves.length)],[0,2,0]);place(tree,x,z)}
+ const stone=mat(0x51445e),glow=mat(0x5e3e91,.45,0x27104b);
+ for(let i=0;i<15;i++){const a=rand()*Math.PI*2,r=8+rand()*20,x=Math.cos(a)*r,z=Math.sin(a)*r;const rock=addMesh(new THREE.Group(),new THREE.DodecahedronGeometry(.5+rand()*.9,0),stone,[x,.25,z],[1,.7,1]);rock.rotation.set(rand(),rand()*3,rand());world.add(rock);worldObjects.push(rock)}
+ for(let i=0;i<7;i++){const a=i/7*Math.PI*2,r=4.5,x=Math.cos(a)*r,z=Math.sin(a)*r;const pillar=new THREE.Group();addMesh(pillar,new THREE.CylinderGeometry(.3,.4,2.4,6),stone,[0,1.2,0]);addMesh(pillar,new THREE.OctahedronGeometry(.22),glow,[0,2.55,0]);place(pillar,x,z)}
+ // A readable path leading out from the ruined ring.
+ const pathMat=mat(0x393047);for(let i=0;i<13;i++){const tile=addMesh(new THREE.Group(),new THREE.BoxGeometry(1.2,.07,.75),pathMat,[0,0,0]);tile.position.set((i-6)*.9,-.01,-5-i*1.25);tile.rotation.y=(rand()-.5)*.16;world.add(tile);worldObjects.push(tile)}
+ }
+generate(seed);
+function showStory(i){if(!story.length)return;storyIndex=(i+story.length)%story.length;const s=story[storyIndex];document.querySelector('#chapter').textContent='CHRONICLE · SCENE '+(storyIndex+1)+' / '+story.length;document.querySelector('#title').textContent=s.title;document.querySelector('#body').textContent=s.body;document.querySelector('#objective').textContent=s.objective;document.querySelector('#advance').textContent=s.action+' →'}
+fetch('./data/canonical-story-manifest.json').then(r=>{if(!r.ok)throw Error('Story manifest unavailable');return r.json()}).then(d=>{story=d.scenes||[];showStory(0)}).catch(e=>{document.querySelector('#title').textContent='Chronicle unavailable';document.querySelector('#body').textContent='The world can still be explored, but the story manifest did not load.'});
+document.querySelector('#advance').addEventListener('click',()=>showStory(storyIndex+1));document.querySelector('#storyPrev').onclick=()=>showStory(storyIndex-1);document.querySelector('#storyNext').onclick=()=>showStory(storyIndex+1);
+document.querySelector('#generate').onclick=()=>{const v=Number(document.querySelector('#seed').value);generate(Number.isFinite(v)?v:Math.floor(Math.random()*2147483647))};
+document.querySelector('#reset').onclick=()=>{hero.position.set(0,0,0);yaw=0;pitch=.22};
+addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault()},{passive:false});addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+renderer.domElement.addEventListener('pointerdown',e=>{dragging=true;lastX=e.clientX;lastY=e.clientY;renderer.domElement.setPointerCapture?.(e.pointerId)});addEventListener('pointerup',()=>dragging=false);addEventListener('pointermove',e=>{if(!dragging)return;yaw-=(e.clientX-lastX)*.006;pitch=Math.max(-.2,Math.min(.8,pitch+(e.clientY-lastY)*.003));lastX=e.clientX;lastY=e.clientY});
+const joy=document.querySelector('#joy'),nub=document.querySelector('#nub');let joyId=null;function setJoy(e){const r=joy.getBoundingClientRect(),dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2),d=Math.max(1,Math.hypot(dx,dy)),m=Math.min(32,d);move.x=dx/d*m/32;move.y=dy/d*m/32;nub.style.transform='translate('+move.x*32+'px,'+move.y*32+'px)'}joy.addEventListener('pointerdown',e=>{joyId=e.pointerId;joy.setPointerCapture(e.pointerId);setJoy(e)});joy.addEventListener('pointermove',e=>{if(e.pointerId===joyId)setJoy(e)});function endJoy(){joyId=null;move.x=move.y=0;nub.style.transform=''}joy.addEventListener('pointerup',endJoy);joy.addEventListener('pointercancel',endJoy);
+const clock=new THREE.Clock();function frame(){requestAnimationFrame(frame);const dt=Math.min(clock.getDelta(),.04);let f=(keys.w||keys.arrowup?1:0)-(keys.s||keys.arrowdown?1:0)-move.y;let side=(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0)+move.x;const len=Math.hypot(f,side)||1;f/=len;side/=len;hero.position.x+= (Math.cos(yaw)*side+Math.sin(yaw)*f)*dt*4.2;hero.position.z+=(-Math.sin(yaw)*side-Math.cos(yaw)*f)*dt*4.2;hero.position.x=Math.max(-42,Math.min(42,hero.position.x));hero.position.z=Math.max(-42,Math.min(42,hero.position.z));hero.rotation.y=yaw;familiar.position.y=1.3+Math.sin(performance.now()*.003)*.12;
+const target=new THREE.Vector3(hero.position.x,hero.position.y+1,hero.position.z);const offset=new THREE.Vector3(Math.sin(yaw)*Math.cos(pitch)*9,4.5+pitch*2,Math.cos(yaw)*Math.cos(pitch)*9);camera.position.lerp(target.clone().add(offset),1-Math.exp(-dt*5));camera.lookAt(target);renderer.render(scene,camera)}
+frame();addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.5));renderer.setSize(innerWidth,innerHeight)});
+</script>
+</body></html>
