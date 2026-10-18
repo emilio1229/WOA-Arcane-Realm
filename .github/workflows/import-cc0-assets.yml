@@ -76,9 +76,9 @@ jobs:
                   if any(t in base for t in ("bush", "plant", "fern", "flower", "grass")): return (1, base)
                   if any(t in base for t in ("rock", "stone", "boulder", "cliff")): return (2, base)
                 else:
-                  if any(t in base for t in ("house", "cottage", "building", "shop", "market", "tower", "gate", "bridge", "roof")): return (0, base)
-                  if any(t in base for t in ("wall", "fence", "arch", "door", "window")): return (1, base)
-                  if any(t in base for t in ("fountain", "well", "bench", "lamp", "sign")): return (2, base)
+                  if any(t in base for t in ("house", "cottage", "building", "shop", "market", "tower", "gate", "bridge")): return (0, base)
+                  if any(t in base for t in ("wall", "fence", "arch", "door", "window", "balcony")): return (1, base)
+                  if any(t in base for t in ("roof", "fountain", "well", "bench", "lamp", "sign")): return (2, base)
                 return (9, base)
               selected = [n for n in sorted(glbs, key=rank) if rank(n)[0] < 9][:pack["limit"]]
               if len(selected) < 4:
@@ -124,4 +124,6 @@ jobs:
             exit 0
           fi
           git commit -m "Import selected CC0 Kenney 3D starter models"
+          # Other app edits can land while the ZIPs are downloading; replay this asset commit on latest main.
+          git pull --rebase origin main
           git push origin HEAD:main
