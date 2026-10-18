@@ -179,12 +179,14 @@ const importedModels={trees:[],rocks:[],town:[],allTown:[]};
 // The CC0 town kit contains a few untextured pale meshes. Give those meshes a coherent dusk palette instead of leaving them stark white.
 function themeTownModel(model,name){
  const n=name.toLowerCase();
- let tint=0x78677f;
- if(/roof|shingle|awning/.test(n))tint=0x38263f;
- else if(/wall|stone|arch|gate|tower|bridge/.test(n))tint=0x77677e;
- else if(/fence|balcony|door|wood|window/.test(n))tint=0x543744;
- else if(/hedge|bush|garden/.test(n))tint=0x29483a;
- else if(/house|cottage|building|shop|market/.test(n))tint=0x8b7889;
+ let tint=0x8b7469;
+ if(/roof|shingle/.test(n))tint=0x38233f;
+ else if(/awning|cloth|market/.test(n))tint=0x8a4d70;
+ else if(/wall|stone|arch|gate|tower|bridge/.test(n))tint=0x827b87;
+ else if(/fence|balcony|door|wood|timber/.test(n))tint=0x594035;
+ else if(/window|lamp|lantern/.test(n))tint=0xd6a45e;
+ else if(/hedge|bush|garden/.test(n))tint=0x31513b;
+ else if(/house|cottage|building|shop/.test(n))tint=0xb59a7b;
  model.traverse(node=>{if(!node.isMesh||!node.material)return;const materials=Array.isArray(node.material)?node.material:[node.material];const themed=materials.map(original=>{const m=original.clone();if(!m.map&&m.color){const c=m.color,brightness=(c.r+c.g+c.b)/3;if(brightness>.72){m.color.setHex(tint);m.roughness=Math.max(m.roughness||.7,.72);}}return m;});node.material=Array.isArray(node.material)?themed:themed[0];});
 }
 function makeAssetInstance(category,rand,targetHeight){const list=importedModels[category]||[];if(!list.length)return null;const source=list[Math.floor(rand()*list.length)];const model=source.clone(true);model.updateMatrixWorld(true);const box=new THREE.Box3().setFromObject(model);const size=box.getSize(new THREE.Vector3());const h=Math.max(.001,size.y);const scale=targetHeight/h;model.scale.multiplyScalar(scale);model.updateMatrixWorld(true);const scaledBox=new THREE.Box3().setFromObject(model);model.position.y-=scaledBox.min.y;return model;}
@@ -231,53 +233,59 @@ function generate(s){seed=s>>>0;document.querySelector('#seedLabel').textContent
  place(gate,0,-1.2);
  addCollider(-1.56,-1.14,-1.48,-.92);
  addCollider(1.14,1.56,-1.48,-.92);
- // Small, coherent ruined hamlet: timber-framed cottages with lit windows and varied roofs.
- const hutMat=mat(0x514052),roofMat=mat(0x30243b),doorMat=mat(0x171020),timberMat=mat(0x332536);
- const windowGlow=new THREE.MeshStandardMaterial({color:0xffc879,emissive:0xb65a23,emissiveIntensity:1.15});
- for(let i=0;i<4;i++){
-   const x=(i%2?1:-1)*(9.2+(i%2)*.25),z=-10.5-Math.floor(i/2)*11;
-   const hut=new THREE.Group(),wide=i===0?2.1:1.85,depth=1.65;
+ // Six timber-framed homes form two spaced residential lanes around a genuinely open square.
+ // Keep the center clear for the well, stalls, benches, and a walkable north-south street.
+ const hutMat=mat(0x92775f),roofMat=mat(0x38233f),doorMat=mat(0x241724),timberMat=mat(0x49302e);
+ const windowGlow=new THREE.MeshStandardMaterial({color:0xffd18a,emissive:0xc66a28,emissiveIntensity:1.35});
+ const cottageSites=[
+   {x:-10.4,z:-10.2,w:2.15,d:1.85,roof:1.5},
+   {x:10.4,z:-10.2,w:1.95,d:1.72,roof:1.35},
+   {x:-10.7,z:-24.3,w:1.95,d:1.75,roof:1.38},
+   {x:10.7,z:-24.3,w:2.2,d:1.9,roof:1.55},
+   {x:-6.7,z:-28.5,w:1.75,d:1.55,roof:1.25},
+   {x:6.7,z:-28.5,w:1.85,d:1.6,roof:1.3}
+ ];
+ cottageSites.forEach((site,i)=>{
+   const {x,z,w:wide,d:depth,roof:roofSize}=site;
+   const hut=new THREE.Group();
    addMesh(hut,new THREE.BoxGeometry(wide,1.35,depth),hutMat,[0,.72,0]);
-   // Steep roof silhouette and visible eaves give each cottage a distinct profile.
-   const roof=addMesh(hut,new THREE.ConeGeometry(i===0?1.55:1.35,1.05,4),roofMat,[0,1.82,0]);roof.rotation.y=Math.PI/4;
+   const roof=addMesh(hut,new THREE.ConeGeometry(roofSize,1.05,4),roofMat,[0,1.82,0]);roof.rotation.y=Math.PI/4;
+   // Dark doorway, warm glowing windows, and strong timber framing make the homes read at a glance.
    addMesh(hut,new THREE.BoxGeometry(.43,.82,.09),doorMat,[0,.43,depth/2+.045]);
    for(const wx of [-.58,.58]){
      addMesh(hut,new THREE.BoxGeometry(.28,.34,.07),windowGlow,[wx,.91,depth/2+.045]);
      addMesh(hut,new THREE.BoxGeometry(.34,.045,.09),timberMat,[wx,.91,depth/2+.085]);
      addMesh(hut,new THREE.BoxGeometry(.045,.38,.09),timberMat,[wx,.91,depth/2+.085]);
    }
-   // Corner posts and a foundation make the primitive fallback read as a built structure.
    for(const px of [-wide/2+.09,wide/2-.09])for(const pz of [-depth/2+.08,depth/2-.08])
      addMesh(hut,new THREE.BoxGeometry(.12,1.35,.12),timberMat,[px,.72,pz]);
    addMesh(hut,new THREE.BoxGeometry(wide+.18,.14,depth+.18),timberMat,[0,.12,0]);
-   hut.rotation.y=z>-16?Math.PI:0;
+   hut.rotation.y=x<0?Math.PI:0;
    placeSolid(hut,x,z);
- }
- // Dress the settlement with imported CC0 fence, gate, and wall modules.
- // Use every imported Kenney fantasy-town model in the actual village layout.
- // Modular walls, gates, roof pieces and fences form a broken settlement edge.
- const townPieces=(importedModels.allTown||[]).filter(entry=>/house|cottage|building|tower|gate|arch|bridge|wall|fence|roof|market|shop|well|fountain|balcony|hedge/.test(entry.name||'')).slice(0,18);
+ });
+ // Use the imported CC0 town kit as a deliberate perimeter, not a pile of overlapping modules.
+ // Large buildings are excluded here because the handcrafted cottages already occupy the residential lanes.
+ const townPieces=(importedModels.allTown||[]).filter(entry=>/gate|arch|bridge|wall|fence|roof|balcony|hedge/.test(entry.name||'')).slice(0,12);
  for(let i=0;i<townPieces.length;i++){
    const entry=townPieces[i],name=entry.name||'',piece=entry.model.clone(true);
    piece.updateMatrixWorld(true);
    const box=new THREE.Box3().setFromObject(piece),size=box.getSize(new THREE.Vector3());
-   const h=Math.max(.001,size.y),targetHeight=/wall|arch|gate|roof|balcony/i.test(name)?1.7:/fence|hedge/i.test(name)?1.05:1.35;
+   const h=Math.max(.001,size.y),targetHeight=/wall|arch|gate|roof|balcony/i.test(name)?1.45:/fence|hedge/i.test(name)?0.9:1.35;
    piece.scale.multiplyScalar(targetHeight/h);piece.updateMatrixWorld(true);
    const scaled=new THREE.Box3().setFromObject(piece);piece.position.y-=scaled.min.y;
-   // Arrange modular pieces along two sides and the back of the hamlet rather than scattering them.
+   // Five broad bays on each side and a broken rear boundary leave the main square open.
    const sideIndex=i%2,slot=Math.floor(i/2);
-   if(slot<5){
-     piece.position.x=(sideIndex===0?-1:1)*14.2;
-     piece.position.z=-9.5+slot*4.15;
+   if(slot<3){
+     piece.position.x=(sideIndex===0?-15.3:15.3);
+     piece.position.z=-10.5+slot*7.1;
      piece.rotation.y=sideIndex===0?Math.PI/2:-Math.PI/2;
    }else{
-     const backSlot=slot-5;
-     piece.position.x=-10.5+backSlot*4.2;
-     piece.position.z=-28.2;
+     const backSlot=slot-3;
+     piece.position.x=-10.5+backSlot*7;
+     piece.position.z=-31.4;
      piece.rotation.y=Math.PI;
    }
-   // Subtle variation avoids a perfectly repeated kit-bash look.
-   piece.rotation.y+=(rand()-.5)*.06;
+   piece.rotation.y+=(rand()-.5)*.035;
    placeSolid(piece,piece.position.x,piece.position.z);
  }
  // Street dressing: lantern posts, signboard, stacked crates, barrels, and short fence runs.
