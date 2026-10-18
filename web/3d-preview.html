@@ -94,6 +94,9 @@ body.entered #brand,body.entered #story,body.entered #controls,body.entered #joy
  setTimeout(()=>{if(!document.body.classList.contains('entered')&&Date.now()-bootStart>5500){const note=document.getElementById('menuNote');if(note)note.textContent='The title menu is ready. If the 3D world is blank after entering, a 3D module or asset request failed to load.';}},5600);
 })();
 </script>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js"}}
+</script>
 <script type="module">
 let THREE,GLTFLoader;
 try {
@@ -112,7 +115,14 @@ try {
   }
 }
 const root=document.querySelector('#world');
-const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
+let renderer;
+try {
+ renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
+} catch(renderError) {
+ const note=document.querySelector('#menuNote');
+ if(note) note.textContent='The 3D engine loaded, but this browser could not create a WebGL scene. Try closing other tabs and refreshing; if it persists, this device/browser may not support the current renderer.';
+ throw renderError;
+}
 renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.5));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=false;renderer.outputColorSpace=THREE.SRGBColorSpace;root.appendChild(renderer.domElement);
 const scene=new THREE.Scene();scene.background=new THREE.Color('#0a0713');scene.fog=new THREE.FogExp2('#0a0713',.023);
 const camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,.1,180);camera.position.set(0,7,11);
