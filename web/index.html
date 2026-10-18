@@ -87,112 +87,13 @@
 <div id="bottom-hint" class="bottom-hint hidden">The path ahead is veiled. Mathias awaits beyond the town gate.</div>
 <script src="https://cdn.jsdelivr.net/npm/phaser@4.2.1/dist/phaser.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="./runtime/arcane-art.js"></script>
 <script>
 (() => {
   const $ = (id) => document.getElementById(id);
   const screens = ["start-screen","creator-screen","chronicles-screen"];
-  // Load the approved art starter ZIP directly from the repository and extract it in-browser.
-  // The ZIP contains concept panels, not animation-ready sprite atlases, so only the portrait crops
-  // are used as character portraits; the existing SVGs remain safe fallbacks.
-  window.woaArtReady = (async () => {
-    const archiveUrl = "https://raw.githubusercontent.com/emilio1229/WOA-Arcane-Realm/main/assets/art-source/woa_arcane_realm_asset_starter.zip";
-    try {
-      if (!window.JSZip) throw new Error("ZIP reader unavailable");
-      const response = await fetch(archiveUrl, { cache: "force-cache" });
-      if (!response.ok) throw new Error("Art ZIP returned " + response.status);
-      const zip = await JSZip.loadAsync(await response.arrayBuffer());
-      const getImage = async (name) => {
-        const entry = Object.values(zip.files).find(file => !file.dir && file.name.endsWith(name));
-        if (!entry) return null;
-        const blob = await entry.async("blob");
-        return await new Promise((resolve, reject) => {
-          const image = new Image();
-          image.onload = () => resolve(image);
-          image.onerror = reject;
-          image.src = URL.createObjectURL(blob);
-        });
-      };
-      const crop = (image, rect) => {
-        if (!image) return null;
-        const canvas = document.createElement("canvas");
-        canvas.width = rect.w; canvas.height = rect.h;
-        canvas.getContext("2d").drawImage(image, rect.x, rect.y, rect.w, rect.h, 0, 0, rect.w, rect.h);
-        return canvas.toDataURL("image/png");
-      };
-      const makeTransparentSprite = (image, rect, keyColor = "purple") => {
-        if (!image) return null;
-        const canvas = document.createElement("canvas");
-        canvas.width = rect.w; canvas.height = rect.h;
-        const ctx = canvas.getContext("2d", { willReadFrequently: true });
-        ctx.drawImage(image, rect.x, rect.y, rect.w, rect.h, 0, 0, rect.w, rect.h);
-        const frame = ctx.getImageData(0, 0, rect.w, rect.h);
-        const px = frame.data;
-        for (let i = 0; i < px.length; i += 4) {
-          const r = px[i], g = px[i+1], b = px[i+2];
-          // These sheets use a saturated violet presentation background. Remove only
-          // background-like pixels; retain near-black outlines and bright magenta highlights.
-          const violetBackground = b > 75 && r > 35 && b > g * 1.28 && r > g * 1.18 && (b-r) < 105;
-          const deepVioletBackground = b > 45 && r > 25 && b > g * 1.35 && r > g * 1.22 && r < 115 && g < 65;
-          if (violetBackground || deepVioletBackground) px[i+3] = 0;
-        }
-        ctx.putImageData(frame, 0, 0);
-        return canvas.toDataURL("image/png");
-      };
-      const portraits = await getImage("04_portraits_and_class_outfits.png");
-      if (portraits) {
-        window.woaArtPortraits = {
-          masculine: crop(portraits, {x:18,y:46,w:136,h:108}),
-          feminine: crop(portraits, {x:176,y:46,w:135,h:108})
-        };
-      }
-      // Convert one clearly isolated familiar pose into a transparent PNG at runtime.
-      // The source is a concept sheet, not a true animation atlas; this is a usable
-      // static gameplay sprite while hand-cleaned frame art is being produced.
-      const familiarSheet = await getImage("08_familiars_and_pets.png");
-      const enemySheet = await getImage("07_enemies.png");
-      const mathiasSheet = await getImage("06_mathias_supporting_character.png");
-      const spellSheet = await getImage("05_spell_and_combat_effects.png");
-      window.woaRuntimeSprites = window.woaRuntimeSprites || {};
-      if (familiarSheet) {
-        // One clean pose per creature family; these are static sprite assets, not fake atlases.
-        window.woaRuntimeSprites.familiarRaven = makeTransparentSprite(familiarSheet, {x:18,y:55,w:45,h:38});
-        window.woaRuntimeSprites.familiarWolf = makeTransparentSprite(familiarSheet, {x:10,y:108,w:56,h:39});
-        window.woaRuntimeSprites.familiarDragon = makeTransparentSprite(familiarSheet, {x:10,y:164,w:48,h:43});
-        window.woaRuntimeSprites.familiarElemental = makeTransparentSprite(familiarSheet, {x:7,y:219,w:49,h:48});
-      }
-      // Isolated reference poses/effects are exported as transparent single-frame PNGs.
-      // They are not advertised as complete animations; the game animates them with Phaser tweens.
-      if (enemySheet) window.woaRuntimeSprites.shadowWraith = makeTransparentSprite(enemySheet, {x:3,y:42,w:48,h:49});
-      if (mathiasSheet) window.woaRuntimeSprites.mathias = makeTransparentSprite(mathiasSheet, {x:18,y:43,w:37,h:52});
-      if (spellSheet) window.woaRuntimeSprites.arcaneBlast = makeTransparentSprite(spellSheet, {x:109,y:48,w:84,h:43});
-      // Keep the categorized concept panels available to future scene/UI integrations.
-      window.woaConceptArt = {};
-      const categories = [
-        ["characters","01_player_characters_and_classes.png"],
-        ["animations","02_player_animations.png"],
-        ["directions","03_directional_facing_and_actions.png"],
-        ["portraits","04_portraits_and_class_outfits.png"],
-        ["spells","05_spell_and_combat_effects.png"],
-        ["mathias","06_mathias_supporting_character.png"],
-        ["enemies","07_enemies.png"],
-        ["familiars","08_familiars_and_pets.png"],
-        ["equipment","09_equipment_and_items.png"],
-        ["world","10_world_environment.png"],
-        ["ui","11_ui_elements_and_palette.png"],
-        ["branding","12_woa_branding.png"]
-      ];
-      for (const [key, filename] of categories) {
-        const entry = Object.values(zip.files).find(file => !file.dir && file.name.endsWith(filename));
-        if (entry) window.woaConceptArt[key] = URL.createObjectURL(await entry.async("blob"));
-      }
-      document.documentElement.dataset.woaArtLoaded = "true";
-      return true;
-    } catch (error) {
-      console.warn("WoA concept art archive could not be loaded; using built-in game sprites.", error);
-      return false;
-    }
-  })();
-
+  // Typed art loader is loaded before this UI script from ./runtime/arcane-art.js.
+  // window.woaArtReady remains the compatibility contract for existing game systems.
   let chosenPresentation = "masculine";
   let chosenClass = "Storm Herald";
   let heroName = "";
