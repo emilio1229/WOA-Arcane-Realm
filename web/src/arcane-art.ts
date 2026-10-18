@@ -101,7 +101,13 @@ async function loadConceptArchive(): Promise<boolean> {
       sprites.familiarDragon = makeTransparentSprite(familiar,{x:10,y:164,w:48,h:43});
       sprites.familiarElemental = makeTransparentSprite(familiar,{x:7,y:219,w:49,h:48});
     }
-    if (enemy) sprites.shadowWraith = makeTransparentSprite(enemy,{x:3,y:42,w:48,h:49});
+    if (enemy) {
+      // Tight, individually keyed enemy silhouettes from each labeled enemy row.
+      sprites.shadowWraith = makeTransparentSprite(enemy,{x:3,y:42,w:48,h:49});
+      sprites.darkAnimus = makeTransparentSprite(enemy,{x:8,y:112,w:52,h:49});
+      sprites.corruptedBeast = makeTransparentSprite(enemy,{x:3,y:176,w:55,h:49});
+      sprites.arcaneGolem = makeTransparentSprite(enemy,{x:4,y:238,w:58,h:58});
+    }
     if (mathias) {
       // The concept panel labels seven distinct poses across its top row.
       // These remain single-frame action poses, not a fabricated walk cycle.
