@@ -204,11 +204,11 @@ function generate(s){seed=s>>>0;document.querySelector('#seedLabel').textContent
  for(let i=0;i<250;i++){const x=(rand()-.5)*85,z=(rand()-.5)*85;if(Math.hypot(x,z)<5)continue;const g=addMesh(new THREE.Group(),new THREE.ConeGeometry(.06+rand()*.09,.12+rand()*.3,4),grassMats[Math.floor(rand()*grassMats.length)],[0,0,0]);g.position.set(x,-.03,z);world.add(g);worldObjects.push(g)}
  const treeTrunk=mat(0x453047),leaves=[mat(0x253a35),mat(0x2c3547),mat(0x382844)];
  // Keep the village footprint and its main approach free of random forest props.
- const insideVillageClearance=(x,z)=>x>-11.5&&x<11.5&&z>-24.5&&z<-5.5;
+ const insideVillageClearance=(x,z)=>x>-16.5&&x<16.5&&z>-31&&z<-5.5;
  for(let i=0;i<48;i++){const a=rand()*Math.PI*2,r=7+rand()*32,x=Math.cos(a)*r,z=Math.sin(a)*r;if(insideVillageClearance(x,z))continue;let tree=makeAssetInstance('trees',rand,2.8+rand()*1.2);if(!tree){tree=new THREE.Group();addMesh(tree,new THREE.CylinderGeometry(.12,.22,1.4,5),treeTrunk,[0,.7,0]);addMesh(tree,new THREE.ConeGeometry(.75+rand()*.5,2.2+rand(),6),leaves[Math.floor(rand()*leaves.length)],[0,2,0]);}placeSolid(tree,x,z)}
  // Low, layered shrub beds soften the hard edges of the cottages without blocking paths or doorways.
  const shrubMats=[mat(0x254638),mat(0x31533f),mat(0x3e4b42),mat(0x49334f)];
- const gardenSpots=[[-8.5,-11.5],[8.5,-11.5],[-8.8,-15.2],[8.8,-15.2],[-8.2,-19.3],[8.2,-19.3],[-6.8,-22.7],[6.8,-22.7],[-3.8,-8.3],[4.8,-8.3]];
+ const gardenSpots=[[-12,-11.5],[12,-11.5],[-12.2,-16.5],[12.2,-16.5],[-12,-21.5],[12,-21.5],[-8.8,-26],[8.8,-26],[-5.8,-7.8],[5.8,-7.8]];
  function makeShrub(x,z,scale=1){const bush=new THREE.Group();for(let j=0;j<3;j++){const radius=(.25+rand()*.18)*scale,leaf=addMesh(bush,new THREE.IcosahedronGeometry(radius,0),shrubMats[Math.floor(rand()*shrubMats.length)],[(rand()-.5)*.62*scale,.22+rand()*.3,(rand()-.5)*.5*scale]);leaf.scale.y=.7+rand()*.35;}place(bush,x,z);}
  gardenSpots.forEach(([x,z],i)=>makeShrub(x,z,.82+(i%3)*.12));
  for(let i=0;i<28;i++){const a=rand()*Math.PI*2,r=9+rand()*27,x=Math.cos(a)*r,z=Math.sin(a)*r;if(insideVillageClearance(x,z)||Math.hypot(x,z)<7)continue;makeShrub(x,z,.65+rand()*.55)}
@@ -235,7 +235,7 @@ function generate(s){seed=s>>>0;document.querySelector('#seedLabel').textContent
  const hutMat=mat(0x514052),roofMat=mat(0x30243b),doorMat=mat(0x171020),timberMat=mat(0x332536);
  const windowGlow=new THREE.MeshStandardMaterial({color:0xffc879,emissive:0xb65a23,emissiveIntensity:1.15});
  for(let i=0;i<4;i++){
-   const x=(i%2?1:-1)*(5.8+(i%2)*.45),z=-11.7-Math.floor(i/2)*4.1;
+   const x=(i%2?1:-1)*(9.2+(i%2)*.25),z=-10.5-Math.floor(i/2)*11;
    const hut=new THREE.Group(),wide=i===0?2.1:1.85,depth=1.65;
    addMesh(hut,new THREE.BoxGeometry(wide,1.35,depth),hutMat,[0,.72,0]);
    // Steep roof silhouette and visible eaves give each cottage a distinct profile.
@@ -250,12 +250,13 @@ function generate(s){seed=s>>>0;document.querySelector('#seedLabel').textContent
    for(const px of [-wide/2+.09,wide/2-.09])for(const pz of [-depth/2+.08,depth/2-.08])
      addMesh(hut,new THREE.BoxGeometry(.12,1.35,.12),timberMat,[px,.72,pz]);
    addMesh(hut,new THREE.BoxGeometry(wide+.18,.14,depth+.18),timberMat,[0,.12,0]);
+   hut.rotation.y=z<-16?Math.PI:0;
    placeSolid(hut,x,z);
  }
  // Dress the settlement with imported CC0 fence, gate, and wall modules.
  // Use every imported Kenney fantasy-town model in the actual village layout.
  // Modular walls, gates, roof pieces and fences form a broken settlement edge.
- const townPieces=importedModels.allTown||[];
+ const townPieces=(importedModels.allTown||[]).filter(entry=>/house|cottage|building|tower|gate|arch|bridge|wall|fence|roof|market|shop|well|fountain|balcony|hedge/.test(entry.name||'')).slice(0,18);
  for(let i=0;i<townPieces.length;i++){
    const entry=townPieces[i],name=entry.name||'',piece=entry.model.clone(true);
    piece.updateMatrixWorld(true);
@@ -265,15 +266,15 @@ function generate(s){seed=s>>>0;document.querySelector('#seedLabel').textContent
    const scaled=new THREE.Box3().setFromObject(piece);piece.position.y-=scaled.min.y;
    // Arrange modular pieces along two sides and the back of the hamlet rather than scattering them.
    const sideIndex=i%2,slot=Math.floor(i/2);
-   if(slot<4){
-     piece.position.x=(sideIndex===0?-1:1)*(7.5+(slot%2)*.35);
-     piece.position.z=-9.4-slot*2.05;
+   if(slot<5){
+     piece.position.x=(sideIndex===0?-1:1)*14.2;
+     piece.position.z=-9.5+slot*4.15;
      piece.rotation.y=sideIndex===0?Math.PI/2:-Math.PI/2;
    }else{
-     const backSlot=slot-4;
-     piece.position.x=-7.2+backSlot*2.35;
-     piece.position.z=backSlot%2===0?-19.2:-8.4;
-     piece.rotation.y=backSlot%2===0?0:Math.PI;
+     const backSlot=slot-5;
+     piece.position.x=-10.5+backSlot*4.2;
+     piece.position.z=-28.2;
+     piece.rotation.y=Math.PI;
    }
    // Subtle variation avoids a perfectly repeated kit-bash look.
    piece.rotation.y+=(rand()-.5)*.06;
@@ -291,7 +292,7 @@ function generate(s){seed=s>>>0;document.querySelector('#seedLabel').textContent
    const light=new THREE.PointLight(0xffb968,.8,5);light.position.set(0,1.9,0);lamp.add(light);
    placeSolid(lamp,x,z);
  }
- [[-3.5,-8.5],[3.5,-8.5],[-9,-14],[9,-14],[-3,-20],[4,-20]].forEach(p=>makeLantern(p[0],p[1]));
+ [[-5.5,-7.5],[5.5,-7.5],[-13,-13],[13,-13],[-5.5,-24],[5.5,-24]].forEach(p=>makeLantern(p[0],p[1]));
  // Low fences define the settlement edge without walling off the exploration routes.
  function fenceRun(x,z,count,rotation=0){
    const fence=new THREE.Group();
@@ -305,8 +306,8 @@ function generate(s){seed=s>>>0;document.querySelector('#seedLabel').textContent
    }
    fence.rotation.y=rotation;placeSolid(fence,x,z);
  }
- fenceRun(-9.8,-7.9,4,Math.PI/2);fenceRun(6.9,-7.9,4,Math.PI/2);
- fenceRun(-5.2,-21.8,8,0);
+ fenceRun(-13.2,-8.2,5,Math.PI/2);fenceRun(8.8,-8.2,5,Math.PI/2);
+ fenceRun(-7.4,-25.5,8,0);
  // Market crates and barrels give the village a lived-in scale.
  function makeCrate(x,z,scale=1){
    const crate=new THREE.Group(),wood=mat(0x68452f),edge=mat(0x3c2a27);
@@ -322,14 +323,14 @@ function generate(s){seed=s>>>0;document.querySelector('#seedLabel').textContent
    for(const yy of [.13,.48])addMesh(barrel,new THREE.TorusGeometry(.29,.035,5,12),hoop,[0,yy,0]).rotation.x=Math.PI/2;
    placeSolid(barrel,x,z);
  }
- makeCrate(-4.25,-11.8);makeCrate(-3.6,-11.75,.78);makeCrate(4.1,-15.8);
- makeBarrel(4.5,-15.7);makeBarrel(-4.3,-15.9);
+ makeCrate(-5.2,-12.8);makeCrate(-4.5,-12.5,.78);makeCrate(5.2,-17.4);
+ makeBarrel(5.7,-17.1);makeBarrel(-5.6,-17.5);
  // A simple wayfinder sign marks the road leaving the village.
  const sign=new THREE.Group();
  addMesh(sign,new THREE.CylinderGeometry(.06,.08,1.7,6),postWood,[0,.85,0]);
  addMesh(sign,new THREE.BoxGeometry(1.05,.28,.12),timberMat,[.24,1.35,0]);
  addMesh(sign,new THREE.BoxGeometry(.04,.17,.14),trim,[.24,1.35,.075]);
- placeSolid(sign,1.6,-7.1);
+ placeSolid(sign,0,-6.8);
 
 
  // A proper village square: a stone well, canvas market awnings, benches, and a notice board.
@@ -341,7 +342,7 @@ function generate(s){seed=s>>>0;document.querySelector('#seedLabel').textContent
  for(const sx of [-.66,.66])addMesh(well,new THREE.BoxGeometry(.12,1.15,.12),timberMat,[sx,1.25,0]);
  addMesh(well,new THREE.BoxGeometry(1.55,.12,.16),timberMat,[0,1.82,0]);
  const roofWell=addMesh(well,new THREE.ConeGeometry(1.08,.58,4),roofMat,[0,2.1,0]);roofWell.rotation.y=Math.PI/4;
- placeSolid(well,0,-14.1);
+ placeSolid(well,0,-15.2);
  function marketStall(x,z,clothColor){
    const stall=new THREE.Group(),cloth=mat(clothColor),canvasEdge=mat(0x302239);
    for(const sx of [-.95,.95])for(const sz of [-.52,.52])addMesh(stall,new THREE.CylinderGeometry(.045,.055,1.8,5),postWood,[sx,.9,sz]);
@@ -351,7 +352,7 @@ function generate(s){seed=s>>>0;document.querySelector('#seedLabel').textContent
    for(let i=0;i<5;i++)addMesh(stall,new THREE.BoxGeometry(.22,.16,.035),cloth,[ -.84+i*.42,1.65,.76]);
    placeSolid(stall,x,z);
  }
- marketStall(-2.8,-16.1,0x6b416f);marketStall(2.7,-16.2,0x80603c);
+ marketStall(-4.6,-15.2,0x6b416f);marketStall(4.6,-15.2,0x80603c);
  function villageBench(x,z,rot=0){
    const bench=new THREE.Group(),seat=mat(0x73513c),legs=mat(0x3d2b2e);
    addMesh(bench,new THREE.BoxGeometry(1.25,.12,.34),seat,[0,.52,0]);
@@ -359,7 +360,7 @@ function generate(s){seed=s>>>0;document.querySelector('#seedLabel').textContent
    addMesh(bench,new THREE.BoxGeometry(1.25,.12,.1),seat,[0,.83,-.1]);
    bench.rotation.y=rot;placeSolid(bench,x,z);
  }
- villageBench(-4.4,-18.7,.35);villageBench(4.5,-18.8,-.35);
+ villageBench(-5.2,-20.2,.35);villageBench(5.2,-20.2,-.35);
  // A tiny notice board makes the square feel like the village once had a community.
  const notice=new THREE.Group();
  addMesh(notice,new THREE.BoxGeometry(.9,.72,.12),timberMat,[0,1.22,0]);
@@ -367,7 +368,7 @@ function generate(s){seed=s>>>0;document.querySelector('#seedLabel').textContent
  for(const sx of [-.32,.32])addMesh(notice,new THREE.BoxGeometry(.035,.36,.045),mat(0x51364e),[sx,1.22,.11]);
  addMesh(notice,new THREE.BoxGeometry(.5,.035,.045),mat(0x51364e),[0,1.22,.11]);
  for(const sx of [-.32,.32])addMesh(notice,new THREE.CylinderGeometry(.045,.055,.92,5),postWood,[sx,.46,0]);
- placeSolid(notice,-1.8,-9.7);
+ placeSolid(notice,-2.2,-8.2);
 
  // Rune-ring pool, a visual destination beside the path.
  const waterMat=new THREE.MeshStandardMaterial({color:0x29204e,metalness:.35,roughness:.22,emissive:0x160b35,emissiveIntensity:.6});
