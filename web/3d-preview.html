@@ -34,12 +34,31 @@
 #brand,#story,#controls,#joy{transition:opacity .5s ease}
 body:not(.entered) #brand,body:not(.entered) #story,body:not(.entered) #controls,body:not(.entered) #joy{opacity:0;pointer-events:none}
 body.entered #brand,body.entered #story,body.entered #controls,body.entered #joy{opacity:1;pointer-events:auto}
+/* Exploration-first HUD: keep the world visible and make panels opt-in on small screens. */
+#hudToggle,#storyToggle{position:fixed;z-index:8;top:12px;padding:9px 12px;border-radius:999px;background:#100b1dcc;backdrop-filter:blur(10px);box-shadow:0 5px 18px #0006}
+#hudToggle{right:12px}#storyToggle{right:122px}
+@media(max-width:650px){
+ #brand{left:10px;top:10px;max-width:calc(100vw - 150px);padding:8px 10px;border-radius:12px}
+ #brand h1{font-size:12px;margin:0}#brand small{font-size:9px}#assetStatus,#brand .hint{display:none}
+ #story{display:none;top:58px;bottom:auto;right:10px;left:10px;width:auto;max-width:none;max-height:42vh;padding:12px}
+ body.story-open #story{display:block}
+ #controls{display:none;top:auto;bottom:calc(12px + env(safe-area-inset-bottom));left:10px;right:10px;max-width:none;padding:9px;gap:6px;background:#100b1beF}
+ body.hud-open #controls{display:flex}
+ #controls label{font-size:11px}#controls input{width:76px;padding:7px}#controls button{padding:8px;font-size:11px}
+ #joy{width:90px;height:90px;left:14px;bottom:calc(18px + env(safe-area-inset-bottom));background:#100b1b55}
+ #nub{left:25px;top:25px;width:38px;height:38px}
+ body.hud-open #joy{bottom:calc(96px + env(safe-area-inset-bottom))}
+ #storyToggle{right:104px;top:10px}#hudToggle{right:10px;top:10px}
+}
+@media(min-width:651px){#hudToggle,#storyToggle{display:none}}
 @media(max-width:500px){.boot-mark{width:70px;height:70px;font-size:34px}.menu-options{grid-template-columns:1fr}.title-view .subtitle{font-size:12px}.title-view h1{font-size:30px}}
 
 </style>
 </head>
 <body>
 <div id="world"></div>
+<button id="storyToggle" type="button" aria-expanded="false">✦ Chronicle</button>
+<button id="hudToggle" type="button" aria-expanded="false">☰ World</button>
 
 <div id="boot" aria-live="polite">
  <div class="boot-inner">
@@ -219,6 +238,9 @@ function showStory(i){if(!story.length)return;storyIndex=(i+story.length)%story.
 fetch('./data/canonical-story-manifest.json').then(r=>{if(!r.ok)throw Error('Story manifest unavailable');return r.json()}).then(d=>{story=d.scenes||[];showStory(0);storyReady=true;setLoadProgress(94,'Reading the chronicle');maybeOpenMenu()}).catch(e=>{document.querySelector('#title').textContent='Chronicle unavailable';document.querySelector('#body').textContent='The world can still be explored, but the story manifest did not load.';storyReady=true;maybeOpenMenu()});
 document.querySelector('#enterRealm').addEventListener('click',()=>{document.body.classList.add('entered');document.querySelector('#boot').classList.add('done');const name=document.querySelector('#wizardName').value.trim();const path=document.querySelector('#wizardPath').value;document.querySelector('#brand').querySelector('h1').textContent='✦ '+(name||'TRAVELER')+' · '+path.toUpperCase();hero.userData.wizardName=name||'Traveler';hero.userData.wizardPath=path;});
 document.querySelector('#menuSettings').addEventListener('click',()=>{const note=document.querySelector('#menuNote');note.textContent='Visual quality: balanced for mobile. Sound and saved character profiles will be added after the start menu milestone.';});
+const storyToggle=document.querySelector('#storyToggle'),hudToggle=document.querySelector('#hudToggle');
+storyToggle.addEventListener('click',()=>{const open=document.body.classList.toggle('story-open');storyToggle.setAttribute('aria-expanded',String(open));});
+hudToggle.addEventListener('click',()=>{const open=document.body.classList.toggle('hud-open');hudToggle.setAttribute('aria-expanded',String(open));hudToggle.textContent=open?'✕ Close':'☰ World';});
 document.querySelector('#advance').addEventListener('click',()=>showStory(storyIndex+1));document.querySelector('#storyPrev').onclick=()=>showStory(storyIndex-1);document.querySelector('#storyNext').onclick=()=>showStory(storyIndex+1);
 document.querySelector('#generate').onclick=()=>{const v=Number(document.querySelector('#seed').value);generate(Number.isFinite(v)?v:Math.floor(Math.random()*2147483647))};
 document.querySelector('#reset').onclick=()=>{hero.position.set(0,0,0);yaw=0;pitch=.22};
