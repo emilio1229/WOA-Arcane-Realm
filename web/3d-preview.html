@@ -192,9 +192,11 @@ function generate(s){seed=s>>>0;document.querySelector('#seedLabel').textContent
  const grassMats=[mat(0x26352e),mat(0x30352f),mat(0x343044)];
  for(let i=0;i<250;i++){const x=(rand()-.5)*85,z=(rand()-.5)*85;if(Math.hypot(x,z)<5)continue;const g=addMesh(new THREE.Group(),new THREE.ConeGeometry(.06+rand()*.09,.12+rand()*.3,4),grassMats[Math.floor(rand()*grassMats.length)],[0,0,0]);g.position.set(x,-.03,z);world.add(g);worldObjects.push(g)}
  const treeTrunk=mat(0x453047),leaves=[mat(0x253a35),mat(0x2c3547),mat(0x382844)];
- for(let i=0;i<48;i++){const a=rand()*Math.PI*2,r=7+rand()*32,x=Math.cos(a)*r,z=Math.sin(a)*r;let tree=makeAssetInstance('trees',rand,2.8+rand()*1.2);if(!tree){tree=new THREE.Group();addMesh(tree,new THREE.CylinderGeometry(.12,.22,1.4,5),treeTrunk,[0,.7,0]);addMesh(tree,new THREE.ConeGeometry(.75+rand()*.5,2.2+rand(),6),leaves[Math.floor(rand()*leaves.length)],[0,2,0]);}placeSolid(tree,x,z)}
+ // Keep the village footprint and its main approach free of random forest props.
+ const insideVillageClearance=(x,z)=>x>-11.5&&x<11.5&&z>-24.5&&z<-5.5;
+ for(let i=0;i<48;i++){const a=rand()*Math.PI*2,r=7+rand()*32,x=Math.cos(a)*r,z=Math.sin(a)*r;if(insideVillageClearance(x,z))continue;let tree=makeAssetInstance('trees',rand,2.8+rand()*1.2);if(!tree){tree=new THREE.Group();addMesh(tree,new THREE.CylinderGeometry(.12,.22,1.4,5),treeTrunk,[0,.7,0]);addMesh(tree,new THREE.ConeGeometry(.75+rand()*.5,2.2+rand(),6),leaves[Math.floor(rand()*leaves.length)],[0,2,0]);}placeSolid(tree,x,z)}
  const stone=mat(0x51445e),glow=mat(0x5e3e91,.45,0x27104b);
- for(let i=0;i<15;i++){const a=rand()*Math.PI*2,r=8+rand()*20,x=Math.cos(a)*r,z=Math.sin(a)*r;let rock=makeAssetInstance('rocks',rand,0.8+rand()*1.2);if(!rock)rock=addMesh(new THREE.Group(),new THREE.DodecahedronGeometry(.5+rand()*.9,0),stone,[0,.25,0],[1,.7,1]);rock.rotation.set(rand(),rand()*3,rand());placeSolid(rock,x,z)}
+ for(let i=0;i<15;i++){const a=rand()*Math.PI*2,r=8+rand()*20,x=Math.cos(a)*r,z=Math.sin(a)*r;if(insideVillageClearance(x,z))continue;let rock=makeAssetInstance('rocks',rand,0.8+rand()*1.2);if(!rock)rock=addMesh(new THREE.Group(),new THREE.DodecahedronGeometry(.5+rand()*.9,0),stone,[0,.25,0],[1,.7,1]);rock.rotation.set(rand(),rand()*3,rand());placeSolid(rock,x,z)}
  for(let i=0;i<7;i++){const a=i/7*Math.PI*2,r=4.5,x=Math.cos(a)*r,z=Math.sin(a)*r;const pillar=new THREE.Group();addMesh(pillar,new THREE.CylinderGeometry(.3,.4,2.4,6),stone,[0,1.2,0]);addMesh(pillar,new THREE.OctahedronGeometry(.22),glow,[0,2.55,0]);placeSolid(pillar,x,z)}
  // Central fractured gate: the first memorable landmark in the Realm.
  const gateStone=mat(0x66556f),gateGlow=mat(0x8f54e8,.28,0x5524a5);
