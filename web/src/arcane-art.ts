@@ -84,7 +84,17 @@ async function loadConceptArchive(): Promise<boolean> {
       sprites.familiarElemental = makeTransparentSprite(familiar,{x:7,y:219,w:49,h:48});
     }
     if (enemy) sprites.shadowWraith = makeTransparentSprite(enemy,{x:3,y:42,w:48,h:49});
-    if (mathias) sprites.mathias = makeTransparentSprite(mathias,{x:18,y:43,w:37,h:52});
+    if (mathias) {
+      // The concept panel labels seven distinct poses across its top row.
+      // These remain single-frame action poses, not a fabricated walk cycle.
+      sprites.mathias = makeTransparentSprite(mathias,{x:18,y:43,w:37,h:52});
+      sprites.mathiasWalk = makeTransparentSprite(mathias,{x:58,y:43,w:34,h:52});
+      sprites.mathiasRun = makeTransparentSprite(mathias,{x:100,y:43,w:34,h:52});
+      sprites.mathiasAttack = makeTransparentSprite(mathias,{x:143,y:43,w:34,h:52});
+      sprites.mathiasCast = makeTransparentSprite(mathias,{x:186,y:43,w:34,h:52});
+      sprites.mathiasHurt = makeTransparentSprite(mathias,{x:229,y:43,w:34,h:52});
+      sprites.mathiasDeath = makeTransparentSprite(mathias,{x:273,y:43,w:38,h:52});
+    }
     if (spell) sprites.arcaneBlast = makeTransparentSprite(spell,{x:109,y:48,w:84,h:43});
     artWindow.woaRuntimeSprites = {...(artWindow.woaRuntimeSprites || {}),...sprites};
     const conceptArt: Record<string,string> = {};
