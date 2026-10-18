@@ -372,6 +372,20 @@ function generate(s){seed=s>>>0;document.querySelector('#seedLabel').textContent
  // Fallen columns and scattered blocks suggest an older ruin swallowed by the forest.
  const ruinStone=mat(0x5b5068);
  for(let i=0;i<7;i++){const block=new THREE.Group(),w=.45+rand()*.65,h=.35+rand()*.7,d=.4+rand()*.5;addMesh(block,new THREE.BoxGeometry(w,h,d),ruinStone,[0,h/2,0]);block.rotation.y=rand()*Math.PI;block.rotation.z=(rand()-.5)*.2;placeSolid(block,21+(rand()-.5)*5,8+(rand()-.5)*6);}
+
+ // A communal hearth gives the square a warm center after sunset.
+ const hearth=new THREE.Group(),hearthStone=mat(0x625267),coal=mat(0x2c1c32),flameMat=new THREE.MeshStandardMaterial({color:0xffb05c,emissive:0xff5d22,emissiveIntensity:2});
+ const hearthRing=new THREE.Mesh(new THREE.TorusGeometry(.78,.16,6,12),hearthStone);hearthRing.rotation.x=Math.PI/2;hearthRing.position.y=.2;hearth.add(hearthRing);
+ addMesh(hearth,new THREE.CylinderGeometry(.62,.62,.08,12),coal,[0,.12,0]);
+ for(let i=0;i<5;i++){const log=addMesh(hearth,new THREE.CylinderGeometry(.075,.09,.72,5),postWood,[0,.23,0]);log.rotation.z=Math.PI/2;log.rotation.y=i*.63;}
+ const fireA=addMesh(hearth,new THREE.ConeGeometry(.2,.65,5),flameMat,[-.08,.48,0]);fireA.rotation.z=.12;
+ const fireB=addMesh(hearth,new THREE.ConeGeometry(.13,.46,5),mat(0xffd27b,.2,0xff7b24),[.12,.4,.04]);fireB.rotation.z=-.16;
+ const hearthLight=new THREE.PointLight(0xff9848,1.25,6);hearthLight.position.set(0,.8,0);hearth.add(hearthLight);
+ placeSolid(hearth,0,-18.2);
+ // Flat stepping stones branch from the square toward the pool and forest trails.
+ const stepStone=mat(0x51475e);
+ for(let i=0;i<7;i++){const t=addMesh(new THREE.Group(),new THREE.CylinderGeometry(.38,.43,.09,6),stepStone,[0,0,0]);t.position.set(-4.7-i*.78,.015,-20.8-i*.9);t.rotation.y=rand()*Math.PI;world.add(t);worldObjects.push(t);}
+
  // A tiny wayfinder brazier makes the settlement edge feel inhabited.
  const brazier=new THREE.Group(),ember=mat(0xffa56b,.25,0xff6a26);
  addMesh(brazier,new THREE.CylinderGeometry(.24,.34,.55,7),towerStone,[0,.3,0]);
