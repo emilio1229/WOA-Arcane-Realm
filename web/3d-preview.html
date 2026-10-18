@@ -183,7 +183,8 @@ async function loadImportedModels(){try{const response=await fetch('./assets/3d/
 function rngFactory(s){return()=>{s=(Math.imul(1664525,s)+1013904223)>>>0;return s/4294967296}}
 function clearWorld(){for(const o of worldObjects)world.remove(o);worldObjects=[];solidObjects=[];solidColliders=[]}
 function place(o,x,z){o.position.x=x;o.position.z=z;world.add(o);worldObjects.push(o)}
-function placeSolid(o,x,z){place(o,x,z);o.updateMatrixWorld(true);const bounds=new THREE.Box3().setFromObject(o);if(Number.isFinite(bounds.min.x)&&Number.isFinite(bounds.min.z))solidColliders.push({minX:bounds.min.x,maxX:bounds.max.x,minZ:bounds.min.z,maxZ:bounds.max.z});solidObjects.push(o)}
+function addCollider(minX,maxX,minZ,maxZ){solidColliders.push({minX,maxX,minZ,maxZ})}
+function placeSolid(o,x,z){place(o,x,z);o.updateMatrixWorld(true);const bounds=new THREE.Box3().setFromObject(o);if(Number.isFinite(bounds.min.x)&&Number.isFinite(bounds.min.z))addCollider(bounds.min.x,bounds.max.x,bounds.min.z,bounds.max.z);solidObjects.push(o)}
 // Cache world-space footprints once per build; this keeps collision checks cheap on phones.
 let solidColliders=[];
 function isBlocked(x,z){const radius=.34;for(const b of solidColliders){const nx=Math.max(b.minX,Math.min(x,b.maxX)),nz=Math.max(b.minZ,Math.min(z,b.maxZ));if((x-nx)*(x-nx)+(z-nz)*(z-nz)<radius*radius)return true;}return false;}
@@ -203,7 +204,11 @@ function generate(s){seed=s>>>0;document.querySelector('#seedLabel').textContent
  addMesh(gate,new THREE.BoxGeometry(3.1,.42,.55),gateStone,[0,3.15,0]);
  const arch=addMesh(gate,new THREE.TorusGeometry(1.12,.11,8,24,Math.PI),gateGlow,[0,2.15,-.03]);arch.rotation.z=Math.PI;
  addMesh(gate,new THREE.PlaneGeometry(1.95,2.05),new THREE.MeshBasicMaterial({color:0x572d9b,transparent:true,opacity:.38,side:THREE.DoubleSide}),[0,1.95,.04]);
- placeSolid(gate,0,-1.2);
+ // The portal opening must be walk-through: only the two stone uprights block movement.
+ // The overhead lintel and magical arch are above the player's head and must not create a full-width invisible wall.
+ place(gate,0,-1.2);
+ addCollider(-1.56,-1.14,-1.48,-.92);
+ addCollider(1.14,1.56,-1.48,-.92);
  // Small, coherent ruined hamlet: timber-framed cottages with lit windows and varied roofs.
  const hutMat=mat(0x514052),roofMat=mat(0x30243b),doorMat=mat(0x171020),timberMat=mat(0x332536);
  const windowGlow=new THREE.MeshStandardMaterial({color:0xffc879,emissive:0xb65a23,emissiveIntensity:1.15});
