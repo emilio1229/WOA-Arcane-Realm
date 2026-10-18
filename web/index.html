@@ -227,7 +227,8 @@
         for (const [name,key] of Object.entries(keys)) {
           const data = assets[name];
           if (!data || this.textures.exists(key)) continue;
-          this.textures.addBase64(key, data);
+          // Subscribe before starting the asynchronous base64 decode. Registering
+          // after addBase64 can miss the texture event on fast devices/browsers.
           this.textures.once("addtexture-" + key, () => {
             if (name.startsWith("familiar") && this.familiarSprite && this.textures.exists(key)) {
               const profile = (()=>{try{return JSON.parse(localStorage.getItem("woa-preview-profile-v1")||"{}")}catch(_){return {}}})();
@@ -239,6 +240,7 @@
               this.mathiasSprite.setTexture(key).setDisplaySize(43,61);
             }
           });
+          this.textures.addBase64(key, data);
         }
       };
       if (window.woaArtReady) window.woaArtReady.then(installRuntimeArt);
