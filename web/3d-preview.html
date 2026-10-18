@@ -76,11 +76,12 @@ function generate(s){seed=s>>>0;document.querySelector('#seedLabel').textContent
    const x=(i%2?1:-1)*(5.8+rand()*1.5),z=-12-Math.floor(i/2)*3.3;
    const hut=new THREE.Group();
    addMesh(hut,new THREE.BoxGeometry(1.8,1.25,1.5),hutMat,[0,.7,0]);
-   const roofAsset=makeAssetInstance('town',rand,.85);
-   if(roofAsset){roofAsset.position.set(0,1.35,0);hut.add(roofAsset);}else addMesh(hut,new THREE.ConeGeometry(1.45,.85,4),roofMat,[0,1.7,0]).rotation.y=Math.PI/4;
+   addMesh(hut,new THREE.ConeGeometry(1.45,.85,4),roofMat,[0,1.7,0]).rotation.y=Math.PI/4;
    addMesh(hut,new THREE.BoxGeometry(.38,.78,.08),doorMat,[0,.42,.77]);
    place(hut,x,z);
  }
+ // Dress the settlement with imported CC0 fence, gate, and wall modules.
+ for(let i=0;i<5;i++){const piece=makeAssetInstance('town',rand,1.2+rand()*.6);if(!piece)continue;const side=i%2?1:-1;piece.rotation.y=(rand()-.5)*.35;place(piece,side*(4.5+rand()*2),-10-i*1.7);}
  // Rune-ring pool, a visual destination beside the path.
  const waterMat=new THREE.MeshStandardMaterial({color:0x29204e,metalness:.35,roughness:.22,emissive:0x160b35,emissiveIntensity:.6});
  const pool=addMesh(new THREE.Group(),new THREE.CylinderGeometry(2.7,2.7,.12,24),waterMat,[0,0,0]);
