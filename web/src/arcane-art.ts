@@ -51,11 +51,29 @@ function makeTransparentSprite(image: HTMLImageElement | null, rect: CropRect): 
   if (!context) return null;
   context.drawImage(image, rect.x, rect.y, rect.w, rect.h, 0, 0, rect.w, rect.h);
   const frame = context.getImageData(0, 0, rect.w, rect.h), pixels = frame.data;
-  for (let i = 0; i < pixels.length; i += 4) {
-    const red = pixels[i], green = pixels[i + 1], blue = pixels[i + 2];
-    const violet = blue > 75 && red > 35 && blue > green * 1.28 && red > green * 1.18 && blue - red < 105;
-    const deepViolet = blue > 45 && red > 25 && blue > green * 1.35 && red > green * 1.22 && red < 115 && green < 65;
-    if (violet || deepViolet) pixels[i + 3] = 0;
+  // Remove only background pixels connected to the crop's border. The earlier
+  // global purple color-key erased purple highlights from the actual characters.
+  const width = rect.w, height = rect.h, visited = new Uint8Array(width * height);
+  const queue = new Int32Array(width * height);
+  let head = 0, tail = 0;
+  const isBackground = (index: number): boolean => {
+    const p = index * 4, red = pixels[p], green = pixels[p + 1], blue = pixels[p + 2];
+    // Purple gradient used on the concept sheets; keep the test broad enough
+    // for edge pixels, but flood-fill connectivity protects the artwork.
+    return blue > 55 && red > 35 && blue > green * 1.25 && red > green * 1.15;
+  };
+  const enqueue = (x: number, y: number): void => {
+    if (x < 0 || y < 0 || x >= width || y >= height) return;
+    const index = y * width + x;
+    if (visited[index] || !isBackground(index)) return;
+    visited[index] = 1; queue[tail++] = index;
+  };
+  for (let x = 0; x < width; x++) { enqueue(x, 0); enqueue(x, height - 1); }
+  for (let y = 0; y < height; y++) { enqueue(0, y); enqueue(width - 1, y); }
+  while (head < tail) {
+    const index = queue[head++], x = index % width, y = Math.floor(index / width);
+    pixels[index * 4 + 3] = 0;
+    enqueue(x - 1, y); enqueue(x + 1, y); enqueue(x, y - 1); enqueue(x, y + 1);
   }
   context.putImageData(frame, 0, 0);
   return canvas.toDataURL("image/png");
