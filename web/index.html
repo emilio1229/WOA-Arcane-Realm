@@ -223,7 +223,7 @@
       // into Phaser without delaying the initial game boot.
       const installRuntimeArt = () => {
         const assets = window.woaRuntimeSprites || {};
-        const keys = {familiarRaven:"woa-familiar-raven",familiarWolf:"woa-familiar-wolf",familiarDragon:"woa-familiar-dragon",familiarElemental:"woa-familiar-elemental",shadowWraith:"woa-enemy-art",mathias:"woa-mathias-art",arcaneBlast:"woa-spell-art"};
+        const keys = {familiarRaven:"woa-familiar-raven",familiarWolf:"woa-familiar-wolf",familiarDragon:"woa-familiar-dragon",familiarElemental:"woa-familiar-elemental",shadowWraith:"woa-enemy-art",mathias:"woa-mathias-art",mathiasWalk:"woa-mathias-walk",mathiasRun:"woa-mathias-run",mathiasAttack:"woa-mathias-attack",mathiasCast:"woa-mathias-cast",mathiasHurt:"woa-mathias-hurt",mathiasDeath:"woa-mathias-death",arcaneBlast:"woa-spell-art"};
         for (const [name,key] of Object.entries(keys)) {
           const data = assets[name];
           if (!data || this.textures.exists(key)) continue;
@@ -283,6 +283,13 @@
       if(this.mode!=="town"||!this.add||!this.tweens)return;
       const x=this.scale.width*.5, y=(this.playerBaseY||this.scale.height*.76)-12;
       const spell=action==="spell"||action==="magic";
+      const mathiasPose = spell ? "woa-mathias-cast" : "woa-mathias-attack";
+      if(this.mathiasSprite && this.textures.exists(mathiasPose)) {
+        this.mathiasSprite.setTexture(mathiasPose);
+        this.time.delayedCall(520, () => {
+          if(this.mathiasSprite && this.textures.exists("woa-mathias-art")) this.mathiasSprite.setTexture("woa-mathias-art");
+        });
+      }
       if(spell){
         if(this.textures.exists("woa-spell-art")){
           const blast=this.add.image(x,y-34,"woa-spell-art").setDisplaySize(66,52).setDepth(19);
