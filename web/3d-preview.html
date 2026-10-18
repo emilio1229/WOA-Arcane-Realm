@@ -250,7 +250,7 @@ function generate(s){seed=s>>>0;document.querySelector('#seedLabel').textContent
    for(const px of [-wide/2+.09,wide/2-.09])for(const pz of [-depth/2+.08,depth/2-.08])
      addMesh(hut,new THREE.BoxGeometry(.12,1.35,.12),timberMat,[px,.72,pz]);
    addMesh(hut,new THREE.BoxGeometry(wide+.18,.14,depth+.18),timberMat,[0,.12,0]);
-   hut.rotation.y=z<-16?Math.PI:0;
+   hut.rotation.y=z>-16?Math.PI:0;
    placeSolid(hut,x,z);
  }
  // Dress the settlement with imported CC0 fence, gate, and wall modules.
