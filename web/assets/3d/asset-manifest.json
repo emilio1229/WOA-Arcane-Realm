@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-10-17",
+  "status": "catalogued-not-yet-vendored",
+  "policy": "Only use files from original publisher downloads. Re-check each license at import time. Do not describe an asset as integrated until the file is committed and loaded in the game.",
+  "packs": [
+    {
+      "id": "kenney-nature-kit",
+      "name": "Kenney Nature Kit",
+      "publisher": "Kenney",
+      "page": "https://kenney.nl/assets/nature-kit",
+      "license": "CC0",
+      "attributionRequired": false,
+      "intendedUse": [
+        "trees",
+        "rocks",
+        "foliage"
+      ],
+      "status": "selected-for-import"
+    },
+    {
+      "id": "kenney-fantasy-town-kit",
+      "name": "Kenney Fantasy Town Kit",
+      "publisher": "Kenney",
+      "page": "https://kenney.nl/assets/fantasy-town-kit",
+      "license": "CC0",
+      "attributionRequired": false,
+      "intendedUse": [
+        "settlement",
+        "walls",
+        "buildings"
+      ],
+      "status": "selected-for-import"
+    },
+    {
+      "id": "kenney-retro-fantasy-kit",
+      "name": "Kenney Retro Fantasy Kit",
+      "publisher": "Kenney",
+      "page": "https://kenney.nl/assets/retro-fantasy-kit",
+      "license": "CC0",
+      "attributionRequired": false,
+      "intendedUse": [
+        "ruins",
+        "fantasy props",
+        "optional landmarks"
+      ],
+      "status": "optional-style-review"
+    },
+    {
+      "id": "ambientcg",
+      "name": "ambientCG materials",
+      "publisher": "ambientCG",
+      "page": "https://ambientcg.com/",
+      "license": "CC0 1.0",
+      "attributionRequired": false,
+      "intendedUse": [
+        "ground",
+        "stone",
+        "bark textures"
+      ],
+      "status": "selected-for-import",
+      "suggestedAssets": [
+        "Grass004",
+        "Ground071",
+        "PavingStones046"
+      ],
+      "suggestedResolution": "1K JPG for mobile"
+    },
+    {
+      "id": "polyhaven",
+      "name": "Poly Haven",
+      "publisher": "Poly Haven",
+      "page": "https://polyhaven.com/",
+      "license": "CC0",
+      "attributionRequired": false,
+      "intendedUse": [
+        "optional low-resolution HDRI",
+        "select environment materials"
+      ],
+      "status": "optional-after-performance-test"
+    },
+    {
+      "id": "quaternius",
+      "name": "Quaternius",
+      "publisher": "Quaternius",
+      "page": "https://quaternius.com/",
+      "license": "verify per individual pack",
+      "attributionRequired": "verify per individual pack",
+      "intendedUse": [
+        "possible stylized nature alternatives"
+      ],
+      "status": "license-review-required"
+    },
+    {
+      "id": "tiny-treats-homely-house",
+      "name": "Homely House",
+      "publisher": "Tiny Treats",
+      "page": "https://tinytreats.itch.io/homely-house",
+      "license": "reported CC0; verify at download",
+      "attributionRequired": "verify at download",
+      "intendedUse": [
+        "optional settlement accents"
+      ],
+      "status": "license-review-required"
+    }
+  ]
+}
