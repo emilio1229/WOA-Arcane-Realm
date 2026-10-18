@@ -1,21 +1,12 @@
-# WOA Arcane Realm is a 2D pixel-art browser RPG.
-# Serve the game and its committed runtime assets from the same web root.
+# WOA Arcane Realm browser build — 3D world is the production entry point.
 FROM nginx:1.28-alpine
 ENV PORT=8080
 COPY deploy/nginx.conf /etc/nginx/default.conf.template
-COPY web/index.html /usr/share/nginx/html/index.html
-COPY web/runtime/arcane-art.js /usr/share/nginx/html/runtime/arcane-art.js
-# Phaser browser RPG is the main game entry point. Keep legacy Godot and old prototypes out of the served root.
-COPY web/story-layer.js /usr/share/nginx/html/story-layer.js
-COPY web/story-data.js /usr/share/nginx/html/story-data.js
-COPY web/canonical-story.js /usr/share/nginx/html/canonical-story.js
-COPY web/player-systems.js /usr/share/nginx/html/player-systems.js
-COPY web/world-systems.js /usr/share/nginx/html/world-systems.js
-COPY web/controls.js /usr/share/nginx/html/controls.js
-COPY web/audio.js /usr/share/nginx/html/audio.js
+# Serve the new 3D experience at / instead of the retired 2D Phaser page.
+COPY web/3d-preview.html /usr/share/nginx/html/index.html
+COPY web/data/canonical-story-manifest.json /usr/share/nginx/html/data/canonical-story-manifest.json
+# Retain source art folders for future licensed 3D asset integration.
 COPY assets/ /usr/share/nginx/html/assets/
 COPY web/assets/ /usr/share/nginx/html/assets/
-# Separate UI-only preview; the existing game entry point remains unchanged.
-COPY activity-preview/ /usr/share/nginx/html/activity-preview/
 EXPOSE 8080
 CMD ["sh", "-c", "envsubst '${PORT}' < /etc/nginx/default.conf.template > /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"]
