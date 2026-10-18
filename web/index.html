@@ -154,13 +154,17 @@
       const spellSheet = await getImage("05_spell_and_combat_effects.png");
       window.woaRuntimeSprites = window.woaRuntimeSprites || {};
       if (familiarSheet) {
-        window.woaRuntimeSprites.familiarWolf = makeTransparentSprite(familiarSheet, {x:8,y:104,w:48,h:34});
+        // One clean pose per creature family; these are static sprite assets, not fake atlases.
+        window.woaRuntimeSprites.familiarRaven = makeTransparentSprite(familiarSheet, {x:18,y:55,w:45,h:38});
+        window.woaRuntimeSprites.familiarWolf = makeTransparentSprite(familiarSheet, {x:10,y:108,w:56,h:39});
+        window.woaRuntimeSprites.familiarDragon = makeTransparentSprite(familiarSheet, {x:10,y:164,w:48,h:43});
+        window.woaRuntimeSprites.familiarElemental = makeTransparentSprite(familiarSheet, {x:7,y:219,w:49,h:48});
       }
       // Isolated reference poses/effects are exported as transparent single-frame PNGs.
       // They are not advertised as complete animations; the game animates them with Phaser tweens.
-      if (enemySheet) window.woaRuntimeSprites.shadowWraith = makeTransparentSprite(enemySheet, {x:4,y:43,w:47,h:48});
+      if (enemySheet) window.woaRuntimeSprites.shadowWraith = makeTransparentSprite(enemySheet, {x:3,y:42,w:48,h:49});
       if (mathiasSheet) window.woaRuntimeSprites.mathias = makeTransparentSprite(mathiasSheet, {x:18,y:43,w:37,h:52});
-      if (spellSheet) window.woaRuntimeSprites.arcaneBlast = makeTransparentSprite(spellSheet, {x:98,y:40,w:86,h:68});
+      if (spellSheet) window.woaRuntimeSprites.arcaneBlast = makeTransparentSprite(spellSheet, {x:109,y:48,w:84,h:43});
       // Keep the categorized concept panels available to future scene/UI integrations.
       window.woaConceptArt = {};
       const categories = [
@@ -318,7 +322,7 @@
       // into Phaser without delaying the initial game boot.
       const installRuntimeArt = () => {
         const assets = window.woaRuntimeSprites || {};
-        const keys = {familiarWolf:"woa-familiar-art",shadowWraith:"woa-enemy-art",mathias:"woa-mathias-art",arcaneBlast:"woa-spell-art"};
+        const keys = {familiarRaven:"woa-familiar-raven",familiarWolf:"woa-familiar-wolf",familiarDragon:"woa-familiar-dragon",familiarElemental:"woa-familiar-elemental",shadowWraith:"woa-enemy-art",mathias:"woa-mathias-art",arcaneBlast:"woa-spell-art"};
         for (const [name,key] of Object.entries(keys)) {
           const data = assets[name];
           if (!data || this.textures.exists(key)) continue;
@@ -610,8 +614,10 @@
         const familiarTint=familiarTints[familiarName]||familiarTints["Archive Wisp"];
         this.familiarAura=this.add.circle(x+47,y-25,22,familiarTint,.10).setDepth(11);
         this.tweens.add({targets:this.familiarAura,alpha:.22,scale:1.18,duration:1500,yoyo:true,repeat:-1,ease:"Sine.InOut"});
-        const familiarTexture=this.textures.exists("woa-familiar-art")?"woa-familiar-art":"woa-familiar";
-        this.familiarSprite=this.add.image(x+47,y-25,familiarTexture).setDisplaySize(44,familiarTexture==="woa-familiar-art"?34:50).setTint(familiarTexture==="woa-familiar-art"?0xffffff:familiarTint).setDepth(12);
+        const familiarKeys={"Archive Wisp":"woa-familiar-elemental","Ember Fox":"woa-familiar-dragon","Moon Moth":"woa-familiar-raven","Mossling":"woa-familiar-wolf"};
+        const preferredTexture=familiarKeys[familiarName]||"woa-familiar-elemental";
+        const familiarTexture=this.textures.exists(preferredTexture)?preferredTexture:(this.textures.exists("woa-familiar-wolf")?"woa-familiar-wolf":"woa-familiar");
+        this.familiarSprite=this.add.image(x+47,y-25,familiarTexture).setDisplaySize(44,40).setTint(familiarTexture==="woa-familiar"?familiarTint:0xffffff).setDepth(12);
         this.tweens.add({targets:this.familiarSprite,y:y-30,duration:1200,yoyo:true,repeat:-1,ease:"Sine.InOut"});
       }
       this.townLabel=this.add.text(w*.5,h*.9,"THE OUTER WARD",{fontFamily:"Georgia",fontSize:Math.max(10,Math.min(15,w*.014))+"px",color:"#d7b6ef",letterSpacing:4}).setOrigin(.5);
