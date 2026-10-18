@@ -6,6 +6,7 @@ The WoA event bot repository `emilio1229/woa-event-bot` is the source of truth f
 
 Primary story implementation:
 - `src/arcane/story.ts` — chapter text, story choices, route/familiar state, encounters and boss progression.
+- `web/data/canonical-story-manifest.json` — committed mirror of the 21 narrative scene entries currently extracted from `story.ts` for the browser client. Its recorded source commit is included in the manifest; regenerate it whenever the bot story changes.
 - `src/arcane/store.ts` and the Prisma `arcaneQuestProgress` model — progression storage and persistence.
 - Related battle, familiar, inventory, class, and reward modules in that repository are authoritative for their respective systems.
 
@@ -55,6 +56,10 @@ Only integrate files downloaded from original publisher pages with a verified no
 6. Test build, mobile browser, Discord Activity viewport, and save compatibility.
 7. Switch the default presentation to 3D.
 8. Remove the old 2D renderer and only those 2D-only assets that no longer have references. Keep any story illustrations that remain useful in Codex or narrative UI.
+
+## Story mirror created
+
+A browser-side story manifest has been committed at `web/data/canonical-story-manifest.json`. It contains the 21 narrative scene entries currently defined in the bot story source (title, body, objective, and action), along with the source repository/path/commit and synchronization rules. This is a content mirror only: it does not yet connect browser choices to the bot database, and bot branching, battles, rewards, and progression remain authoritative in the bot.
 
 ## Truthful status at the time this plan was written
 
