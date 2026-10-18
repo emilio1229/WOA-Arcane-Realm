@@ -200,14 +200,25 @@ function generate(s){seed=s>>>0;document.querySelector('#seedLabel').textContent
  const arch=addMesh(gate,new THREE.TorusGeometry(1.12,.11,8,24,Math.PI),gateGlow,[0,2.15,-.03]);arch.rotation.z=Math.PI;
  addMesh(gate,new THREE.PlaneGeometry(1.95,2.05),new THREE.MeshBasicMaterial({color:0x572d9b,transparent:true,opacity:.38,side:THREE.DoubleSide}),[0,1.95,.04]);
  place(gate,0,-1.2);
- // A modest ruined settlement along the trail.
- const hutMat=mat(0x423047),roofMat=mat(0x2c203c),doorMat=mat(0x171020);
+ // Small, coherent ruined hamlet: timber-framed cottages with lit windows and varied roofs.
+ const hutMat=mat(0x514052),roofMat=mat(0x30243b),doorMat=mat(0x171020),timberMat=mat(0x332536);
+ const windowGlow=new THREE.MeshStandardMaterial({color:0xffc879,emissive:0xb65a23,emissiveIntensity:1.15});
  for(let i=0;i<4;i++){
-   const x=(i%2?1:-1)*(5.8+rand()*1.5),z=-12-Math.floor(i/2)*3.3;
-   const hut=new THREE.Group();
-   addMesh(hut,new THREE.BoxGeometry(1.8,1.25,1.5),hutMat,[0,.7,0]);
-   addMesh(hut,new THREE.ConeGeometry(1.45,.85,4),roofMat,[0,1.7,0]).rotation.y=Math.PI/4;
-   addMesh(hut,new THREE.BoxGeometry(.38,.78,.08),doorMat,[0,.42,.77]);
+   const x=(i%2?1:-1)*(5.8+(i%2)*.45),z=-11.7-Math.floor(i/2)*4.1;
+   const hut=new THREE.Group(),wide=i===0?2.1:1.85,depth=1.65;
+   addMesh(hut,new THREE.BoxGeometry(wide,1.35,depth),hutMat,[0,.72,0]);
+   // Steep roof silhouette and visible eaves give each cottage a distinct profile.
+   const roof=addMesh(hut,new THREE.ConeGeometry(i===0?1.55:1.35,1.05,4),roofMat,[0,1.82,0]);roof.rotation.y=Math.PI/4;
+   addMesh(hut,new THREE.BoxGeometry(.43,.82,.09),doorMat,[0,.43,depth/2+.045]);
+   for(const wx of [-.58,.58]){
+     addMesh(hut,new THREE.BoxGeometry(.28,.34,.07),windowGlow,[wx,.91,depth/2+.045]);
+     addMesh(hut,new THREE.BoxGeometry(.34,.045,.09),timberMat,[wx,.91,depth/2+.085]);
+     addMesh(hut,new THREE.BoxGeometry(.045,.38,.09),timberMat,[wx,.91,depth/2+.085]);
+   }
+   // Corner posts and a foundation make the primitive fallback read as a built structure.
+   for(const px of [-wide/2+.09,wide/2-.09])for(const pz of [-depth/2+.08,depth/2-.08])
+     addMesh(hut,new THREE.BoxGeometry(.12,1.35,.12),timberMat,[px,.72,pz]);
+   addMesh(hut,new THREE.BoxGeometry(wide+.18,.14,depth+.18),timberMat,[0,.12,0]);
    place(hut,x,z);
  }
  // Dress the settlement with imported CC0 fence, gate, and wall modules.
@@ -221,9 +232,20 @@ function generate(s){seed=s>>>0;document.querySelector('#seedLabel').textContent
    const h=Math.max(.001,size.y),targetHeight=/wall|arch|gate|roof|balcony/i.test(name)?1.7:/fence|hedge/i.test(name)?1.05:1.35;
    piece.scale.multiplyScalar(targetHeight/h);piece.updateMatrixWorld(true);
    const scaled=new THREE.Box3().setFromObject(piece);piece.position.y-=scaled.min.y;
-   const side=i%2===0?-1:1,slot=Math.floor(i/2);
-   if(slot<4){piece.position.x=side*(7.2+(slot%2)*.25);piece.position.z=-8.5-slot*2.15;piece.rotation.y=side<0?Math.PI/2:-Math.PI/2;}
-   else {piece.position.x=-6.5+(slot-4)*2.2;piece.position.z=slot%2===0?-17.4:-8.2;piece.rotation.y=(rand()-.5)*.15;}
+   // Arrange modular pieces along two sides and the back of the hamlet rather than scattering them.
+   const sideIndex=i%2,slot=Math.floor(i/2);
+   if(slot<4){
+     piece.position.x=(sideIndex===0?-1:1)*(7.5+(slot%2)*.35);
+     piece.position.z=-9.4-slot*2.05;
+     piece.rotation.y=sideIndex===0?Math.PI/2:-Math.PI/2;
+   }else{
+     const backSlot=slot-4;
+     piece.position.x=-7.2+backSlot*2.35;
+     piece.position.z=backSlot%2===0?-19.2:-8.4;
+     piece.rotation.y=backSlot%2===0?0:Math.PI;
+   }
+   // Subtle variation avoids a perfectly repeated kit-bash look.
+   piece.rotation.y+=(rand()-.5)*.06;
    world.add(piece);worldObjects.push(piece);
  }
  // Rune-ring pool, a visual destination beside the path.
