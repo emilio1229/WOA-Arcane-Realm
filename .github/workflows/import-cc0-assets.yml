@@ -68,13 +68,18 @@ jobs:
               glbs = [n for n in names if n.lower().endswith(".glb")]
               if not glbs:
                 raise RuntimeError("No GLB files found in " + pack["id"])
-              selected = []
-              for name in sorted(glbs, key=lambda n: n.lower()):
+              def rank(name):
                 base = Path(name).stem.lower().replace("-", "_")
-                if any(term in base for term in pack["terms"]):
-                  selected.append(name)
-              # Keep first selected models from the publisher's own GLB files; cap repository weight.
-              selected = selected[:pack["limit"]]
+                if pack["id"] == "kenney-nature-kit":
+                  if any(t in base for t in ("tree", "oak", "pine", "birch")): return (0, base)
+                  if any(t in base for t in ("bush", "plant", "fern", "flower", "grass")): return (1, base)
+                  if any(t in base for t in ("rock", "stone", "boulder", "cliff")): return (2, base)
+                else:
+                  if any(t in base for t in ("house", "cottage", "building", "shop", "market", "tower", "gate", "bridge", "roof")): return (0, base)
+                  if any(t in base for t in ("wall", "fence", "arch", "door", "window")): return (1, base)
+                  if any(t in base for t in ("fountain", "well", "bench", "lamp", "sign")): return (2, base)
+                return (9, base)
+              selected = [n for n in sorted(glbs, key=rank) if rank(n)[0] < 9][:pack["limit"]]
               if len(selected) < 4:
                 raise RuntimeError(f"Too few matching GLB files for {pack['id']}: {len(selected)}")
               pack["dest"].mkdir(parents=True, exist_ok=True)
