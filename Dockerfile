@@ -4,6 +4,7 @@ FROM nginx:1.28-alpine
 ENV PORT=8080
 COPY deploy/nginx.conf /etc/nginx/default.conf.template
 COPY web/index.html /usr/share/nginx/html/index.html
+COPY web/runtime/arcane-art.js /usr/share/nginx/html/runtime/arcane-art.js
 # Phaser browser RPG is the main game entry point. Keep legacy Godot and old prototypes out of the served root.
 COPY web/story-layer.js /usr/share/nginx/html/story-layer.js
 COPY web/story-data.js /usr/share/nginx/html/story-data.js
