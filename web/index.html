@@ -328,8 +328,14 @@
           if (!data || this.textures.exists(key)) continue;
           this.textures.addBase64(key, data);
           this.textures.once("addtexture-" + key, () => {
-            if (name === "familiarWolf" && this.familiarSprite && this.textures.exists(key)) {
-              this.familiarSprite.setTexture(key).clearTint().setDisplaySize(44, 34);
+            if (name.startsWith("familiar") && this.familiarSprite && this.textures.exists(key)) {
+              const profile = (()=>{try{return JSON.parse(localStorage.getItem("woa-preview-profile-v1")||"{}")}catch(_){return {}}})();
+              const map={"Archive Wisp":"woa-familiar-elemental","Ember Fox":"woa-familiar-dragon","Moon Moth":"woa-familiar-raven","Mossling":"woa-familiar-wolf"};
+              const preferred=map[String(profile.familiar||"Archive Wisp")]||"woa-familiar-elemental";
+              if (this.textures.exists(preferred)) this.familiarSprite.setTexture(preferred).clearTint().setDisplaySize(44,40);
+            }
+            if (name === "mathias" && this.mathiasSprite && this.textures.exists(key)) {
+              this.mathiasSprite.setTexture(key).setDisplaySize(43,61);
             }
           });
         }
@@ -586,6 +592,17 @@
         if(Math.abs(x-w*.5)<tileW*1.25)continue;
         diamond(x,y,tileW*.22,tileH*.14,i%2?0xb08bc6:0x8b65aa,.5);
       }
+      // Mathias stands near the central ward gate as a recognizable supporting character.
+      // His concept pose is used when loaded; the repository SVG remains the fallback.
+      const mathiasX=w*.5-tileW*1.25, mathiasY=gateY+tileH*1.65;
+      const mathiasShadow=this.add.ellipse(mathiasX,mathiasY+20,28,9,0x000000,.45).setDepth(mathiasY+20);
+      const mathiasKey=this.textures.exists("woa-mathias-art")?"woa-mathias-art":"woa-mathias";
+      this.mathiasSprite=this.add.image(mathiasX,mathiasY,mathiasKey).setDisplaySize(43,61).setDepth(mathiasY);
+      this.mathiasSprite.setInteractive({useHandCursor:true});
+      this.mathiasSprite.on("pointerdown",()=> {
+        const label=this.add.text(mathiasX,mathiasY-48,"MATHIAS",{fontFamily:"Georgia",fontSize:"12px",color:"#f0d6ff",stroke:"#160d22",strokeThickness:3}).setOrigin(.5).setDepth(999);
+        this.tweens.add({targets:label,y:label.y-12,alpha:0,duration:1600,onComplete:()=>label.destroy()});
+      });
       // Terrain is already the first child of the world container; props render above it.
       // Keep the player anchored on screen while the isometric environment scrolls around them.
       const x=w*.5,y=h*.76;
