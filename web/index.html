@@ -521,6 +521,11 @@
       const mathiasShadow=this.add.ellipse(mathiasX,mathiasY+20,28,9,0x000000,.45).setDepth(mathiasY+20);
       const mathiasKey=this.textures.exists("woa-mathias-art")?"woa-mathias-art":"woa-mathias";
       this.mathiasSprite=this.add.image(mathiasX,mathiasY,mathiasKey).setDisplaySize(43,61).setDepth(mathiasY);
+      // Subtle idle motion makes the supporting character feel present while we
+      // prepare proper frame-by-frame Piskel sheets; keep the feet anchored.
+      this.mathiasIdleBaseY=mathiasY;
+      this.tweens.add({targets:this.mathiasSprite,y:mathiasY-1.8,duration:980,yoyo:true,repeat:-1,ease:"Sine.InOut"});
+      this.tweens.add({targets:this.mathiasSprite,angle:1.1,duration:1450,yoyo:true,repeat:-1,ease:"Sine.InOut"});
       this.mathiasSprite.setInteractive({useHandCursor:true});
       this.mathiasSprite.on("pointerdown",()=> {
         const label=this.add.text(mathiasX,mathiasY-48,"MATHIAS",{fontFamily:"Georgia",fontSize:"12px",color:"#f0d6ff",stroke:"#160d22",strokeThickness:3}).setOrigin(.5).setDepth(999);
