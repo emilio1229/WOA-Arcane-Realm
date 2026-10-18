@@ -10,10 +10,63 @@
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080610;color:#f8f0ff;font-family:Georgia,serif}#world{position:fixed;inset:0}canvas{display:block;touch-action:none}
 .panel{position:fixed;z-index:2;background:var(--panel);border:1px solid var(--line);box-shadow:0 12px 40px #0008;backdrop-filter:blur(12px);border-radius:14px;padding:12px 14px;max-width:min(390px,calc(100vw - 24px))}
 #brand{left:12px;top:12px}#story{right:12px;top:12px;width:min(340px,calc(100vw - 24px));max-height:66vh;overflow:auto}#controls{left:12px;bottom:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;max-width:calc(100vw - 24px)}h1{font-size:17px;margin:0 0 4px;color:#e7c8ff}h2{font-size:16px;line-height:1.25;margin:8px 0;color:#f1d8ff}p{font-size:13px;line-height:1.5;color:#e0d3ef;white-space:pre-line;margin:8px 0}small{color:#c9b4df}button{border:1px solid #9d6bc3;border-radius:9px;padding:10px 12px;background:linear-gradient(#42285b,#1a1028);color:#fff;font:inherit;font-size:13px;touch-action:manipulation}button:active{transform:scale(.98)}input{width:100px;max-width:26vw;background:#090611;color:white;border:1px solid #694a83;border-radius:8px;padding:9px}.hint{font-size:11px;color:#b9a6cc}#joy{position:fixed;z-index:3;bottom:82px;left:20px;width:106px;height:106px;border:1px solid #c7a5f266;border-radius:50%;background:#170f2877;touch-action:none;display:none}#nub{position:absolute;left:31px;top:31px;width:42px;height:42px;border-radius:50%;background:#a66eea99;border:1px solid #e1c0ff} @media(max-width:650px){#story{top:auto;bottom:12px;right:12px;max-height:34vh;width:min(310px,calc(100vw - 24px));padding:10px}#brand{max-width:220px}#controls{bottom:auto;top:105px;max-width:calc(100vw - 24px)}#joy{display:block}p{font-size:12px}#story h2{font-size:14px}}
+
+#boot{position:fixed;inset:0;z-index:20;display:grid;place-items:center;background:radial-gradient(ellipse at 50% 42%,#26123ddd 0%,#090611f5 58%,#05040afc 100%);transition:opacity .8s ease,visibility .8s ease;padding:22px}
+#boot.done{opacity:0;visibility:hidden;pointer-events:none}
+.boot-inner{width:min(650px,100%);text-align:center}
+.sigils{font-size:13px;letter-spacing:.42em;color:#d6b1ff;text-transform:uppercase}
+.boot-mark{width:88px;height:88px;margin:18px auto;display:grid;place-items:center;border:1px solid #b47bff88;border-radius:50%;box-shadow:0 0 45px #8d4fe966,inset 0 0 28px #8d4fe933;font-size:42px;color:#ead5ff;animation:markPulse 2.8s ease-in-out infinite}
+@keyframes markPulse{50%{transform:scale(1.06);box-shadow:0 0 70px #a76affaa,inset 0 0 35px #8d4fe955}}
+#loadingView h1,.title-view h1{font-size:clamp(30px,6vw,54px);letter-spacing:.08em;line-height:1.05;color:#f2e4ff;text-shadow:0 0 28px #a76aff88;margin:12px 0}
+#loadingView p,.title-view p{font-size:14px;color:#cbb8df;letter-spacing:.06em}
+.progress-track{height:5px;width:min(340px,90%);margin:26px auto 10px;background:#2c1d3b;border-radius:9px;overflow:hidden;border:1px solid #64427d}
+#progressBar{height:100%;width:4%;background:linear-gradient(90deg,#8350c9,#f0d6ff);box-shadow:0 0 18px #bd82ff;transition:width .4s}
+#loadLabel{font-size:11px;letter-spacing:.16em;color:#b9a6cc;text-transform:uppercase}
+.title-view{display:none}
+.title-view .eyebrow{color:#dfc18d;font-size:11px;letter-spacing:.35em;text-transform:uppercase}
+.title-view .subtitle{max-width:440px;margin:0 auto 22px;line-height:1.7}
+.title-actions{display:grid;gap:12px;max-width:380px;margin:25px auto 0}
+#enterRealm{padding:15px 20px;font-size:14px;letter-spacing:.16em;text-transform:uppercase;background:linear-gradient(120deg,#7a3eb2,#392050 55%,#9a6a3a);border-color:#d7b1ff;box-shadow:0 0 26px #8c4ed744}
+.menu-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;text-align:left;margin:18px auto 0;max-width:440px}
+.menu-field{display:grid;gap:6px;color:#cbb8df;font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+.menu-field input,.menu-field select{width:100%;max-width:none;background:#100a1b;border:1px solid #64427d;border-radius:8px;padding:11px;color:#fff;font:inherit;font-size:13px;letter-spacing:normal;text-transform:none}
+.menu-note{font-size:11px!important;color:#9e8bb2!important}
+#brand,#story,#controls,#joy{transition:opacity .5s ease}
+body:not(.entered) #brand,body:not(.entered) #story,body:not(.entered) #controls,body:not(.entered) #joy{opacity:0;pointer-events:none}
+body.entered #brand,body.entered #story,body.entered #controls,body.entered #joy{opacity:1;pointer-events:auto}
+@media(max-width:500px){.boot-mark{width:70px;height:70px;font-size:34px}.menu-options{grid-template-columns:1fr}.title-view .subtitle{font-size:12px}.title-view h1{font-size:30px}}
+
 </style>
 </head>
 <body>
 <div id="world"></div>
+
+<div id="boot" aria-live="polite">
+ <div class="boot-inner">
+  <div id="loadingView">
+   <div class="sigils">The Wizards of Ark Present</div>
+   <div class="boot-mark">✦</div>
+   <h1>ARCANE REALM</h1>
+   <p>Stirring the ancient magic…</p>
+   <div class="progress-track"><div id="progressBar"></div></div>
+   <div id="loadLabel">Awakening the realm · 4%</div>
+  </div>
+  <div id="titleView" class="title-view">
+   <div class="sigils">The Wizards of Ark</div>
+   <div class="boot-mark">✧</div>
+   <div class="eyebrow">A world beyond the veil</div>
+   <h1>ARCANE REALM</h1>
+   <p class="subtitle">The old sigils are breaking. Forgotten paths stir beneath the moon, and something beyond the fractured gate has begun to answer.</p>
+   <div class="menu-options">
+    <label class="menu-field">Wizard name<input id="wizardName" maxlength="18" placeholder="Name your traveler" autocomplete="nickname"></label>
+    <label class="menu-field">Path<select id="wizardPath"><option value="Storm Herald">Storm Herald</option><option value="Ember Arcanist">Ember Arcanist</option><option value="Gloom Warden">Gloom Warden</option><option value="Astral Sage">Astral Sage</option></select></label>
+   </div>
+   <div class="title-actions"><button id="enterRealm">✦ Enter the Realm</button><button id="menuSettings">Realm Settings</button></div>
+   <p id="menuNote" class="menu-note">A new journey begins here. Character choices are currently visual setup only; saved profiles are not connected yet.</p>
+  </div>
+ </div>
+</div>
+
 <section id="brand" class="panel"><h1>✦ WOA: ARCANE REALM</h1><small>3D world prototype · world seed <b id="seedLabel">74291</b></small><p id="assetStatus" class="hint">Loading local 3D asset pack…</p><p class="hint">The 3D path is being built separately so the old game isn't destroyed before the replacement works.</p></section>
 <section id="story" class="panel"><small id="chapter">CANONICAL STORY · LOADING</small><h2 id="title">Opening the Chronicle…</h2><p id="body"></p><p><b>Objective:</b> <span id="objective"></span></p><button id="advance">Continue Chronicle →</button><p class="hint">Narrative scene text mirrored from the event bot. Live bot saves and battle rules are not connected yet.</p></section>
 <section id="controls" class="panel"><label>Seed <input id="seed" value="74291" inputmode="numeric" maxlength="10"></label><button id="generate">Generate world</button><button id="reset">Center hero</button><button id="storyPrev">← Story</button><button id="storyNext">Story →</button><small class="hint">WASD / arrows · drag to look · touch joystick</small></section>
@@ -45,11 +98,20 @@ const familiar=new THREE.Group();hero.add(familiar);
 addMesh(familiar,new THREE.SphereGeometry(.18,10,8),mat(0xb9a0ff,.35,0x7e47ff),[.65,1.3,.2],[1,1,.85]);
 addMesh(familiar,new THREE.ConeGeometry(.08,.28,5),trim,[.65,1.53,.2]);
 let seed=74291, worldObjects=[], keys={}, move={x:0,y:0}, yaw=0, pitch=.22, dragging=false,lastX=0,lastY=0,story=[],storyIndex=0;
+let assetsReady=false,storyReady=false,bootStarted=performance.now(),menuOpened=false;
+function setLoadProgress(value,label){const pct=Math.max(0,Math.min(100,value));document.querySelector('#progressBar').style.width=pct+'%';document.querySelector('#loadLabel').textContent=label+' · '+Math.round(pct)+'%';}
+function maybeOpenMenu(){if(menuOpened)return;if((assetsReady&&storyReady)||performance.now()-bootStarted>6500){menuOpened=true;setLoadProgress(100,'Realm awakened');setTimeout(()=>{document.querySelector('#loadingView').style.display='none';document.querySelector('#titleView').style.display='block';},450);}}
+setLoadProgress(8,'Gathering the starlight');
+setTimeout(()=>setLoadProgress(24,'Tracing ancient sigils'),250);
+setTimeout(()=>setLoadProgress(42,'Opening the forest paths'),700);
+setTimeout(()=>setLoadProgress(58,'Calling the familiars'),1150);
+setTimeout(()=>{if(!menuOpened)setLoadProgress(72,'Binding the chronicle');},1650);
+setTimeout(maybeOpenMenu,2100);
 const importedModels={trees:[],rocks:[],town:[]};
 function makeAssetInstance(category,rand,targetHeight){const list=importedModels[category]||[];if(!list.length)return null;const source=list[Math.floor(rand()*list.length)];const model=source.clone(true);model.updateMatrixWorld(true);const box=new THREE.Box3().setFromObject(model);const size=box.getSize(new THREE.Vector3());const h=Math.max(.001,size.y);const scale=targetHeight/h;model.scale.multiplyScalar(scale);model.updateMatrixWorld(true);const scaledBox=new THREE.Box3().setFromObject(model);model.position.y-=scaledBox.min.y;return model;}
 async function loadImportedModels(){try{const response=await fetch('./assets/3d/imported-assets.json');if(!response.ok)return;const manifest=await response.json();const loader=new GLTFLoader();await Promise.all((manifest.assets||[]).map(async item=>{const path='./'+item.repoPath.replace(/^web\\//,'');const gltf=await loader.loadAsync(path);const model=gltf.scene;const name=(item.archivePath||item.repoPath).toLowerCase();const isNature=item.pack.includes('nature'),isTown=item.pack.includes('fantasy-town');if(!isNature&&!isTown)return;if(isNature){if(/tree|oak|pine|birch|bush|plant|fern|flower|grass/.test(name))importedModels.trees.push(model);else if(/rock|stone|boulder|cliff/.test(name))importedModels.rocks.push(model);}else if(isTown&&/gate|wall|fence|house|cottage|building|tower|bridge|balcony/.test(name))importedModels.town.push(model);}));
- if(importedModels.trees.length||importedModels.rocks.length||importedModels.town.length){document.querySelector('#assetStatus').textContent='CC0 models loaded · '+importedModels.trees.length+' trees / '+importedModels.rocks.length+' rocks / '+importedModels.town.length+' town pieces';generate(seed);}
- }catch(error){console.warn('Imported model pack unavailable; procedural world remains active.',error);}}
+ if(importedModels.trees.length||importedModels.rocks.length||importedModels.town.length){document.querySelector('#assetStatus').textContent='CC0 models loaded · '+importedModels.trees.length+' trees / '+importedModels.rocks.length+' rocks / '+importedModels.town.length+' town pieces';generate(seed);}assetsReady=true;setLoadProgress(88,'Placing the world');maybeOpenMenu();
+ }catch(error){console.warn('Imported model pack unavailable; procedural world remains active.',error);assetsReady=true;setLoadProgress(82,'Using local world fallback');maybeOpenMenu();}}
 function rngFactory(s){return()=>{s=(Math.imul(1664525,s)+1013904223)>>>0;return s/4294967296}}
 function clearWorld(){for(const o of worldObjects)world.remove(o);worldObjects=[]}
 function place(o,x,z){o.position.x=x;o.position.z=z;world.add(o);worldObjects.push(o)}
@@ -94,7 +156,9 @@ function generate(s){seed=s>>>0;document.querySelector('#seedLabel').textContent
 generate(seed);
 loadImportedModels();
 function showStory(i){if(!story.length)return;storyIndex=(i+story.length)%story.length;const s=story[storyIndex];document.querySelector('#chapter').textContent='CHRONICLE · SCENE '+(storyIndex+1)+' / '+story.length;document.querySelector('#title').textContent=s.title;document.querySelector('#body').textContent=s.body;document.querySelector('#objective').textContent=s.objective;document.querySelector('#advance').textContent=s.action+' →'}
-fetch('./data/canonical-story-manifest.json').then(r=>{if(!r.ok)throw Error('Story manifest unavailable');return r.json()}).then(d=>{story=d.scenes||[];showStory(0)}).catch(e=>{document.querySelector('#title').textContent='Chronicle unavailable';document.querySelector('#body').textContent='The world can still be explored, but the story manifest did not load.'});
+fetch('./data/canonical-story-manifest.json').then(r=>{if(!r.ok)throw Error('Story manifest unavailable');return r.json()}).then(d=>{story=d.scenes||[];showStory(0);storyReady=true;setLoadProgress(94,'Reading the chronicle');maybeOpenMenu()}).catch(e=>{document.querySelector('#title').textContent='Chronicle unavailable';document.querySelector('#body').textContent='The world can still be explored, but the story manifest did not load.';storyReady=true;maybeOpenMenu()});
+document.querySelector('#enterRealm').addEventListener('click',()=>{document.body.classList.add('entered');document.querySelector('#boot').classList.add('done');const name=document.querySelector('#wizardName').value.trim();const path=document.querySelector('#wizardPath').value;document.querySelector('#brand').querySelector('h1').textContent='✦ '+(name||'TRAVELER')+' · '+path.toUpperCase();hero.userData.wizardName=name||'Traveler';hero.userData.wizardPath=path;});
+document.querySelector('#menuSettings').addEventListener('click',()=>{const note=document.querySelector('#menuNote');note.textContent='Visual quality: balanced for mobile. Sound and saved character profiles will be added after the start menu milestone.';});
 document.querySelector('#advance').addEventListener('click',()=>showStory(storyIndex+1));document.querySelector('#storyPrev').onclick=()=>showStory(storyIndex-1);document.querySelector('#storyNext').onclick=()=>showStory(storyIndex+1);
 document.querySelector('#generate').onclick=()=>{const v=Number(document.querySelector('#seed').value);generate(Number.isFinite(v)?v:Math.floor(Math.random()*2147483647))};
 document.querySelector('#reset').onclick=()=>{hero.position.set(0,0,0);yaw=0;pitch=.22};
