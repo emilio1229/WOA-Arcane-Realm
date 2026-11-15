@@ -20,6 +20,8 @@ jobs:
       - run: npm run assets:new -- --id qa.pipeline-check --category vfx --name "CI Pipeline Check" --dry-run
       - run: npm run assets:validate
       - run: npm install --no-save playwright@1.56.1
-      - run: npx playwright install chromium --only-shell
+      - uses: browser-actions/setup-chrome@v1
+        id: chrome
+      - run: echo "CHROME_BIN=${{ steps.chrome.outputs.chrome-path }}" >> "$GITHUB_ENV"
       - run: npm run test:browser
       - run: npm run build
