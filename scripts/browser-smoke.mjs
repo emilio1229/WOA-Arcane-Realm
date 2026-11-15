@@ -43,6 +43,7 @@ try {
   assert.ok(canvasSize.width > 0 && canvasSize.height > 0, "game canvas should have a real drawing surface");
 
   const beforeMove = await desktop.evaluate(() => window.arcaneTest.getPlayerPosition());
+  const familiarBeforeMove = await desktop.evaluate(() => window.arcaneTest.getFamiliarPosition());
   await desktop.keyboard.down("w");
   await delay(450);
   await desktop.keyboard.up("w");
@@ -50,6 +51,12 @@ try {
   assert.ok(
     Math.hypot(afterMove.x - beforeMove.x, afterMove.y - beforeMove.y) > 20,
     "keyboard movement should move the wizard",
+  );
+  await delay(250);
+  const familiarAfterMove = await desktop.evaluate(() => window.arcaneTest.getFamiliarPosition());
+  assert.ok(
+    Math.hypot(familiarAfterMove.x - familiarBeforeMove.x, familiarAfterMove.y - familiarBeforeMove.y) > 8,
+    "Glimmer should follow the moving wizard",
   );
 
   // Walk into the Grand Library footprint and confirm the wizard slides along its edge.
@@ -103,7 +110,7 @@ try {
   );
   assert.deepEqual(mobileErrors, [], "mobile play session should not throw browser errors");
 
-  console.log("Browser smoke test passed: canvas, keyboard movement, spell cast, NPC dialogue, mobile controls.");
+  console.log("Browser play test passed: canvas, keyboard movement, familiar following, building collision, spell cast, NPC dialogue, mobile controls.");
 } finally {
   if (browser) await browser.close();
   server.kill("SIGTERM");
