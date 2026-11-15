@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+<defs><radialGradient id="fire"><stop stop-color="#fff6bf"/><stop offset=".28" stop-color="#ffbd66"/><stop offset=".68" stop-color="#f45c39"/><stop offset="1" stop-color="#8e245d" stop-opacity=".1"/></radialGradient><filter id="blur"><feGaussianBlur stdDeviation="8"/></filter></defs>
+<ellipse cx="128" cy="218" rx="55" ry="12" fill="#ff7c4b" opacity=".22" filter="url(#blur)"/>
+<path d="M128 20 Q171 70 184 115 Q216 180 128 218 Q40 180 72 115 Q85 70 128 20Z" fill="url(#fire)" stroke="#ffbd70" stroke-width="4"/>
+<path d="M84 155 Q47 170 65 206 Q88 194 104 181 M172 155 Q209 170 191 206 Q168 194 152 181" fill="#e84b39" stroke="#ff9b52" stroke-width="5"/>
+<path d="M97 125 Q110 111 121 126 M135 126 Q146 111 159 125" fill="none" stroke="#5d253e" stroke-width="8" stroke-linecap="round"/>
+<path d="M109 158 Q128 170 147 158" fill="none" stroke="#7c2944" stroke-width="5" stroke-linecap="round"/>
+<path d="M128 25 Q107 67 128 88 Q149 67 128 25Z" fill="#fff4bc"/><g fill="#ffda8b"><circle cx="54" cy="84" r="5"/><circle cx="205" cy="67" r="4"/><circle cx="207" cy="165" r="6"/><circle cx="43" cy="174" r="4"/></g>
+</svg>
