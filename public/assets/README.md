@@ -45,3 +45,14 @@ Original, editable SVG source assets for the Arcane Realm prototype.
 6. Keep source and runtime variants linked by stable ID.
 
 The pack is integrated into the Sanctuary prototype: all five building exteriors, lanterns, rune obelisk, crystal cluster, Arcane wizard, Glimmer, Ember Wisp, and Grand Portal are loaded by the scene. Arcane Bolt, Arcane Impact, and Arcane Mote now power the first local spell-casting prototype and ambient magic layer. Sigil remains catalogued for the upcoming HUD/economy pass. Use Space or the mobile Cast control to launch the Arcane Bolt.
+
+## Creating a new asset scaffold
+
+Use the generator to reserve a stable ID, create an editable SVG source file, and register it in the manifest in one operation:
+
+```bash
+npm run assets:new -- --id creature.storm-wisp --category creature --name "Storm Wisp" --width 256 --height 256 --tags creature,enemy,storm,wisp
+npm run assets:validate
+```
+
+Supported categories: `character`, `familiar`, `creature`, `environment`, `vfx`, `ui`, `building`, and `prop`. The generator rejects duplicate IDs/files and marks generated artwork as `scaffold`; replace the placeholder geometry and visually review it before integration. It never overwrites existing source art.
