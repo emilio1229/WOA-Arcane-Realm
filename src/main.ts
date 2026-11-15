@@ -20,6 +20,8 @@ const NPCS: NPC[] = [
 class SanctuaryScene extends Phaser.Scene {
   private player!: Phaser.Physics.Arcade.Image;
   private playerArt!: Phaser.GameObjects.Container;
+  private wizardSprite!: Phaser.GameObjects.Image;
+  private lastFacing = new Phaser.Math.Vector2(0, -1);
   private keys!: Record<string, Phaser.Input.Keyboard.Key>;
   private obstacles: Phaser.Geom.Rectangle[] = [];
   private npcs: Array<{ data: NPC; art: Phaser.GameObjects.Container }> = [];
@@ -38,6 +40,8 @@ class SanctuaryScene extends Phaser.Scene {
     this.load.svg("ember-wisp", "/assets/creatures/ember-wisp.svg", { width: 128, height: 128 });
     this.load.svg("grand-portal", "/assets/environment/grand-portal.svg", { width: 256, height: 256 });
     this.load.svg("arcane-bolt", "/assets/vfx/arcane-bolt.svg", { width: 64, height: 64 });
+    this.load.svg("arcane-impact", "/assets/vfx/arcane-impact.svg", { width: 128, height: 128 });
+    this.load.svg("arcane-mote", "/assets/vfx/arcane-mote.svg", { width: 64, height: 64 });
     this.load.svg("sigil", "/assets/ui/sigil.svg", { width: 64, height: 64 });
     this.load.svg("building-library", "/assets/buildings/grand-library.svg", { width: 256, height: 256 });
     this.load.svg("building-familiar", "/assets/buildings/familiar-sanctuary.svg", { width: 256, height: 256 });
@@ -55,6 +59,7 @@ class SanctuaryScene extends Phaser.Scene {
     this.createBuildings();
     this.createNPCs();
     this.createAssetShowcase();
+    this.createAmbientMagic();
 
     this.player = this.physics.add.image(900, 760, "__WHITE");
     this.player.setDisplaySize(18, 18).setTint(0xffffff).setAlpha(0);
@@ -67,7 +72,7 @@ class SanctuaryScene extends Phaser.Scene {
     this.cameras.main.setZoom(Math.min(1, this.scale.width / 1100));
     this.physics.world.setBounds(70, 70, WORLD.width - 140, WORLD.height - 140);
 
-    this.keys = this.input.keyboard!.addKeys("W,A,S,D,UP,DOWN,LEFT,RIGHT,E,ENTER") as Record<string, Phaser.Input.Keyboard.Key>;
+    this.keys = this.input.keyboard!.addKeys("W,A,S,D,UP,DOWN,LEFT,RIGHT,E,ENTER,SPACE") as Record<string, Phaser.Input.Keyboard.Key>;
     this.prompt = this.add.text(0, 0, "E  SPEAK", {
       fontFamily: "Manrope, sans-serif", fontSize: "11px", color: "#fff4d9",
       backgroundColor: "#2c1e40", padding: { x: 9, y: 6 }, stroke: "#d5a5ef", strokeThickness: 1,
@@ -163,9 +168,56 @@ class SanctuaryScene extends Phaser.Scene {
     this.tweens.add({ targets: obelisk, alpha: { from: 0.86, to: 1 }, duration: 2200, yoyo: true, repeat: -1 });
   }
 
+
   private drawWizard(container: Phaser.GameObjects.Container) {
-    const wizard = this.add.image(0, 0, "wizard-arcane").setDisplaySize(78, 98).setOrigin(0.5, 0.9);
-    container.add(wizard);
+    this.wizardSprite = this.add.image(0, 0, "wizard-arcane").setDisplaySize(78, 98).setOrigin(0.5, 0.9);
+    container.add(this.wizardSprite);
+  }
+
+  private createAmbientMagic() {
+    for (let i = 0; i < 16; i++) {
+      const x = Phaser.Math.Between(500, 1300);
+      const y = Phaser.Math.Between(360, 920);
+      const mote = this.add.image(x, y, "arcane-mote")
+        .setDisplaySize(Phaser.Math.Between(10, 20), Phaser.Math.Between(10, 20))
+        .setAlpha(Phaser.Math.FloatBetween(0.25, 0.6))
+        .setDepth(y + 2);
+      this.tweens.add({
+        targets: mote, y: y - Phaser.Math.Between(22, 58), alpha: 0.08,
+        duration: Phaser.Math.Between(1800, 3600), delay: Phaser.Math.Between(0, 1800),
+        yoyo: true, repeat: -1, ease: "Sine.easeInOut",
+      });
+    }
+  }
+
+  private castSpell() {
+    const startX = this.player.x + this.lastFacing.x * 30;
+    const startY = this.player.y - 28 + this.lastFacing.y * 30;
+    const bolt = this.add.image(startX, startY, "arcane-bolt")
+      .setDisplaySize(42, 42)
+      .setDepth(this.player.y + 80)
+      .setRotation(Math.atan2(this.lastFacing.y, this.lastFacing.x) + Math.PI / 2);
+    const targetX = startX + this.lastFacing.x * 270;
+    const targetY = startY + this.lastFacing.y * 270;
+    this.tweens.add({
+      targets: bolt, x: targetX, y: targetY, alpha: 0.25, scale: 0.45,
+      duration: 390, ease: "Cubic.easeOut",
+      onComplete: () => {
+        bolt.destroy();
+        const impact = this.add.image(targetX, targetY, "arcane-impact")
+          .setDisplaySize(18, 18).setDepth(targetY + 90).setAlpha(0.95);
+        this.tweens.add({
+          targets: impact, displayWidth: 112, displayHeight: 112, alpha: 0,
+          angle: 35, duration: 320, ease: "Cubic.easeOut",
+          onComplete: () => impact.destroy(),
+        });
+      },
+    });
+    this.wizardSprite.setTint(0xe9d2ff);
+    this.tweens.add({
+      targets: this.wizardSprite, alpha: 0.65, duration: 90, yoyo: true,
+      onComplete: () => this.wizardSprite.clearTint(),
+    });
   }
 
   private interact() {
@@ -200,8 +252,10 @@ class SanctuaryScene extends Phaser.Scene {
     const vector = new Phaser.Math.Vector2((x - y) * 0.7071, (x + y) * 0.5);
     if (vector.length() > 1) vector.normalize();
     const speed = 190;
-    const nextX = this.player.x + vector.x * speed * (1 / 60);
-    const nextY = this.player.y + vector.y * speed * (1 / 60);
+    const delta = Math.min(this.game.loop.delta, 50) / 1000;
+    if (vector.lengthSq() > 0.001) this.lastFacing.copy(vector).normalize();
+    const nextX = this.player.x + vector.x * speed * delta;
+    const nextY = this.player.y + vector.y * speed * delta;
     const candidate = new Phaser.Geom.Circle(nextX, nextY, 9);
     const blocked = this.obstacles.some(rect => Phaser.Geom.Intersects.CircleToRectangle(candidate, rect));
     if (!blocked) this.player.setVelocity(vector.x * speed, vector.y * speed);
@@ -209,6 +263,7 @@ class SanctuaryScene extends Phaser.Scene {
     if (blocked && !this.obstacles.some(rect => Phaser.Geom.Intersects.CircleToRectangle(new Phaser.Geom.Circle(this.player.x + vector.x * 3, this.player.y, 9), rect))) this.player.setVelocityX(vector.x * speed);
     if (blocked && !this.obstacles.some(rect => Phaser.Geom.Intersects.CircleToRectangle(new Phaser.Geom.Circle(this.player.x, this.player.y + vector.y * 3, 9), rect))) this.player.setVelocityY(vector.y * speed);
     this.playerArt.setPosition(this.player.x, this.player.y);
+    this.wizardSprite.setRotation(vector.lengthSq() > 0.001 ? Math.sin(this.time.now / 75) * 0.035 : Math.sin(this.time.now / 520) * 0.012);
     this.playerArt.setDepth(this.player.y + 20);
     this.npcs.forEach(n => n.art.setDepth(n.data.y + 10));
     const nearby = this.nearestNPC();
@@ -217,6 +272,7 @@ class SanctuaryScene extends Phaser.Scene {
       this.prompt.setPosition(this.scale.width / 2, this.scale.height - 105);
     }
     if (Phaser.Input.Keyboard.JustDown(keyboard.E) || Phaser.Input.Keyboard.JustDown(keyboard.ENTER)) this.interact();
+    if (Phaser.Input.Keyboard.JustDown(keyboard.SPACE)) this.castSpell();
   }
 }
 
