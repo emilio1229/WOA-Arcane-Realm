@@ -70,10 +70,10 @@ try {
 
   await desktop.evaluate(() => window.arcaneTest.setPlayerPosition(560, 410));
   await desktop.keyboard.down("d");
-  await desktop.keyboard.down("w");
+  await desktop.keyboard.down("s");
   await delay(650);
   await desktop.keyboard.up("d");
-  await desktop.keyboard.up("w");
+  await desktop.keyboard.up("s");
   const afterCollision = await desktop.evaluate(() => window.arcaneTest.getPlayerPosition());
   assert.ok(afterCollision.x < 575, "wall sliding should keep the wizard outside the library footprint");
   assert.ok(afterCollision.y > 450, "the wizard should travel along the library wall");
