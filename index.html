@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#100d20" />
+    <meta name="description" content="Enter the Arcane Sanctuary in the Wizards of Ark fantasy realm." />
+    <title>Arcane Realm — Wizards of Ark</title>
+  </head>
+  <body>
+    <main id="app">
+      <header class="topbar">
+        <div class="brand"><span class="brand-mark">✧</span><div><strong>ARCANE REALM</strong><small>WIZARDS OF ARK</small></div></div>
+        <div class="realm-status"><span class="status-dot"></span> SANCTUARY <span class="divider">/</span> EXPLORATION</div>
+        <div class="profile"><span class="avatar">✦</span><span><b>Wayfarer</b><small>Novice · Level 1</small></span></div>
+      </header>
+      <section class="game-shell">
+        <div id="game" aria-label="Playable Arcane Sanctuary game world"></div>
+        <div class="location-tag"><span>⌖</span><div><b>ARCANE SANCTUARY</b><small>The last light before the unknown</small></div></div>
+        <div class="quest-card"><div class="quest-kicker">✧ FIRST STEPS</div><b>Find your place in the Sanctuary</b><p>Explore the square and speak with the people who call it home.</p><div class="quest-progress"><i></i></div><small>Explore freely · No quest accepted</small></div>
+        <div class="controls-hint"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> MOVE <span>·</span> <kbd>E</kbd> INTERACT</div>
+        <div class="mobile-controls">
+          <div class="stick" id="stick"><div class="stick-knob" id="stick-knob"></div></div>
+          <button id="interact" class="touch-action" aria-label="Interact">✧<small>INTERACT</small></button>
+        </div>
+        <div id="dialogue" class="dialogue hidden" role="status"><div class="dialogue-icon">✦</div><div><b id="npc-name">Sanctuary Keeper</b><p id="npc-line"></p></div><button id="close-dialogue" aria-label="Close">×</button></div>
+      </section>
+      <footer><span>✧ A WORLD OF WONDERS AWAITS</span><span>DEVELOPMENT REALM · PROGRESS NOT SAVED</span></footer>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
