@@ -12,7 +12,7 @@ Official reference: https://docs.phaser.io/phaser/getting-started/installation
 - Responsive game canvas and camera follow.
 - Isometric diamond ground presentation, plaza, gardens, fountain, and glowing portal with orbiting Sigil glyphs.
 - Sanctuary buildings with depth layering and basic collision volumes.
-- Controllable wizard with WASD/arrow movement, subtle idle/movement motion, and direction-aware facing.\n- First local spell-casting interaction: Space or the mobile Cast button launches an Arcane Bolt with an impact burst.\n- Ambient floating magic motes around the Sanctuary; touch controls now include both Interact and Cast.
+- Controllable wizard with WASD/arrow movement, subtle idle/movement motion, and direction-aware facing.\n- First local spell-casting interaction: Space or the mobile Cast button launches an Arcane Bolt with an impact burst with a short local cast throttle.\n- Ambient floating magic motes around the Sanctuary; touch controls now include both Interact and Cast.
 - NPCs with names, idle bobbing, proximity detection, and E/Enter interaction.
 - Responsive HUD and a contextual dialogue panel.
 - Mobile virtual joystick and touch interaction button.
@@ -25,11 +25,11 @@ The repository now includes an original SVG asset library under `public/assets/`
 ## Deliberate limitations
 
 - This is a playable foundation prototype, not the complete Stage 1 acceptance milestone.
-- Original SVG character, familiar, creature, portal, spell, and UI assets now replace several initial primitives; building architecture, garden dressing, and some environment details remain procedural placeholders. All current art is prototype quality, not final release art. Wizard motion is procedural rather than a frame-based walk cycle; combat is currently a local visual effect with no damage, enemy AI, cooldown system, or server authority.
-- Collision uses simple rectangular building footprints; environment boundaries and pathing need refinement.
+- Original SVG character, familiar, creature, portal, spell, and UI assets now replace several initial primitives; building architecture, garden dressing, and some environment details remain procedural placeholders. All current art is prototype quality, not final release art. Wizard motion is procedural rather than a frame-based walk cycle; combat is currently a local visual effect with no damage, enemy AI, gameplay cooldown progression, or server authority; the short cast throttle only limits visual spam.
+- Collision uses simple rectangular building footprints with axis-separated wall sliding; environment boundaries and pathing need refinement.
 - Movement currently uses local client simulation. No server authority or persistent character save exists.
 - The quest panel is informational only; no quest engine is implemented.
-- Mobile controls are included but still require device/browser testing.
+- Desktop and mobile-viewport controls now pass a headless Chromium smoke test in CI. Real-device touch feel, camera behavior across phones/tablets, and broader browser compatibility still require manual testing.
 - No backend, database, multiplayer, Discord Activity, or Sigil integration is included.
 
 ## Run locally
