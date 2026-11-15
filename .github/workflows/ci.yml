@@ -16,5 +16,6 @@ jobs:
           node-version: 22
       - run: npm install
       - run: npm run typecheck
+      - run: node --check scripts/new-asset.mjs
       - run: npm run assets:validate
       - run: npm run build
