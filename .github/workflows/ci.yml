@@ -19,4 +19,7 @@ jobs:
       - run: node --check scripts/new-asset.mjs
       - run: npm run assets:new -- --id qa.pipeline-check --category vfx --name "CI Pipeline Check" --dry-run
       - run: npm run assets:validate
+      - run: npm install --no-save playwright@1.56.1
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:browser
       - run: npm run build
