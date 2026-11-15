@@ -10,7 +10,8 @@ declare global {
     arcaneTest?: {
       getPlayerPosition: () => { x: number; y: number };
       getFamiliarPosition: () => { x: number; y: number };
-      setPlayerPosition: (x: number, y: number) => void;
+      getPracticeWispHealth: () => number;
+      setPlayerPosition: (x: number, y: number, facingX?: number, facingY?: number) => void;
     };
   }
 }
@@ -108,11 +109,13 @@ class SanctuaryScene extends Phaser.Scene {
       window.arcaneTest = {
         getPlayerPosition: () => ({ x: this.player.x, y: this.player.y }),
         getFamiliarPosition: () => ({ x: this.familiarArt.x, y: this.familiarArt.y }),
-        setPlayerPosition: (x, y) => {
+        getPracticeWispHealth: () => this.practiceWispHealth,
+        setPlayerPosition: (x, y, facingX = 0, facingY = -1) => {
           this.player.setVelocity(0, 0);
           this.player.setPosition(x, y);
           this.player.body!.reset(x, y);
           this.playerArt.setPosition(x, y);
+          this.lastFacing.set(facingX, facingY).normalize();
         },
       };
     }
