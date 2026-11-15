@@ -20,7 +20,7 @@ Official reference: https://docs.phaser.io/phaser/getting-started/installation
 
 ## Original asset pack
 
-The repository now includes an original SVG asset library under `public/assets/`: five shared-silhouette tradition robes (Arcane, Ember, Frost, Verdant, Shadow), Glimmer, Ember Wisp, Grand Portal, Arcane Bolt, and a Sigil icon. The Arcane wizard, Glimmer, Ember Wisp, and portal are integrated into the sanctuary scene. Stable IDs and provenance metadata live in `public/assets/manifest.json`; library rules are in `public/assets/README.md`. Run `npm run assets:validate` to check IDs, file paths, SVG dimensions, and safe inline-only content.
+The repository now includes an original SVG asset library under `public/assets/`: five shared-silhouette tradition robes (Arcane, Ember, Frost, Verdant, Shadow), five distinct sanctuary building exteriors, three environment props (lantern, rune obelisk, crystal cluster), Glimmer, Ember Wisp, Grand Portal, Arcane Bolt, and a Sigil icon. The Arcane wizard, Glimmer, Ember Wisp, and portal are integrated into the sanctuary scene. Stable IDs and provenance metadata live in `public/assets/manifest.json`; library rules are in `public/assets/README.md`. Run `npm run assets:validate` to check IDs, file paths, SVG dimensions, and safe inline-only content.
 
 ## Deliberate limitations
 
