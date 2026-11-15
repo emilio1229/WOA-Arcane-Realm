@@ -59,14 +59,24 @@ try {
     "Glimmer should follow the moving wizard",
   );
 
-  // Walk into the Grand Library footprint and confirm the wizard slides along its edge.
+  // Approach the Grand Library's left wall, then move parallel to it.
   await desktop.evaluate(() => window.arcaneTest.setPlayerPosition(560, 410));
   await desktop.keyboard.down("d");
+  await delay(300);
+  await desktop.keyboard.up("d");
+  const atWall = await desktop.evaluate(() => window.arcaneTest.getPlayerPosition());
+  assert.ok(atWall.x <= 567, "building collision should stop the wizard at the library wall");
+  assert.ok(atWall.y > 410, "axis-separated collision should preserve movement along the wall");
+
+  await desktop.evaluate(() => window.arcaneTest.setPlayerPosition(560, 410));
+  await desktop.keyboard.down("d");
+  await desktop.keyboard.down("w");
   await delay(650);
   await desktop.keyboard.up("d");
+  await desktop.keyboard.up("w");
   const afterCollision = await desktop.evaluate(() => window.arcaneTest.getPlayerPosition());
-  assert.ok(afterCollision.x < 575, "building collision should prevent walking through the library wall");
-  assert.ok(afterCollision.y > 410, "axis-separated collision should allow sliding along the wall");
+  assert.ok(afterCollision.x < 575, "wall sliding should keep the wizard outside the library footprint");
+  assert.ok(afterCollision.y > 450, "the wizard should travel along the library wall");
 
   await desktop.keyboard.press("Space");
   await delay(500);
