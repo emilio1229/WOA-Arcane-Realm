@@ -205,10 +205,6 @@ class SanctuaryScene extends Phaser.Scene {
   }
 
   private createAssetShowcase() {
-    const glimmer = this.add.image(1165, 285, "glimmer").setDisplaySize(76, 76).setDepth(330);
-    this.tweens.add({ targets: glimmer, y: 267, angle: { from: -7, to: 7 }, duration: 1700, yoyo: true, repeat: -1, ease: "Sine.easeInOut" });
-    this.add.text(1165, 324, "GLIMMER", { fontFamily: "Cinzel,serif", fontSize: "9px", color: "#e9dcff", stroke: "#21172e", strokeThickness: 3 }).setOrigin(0.5).setDepth(340);
-
     const sprite = this.add.image(1380, 285, "verdant-sprite").setDisplaySize(66, 66).setDepth(330);
     this.tweens.add({ targets: sprite, y: 267, angle: { from: 5, to: -5 }, duration: 1900, yoyo: true, repeat: -1, ease: "Sine.easeInOut" });
     this.add.text(1380, 324, "VERDANT SPRITE", { fontFamily: "Cinzel,serif", fontSize: "8px", color: "#c9ffd0", stroke: "#21172e", strokeThickness: 3 }).setOrigin(0.5).setDepth(340);
