@@ -39,7 +39,9 @@ class SanctuaryScene extends Phaser.Scene {
     this.load.svg("wizard-verdant", "/assets/characters/wizard-verdant.svg", { width: 128, height: 160 });
     this.load.svg("wizard-shadow", "/assets/characters/wizard-shadow.svg", { width: 128, height: 160 });
     this.load.svg("glimmer", "/assets/familiars/glimmer.svg", { width: 128, height: 128 });
+    this.load.svg("verdant-sprite", "/assets/familiars/verdant-sprite.svg", { width: 128, height: 128 });
     this.load.svg("ember-wisp", "/assets/creatures/ember-wisp.svg", { width: 128, height: 128 });
+    this.load.svg("frost-wisp", "/assets/creatures/frost-wisp.svg", { width: 128, height: 128 });
     this.load.svg("grand-portal", "/assets/environment/grand-portal.svg", { width: 256, height: 256 });
     this.load.svg("arcane-bolt", "/assets/vfx/arcane-bolt.svg", { width: 64, height: 64 });
     this.load.svg("arcane-impact", "/assets/vfx/arcane-impact.svg", { width: 128, height: 128 });
@@ -171,9 +173,17 @@ class SanctuaryScene extends Phaser.Scene {
     this.tweens.add({ targets: glimmer, y: 267, angle: { from: -7, to: 7 }, duration: 1700, yoyo: true, repeat: -1, ease: "Sine.easeInOut" });
     this.add.text(1165, 324, "GLIMMER", { fontFamily: "Cinzel,serif", fontSize: "9px", color: "#e9dcff", stroke: "#21172e", strokeThickness: 3 }).setOrigin(0.5).setDepth(340);
 
+    const sprite = this.add.image(1380, 285, "verdant-sprite").setDisplaySize(66, 66).setDepth(330);
+    this.tweens.add({ targets: sprite, y: 267, angle: { from: 5, to: -5 }, duration: 1900, yoyo: true, repeat: -1, ease: "Sine.easeInOut" });
+    this.add.text(1380, 324, "VERDANT SPRITE", { fontFamily: "Cinzel,serif", fontSize: "8px", color: "#c9ffd0", stroke: "#21172e", strokeThickness: 3 }).setOrigin(0.5).setDepth(340);
+
     const wisp = this.add.image(470, 635, "ember-wisp").setDisplaySize(74, 74).setDepth(645);
     this.tweens.add({ targets: wisp, y: 618, alpha: { from: 0.82, to: 1 }, duration: 1250, yoyo: true, repeat: -1, ease: "Sine.easeInOut" });
     this.add.text(470, 674, "EMBER WISP", { fontFamily: "Cinzel,serif", fontSize: "9px", color: "#ffd0a1", stroke: "#21172e", strokeThickness: 3 }).setOrigin(0.5).setDepth(650);
+
+    const frostWisp = this.add.image(1450, 640, "frost-wisp").setDisplaySize(70, 70).setDepth(650);
+    this.tweens.add({ targets: frostWisp, y: 621, alpha: { from: 0.78, to: 1 }, duration: 1600, yoyo: true, repeat: -1, ease: "Sine.easeInOut" });
+    this.add.text(1450, 678, "FROST WISP", { fontFamily: "Cinzel,serif", fontSize: "9px", color: "#c8f5ff", stroke: "#21172e", strokeThickness: 3 }).setOrigin(0.5).setDepth(655);
 
     for (const [x, y] of [[365, 620], [1450, 620], [405, 1000], [1390, 1030]]) {
       const lantern = this.add.image(x, y, "prop-lantern").setDisplaySize(48, 96).setOrigin(0.5, 0.88).setDepth(y);
