@@ -280,6 +280,38 @@
         "magic"
       ],
       "status": "prototype-integrated"
+    },
+    {
+      "id": "vfx.arcane-impact",
+      "path": "/assets/vfx/arcane-impact.svg",
+      "category": "vfx",
+      "format": "svg",
+      "source": true,
+      "width": 128,
+      "height": 128,
+      "tags": [
+        "spell",
+        "impact",
+        "burst",
+        "arcane"
+      ],
+      "status": "prototype-integrated"
+    },
+    {
+      "id": "vfx.arcane-mote",
+      "path": "/assets/vfx/arcane-mote.svg",
+      "category": "vfx",
+      "format": "svg",
+      "source": true,
+      "width": 64,
+      "height": 64,
+      "tags": [
+        "ambient",
+        "magic",
+        "particle",
+        "light"
+      ],
+      "status": "prototype-integrated"
     }
   ]
 }
