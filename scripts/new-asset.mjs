@@ -37,6 +37,10 @@ if (!existsSync(manifestPath)) throw new Error("Missing public/assets/manifest.j
 const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
 if (manifest.assets.some(asset => asset.id === args.id)) throw new Error(`Asset ID already exists: ${args.id}`);
 if (existsSync(absolutePath)) throw new Error(`Asset file already exists: ${relativePath}`);
+if ("dry-run" in args) {
+  console.log(`Asset scaffold check passed for ${args.id} -> ${relativePath} (${width}x${height}). No files changed.`);
+  process.exit(0);
+}
 
 const safeTitle = args.name.replace(/[&<>"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[char]);
 const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" fill="none">
