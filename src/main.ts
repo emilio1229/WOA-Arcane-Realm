@@ -33,6 +33,7 @@ class SanctuaryScene extends Phaser.Scene {
 
   preload() {
     this.load.svg("wizard-arcane", "/assets/characters/wizard-arcane.svg", { width: 128, height: 160 });
+    this.load.svg("wizard-arcane-cast", "/assets/characters/wizard-arcane-cast.svg", { width: 128, height: 160 });
     this.load.svg("wizard-ember", "/assets/characters/wizard-ember.svg", { width: 128, height: 160 });
     this.load.svg("wizard-frost", "/assets/characters/wizard-frost.svg", { width: 128, height: 160 });
     this.load.svg("wizard-verdant", "/assets/characters/wizard-verdant.svg", { width: 128, height: 160 });
@@ -228,7 +229,8 @@ class SanctuaryScene extends Phaser.Scene {
         });
       },
     });
-    this.wizardSprite.setTint(0xe9d2ff);
+    this.wizardSprite.setTexture("wizard-arcane-cast").setTint(0xe9d2ff);
+    this.time.delayedCall(250, () => this.wizardSprite.setTexture("wizard-arcane"));
     this.tweens.add({
       targets: this.wizardSprite, alpha: 0.65, duration: 90, yoyo: true,
       onComplete: () => this.wizardSprite.clearTint(),
