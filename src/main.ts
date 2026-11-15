@@ -23,6 +23,7 @@ class SanctuaryScene extends Phaser.Scene {
   private playerArt!: Phaser.GameObjects.Container;
   private wizardSprite!: Phaser.GameObjects.Image;
   private lastFacing = new Phaser.Math.Vector2(0, -1);
+  private nextCastAt = 0;
   private keys!: Record<string, Phaser.Input.Keyboard.Key>;
   private obstacles: Phaser.Geom.Rectangle[] = [];
   private npcs: Array<{ data: NPC; art: Phaser.GameObjects.Container }> = [];
@@ -217,6 +218,9 @@ class SanctuaryScene extends Phaser.Scene {
   }
 
   private castSpell() {
+    // A small local cooldown keeps the prototype readable and prevents a pile-up of tweens.
+    if (this.time.now < this.nextCastAt) return;
+    this.nextCastAt = this.time.now + 350;
     const startX = this.player.x + this.lastFacing.x * 30;
     const startY = this.player.y - 28 + this.lastFacing.y * 30;
     const bolt = this.add.image(startX, startY, "arcane-bolt")
@@ -281,15 +285,29 @@ class SanctuaryScene extends Phaser.Scene {
     const speed = 190;
     const delta = Math.min(this.game.loop.delta, 50) / 1000;
     if (vector.lengthSq() > 0.001) this.lastFacing.copy(vector).normalize();
-    const nextX = this.player.x + vector.x * speed * delta;
-    const nextY = this.player.y + vector.y * speed * delta;
-    const candidate = new Phaser.Geom.Circle(nextX, nextY, 9);
-    const blocked = this.obstacles.some(rect => Phaser.Geom.Intersects.CircleToRectangle(candidate, rect));
-    if (!blocked) this.player.setVelocity(vector.x * speed, vector.y * speed);
-    else this.player.setVelocity(0, 0);
-    if (blocked && !this.obstacles.some(rect => Phaser.Geom.Intersects.CircleToRectangle(new Phaser.Geom.Circle(this.player.x + vector.x * 3, this.player.y, 9), rect))) this.player.setVelocityX(vector.x * speed);
-    if (blocked && !this.obstacles.some(rect => Phaser.Geom.Intersects.CircleToRectangle(new Phaser.Geom.Circle(this.player.x, this.player.y + vector.y * 3, 9), rect))) this.player.setVelocityY(vector.y * speed);
-    this.playerArt.setPosition(this.player.x, this.player.y);
+    const radius = 9;
+    const minX = 70 + radius, maxX = WORLD.width - 70 - radius;
+    const minY = 70 + radius, maxY = WORLD.height - 70 - radius;
+    const collidesAt = (x: number, y: number) => {
+      const circle = new Phaser.Geom.Circle(x, y, radius);
+      return this.obstacles.some(rect => Phaser.Geom.Intersects.CircleToRectangle(circle, rect));
+    };
+
+    // Resolve each axis independently. This gives the player a reliable slide along
+    // building footprints instead of freezing on a diagonal corner.
+    const wantedX = Phaser.Math.Clamp(this.player.x + vector.x * speed * delta, minX, maxX);
+    const wantedY = Phaser.Math.Clamp(this.player.y + vector.y * speed * delta, minY, maxY);
+    let resolvedX = this.player.x;
+    let resolvedY = this.player.y;
+    if (!collidesAt(wantedX, resolvedY)) resolvedX = wantedX;
+    if (!collidesAt(resolvedX, wantedY)) resolvedY = wantedY;
+
+    // This is a kinematic character controller: physics supplies the body, while
+    // movement and collision resolution stay deterministic across frame rates.
+    this.player.setVelocity(0, 0);
+    this.player.setPosition(resolvedX, resolvedY);
+    this.player.body!.reset(resolvedX, resolvedY);
+    this.playerArt.setPosition(resolvedX, resolvedY);
     this.wizardSprite.setRotation(vector.lengthSq() > 0.001 ? Math.sin(this.time.now / 75) * 0.035 : Math.sin(this.time.now / 520) * 0.012);
     this.playerArt.setDepth(this.player.y + 20);
     this.npcs.forEach(n => n.art.setDepth(n.data.y + 10));
