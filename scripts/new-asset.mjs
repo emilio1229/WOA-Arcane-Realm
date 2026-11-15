@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 
 const args = Object.fromEntries(process.argv.slice(2).reduce((pairs, value, index, all) => {
@@ -64,6 +64,7 @@ const record = {
   status: "scaffold",
 };
 manifest.assets.push(record);
+mkdirSync(dirname(absolutePath), { recursive: true });
 writeFileSync(absolutePath, svg, { flag: "wx" });
 try {
   writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + "\n");
