@@ -1,0 +1,165 @@
+{
+  "schemaVersion": 1,
+  "project": "woa-arcane-realm",
+  "license": "CC0-1.0 for original in-repository SVG source assets created for this project; no third-party artwork embedded.",
+  "artDirection": {
+    "rendering": "dimensional 2.5D/isometric fantasy",
+    "palette": "region-specific jewel tones with luminous magical accents",
+    "characterRule": "shared wizard silhouette and proportions; tradition identity is robe recoloring",
+    "mobile": "clear silhouette at small scale; avoid detail that depends on fine texture"
+  },
+  "assets": [
+    {
+      "id": "character.wizard.arcane",
+      "path": "/assets/characters/wizard-arcane.svg",
+      "category": "character",
+      "format": "svg",
+      "source": true,
+      "width": 256,
+      "height": 320,
+      "tags": [
+        "player",
+        "wizard",
+        "arcane",
+        "robe"
+      ],
+      "status": "prototype-integrated"
+    },
+    {
+      "id": "character.wizard.ember",
+      "path": "/assets/characters/wizard-ember.svg",
+      "category": "character",
+      "format": "svg",
+      "source": true,
+      "width": 256,
+      "height": 320,
+      "tags": [
+        "wizard",
+        "ember",
+        "robe"
+      ],
+      "status": "library-ready"
+    },
+    {
+      "id": "character.wizard.frost",
+      "path": "/assets/characters/wizard-frost.svg",
+      "category": "character",
+      "format": "svg",
+      "source": true,
+      "width": 256,
+      "height": 320,
+      "tags": [
+        "wizard",
+        "frost",
+        "robe"
+      ],
+      "status": "library-ready"
+    },
+    {
+      "id": "character.wizard.verdant",
+      "path": "/assets/characters/wizard-verdant.svg",
+      "category": "character",
+      "format": "svg",
+      "source": true,
+      "width": 256,
+      "height": 320,
+      "tags": [
+        "wizard",
+        "verdant",
+        "robe"
+      ],
+      "status": "library-ready"
+    },
+    {
+      "id": "character.wizard.shadow",
+      "path": "/assets/characters/wizard-shadow.svg",
+      "category": "character",
+      "format": "svg",
+      "source": true,
+      "width": 256,
+      "height": 320,
+      "tags": [
+        "wizard",
+        "shadow",
+        "robe"
+      ],
+      "status": "library-ready"
+    },
+    {
+      "id": "familiar.glimmer",
+      "path": "/assets/familiars/glimmer.svg",
+      "category": "familiar",
+      "format": "svg",
+      "source": true,
+      "width": 256,
+      "height": 256,
+      "tags": [
+        "familiar",
+        "moth",
+        "light",
+        "companion"
+      ],
+      "status": "prototype-integrated"
+    },
+    {
+      "id": "creature.ember-wisp",
+      "path": "/assets/creatures/ember-wisp.svg",
+      "category": "creature",
+      "format": "svg",
+      "source": true,
+      "width": 256,
+      "height": 256,
+      "tags": [
+        "enemy",
+        "ember",
+        "wisp"
+      ],
+      "status": "prototype-integrated"
+    },
+    {
+      "id": "environment.grand-portal",
+      "path": "/assets/environment/grand-portal.svg",
+      "category": "environment",
+      "format": "svg",
+      "source": true,
+      "width": 512,
+      "height": 512,
+      "tags": [
+        "portal",
+        "sanctuary",
+        "landmark"
+      ],
+      "status": "prototype-integrated"
+    },
+    {
+      "id": "vfx.arcane-bolt",
+      "path": "/assets/vfx/arcane-bolt.svg",
+      "category": "vfx",
+      "format": "svg",
+      "source": true,
+      "width": 128,
+      "height": 128,
+      "tags": [
+        "spell",
+        "projectile",
+        "arcane"
+      ],
+      "status": "library-ready"
+    },
+    {
+      "id": "ui.sigil",
+      "path": "/assets/ui/sigil.svg",
+      "category": "ui",
+      "format": "svg",
+      "source": true,
+      "width": 128,
+      "height": 128,
+      "tags": [
+        "currency",
+        "sigil",
+        "icon"
+      ],
+      "status": "library-ready"
+    }
+  ]
+}
