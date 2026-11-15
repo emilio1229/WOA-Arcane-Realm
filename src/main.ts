@@ -9,6 +9,7 @@ declare global {
     /** Development-only hooks used by the headless browser smoke test. */
     arcaneTest?: {
       getPlayerPosition: () => { x: number; y: number };
+      getFamiliarPosition: () => { x: number; y: number };
       setPlayerPosition: (x: number, y: number) => void;
     };
   }
