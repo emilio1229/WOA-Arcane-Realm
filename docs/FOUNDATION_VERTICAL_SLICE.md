@@ -25,7 +25,7 @@ The repository now includes an original SVG asset library under `public/assets/`
 ## Deliberate limitations
 
 - This is a playable foundation prototype, not the complete Stage 1 acceptance milestone.
-- Art is procedural/vector placeholder geometry; it is not final production art or character animation.
+- Original SVG character, familiar, creature, portal, spell, and UI assets now replace several initial primitives; building architecture, garden dressing, and some environment details remain procedural placeholders. All current art is prototype quality, not final release art or completed animation.
 - Collision uses simple rectangular building footprints; environment boundaries and pathing need refinement.
 - Movement currently uses local client simulation. No server authority or persistent character save exists.
 - The quest panel is informational only; no quest engine is implemented.
