@@ -328,6 +328,38 @@
         "pose"
       ],
       "status": "prototype-integrated"
+    },
+    {
+      "id": "familiar.verdant-sprite",
+      "path": "/assets/familiars/verdant-sprite.svg",
+      "category": "familiar",
+      "format": "svg",
+      "source": true,
+      "width": 256,
+      "height": 256,
+      "tags": [
+        "familiar",
+        "verdant",
+        "sprite",
+        "companion"
+      ],
+      "status": "prototype-integrated"
+    },
+    {
+      "id": "creature.frost-wisp",
+      "path": "/assets/creatures/frost-wisp.svg",
+      "category": "creature",
+      "format": "svg",
+      "source": true,
+      "width": 256,
+      "height": 256,
+      "tags": [
+        "enemy",
+        "frost",
+        "wisp",
+        "ice"
+      ],
+      "status": "prototype-integrated"
     }
   ]
 }
