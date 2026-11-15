@@ -16,7 +16,7 @@ Original, editable SVG source assets for the Arcane Realm prototype.
 
 | Asset | Stable ID | Use |
 |---|---|---|
-| Arcane wizard | `character.wizard.arcane` | Player placeholder/reusable base tradition |
+| Arcane wizard | `character.wizard.arcane` | Player idle pose/reusable base tradition |\n| Arcane wizard casting pose | `character.wizard.arcane.cast` | Temporary spell-casting pose with the same robe silhouette |
 | Ember wizard | `character.wizard.ember` | NPC/tradition appearance |
 | Frost wizard | `character.wizard.frost` | NPC/tradition appearance |
 | Verdant wizard | `character.wizard.verdant` | NPC/tradition appearance |
