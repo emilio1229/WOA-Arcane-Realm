@@ -5,6 +5,7 @@ declare global {
   interface Window {
     arcaneMove?: { x: number; y: number };
     arcaneInteract?: () => void;
+    arcaneCast?: () => void;
   }
 }
 
@@ -82,7 +83,8 @@ class SanctuaryScene extends Phaser.Scene {
       if (pointer.wasTouch && pointer.x > this.scale.width * 0.58 && pointer.y > this.scale.height * 0.55) this.interact();
     });
     window.arcaneInteract = this.interactHandler;
-    this.events.once("shutdown", () => { window.arcaneInteract = undefined; });
+    window.arcaneCast = () => this.castSpell();
+    this.events.once("shutdown", () => { window.arcaneInteract = undefined; window.arcaneCast = undefined; });
     this.scale.on("resize", (size: Phaser.Structs.Size) => this.cameras.main.setZoom(Math.min(1, size.width / 1100)));
   }
 
@@ -309,5 +311,6 @@ if (stick && knob) {
   stick.addEventListener("pointercancel", release);
 }
 document.querySelector("#interact")?.addEventListener("click", () => window.arcaneInteract?.());
+document.querySelector("#cast")?.addEventListener("click", () => window.arcaneCast?.());
 document.querySelector("#close-dialogue")?.addEventListener("click", () => document.querySelector("#dialogue")?.classList.add("hidden"));
 window.addEventListener("beforeunload", () => game.destroy(true));
