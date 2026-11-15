@@ -101,6 +101,7 @@ class SanctuaryScene extends Phaser.Scene {
     if (import.meta.env.DEV) {
       window.arcaneTest = {
         getPlayerPosition: () => ({ x: this.player.x, y: this.player.y }),
+        getFamiliarPosition: () => ({ x: this.familiarArt.x, y: this.familiarArt.y }),
         setPlayerPosition: (x, y) => {
           this.player.setVelocity(0, 0);
           this.player.setPosition(x, y);
