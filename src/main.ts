@@ -24,7 +24,6 @@ class SanctuaryScene extends Phaser.Scene {
   private obstacles: Phaser.Geom.Rectangle[] = [];
   private npcs: Array<{ data: NPC; art: Phaser.GameObjects.Container }> = [];
   private prompt!: Phaser.GameObjects.Text;
-  private move = { x: 0, y: 0 };
   private interactHandler = () => this.interact();
 
   constructor() { super("Sanctuary"); }
@@ -134,7 +133,7 @@ class SanctuaryScene extends Phaser.Scene {
       const shadow = this.add.ellipse(0, 20, 34, 12, 0x080b12, 0.42);
       const robe = this.add.triangle(0, 3, -15, 20, 15, 20, 0, -17, npc.color);
       const head = this.add.circle(0, -17, 9, 0xe7c5a9);
-      const hood = this.add.arc(0, -18, 12, 180, 360, false, 0x49345f).setClosePath();
+      const hood = this.add.arc(0, -18, 12, 180, 360, false, 0x49345f).setClosePath(true);
       const glow = this.add.circle(0, -4, 23, npc.color, 0.08);
       art.add([glow, shadow, robe, head, hood]);
       this.add.text(npc.x, npc.y + 35, npc.name, { fontFamily: "Cinzel,serif", fontSize: "10px", color: "#fff0d9", stroke: "#21172e", strokeThickness: 3 }).setOrigin(0.5).setDepth(npc.y + 15);
