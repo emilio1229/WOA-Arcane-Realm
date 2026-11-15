@@ -36,4 +36,4 @@ Original, editable SVG source assets for the Arcane Realm prototype.
 5. Review at the smallest target mobile size.
 6. Keep source and runtime variants linked by stable ID.
 
-The current pack has been integrated into the Sanctuary prototype for the Arcane wizard, Glimmer, Ember Wisp, and Grand Portal. The other wizard robes, Arcane Bolt, and Sigil are catalogued for the next character-customization and combat UI passes.
+The pack is integrated into the Sanctuary prototype: all five building exteriors, lanterns, rune obelisk, crystal cluster, Arcane wizard, Glimmer, Ember Wisp, and Grand Portal are loaded by the scene. Arcane Bolt and Sigil are catalogued for the next combat and HUD passes.
