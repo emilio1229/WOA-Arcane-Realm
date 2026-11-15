@@ -39,6 +39,14 @@ class SanctuaryScene extends Phaser.Scene {
     this.load.svg("grand-portal", "/assets/environment/grand-portal.svg", { width: 256, height: 256 });
     this.load.svg("arcane-bolt", "/assets/vfx/arcane-bolt.svg", { width: 64, height: 64 });
     this.load.svg("sigil", "/assets/ui/sigil.svg", { width: 64, height: 64 });
+    this.load.svg("building-library", "/assets/buildings/grand-library.svg", { width: 256, height: 256 });
+    this.load.svg("building-familiar", "/assets/buildings/familiar-sanctuary.svg", { width: 256, height: 256 });
+    this.load.svg("building-academy", "/assets/buildings/spell-academy.svg", { width: 256, height: 256 });
+    this.load.svg("building-merchant", "/assets/buildings/merchant-hall.svg", { width: 256, height: 256 });
+    this.load.svg("building-inn", "/assets/buildings/adventurer-inn.svg", { width: 256, height: 256 });
+    this.load.svg("prop-lantern", "/assets/props/sanctuary-lantern.svg", { width: 64, height: 128 });
+    this.load.svg("prop-obelisk", "/assets/props/rune-obelisk.svg", { width: 128, height: 128 });
+    this.load.svg("prop-crystals", "/assets/props/crystal-cluster.svg", { width: 128, height: 128 });
   }
 
   create() {
@@ -112,22 +120,15 @@ class SanctuaryScene extends Phaser.Scene {
   }
 
   private createBuildings() {
-    this.building(650, 440, "GRAND LIBRARY", 0x45365d, 0x9e80c5);
-    this.building(1160, 450, "FAMILIAR SANCTUARY", 0x34574d, 0x7eb99c);
-    this.building(560, 760, "SPELL ACADEMY", 0x4c365e, 0xb18bd4);
-    this.building(1240, 820, "MERCHANT", 0x655039, 0xe0b978);
-    this.building(900, 1000, "ADVENTURER'S INN", 0x59413d, 0xc58a78);
+    this.building(650, 440, "GRAND LIBRARY", "building-library");
+    this.building(1160, 450, "FAMILIAR SANCTUARY", "building-familiar");
+    this.building(560, 760, "SPELL ACADEMY", "building-academy");
+    this.building(1240, 820, "MERCHANT", "building-merchant");
+    this.building(900, 1000, "ADVENTURER'S INN", "building-inn");
   }
 
-  private building(x: number, y: number, label: string, wall: number, roof: number) {
-    const g = this.add.graphics().setDepth(y);
-    g.fillStyle(0x151522, 0.42); g.fillEllipse(x, y + 34, 240, 100);
-    g.fillStyle(wall); g.fillRect(x - 76, y - 88, 152, 112);
-    g.fillStyle(Phaser.Display.Color.IntegerToColor(wall).darken(18).color); g.fillRect(x - 76, y - 88, 18, 112);
-    g.fillStyle(roof); g.fillTriangle(x - 100, y - 88, x, y - 160, x + 100, y - 88);
-    g.fillStyle(0xf2d39b, 0.95); g.fillRect(x - 9, y - 52, 18, 44);
-    g.fillStyle(0xffd995, 0.75); g.fillRoundedRect(x - 47, y - 61, 18, 28, 5);
-    g.fillStyle(0xffd995, 0.75); g.fillRoundedRect(x + 29, y - 61, 18, 28, 5);
+  private building(x: number, y: number, label: string, texture: string) {
+    this.add.image(x, y + 22, texture).setDisplaySize(255, 255).setOrigin(0.5, 1).setDepth(y);
     this.add.text(x, y + 52, label, { fontFamily: "Cinzel, serif", fontSize: "10px", color: "#f3e3ff", stroke: "#1a1424", strokeThickness: 3, letterSpacing: 1 }).setOrigin(0.5).setDepth(y + 5);
     this.obstacles.push(new Phaser.Geom.Rectangle(x - 75, y - 85, 150, 105));
   }
@@ -152,6 +153,14 @@ class SanctuaryScene extends Phaser.Scene {
     const wisp = this.add.image(470, 635, "ember-wisp").setDisplaySize(74, 74).setDepth(645);
     this.tweens.add({ targets: wisp, y: 618, alpha: { from: 0.82, to: 1 }, duration: 1250, yoyo: true, repeat: -1, ease: "Sine.easeInOut" });
     this.add.text(470, 674, "EMBER WISP", { fontFamily: "Cinzel,serif", fontSize: "9px", color: "#ffd0a1", stroke: "#21172e", strokeThickness: 3 }).setOrigin(0.5).setDepth(650);
+
+    for (const [x, y] of [[365, 620], [1450, 620], [405, 1000], [1390, 1030]]) {
+      const lantern = this.add.image(x, y, "prop-lantern").setDisplaySize(48, 96).setOrigin(0.5, 0.88).setDepth(y);
+      this.tweens.add({ targets: lantern, alpha: { from: 0.82, to: 1 }, duration: 1900, yoyo: true, repeat: -1 });
+    }
+    const obelisk = this.add.image(760, 670, "prop-obelisk").setDisplaySize(92, 92).setDepth(680);
+    this.add.image(1455, 900, "prop-crystals").setDisplaySize(112, 112).setDepth(910);
+    this.tweens.add({ targets: obelisk, alpha: { from: 0.86, to: 1 }, duration: 2200, yoyo: true, repeat: -1 });
   }
 
   private drawWizard(container: Phaser.GameObjects.Container) {
