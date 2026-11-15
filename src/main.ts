@@ -183,7 +183,7 @@ class SanctuaryScene extends Phaser.Scene {
     let y = Number(keyboard.W.isDown || keyboard.UP.isDown) * -1 + Number(keyboard.S.isDown || keyboard.DOWN.isDown);
     x += window.arcaneMove?.x ?? 0;
     y += window.arcaneMove?.y ?? 0;
-    const vector = new Phaser.Math.Vector2(x, y);
+    const vector = new Phaser.Math.Vector2((x - y) * 0.7071, (x + y) * 0.5);
     if (vector.length() > 1) vector.normalize();
     const speed = 190;
     const nextX = this.player.x + vector.x * speed * (1 / 60);
@@ -200,8 +200,7 @@ class SanctuaryScene extends Phaser.Scene {
     const nearby = this.nearestNPC();
     this.prompt.setVisible(Boolean(nearby));
     if (nearby) {
-      const point = this.cameras.main.getWorldPoint(this.scale.width / 2, this.scale.height - 105);
-      this.prompt.setPosition(point.x, point.y);
+      this.prompt.setPosition(this.scale.width / 2, this.scale.height - 105);
     }
     if (Phaser.Input.Keyboard.JustDown(keyboard.E) || Phaser.Input.Keyboard.JustDown(keyboard.ENTER)) this.interact();
   }
