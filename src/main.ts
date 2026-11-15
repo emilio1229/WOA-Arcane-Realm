@@ -27,6 +27,8 @@ class SanctuaryScene extends Phaser.Scene {
   private player!: Phaser.Physics.Arcade.Image;
   private playerArt!: Phaser.GameObjects.Container;
   private wizardSprite!: Phaser.GameObjects.Image;
+  private familiarArt!: Phaser.GameObjects.Image;
+  private familiarGlow!: Phaser.GameObjects.Ellipse;
   private lastFacing = new Phaser.Math.Vector2(0, -1);
   private nextCastAt = 0;
   private keys!: Record<string, Phaser.Input.Keyboard.Key>;
@@ -77,6 +79,9 @@ class SanctuaryScene extends Phaser.Scene {
     this.player.setCollideWorldBounds(true);
     this.playerArt = this.add.container(this.player.x, this.player.y).setDepth(900);
     this.drawWizard(this.playerArt);
+    this.familiarGlow = this.add.ellipse(this.player.x - 8, this.player.y + 34, 54, 30, 0xb98bea, 0.13).setDepth(this.player.y + 12);
+    this.familiarArt = this.add.image(this.player.x - 8, this.player.y + 24, "glimmer")
+      .setDisplaySize(42, 42).setDepth(this.player.y + 18);
     this.cameras.main.setBounds(0, 0, WORLD.width, WORLD.height);
     this.cameras.main.startFollow(this.player, true, 0.08, 0.08);
     this.cameras.main.setZoom(Math.min(1, this.scale.width / 1100));
@@ -330,6 +335,15 @@ class SanctuaryScene extends Phaser.Scene {
     this.playerArt.setPosition(resolvedX, resolvedY);
     this.wizardSprite.setRotation(vector.lengthSq() > 0.001 ? Math.sin(this.time.now / 75) * 0.035 : Math.sin(this.time.now / 520) * 0.012);
     this.playerArt.setDepth(this.player.y + 20);
+    // Glimmer trails the wizard, eases into turns, and floats independently.
+    const familiarTargetX = this.player.x - this.lastFacing.x * 44 - 8;
+    const familiarTargetY = this.player.y - this.lastFacing.y * 34 + 18;
+    const followEase = Phaser.Math.Clamp(delta * 5.5, 0, 1);
+    this.familiarArt.x = Phaser.Math.Linear(this.familiarArt.x, familiarTargetX, followEase);
+    this.familiarArt.y = Phaser.Math.Linear(this.familiarArt.y, familiarTargetY, followEase) + Math.sin(this.time.now / 260) * 3;
+    this.familiarGlow.setPosition(this.familiarArt.x, this.familiarArt.y + 10);
+    this.familiarGlow.setDepth(this.familiarArt.y + 12);
+    this.familiarArt.setDepth(this.familiarArt.y + 18);
     this.npcs.forEach(n => n.art.setDepth(n.data.y + 10));
     const nearby = this.nearestNPC();
     this.prompt.setVisible(Boolean(nearby));
