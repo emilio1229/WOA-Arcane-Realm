@@ -28,11 +28,25 @@ class SanctuaryScene extends Phaser.Scene {
 
   constructor() { super("Sanctuary"); }
 
+  preload() {
+    this.load.svg("wizard-arcane", "/assets/characters/wizard-arcane.svg", { width: 128, height: 160 });
+    this.load.svg("wizard-ember", "/assets/characters/wizard-ember.svg", { width: 128, height: 160 });
+    this.load.svg("wizard-frost", "/assets/characters/wizard-frost.svg", { width: 128, height: 160 });
+    this.load.svg("wizard-verdant", "/assets/characters/wizard-verdant.svg", { width: 128, height: 160 });
+    this.load.svg("wizard-shadow", "/assets/characters/wizard-shadow.svg", { width: 128, height: 160 });
+    this.load.svg("glimmer", "/assets/familiars/glimmer.svg", { width: 128, height: 128 });
+    this.load.svg("ember-wisp", "/assets/creatures/ember-wisp.svg", { width: 128, height: 128 });
+    this.load.svg("grand-portal", "/assets/environment/grand-portal.svg", { width: 256, height: 256 });
+    this.load.svg("arcane-bolt", "/assets/vfx/arcane-bolt.svg", { width: 64, height: 64 });
+    this.load.svg("sigil", "/assets/ui/sigil.svg", { width: 64, height: 64 });
+  }
+
   create() {
     this.cameras.main.setBackgroundColor("#182335");
     this.drawWorld();
     this.createBuildings();
     this.createNPCs();
+    this.createAssetShowcase();
 
     this.player = this.physics.add.image(900, 760, "__WHITE");
     this.player.setDisplaySize(18, 18).setTint(0xffffff).setAlpha(0);
@@ -93,17 +107,8 @@ class SanctuaryScene extends Phaser.Scene {
   }
 
   private drawPortal(x: number, y: number) {
-    const g = this.add.graphics().setDepth(100);
-    g.fillStyle(0x20182e); g.fillEllipse(x, y + 65, 180, 56);
-    g.lineStyle(18, 0x5e3c80, 1); g.strokeEllipse(x, y, 116, 166);
-    g.lineStyle(7, 0xd3a0fa, 0.9); g.strokeEllipse(x, y, 96, 148);
-    g.fillStyle(0x8e62ba, 0.26); g.fillEllipse(x, y, 90, 142);
-    g.lineStyle(2, 0xf1d5ff, 0.8); g.strokeEllipse(x, y, 90, 142);
-    for (let i = 0; i < 8; i++) {
-      const a = i * Math.PI / 4;
-      g.fillStyle(0xe7c27e); g.fillCircle(x + Math.cos(a) * 66, y + Math.sin(a) * 85, 4);
-    }
-    this.tweens.add({ targets: g, alpha: { from: 0.78, to: 1 }, duration: 1700, yoyo: true, repeat: -1 });
+    const portal = this.add.image(x, y, "grand-portal").setDisplaySize(250, 250).setDepth(100).setAlpha(0.92);
+    this.tweens.add({ targets: portal, alpha: { from: 0.78, to: 1 }, scale: { from: 0.97, to: 1.02 }, duration: 2100, yoyo: true, repeat: -1, ease: "Sine.easeInOut" });
   }
 
   private createBuildings() {
@@ -128,28 +133,30 @@ class SanctuaryScene extends Phaser.Scene {
   }
 
   private createNPCs() {
-    for (const npc of NPCS) {
+    const looks = ["wizard-arcane", "wizard-frost", "wizard-ember", "wizard-verdant"];
+    NPCS.forEach((npc, index) => {
       const art = this.add.container(npc.x, npc.y).setDepth(npc.y + 10);
-      const shadow = this.add.ellipse(0, 20, 34, 12, 0x080b12, 0.42);
-      const robe = this.add.triangle(0, 3, -15, 20, 15, 20, 0, -17, npc.color);
-      const head = this.add.circle(0, -17, 9, 0xe7c5a9);
-      const hood = this.add.arc(0, -18, 12, 180, 360, false, 0x49345f).setClosePath(true);
-      const glow = this.add.circle(0, -4, 23, npc.color, 0.08);
-      art.add([glow, shadow, robe, head, hood]);
+      const portrait = this.add.image(0, 0, looks[index]).setDisplaySize(70, 88).setOrigin(0.5, 0.9);
+      art.add(portrait);
       this.add.text(npc.x, npc.y + 35, npc.name, { fontFamily: "Cinzel,serif", fontSize: "10px", color: "#fff0d9", stroke: "#21172e", strokeThickness: 3 }).setOrigin(0.5).setDepth(npc.y + 15);
       this.npcs.push({ data: npc, art });
-      this.tweens.add({ targets: art, y: npc.y - 3, duration: 1400 + Math.random() * 500, yoyo: true, repeat: -1, ease: "Sine.easeInOut" });
-    }
+      this.tweens.add({ targets: art, y: npc.y - 3, duration: 1500 + index * 170, yoyo: true, repeat: -1, ease: "Sine.easeInOut" });
+    });
+  }
+
+  private createAssetShowcase() {
+    const glimmer = this.add.image(1165, 285, "glimmer").setDisplaySize(76, 76).setDepth(330);
+    this.tweens.add({ targets: glimmer, y: 267, angle: { from: -7, to: 7 }, duration: 1700, yoyo: true, repeat: -1, ease: "Sine.easeInOut" });
+    this.add.text(1165, 324, "GLIMMER", { fontFamily: "Cinzel,serif", fontSize: "9px", color: "#e9dcff", stroke: "#21172e", strokeThickness: 3 }).setOrigin(0.5).setDepth(340);
+
+    const wisp = this.add.image(470, 635, "ember-wisp").setDisplaySize(74, 74).setDepth(645);
+    this.tweens.add({ targets: wisp, y: 618, alpha: { from: 0.82, to: 1 }, duration: 1250, yoyo: true, repeat: -1, ease: "Sine.easeInOut" });
+    this.add.text(470, 674, "EMBER WISP", { fontFamily: "Cinzel,serif", fontSize: "9px", color: "#ffd0a1", stroke: "#21172e", strokeThickness: 3 }).setOrigin(0.5).setDepth(650);
   }
 
   private drawWizard(container: Phaser.GameObjects.Container) {
-    const shadow = this.add.ellipse(0, 17, 31, 11, 0x080b12, 0.5);
-    const robe = this.add.triangle(0, 2, -16, 20, 16, 20, 0, -17, 0x8e62bd);
-    const trim = this.add.triangle(0, 5, -8, 16, 8, 16, 0, -12, 0xd5a5f3);
-    const head = this.add.circle(0, -18, 9, 0xe8c9ad);
-    const hat = this.add.triangle(0, -30, -12, -13, 12, -13, 0, -34, 0x30203f);
-    const star = this.add.star(0, -33, 4, 2, 5, 0xf1d28e);
-    container.add([shadow, robe, trim, head, hat, star]);
+    const wizard = this.add.image(0, 0, "wizard-arcane").setDisplaySize(78, 98).setOrigin(0.5, 0.9);
+    container.add(wizard);
   }
 
   private interact() {
