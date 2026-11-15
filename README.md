@@ -6,32 +6,47 @@ A standalone, browser-first fantasy RPG prototype for the Wizards of Ark (WoA) c
 
 ## Project direction
 
-Arcane Realm is intended to become a mobile-friendly, browser-playable, higher-angle isometric fantasy RPG with a portal-connected world, memorable NPCs, combat, quests, familiars, spells, and persistent character progression.
-
-The visual target is a clean, atmospheric, dimensional/isometric presentation—not a 2D pixel-art game. Godot is explicitly not wanted. Phaser with TypeScript or another lightweight browser technology has been considered, but the final renderer/engine is not yet locked. Phaser is a 2D framework, so it must not be represented as native 3D; any 2.5D/isometric approach must be evaluated against the visual requirement before adoption.
+Arcane Realm is intended to become a mobile-friendly, browser-playable, higher-angle isometric and dimensional fantasy RPG. Godot is explicitly excluded. Phaser is currently used for a 2.5D feasibility prototype, not claimed as native 3D or permanently locked as the final renderer. If the visual target requires true 3D, evaluate a browser 3D renderer before expanding the prototype.
 
 ## Start here
 
-1. docs/PROJECT_KNOWLEDGE_BASE.md — accumulated direction, gameplay, world, UX, and boundaries.
-2. docs/PROTOTYPE_BRIEF.md — confirmed decisions, prior test-build concept, and unresolved choices.
-3. docs/ENGINEERING_SKILLS_BLUEPRINT.md — internal development skills and operational safeguards.
-4. docs/ARCANE_ARTIFICER_ASSET_PIPELINE.md — internal asset creation and improvement workflow.
-5. docs/ARCHITECTURE_SECURITY_BLUEPRINT.md — future authoritative services, data integrity, security, and recovery.
+- `docs/PROJECT_KNOWLEDGE_BASE.md` — accumulated product direction and decisions.
+- `docs/PROTOTYPE_BRIEF.md` — confirmed context, prototype seeds, and unresolved choices.
+- `docs/FOUNDATION_VERTICAL_SLICE.md` — current playable foundation and honest implementation status.
+- `docs/ENGINEERING_SKILLS_BLUEPRINT.md` — internal engineering playbook.
+- `docs/ARCANE_ARTIFICER_ASSET_PIPELINE.md` — internal asset production workflow.
+- `docs/ARCHITECTURE_SECURITY_BLUEPRINT.md` — target-state security and operations.
 
-## Repository rules
+## Run locally
 
-- Keep all Arcane Realm work in this repository.
-- Do not modify wizardsofark-website or woa-event-bot.
-- Do not deploy, publish, or connect live player data without explicit approval.
-- Preserve existing work; make focused, reviewable commits.
-- Treat ideas and historical prototype notes as design context, not proof that a working implementation exists.
-- Keep internal developer/AI tools out of the player-facing game.
+Requires Node.js 22+ and npm.
+
+```bash
+npm install
+npm run dev
+```
+
+Open the URL printed by Vite (normally http://localhost:5173).
+
+```bash
+npm run typecheck
+npm run build
+npm run preview
+```
+
+## Current foundation
+
+The first playable foundation has been added: isometric-style sanctuary environment, camera follow, keyboard movement, building collision footprints, NPCs and proximity interaction, HUD, and mobile joystick/touch interaction. Art is currently procedural placeholder geometry. This slice has not yet been browser- or device-tested in this environment; see `docs/FOUNDATION_VERTICAL_SLICE.md` for limitations and next validation steps.
+
+## Repository boundaries
+
+- Keep all Arcane Realm game work here.
+- Do not modify `wizardsofark-website` or `woa-event-bot`.
+- Do not deploy, publish, connect production services, or use live player data without explicit approval.
+- Preserve existing work and make focused, reviewable changes.
 - Never commit credentials, private player data, generated caches, or unlicensed assets.
+- Internal developer/AI tools are not player-facing game features.
 
-## Current status
+## Technical reference
 
-This repository began as documentation only. No runnable game source, engine configuration, art assets, or build pipeline has been verified yet. The next implementation milestone is to settle the rendering approach against the isometric visual requirement, then build one small, playable, testable vertical slice.
-
-## External technical reference
-
-- https://docs.phaser.io/ — Phaser documentation. Phaser is 2D; confirm that an isometric/2.5D implementation meets the intended look before choosing it.
+- https://docs.phaser.io/ — Phaser documentation and installation guidance.
