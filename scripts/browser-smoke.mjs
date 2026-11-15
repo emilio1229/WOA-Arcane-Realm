@@ -41,6 +41,13 @@ try {
     height: canvas.height,
   }));
   assert.ok(canvasSize.width > 0 && canvasSize.height > 0, "game canvas should have a real drawing surface");
+  await desktop.setViewportSize({ width: 980, height: 720 });
+  await delay(300);
+  const resizedCanvas = await desktop.locator("#game canvas").evaluate(canvas => ({ width: canvas.width, height: canvas.height }));
+  assert.ok(resizedCanvas.width > 0 && resizedCanvas.height > 0, "game canvas should survive a viewport resize");
+  assert.notEqual(resizedCanvas.width, canvasSize.width, "game canvas should adapt to the new viewport width");
+  await desktop.setViewportSize({ width: 1280, height: 800 });
+  await delay(150);
 
   const beforeMove = await desktop.evaluate(() => window.arcaneTest.getPlayerPosition());
   const familiarBeforeMove = await desktop.evaluate(() => window.arcaneTest.getFamiliarPosition());
