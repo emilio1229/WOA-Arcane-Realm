@@ -52,6 +52,15 @@ try {
     "keyboard movement should move the wizard",
   );
 
+  // Walk into the Grand Library footprint and confirm the wizard slides along its edge.
+  await desktop.evaluate(() => window.arcaneTest.setPlayerPosition(560, 410));
+  await desktop.keyboard.down("d");
+  await delay(650);
+  await desktop.keyboard.up("d");
+  const afterCollision = await desktop.evaluate(() => window.arcaneTest.getPlayerPosition());
+  assert.ok(afterCollision.x < 575, "building collision should prevent walking through the library wall");
+  assert.ok(afterCollision.y > 410, "axis-separated collision should allow sliding along the wall");
+
   await desktop.keyboard.press("Space");
   await delay(500);
   await desktop.evaluate(() => window.arcaneTest.setPlayerPosition(900, 480));
