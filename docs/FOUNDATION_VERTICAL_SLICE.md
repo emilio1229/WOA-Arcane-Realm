@@ -16,11 +16,11 @@ Official reference: https://docs.phaser.io/phaser/getting-started/installation
 - NPCs with names, idle bobbing, proximity detection, and E/Enter interaction.
 - Responsive HUD and a contextual dialogue panel.
 - Mobile virtual joystick and touch interaction button.
-- No external game services, live player data, or production Discord authentication.
+- Reusable SVG asset scaffold generator (`npm run assets:new`) that registers stable IDs and refuses to overwrite existing artwork.\n- No external game services, live player data, or production Discord authentication.
 
 ## Original asset pack
 
-The repository now includes an original SVG asset library under `public/assets/`: five shared-silhouette tradition robes (Arcane, Ember, Frost, Verdant, Shadow), five distinct sanctuary building exteriors, three environment props (lantern, rune obelisk, crystal cluster), Glimmer, Ember Wisp, Grand Portal, Arcane Bolt, Arcane Impact, Arcane Mote, and a Sigil icon. The Arcane wizard, Glimmer, Ember Wisp, portal, Arcane Bolt, impact burst, and ambient motes are integrated into the sanctuary scene. Stable IDs and provenance metadata live in `public/assets/manifest.json`; library rules are in `public/assets/README.md`. Run `npm run assets:validate` to check IDs, file paths, SVG dimensions, and safe inline-only content.
+The repository now includes an original SVG asset library under `public/assets/`: five shared-silhouette tradition robes (Arcane, Ember, Frost, Verdant, Shadow), five distinct sanctuary building exteriors, three environment props (lantern, rune obelisk, crystal cluster), Glimmer, Ember Wisp, Grand Portal, Arcane Bolt, Arcane Impact, Arcane Mote, and a Sigil icon. The Arcane wizard, Glimmer, Ember Wisp, portal, Arcane Bolt, impact burst, and ambient motes are integrated into the sanctuary scene. Stable IDs and provenance metadata live in `public/assets/manifest.json`; library rules are in `public/assets/README.md`. Run `npm run assets:validate` to check IDs, file paths, SVG dimensions, and safe inline-only content. Use `npm run assets:new -- --id <stable.id> --category <category> --name "Asset Name"` to scaffold and register new SVG source art.
 
 ## Deliberate limitations
 
