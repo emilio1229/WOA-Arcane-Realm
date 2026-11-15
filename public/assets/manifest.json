@@ -312,6 +312,22 @@
         "light"
       ],
       "status": "prototype-integrated"
+    },
+    {
+      "id": "character.wizard.arcane.cast",
+      "path": "/assets/characters/wizard-arcane-cast.svg",
+      "category": "character",
+      "format": "svg",
+      "source": true,
+      "width": 256,
+      "height": 320,
+      "tags": [
+        "wizard",
+        "arcane",
+        "casting",
+        "pose"
+      ],
+      "status": "prototype-integrated"
     }
   ]
 }
