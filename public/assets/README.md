@@ -24,7 +24,7 @@ Original, editable SVG source assets for the Arcane Realm prototype.
 | Glimmer | `familiar.glimmer` | First familiar concept |
 | Ember Wisp | `creature.ember-wisp` | First enemy concept |
 | Grand Portal | `environment.grand-portal` | Sanctuary landmark |
-| Arcane Bolt | `vfx.arcane-bolt` | Spell effect icon/prototype |
+| Arcane Bolt | `vfx.arcane-bolt` | Player spell projectile |\n| Arcane impact | `vfx.arcane-impact` | Spell impact burst |\n| Arcane mote | `vfx.arcane-mote` | Ambient floating magic particle |
 | Sigil | `ui.sigil` | Currency/UI icon |
 | Grand Library | `environment.building.grand-library` | Sanctuary building exterior |
 | Familiar Sanctuary | `environment.building.familiar-sanctuary` | Sanctuary building exterior |
@@ -44,4 +44,4 @@ Original, editable SVG source assets for the Arcane Realm prototype.
 5. Review at the smallest target mobile size.
 6. Keep source and runtime variants linked by stable ID.
 
-The pack is integrated into the Sanctuary prototype: all five building exteriors, lanterns, rune obelisk, crystal cluster, Arcane wizard, Glimmer, Ember Wisp, and Grand Portal are loaded by the scene. Arcane Bolt and Sigil are catalogued for the next combat and HUD passes.
+The pack is integrated into the Sanctuary prototype: all five building exteriors, lanterns, rune obelisk, crystal cluster, Arcane wizard, Glimmer, Ember Wisp, and Grand Portal are loaded by the scene. Arcane Bolt, Arcane Impact, and Arcane Mote now power the first local spell-casting prototype and ambient magic layer. Sigil remains catalogued for the upcoming HUD/economy pass. Use Space or the mobile Cast control to launch the Arcane Bolt.
