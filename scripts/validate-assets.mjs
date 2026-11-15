@@ -21,7 +21,7 @@ for (const asset of manifest.assets) {
   const width = Number(root[1].match(/\bwidth="(\d+)"/)?.[1]);
   const height = Number(root[1].match(/\bheight="(\d+)"/)?.[1]);
   if (width !== asset.width || height !== asset.height) failures.push(`Manifest dimensions mismatch: ${asset.path} (manifest ${asset.width}x${asset.height}, SVG ${width}x${height})`);
-  if (/<script\b|javascript:|https?:\/\//i.test(source)) failures.push(`External/script content is not allowed in game SVG: ${asset.path}`);
+  if (/<script\b|javascript:|(?:href|xlink:href)="(?:https?:)?\/\//i.test(source)) failures.push(`External/script content is not allowed in game SVG: ${asset.path}`);
 }
 if (failures.length) {
   console.error("Asset validation failed:");
