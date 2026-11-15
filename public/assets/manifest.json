@@ -160,6 +160,126 @@
         "icon"
       ],
       "status": "library-ready"
+    },
+    {
+      "id": "environment.building.grand-library",
+      "path": "/assets/buildings/grand-library.svg",
+      "category": "building",
+      "format": "svg",
+      "source": true,
+      "width": 512,
+      "height": 512,
+      "tags": [
+        "building",
+        "library",
+        "sanctuary"
+      ],
+      "status": "prototype-integrated"
+    },
+    {
+      "id": "environment.building.familiar-sanctuary",
+      "path": "/assets/buildings/familiar-sanctuary.svg",
+      "category": "building",
+      "format": "svg",
+      "source": true,
+      "width": 512,
+      "height": 512,
+      "tags": [
+        "building",
+        "familiar",
+        "sanctuary"
+      ],
+      "status": "prototype-integrated"
+    },
+    {
+      "id": "environment.building.spell-academy",
+      "path": "/assets/buildings/spell-academy.svg",
+      "category": "building",
+      "format": "svg",
+      "source": true,
+      "width": 512,
+      "height": 512,
+      "tags": [
+        "building",
+        "academy",
+        "magic"
+      ],
+      "status": "prototype-integrated"
+    },
+    {
+      "id": "environment.building.merchant-hall",
+      "path": "/assets/buildings/merchant-hall.svg",
+      "category": "building",
+      "format": "svg",
+      "source": true,
+      "width": 512,
+      "height": 512,
+      "tags": [
+        "building",
+        "merchant",
+        "market"
+      ],
+      "status": "prototype-integrated"
+    },
+    {
+      "id": "environment.building.adventurer-inn",
+      "path": "/assets/buildings/adventurer-inn.svg",
+      "category": "building",
+      "format": "svg",
+      "source": true,
+      "width": 512,
+      "height": 512,
+      "tags": [
+        "building",
+        "inn",
+        "sanctuary"
+      ],
+      "status": "prototype-integrated"
+    },
+    {
+      "id": "environment.prop.lantern",
+      "path": "/assets/props/sanctuary-lantern.svg",
+      "category": "prop",
+      "format": "svg",
+      "source": true,
+      "width": 128,
+      "height": 256,
+      "tags": [
+        "prop",
+        "lantern",
+        "light"
+      ],
+      "status": "prototype-integrated"
+    },
+    {
+      "id": "environment.prop.rune-obelisk",
+      "path": "/assets/props/rune-obelisk.svg",
+      "category": "prop",
+      "format": "svg",
+      "source": true,
+      "width": 256,
+      "height": 256,
+      "tags": [
+        "prop",
+        "obelisk",
+        "rune"
+      ],
+      "status": "prototype-integrated"
+    },
+    {
+      "id": "environment.prop.crystal-cluster",
+      "path": "/assets/props/crystal-cluster.svg",
+      "category": "prop",
+      "format": "svg",
+      "source": true,
+      "width": 256,
+      "height": 256,
+      "tags": [
+        "prop",
+        "crystal",
+        "magic"
+      ],
+      "status": "prototype-integrated"
     }
   ]
 }
