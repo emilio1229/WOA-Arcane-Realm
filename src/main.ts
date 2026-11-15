@@ -6,6 +6,11 @@ declare global {
     arcaneMove?: { x: number; y: number };
     arcaneInteract?: () => void;
     arcaneCast?: () => void;
+    /** Development-only hooks used by the headless browser smoke test. */
+    arcaneTest?: {
+      getPlayerPosition: () => { x: number; y: number };
+      setPlayerPosition: (x: number, y: number) => void;
+    };
   }
 }
 
@@ -88,7 +93,22 @@ class SanctuaryScene extends Phaser.Scene {
     });
     window.arcaneInteract = this.interactHandler;
     window.arcaneCast = () => this.castSpell();
-    this.events.once("shutdown", () => { window.arcaneInteract = undefined; window.arcaneCast = undefined; });
+    if (import.meta.env.DEV) {
+      window.arcaneTest = {
+        getPlayerPosition: () => ({ x: this.player.x, y: this.player.y }),
+        setPlayerPosition: (x, y) => {
+          this.player.setVelocity(0, 0);
+          this.player.setPosition(x, y);
+          this.player.body!.reset(x, y);
+          this.playerArt.setPosition(x, y);
+        },
+      };
+    }
+    this.events.once("shutdown", () => {
+      window.arcaneInteract = undefined;
+      window.arcaneCast = undefined;
+      window.arcaneTest = undefined;
+    });
     this.scale.on("resize", (size: Phaser.Structs.Size) => this.cameras.main.setZoom(Math.min(1, size.width / 1100)));
   }
 
