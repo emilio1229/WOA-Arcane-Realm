@@ -30,6 +30,11 @@ class SanctuaryScene extends Phaser.Scene {
   private wizardSprite!: Phaser.GameObjects.Image;
   private familiarArt!: Phaser.GameObjects.Image;
   private familiarGlow!: Phaser.GameObjects.Ellipse;
+  private practiceWisp!: Phaser.GameObjects.Container;
+  private practiceWispArt!: Phaser.GameObjects.Image;
+  private practiceWispHealth = 3;
+  private practiceWispFill!: Phaser.GameObjects.Rectangle;
+  private practiceWispLabel!: Phaser.GameObjects.Text;
   private lastFacing = new Phaser.Math.Vector2(0, -1);
   private nextCastAt = 0;
   private keys!: Record<string, Phaser.Input.Keyboard.Key>;
@@ -205,9 +210,15 @@ class SanctuaryScene extends Phaser.Scene {
     this.tweens.add({ targets: sprite, y: 267, angle: { from: 5, to: -5 }, duration: 1900, yoyo: true, repeat: -1, ease: "Sine.easeInOut" });
     this.add.text(1380, 324, "VERDANT SPRITE", { fontFamily: "Cinzel,serif", fontSize: "8px", color: "#c9ffd0", stroke: "#21172e", strokeThickness: 3 }).setOrigin(0.5).setDepth(340);
 
-    const wisp = this.add.image(470, 635, "ember-wisp").setDisplaySize(74, 74).setDepth(645);
-    this.tweens.add({ targets: wisp, y: 618, alpha: { from: 0.82, to: 1 }, duration: 1250, yoyo: true, repeat: -1, ease: "Sine.easeInOut" });
-    this.add.text(470, 674, "EMBER WISP", { fontFamily: "Cinzel,serif", fontSize: "9px", color: "#ffd0a1", stroke: "#21172e", strokeThickness: 3 }).setOrigin(0.5).setDepth(650);
+    this.practiceWisp = this.add.container(470, 635).setDepth(645);
+    this.practiceWispArt = this.add.image(0, 0, "ember-wisp").setDisplaySize(74, 74);
+    this.practiceWispLabel = this.add.text(0, 39, "EMBER WISP · 3", {
+      fontFamily: "Cinzel,serif", fontSize: "9px", color: "#ffd0a1", stroke: "#21172e", strokeThickness: 3,
+    }).setOrigin(0.5);
+    const healthTrack = this.add.rectangle(-26, -48, 52, 5, 0x21172e, 0.9).setOrigin(0, 0.5);
+    this.practiceWispFill = this.add.rectangle(-24, -48, 48, 3, 0xf39b6b, 1).setOrigin(0, 0.5);
+    this.practiceWisp.add([this.practiceWispArt, healthTrack, this.practiceWispFill, this.practiceWispLabel]);
+    this.tweens.add({ targets: this.practiceWispArt, y: -17, alpha: { from: 0.82, to: 1 }, duration: 1250, yoyo: true, repeat: -1, ease: "Sine.easeInOut" });
 
     const frostWisp = this.add.image(1450, 640, "frost-wisp").setDisplaySize(70, 70).setDepth(650);
     this.tweens.add({ targets: frostWisp, y: 621, alpha: { from: 0.78, to: 1 }, duration: 1600, yoyo: true, repeat: -1, ease: "Sine.easeInOut" });
@@ -256,18 +267,26 @@ class SanctuaryScene extends Phaser.Scene {
       .setRotation(Math.atan2(this.lastFacing.y, this.lastFacing.x) + Math.PI / 2);
     const targetX = startX + this.lastFacing.x * 270;
     const targetY = startY + this.lastFacing.y * 270;
+    const enemyDx = this.practiceWisp.x - startX;
+    const enemyDy = this.practiceWisp.y - startY;
+    const alongShot = enemyDx * this.lastFacing.x + enemyDy * this.lastFacing.y;
+    const offShot = Math.abs(enemyDx * this.lastFacing.y - enemyDy * this.lastFacing.x);
+    const hitsPracticeWisp = this.practiceWispHealth > 0 && alongShot >= 0 && alongShot <= 270 && offShot <= 38;
+    const impactX = hitsPracticeWisp ? this.practiceWisp.x : targetX;
+    const impactY = hitsPracticeWisp ? this.practiceWisp.y : targetY;
     this.tweens.add({
-      targets: bolt, x: targetX, y: targetY, alpha: 0.25, scale: 0.45,
+      targets: bolt, x: impactX, y: impactY, alpha: 0.25, scale: 0.45,
       duration: 390, ease: "Cubic.easeOut",
       onComplete: () => {
         bolt.destroy();
-        const impact = this.add.image(targetX, targetY, "arcane-impact")
-          .setDisplaySize(18, 18).setDepth(targetY + 90).setAlpha(0.95);
+        const impact = this.add.image(impactX, impactY, "arcane-impact")
+          .setDisplaySize(18, 18).setDepth(impactY + 90).setAlpha(0.95);
         this.tweens.add({
           targets: impact, displayWidth: 112, displayHeight: 112, alpha: 0,
           angle: 35, duration: 320, ease: "Cubic.easeOut",
           onComplete: () => impact.destroy(),
         });
+        if (hitsPracticeWisp) this.damagePracticeWisp();
       },
     });
     this.wizardSprite.setTexture("wizard-arcane-cast").setTint(0xe9d2ff);
@@ -276,6 +295,23 @@ class SanctuaryScene extends Phaser.Scene {
       targets: this.wizardSprite, alpha: 0.65, duration: 90, yoyo: true,
       onComplete: () => this.wizardSprite.clearTint(),
     });
+  }
+
+  private damagePracticeWisp() {
+    if (this.practiceWispHealth <= 0) return;
+    this.practiceWispHealth -= 1;
+    this.practiceWispFill.setSize(48 * this.practiceWispHealth / 3, 3);
+    this.practiceWispLabel.setText(this.practiceWispHealth > 0 ? `EMBER WISP · ${this.practiceWispHealth}` : "WISP DISPELLED");
+    this.tweens.add({ targets: this.practiceWispArt, alpha: 0.3, duration: 65, yoyo: true, repeat: 1 });
+    if (this.practiceWispHealth === 0) {
+      this.practiceWisp.setAlpha(0.22);
+      this.time.delayedCall(3500, () => {
+        this.practiceWispHealth = 3;
+        this.practiceWispFill.setSize(48, 3);
+        this.practiceWispLabel.setText("EMBER WISP · 3");
+        this.practiceWisp.setAlpha(1);
+      });
+    }
   }
 
   private interact() {
