@@ -90,13 +90,18 @@ try {
   // Aimed Arcane Bolts damage the Ember Wisp practice target and update its health.
   await desktop.evaluate(() => window.arcaneTest.setPlayerPosition(470, 760, 0, -1));
   const wispHealthBefore = await desktop.evaluate(() => window.arcaneTest.getPracticeWispHealth());
-  await desktop.keyboard.down("Space");
-  await delay(120);
-  await desktop.keyboard.up("Space");
-  await delay(650);
-  const wispHealthAfter = await desktop.evaluate(() => window.arcaneTest.getPracticeWispHealth());
   assert.equal(wispHealthBefore, 3, "practice wisp should start with three health");
-  assert.equal(wispHealthAfter, 2, "an aimed Arcane Bolt should damage the Ember Wisp");
+  for (let hit = 0; hit < 3; hit++) {
+    await desktop.keyboard.down("Space");
+    await delay(120);
+    await desktop.keyboard.up("Space");
+    await delay(650);
+  }
+  const wispHealthAfter = await desktop.evaluate(() => window.arcaneTest.getPracticeWispHealth());
+  assert.equal(wispHealthAfter, 0, "three aimed Arcane Bolts should dispel the Ember Wisp");
+  await delay(3700);
+  const wispHealthRespawned = await desktop.evaluate(() => window.arcaneTest.getPracticeWispHealth());
+  assert.equal(wispHealthRespawned, 3, "the practice wisp should respawn with full health");
 
   assert.deepEqual(pageErrors, [], "desktop play session should not throw browser errors");
 
