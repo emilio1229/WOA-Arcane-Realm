@@ -29,7 +29,7 @@ async function waitForGame(page) {
 
 try {
   await waitForServer();
-  browser = await chromium.launch({ headless: true });
+  browser = await chromium.launch({ headless: true, executablePath: process.env.CHROME_BIN });
 
   const desktop = await browser.newPage({ viewport: { width: 1280, height: 800 } });
   const pageErrors = [];
