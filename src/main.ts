@@ -26,7 +26,6 @@ class SanctuaryScene extends Phaser.Scene {
   private prompt!: Phaser.GameObjects.Text;
   private move = { x: 0, y: 0 };
   private interactHandler = () => this.interact();
-  private lastFacing = "down";
 
   constructor() { super("Sanctuary"); }
 
