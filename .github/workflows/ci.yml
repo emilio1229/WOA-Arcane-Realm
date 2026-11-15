@@ -17,5 +17,6 @@ jobs:
       - run: npm install
       - run: npm run typecheck
       - run: node --check scripts/new-asset.mjs
+      - run: npm run assets:new -- --id qa.pipeline-check --category vfx --name "CI Pipeline Check" --dry-run
       - run: npm run assets:validate
       - run: npm run build
