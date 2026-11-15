@@ -55,7 +55,9 @@ try {
   await desktop.keyboard.press("Space");
   await delay(500);
   await desktop.evaluate(() => window.arcaneTest.setPlayerPosition(900, 480));
-  await desktop.keyboard.press("e");
+  await desktop.keyboard.down("e");
+  await delay(120);
+  await desktop.keyboard.up("e");
   await desktop.locator("#dialogue").waitFor({ state: "visible" });
   assert.equal(await desktop.locator("#npc-name").textContent(), "Archmage Elowen");
   assert.deepEqual(pageErrors, [], "desktop play session should not throw browser errors");
