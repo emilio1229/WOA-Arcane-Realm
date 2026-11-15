@@ -12,12 +12,17 @@ Official reference: https://docs.phaser.io/phaser/getting-started/installation
 - Responsive game canvas and camera follow.
 - Isometric diamond ground presentation, plaza, gardens, fountain, and glowing portal with orbiting Sigil glyphs.
 - Sanctuary buildings with depth layering and basic collision volumes.
-- Controllable wizard with WASD/arrow movement, subtle idle/movement motion, and direction-aware facing.\n- First local spell-casting interaction: Space or the mobile Cast button launches an Arcane Bolt with an impact burst and a short local cast throttle.\n- Ambient floating magic motes around the Sanctuary; touch controls now include both Interact and Cast.
+- Controllable wizard with WASD/arrow movement, subtle idle/movement motion, and direction-aware facing.
+- First local spell-casting interaction: Space or the mobile Cast button launches an Arcane Bolt with an impact burst and a short local cast throttle.
+- Aimed Arcane Bolts can damage the three-health Ember Wisp practice target; its health bar updates, it is briefly dispelled at zero health, and it respawns after a short delay.
+- Ambient floating magic motes around the Sanctuary; touch controls now include both Interact and Cast.
 - NPCs with names, idle bobbing, proximity detection, and E/Enter interaction.
 - Responsive HUD and a contextual dialogue panel.
 - Mobile virtual joystick, Interact, and Cast touch buttons.
 - Glimmer now follows the player with eased trailing movement and a floating idle animation.
-- Reusable SVG asset scaffold generator (`npm run assets:new`) that registers stable IDs and refuses to overwrite existing artwork.\n- No external game services, live player data, or production Discord authentication.
+- Headless browser play test covers familiar following, spell damage, collision, NPC dialogue, and desktop/mobile controls.
+- Reusable SVG asset scaffold generator (`npm run assets:new`) that registers stable IDs and refuses to overwrite existing artwork.
+- No external game services, live player data, or production Discord authentication.
 
 ## Original asset pack
 
@@ -26,7 +31,7 @@ The repository now includes an original SVG asset library under `public/assets/`
 ## Deliberate limitations
 
 - This is a playable foundation prototype, not the complete Stage 1 acceptance milestone.
-- Original SVG character, familiar, creature, portal, spell, and UI assets now replace several initial primitives; building architecture, garden dressing, and some environment details remain procedural placeholders. All current art is prototype quality, not final release art. Wizard motion is procedural rather than a frame-based walk cycle; combat is currently a local visual effect with no damage, enemy AI, gameplay cooldown progression, or server authority; the short cast throttle only limits visual spam.
+- Original SVG character, familiar, creature, portal, spell, and UI assets now replace several initial primitives; building architecture, garden dressing, and some environment details remain procedural placeholders. All current art is prototype quality, not final release art. Wizard motion is procedural rather than a frame-based walk cycle; combat is a local prototype: the Ember Wisp is a stationary practice target with three health and timed respawn. There is no hostile enemy AI, progression-based cooldown system, or server authority; the short cast throttle only limits visual spam.
 - Collision uses simple rectangular building footprints with axis-separated wall sliding; environment boundaries and pathing need refinement.
 - Movement currently uses local client simulation. No server authority or persistent character save exists.
 - The quest panel is informational only; no quest engine is implemented.
@@ -52,8 +57,8 @@ npm run preview
 
 ## Next validation
 
-1. Install dependencies and run typecheck/build.
-2. Browser-test movement, camera, collision, NPC interaction, spell visuals, and resize.
-3. Test touch joystick and interaction on a real phone.
+1. Test touch joystick and interaction on a real phone.
+2. Extend combat with hostile enemy behavior, player health, damage feedback, and authoritative validation before adding rewards.
+3. Validate camera framing and resize behavior across phone, tablet, and desktop aspect ratios.
 4. Evaluate the visual result against the dimensional/isometric target; if 2.5D is insufficient, stop expanding Phaser and evaluate a true 3D browser renderer.
 5. Replace vector placeholders with original, licensed assets after the rendering direction is approved.
