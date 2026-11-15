@@ -124,6 +124,19 @@ class SanctuaryScene extends Phaser.Scene {
   private drawPortal(x: number, y: number) {
     const portal = this.add.image(x, y, "grand-portal").setDisplaySize(250, 250).setDepth(100).setAlpha(0.92);
     this.tweens.add({ targets: portal, alpha: { from: 0.78, to: 1 }, scale: { from: 0.97, to: 1.02 }, duration: 2100, yoyo: true, repeat: -1, ease: "Sine.easeInOut" });
+
+    const orbit = { angle: 0 };
+    const glyphs = [0, 1, 2, 3].map(index =>
+      this.add.image(x, y, "sigil").setDisplaySize(25, 25).setAlpha(0.72).setDepth(105 + index)
+    );
+    this.tweens.add({
+      targets: orbit, angle: 360, duration: 24000, repeat: -1, ease: "Linear",
+      onUpdate: () => glyphs.forEach((glyph, index) => {
+        const angle = Phaser.Math.DegToRad(orbit.angle + index * 90);
+        glyph.setPosition(x + Math.cos(angle) * 104, y + Math.sin(angle) * 72);
+        glyph.setRotation(angle + Math.PI / 2);
+      }),
+    });
   }
 
   private createBuildings() {
