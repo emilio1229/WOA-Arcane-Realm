@@ -21,8 +21,8 @@ Original, editable SVG source assets for the Arcane Realm prototype.
 | Frost wizard | `character.wizard.frost` | NPC/tradition appearance |
 | Verdant wizard | `character.wizard.verdant` | NPC/tradition appearance |
 | Shadow wizard | `character.wizard.shadow` | Future character customization |
-| Glimmer | `familiar.glimmer` | First familiar concept |
-| Ember Wisp | `creature.ember-wisp` | First enemy concept |
+| Glimmer | `familiar.glimmer` | First familiar concept |\n| Verdant Sprite | `familiar.verdant-sprite` | Verdant companion concept |
+| Ember Wisp | `creature.ember-wisp` | First enemy concept |\n| Frost Wisp | `creature.frost-wisp` | Frost-aligned enemy concept |
 | Grand Portal | `environment.grand-portal` | Sanctuary landmark |
 | Arcane Bolt | `vfx.arcane-bolt` | Player spell projectile |\n| Arcane impact | `vfx.arcane-impact` | Spell impact burst |\n| Arcane mote | `vfx.arcane-mote` | Ambient floating magic particle |
 | Sigil | `ui.sigil` | Currency/UI icon |
