@@ -86,6 +86,16 @@ try {
   await desktop.keyboard.up("e");
   await desktop.locator("#dialogue").waitFor({ state: "visible" });
   assert.equal(await desktop.locator("#npc-name").textContent(), "Archmage Elowen");
+
+  // Aimed Arcane Bolts damage the Ember Wisp practice target and update its health.
+  await desktop.evaluate(() => window.arcaneTest.setPlayerPosition(470, 760, 0, -1));
+  const wispHealthBefore = await desktop.evaluate(() => window.arcaneTest.getPracticeWispHealth());
+  await desktop.keyboard.press("Space");
+  await delay(520);
+  const wispHealthAfter = await desktop.evaluate(() => window.arcaneTest.getPracticeWispHealth());
+  assert.equal(wispHealthBefore, 3, "practice wisp should start with three health");
+  assert.equal(wispHealthAfter, 2, "an aimed Arcane Bolt should damage the Ember Wisp");
+
   assert.deepEqual(pageErrors, [], "desktop play session should not throw browser errors");
 
   const mobile = await browser.newPage({
