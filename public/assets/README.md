@@ -26,6 +26,14 @@ Original, editable SVG source assets for the Arcane Realm prototype.
 | Grand Portal | `environment.grand-portal` | Sanctuary landmark |
 | Arcane Bolt | `vfx.arcane-bolt` | Spell effect icon/prototype |
 | Sigil | `ui.sigil` | Currency/UI icon |
+| Grand Library | `environment.building.grand-library` | Sanctuary building exterior |
+| Familiar Sanctuary | `environment.building.familiar-sanctuary` | Sanctuary building exterior |
+| Spell Academy | `environment.building.spell-academy` | Sanctuary building exterior |
+| Merchant Hall | `environment.building.merchant-hall` | Sanctuary building exterior |
+| Adventurer's Inn | `environment.building.adventurer-inn` | Sanctuary building exterior |
+| Sanctuary lantern | `environment.prop.lantern` | Path lighting prop |
+| Rune obelisk | `environment.prop.rune-obelisk` | Arcane landmark prop |
+| Crystal cluster | `environment.prop.crystal-cluster` | Magical garden prop |
 
 ## Validation workflow
 
