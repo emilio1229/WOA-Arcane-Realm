@@ -10,7 +10,7 @@ Official reference: https://docs.phaser.io/phaser/getting-started/installation
 
 - Vite + TypeScript + Phaser 3 application shell.
 - Responsive game canvas and camera follow.
-- Isometric diamond ground presentation, plaza, gardens, fountain, and glowing portal.
+- Isometric diamond ground presentation, plaza, gardens, fountain, and glowing portal with orbiting Sigil glyphs.
 - Sanctuary buildings with depth layering and basic collision volumes.
 - Controllable wizard with WASD/arrow movement, subtle idle/movement motion, and direction-aware facing.\n- First local spell-casting interaction: Space or the mobile Cast button launches an Arcane Bolt with an impact burst.\n- Ambient floating magic motes around the Sanctuary; touch controls now include both Interact and Cast.
 - NPCs with names, idle bobbing, proximity detection, and E/Enter interaction.
