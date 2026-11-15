@@ -12,10 +12,11 @@ Official reference: https://docs.phaser.io/phaser/getting-started/installation
 - Responsive game canvas and camera follow.
 - Isometric diamond ground presentation, plaza, gardens, fountain, and glowing portal with orbiting Sigil glyphs.
 - Sanctuary buildings with depth layering and basic collision volumes.
-- Controllable wizard with WASD/arrow movement, subtle idle/movement motion, and direction-aware facing.\n- First local spell-casting interaction: Space or the mobile Cast button launches an Arcane Bolt with an impact burst with a short local cast throttle.\n- Ambient floating magic motes around the Sanctuary; touch controls now include both Interact and Cast.
+- Controllable wizard with WASD/arrow movement, subtle idle/movement motion, and direction-aware facing.\n- First local spell-casting interaction: Space or the mobile Cast button launches an Arcane Bolt with an impact burst and a short local cast throttle.\n- Ambient floating magic motes around the Sanctuary; touch controls now include both Interact and Cast.
 - NPCs with names, idle bobbing, proximity detection, and E/Enter interaction.
 - Responsive HUD and a contextual dialogue panel.
-- Mobile virtual joystick and touch interaction button.
+- Mobile virtual joystick, Interact, and Cast touch buttons.
+- Glimmer now follows the player with eased trailing movement and a floating idle animation.
 - Reusable SVG asset scaffold generator (`npm run assets:new`) that registers stable IDs and refuses to overwrite existing artwork.\n- No external game services, live player data, or production Discord authentication.
 
 ## Original asset pack
@@ -29,7 +30,7 @@ The repository now includes an original SVG asset library under `public/assets/`
 - Collision uses simple rectangular building footprints with axis-separated wall sliding; environment boundaries and pathing need refinement.
 - Movement currently uses local client simulation. No server authority or persistent character save exists.
 - The quest panel is informational only; no quest engine is implemented.
-- Desktop and mobile-viewport controls now pass a headless Chromium smoke test in CI. Real-device touch feel, camera behavior across phones/tablets, and broader browser compatibility still require manual testing.
+- Desktop and mobile-viewport controls, including familiar following and building wall-sliding, pass a headless Chromium play test in CI. Real-device touch feel, camera behavior across phones/tablets, and broader browser compatibility still require manual testing.
 - No backend, database, multiplayer, Discord Activity, or Sigil integration is included.
 
 ## Run locally
