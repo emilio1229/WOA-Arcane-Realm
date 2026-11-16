@@ -336,7 +336,36 @@ try {
   );
   assert.deepEqual(mobileErrors, [], "mobile play session should not throw browser errors");
 
-  console.log("Browser play test passed: canvas, keyboard movement, familiar following, building collision, spell cast, NPC dialogue, mobile controls.");
+  // Touch-first tablet layout must expose the same controls even above 700px.
+  const tablet = await browser.newPage({
+    viewport: { width: 820, height: 1180 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true,
+  });
+  await waitForGame(tablet);
+  await tablet.locator("#stick").waitFor({ state: "visible" });
+  const tabletTargets = await tablet.locator("#interact,#cast,#dodge").evaluateAll(nodes =>
+    nodes.map(node => { const r = node.getBoundingClientRect(); return { width: r.width, height: r.height }; }));
+  assert.ok(tabletTargets.every(r => r.width >= 48 && r.height >= 48),
+    "tablet touch controls should have comfortable minimum hit areas");
+  assert.ok(await tablet.evaluate(() => window.arcaneTest.getCameraZoom()) >= 0.89,
+    "tablet camera should use the tablet framing breakpoint");
+
+  // Landscape phones use a compact HUD and retain visible touch controls.
+  const landscape = await browser.newPage({
+    viewport: { width: 844, height: 390 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true,
+  });
+  await waitForGame(landscape);
+  await landscape.locator("#stick").waitFor({ state: "visible" });
+  const landscapeLayout = await landscape.evaluate(() => ({
+    appHeight: document.querySelector("#app").getBoundingClientRect().height,
+    viewportHeight: document.documentElement.clientHeight,
+    dodge: document.querySelector("#dodge").getBoundingClientRect().toJSON(),
+  }));
+  assert.ok(landscapeLayout.appHeight <= landscapeLayout.viewportHeight + 1,
+    "landscape phone layout should fit the viewport");
+  assert.ok(landscapeLayout.dodge.width >= 48 && landscapeLayout.dodge.height >= 48,
+    "landscape dodge control should remain touchable");
+
+  console.log("Browser play test passed: desktop gameplay, iPhone portrait, touch tablet, landscape phone, movement, combat, and interactions.");
 } finally {
   if (browser) await browser.close();
   server.kill("SIGTERM");

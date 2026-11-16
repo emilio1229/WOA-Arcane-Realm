@@ -124,8 +124,14 @@ button,.stick{ -webkit-tap-highlight-color:transparent}
   .dialogue{bottom:148px}
 }
 @media(pointer:coarse){
-  .mobile-controls{display:block}
+  .mobile-controls{display:block;position:absolute;inset:auto 18px calc(18px + env(safe-area-inset-bottom));pointer-events:none}
   .controls-hint{display:none}
+  .stick{position:absolute;bottom:0;left:0;width:124px;height:124px;border-radius:50%;background:#17132688;border:1px solid #d9b2f366;pointer-events:auto}
+  .stick-knob{position:absolute;width:42px;height:42px;left:40px;top:40px;border-radius:50%;background:#d6a6ef99;border:1px solid #f3dcff;box-shadow:0 0 18px #b76de966}
+  .touch-action{position:absolute;right:0;bottom:14px;width:76px;height:76px;min-width:48px;min-height:48px;border-radius:50%;border:1px solid #e8c17a99;background:#342744e8;color:#f5d9a3;font-size:22px;pointer-events:auto}
+  .touch-action small,.touch-spell small,.touch-dodge small{display:block;font-size:7px;letter-spacing:1px}
+  .touch-spell{position:absolute;right:90px;bottom:20px;width:62px;height:62px;min-width:48px;min-height:48px;border-radius:50%;border:1px solid #c9a5f799;background:#241b3be8;color:#ead8ff;pointer-events:auto}
+  .touch-dodge{display:block;position:absolute;right:160px;bottom:20px;width:62px;height:62px;min-width:48px;min-height:48px;border-radius:50%;border:1px solid #b99df799;background:#302447e8;color:#e7d2ff;pointer-events:auto}
   .stick,.touch-action,.touch-spell,.touch-dodge{touch-action:none}
 }
 @media(orientation:landscape) and (max-height:520px){
