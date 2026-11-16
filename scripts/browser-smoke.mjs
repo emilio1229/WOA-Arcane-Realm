@@ -36,7 +36,11 @@ async function waitForGame(page) {
 
 try {
   await waitForServer();
-  browser = await chromium.launch({ headless: true, executablePath: process.env.CHROME_BIN });
+  browser = await chromium.launch({
+    headless: true,
+    executablePath: process.env.CHROME_BIN,
+    args: ["--disable-background-timer-throttling", "--disable-renderer-backgrounding", "--disable-backgrounding-occluded-windows"],
+  });
 
   const desktop = await browser.newPage({ viewport: { width: 1280, height: 800 } });
   const pageErrors = [];
@@ -67,7 +71,7 @@ try {
   await desktop.evaluate(() => window.arcaneTest.setPlayerPosition(900, 760));
   const cardinalStart = await desktop.evaluate(() => window.arcaneTest.getPlayerPosition());
   await desktop.keyboard.down("w");
-  await delay(350);
+  await delay(600);
   await desktop.keyboard.up("w");
   const cardinalEnd = await desktop.evaluate(() => window.arcaneTest.getPlayerPosition());
   const cardinalDistance = Math.hypot(cardinalEnd.x - cardinalStart.x, cardinalEnd.y - cardinalStart.y);
@@ -80,7 +84,6 @@ try {
   await desktop.keyboard.up("d");
   const diagonalEnd = await desktop.evaluate(() => window.arcaneTest.getPlayerPosition());
   const diagonalDistance = Math.hypot(diagonalEnd.x - diagonalStart.x, diagonalEnd.y - diagonalStart.y);
-  console.log("Movement speed sample", { cardinalDistance, diagonalDistance, cardinalStart, cardinalEnd, diagonalStart, diagonalEnd });
   assert.ok(Math.abs(cardinalDistance - diagonalDistance) / Math.max(cardinalDistance, diagonalDistance) < 0.2,
     "cardinal and diagonal movement should not have a speed penalty");
   await desktop.locator("#pause-game").click();

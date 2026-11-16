@@ -103,7 +103,7 @@ The Asset Forge town-life pass adds a transparent, original SVG layer with marke
 
 ## Movement and tradition fidelity follow-up
 - Normalized all non-zero movement input after the isometric projection so cardinal and diagonal input use the same world-space speed.
-- Added frame-rate-independent acceleration/deceleration and reduced the movement delta clamp to 33.3ms to limit large steps after slow frames.
+- Added frame-rate-independent acceleration/deceleration and preserved up to 100ms of elapsed time on slow frames and subdivided collision resolution into 1/60-second steps to prevent tunneling without slowing movement.
 - Collision resolution now removes velocity only on the blocked axis, preserving reliable wall sliding without accumulating blocked movement.
 - Walking animation now reflects actual resolved movement, not merely held input; idle frames are selected from the active tradition's sprite-sheet row.
 - Arcane Bolt impact bursts inherit the chosen magic color as well as the projectile.
@@ -118,3 +118,5 @@ Added five original 512×512 transparent SVG overlay assets for the Grand Librar
 ## Sanctuary Moonwell landmark
 
 Added `environment.sanctuary-fountain`, a 512×512 original SVG landmark with layered carved stonework, a reflective water basin, a faceted crystal crown, and engraved runes. The previous procedural fountain ellipse stack is replaced with the asset, with a restrained pulse and five small ambient glints. Manifest status is `needs-review` pending visual inspection in a running game and mobile viewports.
+
+- The headless Chromium playtest disables background throttling so timed movement assertions measure gameplay rather than a hidden-tab frame-rate policy.

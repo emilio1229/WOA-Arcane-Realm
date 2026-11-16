@@ -541,7 +541,7 @@ class SanctuaryScene extends Phaser.Scene {
     // this, cardinal directions travel slower than diagonals on the diamond grid.
     if (vector.lengthSq() > 0.001) vector.normalize();
     const isDodging = this.time.now < this.dodgeUntil;
-    const delta = Math.min(this.game.loop.delta, 33.333) / 1000;
+    const delta = Math.min(this.game.loop.delta, 100) / 1000;
     const speed = isDodging ? 470 : 190;
     const desiredVelocity = isDodging
       ? this.dodgeVector.clone().scale(speed)
@@ -563,14 +563,20 @@ class SanctuaryScene extends Phaser.Scene {
     // building footprints instead of freezing on a diagonal corner.
     const startX = this.player.x;
     const startY = this.player.y;
-    const wantedX = Phaser.Math.Clamp(startX + this.movementVelocity.x * delta, minX, maxX);
-    const wantedY = Phaser.Math.Clamp(startY + this.movementVelocity.y * delta, minY, maxY);
     let resolvedX = startX;
     let resolvedY = startY;
-    if (!collidesAt(wantedX, resolvedY)) resolvedX = wantedX;
-    else this.movementVelocity.x = 0;
-    if (!collidesAt(resolvedX, wantedY)) resolvedY = wantedY;
-    else this.movementVelocity.y = 0;
+    // Preserve elapsed time during slow frames, but resolve the path in <= 1/60s
+    // slices so the character cannot tunnel through a building footprint.
+    const collisionSteps = Math.max(1, Math.ceil(delta / (1 / 60)));
+    const stepDelta = delta / collisionSteps;
+    for (let step = 0; step < collisionSteps; step++) {
+      const wantedX = Phaser.Math.Clamp(resolvedX + this.movementVelocity.x * stepDelta, minX, maxX);
+      const wantedY = Phaser.Math.Clamp(resolvedY + this.movementVelocity.y * stepDelta, minY, maxY);
+      if (!collidesAt(wantedX, resolvedY)) resolvedX = wantedX;
+      else this.movementVelocity.x = 0;
+      if (!collidesAt(resolvedX, wantedY)) resolvedY = wantedY;
+      else this.movementVelocity.y = 0;
+    }
 
     // This is a kinematic character controller: physics supplies the body, while
     // movement and collision resolution stay deterministic across frame rates.
