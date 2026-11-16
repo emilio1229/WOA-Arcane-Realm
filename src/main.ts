@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import { HostileWisp } from "./game/HostileWisp";
 import "./style.css";
 
 declare global {
@@ -11,6 +12,8 @@ declare global {
       getPlayerPosition: () => { x: number; y: number };
       getFamiliarPosition: () => { x: number; y: number };
       getPracticeWispHealth: () => number;
+      getHostileWispHealth: () => number;
+      getPlayerHealth: () => number;
       setPlayerPosition: (x: number, y: number, facingX?: number, facingY?: number) => void;
     };
   }
@@ -36,6 +39,8 @@ class SanctuaryScene extends Phaser.Scene {
   private practiceWispHealth = 3;
   private practiceWispFill!: Phaser.GameObjects.Rectangle;
   private practiceWispLabel!: Phaser.GameObjects.Text;
+  private hostileWisp!: HostileWisp;
+  private playerHealth = 5;
   private lastFacing = new Phaser.Math.Vector2(0, -1);
   private nextCastAt = 0;
   private keys!: Record<string, Phaser.Input.Keyboard.Key>;
@@ -89,6 +94,7 @@ class SanctuaryScene extends Phaser.Scene {
     this.familiarGlow = this.add.ellipse(this.player.x - 8, this.player.y + 34, 54, 30, 0xb98bea, 0.13).setDepth(this.player.y + 12);
     this.familiarArt = this.add.image(this.player.x - 8, this.player.y + 24, "glimmer")
       .setDisplaySize(42, 42).setDepth(this.player.y + 18);
+    this.hostileWisp = new HostileWisp(this, 1450, 640, () => this.damagePlayer());
     this.cameras.main.setBounds(0, 0, WORLD.width, WORLD.height);
     this.cameras.main.startFollow(this.player, true, 0.08, 0.08);
     this.cameras.main.setZoom(Math.min(1, this.scale.width / 1100));
@@ -110,6 +116,8 @@ class SanctuaryScene extends Phaser.Scene {
         getPlayerPosition: () => ({ x: this.player.x, y: this.player.y }),
         getFamiliarPosition: () => ({ x: this.familiarArt.x, y: this.familiarArt.y }),
         getPracticeWispHealth: () => this.practiceWispHealth,
+        getHostileWispHealth: () => this.hostileWisp.currentHealth,
+        getPlayerHealth: () => this.playerHealth,
         setPlayerPosition: (x, y, facingX = 0, facingY = -1) => {
           this.player.setVelocity(0, 0);
           this.player.setPosition(x, y);
@@ -271,8 +279,14 @@ class SanctuaryScene extends Phaser.Scene {
     const alongShot = enemyDx * this.lastFacing.x + enemyDy * this.lastFacing.y;
     const offShot = Math.abs(enemyDx * this.lastFacing.y - enemyDy * this.lastFacing.x);
     const hitsPracticeWisp = this.practiceWispHealth > 0 && alongShot >= 0 && alongShot <= 270 && offShot <= 38;
-    const impactX = hitsPracticeWisp ? this.practiceWisp.x : targetX;
-    const impactY = hitsPracticeWisp ? this.practiceWisp.y : targetY;
+    const hostileDx = this.hostileWisp.x - startX;
+    const hostileDy = this.hostileWisp.y - startY;
+    const hostileAlong = hostileDx * this.lastFacing.x + hostileDy * this.lastFacing.y;
+    const hostileOff = Math.abs(hostileDx * this.lastFacing.y - hostileDy * this.lastFacing.x);
+    const hitsHostileWisp = this.hostileWisp.isAlive && hostileAlong >= 0 && hostileAlong <= 270 && hostileOff <= 42;
+    const hitHostileFirst = hitsHostileWisp && (!hitsPracticeWisp || hostileAlong < alongShot);
+    const impactX = hitHostileFirst ? this.hostileWisp.x : hitsPracticeWisp ? this.practiceWisp.x : targetX;
+    const impactY = hitHostileFirst ? this.hostileWisp.y : hitsPracticeWisp ? this.practiceWisp.y : targetY;
     this.tweens.add({
       targets: bolt, x: impactX, y: impactY, alpha: 0.25, scale: 0.45,
       duration: 390, ease: "Cubic.easeOut",
@@ -285,7 +299,8 @@ class SanctuaryScene extends Phaser.Scene {
           angle: 35, duration: 320, ease: "Cubic.easeOut",
           onComplete: () => impact.destroy(),
         });
-        if (hitsPracticeWisp) this.damagePracticeWisp();
+        if (hitHostileFirst) this.hostileWisp.damage();
+        else if (hitsPracticeWisp) this.damagePracticeWisp();
       },
     });
     this.wizardSprite.setTexture("wizard-arcane-cast").setTint(0xe9d2ff);
@@ -294,6 +309,29 @@ class SanctuaryScene extends Phaser.Scene {
       targets: this.wizardSprite, alpha: 0.65, duration: 90, yoyo: true,
       onComplete: () => this.wizardSprite.clearTint(),
     });
+  }
+
+  private damagePlayer() {
+    if (this.playerHealth <= 0) return;
+    this.playerHealth = Math.max(0, this.playerHealth - 1);
+    this.updateHealthHud();
+    this.cameras.main.shake(120, 0.003);
+    this.wizardSprite.setTint(0xff8c9d);
+    this.time.delayedCall(180, () => this.wizardSprite.clearTint());
+    if (this.playerHealth === 0) {
+      this.player.setPosition(900, 760);
+      this.player.body!.reset(900, 760);
+      this.playerArt.setPosition(900, 760);
+      this.playerHealth = 5;
+      this.time.delayedCall(300, () => this.updateHealthHud());
+    }
+  }
+
+  private updateHealthHud() {
+    const value = document.querySelector("#player-health");
+    const fill = document.querySelector<HTMLElement>("#health-fill");
+    if (value) value.textContent = `${this.playerHealth} / 5`;
+    if (fill) fill.style.width = `${this.playerHealth * 20}%`;
   }
 
   private damagePracticeWisp() {
@@ -338,6 +376,7 @@ class SanctuaryScene extends Phaser.Scene {
 
   update() {
     const keyboard = this.keys;
+    this.hostileWisp.update(this.player.x, this.player.y, Math.min(this.game.loop.delta, 50) / 1000);
     let x = Number(keyboard.A.isDown || keyboard.LEFT.isDown) * -1 + Number(keyboard.D.isDown || keyboard.RIGHT.isDown);
     let y = Number(keyboard.W.isDown || keyboard.UP.isDown) * -1 + Number(keyboard.S.isDown || keyboard.DOWN.isDown);
     x += window.arcaneMove?.x ?? 0;
