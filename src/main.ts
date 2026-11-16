@@ -106,7 +106,7 @@ class SanctuaryScene extends Phaser.Scene {
       .setDisplaySize(42, 42).setDepth(this.player.y + 18);
     this.hostileWisp = new HostileWisp(this, 1450, 640, () => this.damagePlayer());
     this.emberSentry = new EmberSentry(
-      this, 340, 760,
+      this, 180, 900,
       () => this.damagePlayer(),
       () => this.time.now < this.invulnerableUntil,
       () => ({ x: this.player.x, y: this.player.y }),
