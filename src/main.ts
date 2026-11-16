@@ -227,10 +227,6 @@ class SanctuaryScene extends Phaser.Scene {
     this.practiceWisp.add([this.practiceWispArt, healthTrack, this.practiceWispFill, this.practiceWispLabel]);
     this.tweens.add({ targets: this.practiceWispArt, y: -17, alpha: { from: 0.82, to: 1 }, duration: 1250, yoyo: true, repeat: -1, ease: "Sine.easeInOut" });
 
-    const frostWisp = this.add.image(1450, 640, "frost-wisp").setDisplaySize(70, 70).setDepth(650);
-    this.tweens.add({ targets: frostWisp, y: 621, alpha: { from: 0.78, to: 1 }, duration: 1600, yoyo: true, repeat: -1, ease: "Sine.easeInOut" });
-    this.add.text(1450, 678, "FROST WISP", { fontFamily: "Cinzel,serif", fontSize: "9px", color: "#c8f5ff", stroke: "#21172e", strokeThickness: 3 }).setOrigin(0.5).setDepth(655);
-
     for (const [x, y] of [[365, 620], [1450, 620], [405, 1000], [1390, 1030]]) {
       const lantern = this.add.image(x, y, "prop-lantern").setDisplaySize(48, 96).setOrigin(0.5, 0.88).setDepth(y);
       this.tweens.add({ targets: lantern, alpha: { from: 0.82, to: 1 }, duration: 1900, yoyo: true, repeat: -1 });
