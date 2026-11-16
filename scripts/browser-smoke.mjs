@@ -112,9 +112,11 @@ try {
 
   // The Frost Wisp should pursue, damage, and be dispellable by aimed Arcane Bolts.
   await desktop.evaluate(() => window.arcaneTest.setPlayerPosition(1450, 760, 0, -1));
-  await delay(900);
+  await delay(2400); // Allow the pursuer to close distance, telegraph, and land a fair attack.
   const hostileHealthBefore = await desktop.evaluate(() => window.arcaneTest.getHostileWispHealth());
   assert.equal(hostileHealthBefore, 4, "hostile Frost Wisp should begin with four health");
+  const healthBeforeFrostDefeat = await desktop.evaluate(() => window.arcaneTest.getPlayerHealth());
+  assert.ok(healthBeforeFrostDefeat < 5, "the hostile Wisp should land its telegraphed attack before it is defeated");
   for (let hit = 0; hit < 4; hit++) {
     await desktop.keyboard.down("Space");
     await delay(120);
@@ -123,9 +125,6 @@ try {
   }
   const hostileHealthAfter = await desktop.evaluate(() => window.arcaneTest.getHostileWispHealth());
   assert.equal(hostileHealthAfter, 0, "four aimed Arcane Bolts should dispel the Frost Wisp");
-  const playerHealthAfterEncounter = await desktop.evaluate(() => window.arcaneTest.getPlayerHealth());
-  assert.ok(playerHealthAfterEncounter < 5, "the hostile Wisp should be able to damage the player");
-
   // The dodge burst should move the wizard, grant a cooldown, and avoid the Sentry's aimed fire orb.
   await desktop.evaluate(() => window.arcaneTest.setPlayerPosition(340, 900, 0, 1));
   const healthBeforeFireOrb = await desktop.evaluate(() => window.arcaneTest.getPlayerHealth());
