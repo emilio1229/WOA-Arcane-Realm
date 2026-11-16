@@ -65,6 +65,7 @@ class SanctuaryScene extends Phaser.Scene {
   constructor() { super("Sanctuary"); }
 
   preload() {
+    this.load.on("progress", (value: number) => window.dispatchEvent(new CustomEvent("arcane:loading", { detail: value })));
     this.load.svg("wizard-arcane", "/assets/characters/wizard-arcane.svg", { width: 128, height: 160 });
     this.load.svg("wizard-arcane-cast", "/assets/characters/wizard-arcane-cast.svg", { width: 128, height: 160 });
     this.load.spritesheet("wizard-arcane-walk", "/assets/characters/wizard-arcane-walk.svg", { frameWidth: 256, frameHeight: 320 });
