@@ -6,8 +6,10 @@ export class HostileWisp {
   private readonly label: Phaser.GameObjects.Text;
   private readonly track: Phaser.GameObjects.Rectangle;
   private readonly fill: Phaser.GameObjects.Rectangle;
+  private readonly warning: Phaser.GameObjects.Arc;
   private health = 4;
   private nextAttackAt = 0;
+  private windupUntil = 0;
   private respawnAt = 0;
 
   constructor(private readonly scene: Phaser.Scene, x: number, y: number, private readonly onPlayerHit: () => void) {
@@ -17,6 +19,7 @@ export class HostileWisp {
     }).setOrigin(0.5).setDepth(y + 12);
     this.track = scene.add.rectangle(x - 25, y - 48, 50, 5, 0x21172e, 0.9).setOrigin(0, 0.5).setDepth(y + 12);
     this.fill = scene.add.rectangle(x - 23, y - 48, 46, 3, 0x8bd9ee, 1).setOrigin(0, 0.5).setDepth(y + 13);
+    this.warning = scene.add.circle(x, y, 46, 0x8bd9ee, 0.08).setStrokeStyle(2, 0x9be8ff, 0.9).setVisible(false).setDepth(y + 2);
     scene.tweens.add({ targets: this.art, y: y - 14, alpha: { from: 0.82, to: 1 }, duration: 1450, yoyo: true, repeat: -1, ease: "Sine.easeInOut" });
   }
 
@@ -37,10 +40,24 @@ export class HostileWisp {
       const step = Math.min(distance - 54, 68 * delta);
       this.art.x += dx / distance * step;
       this.art.y += dy / distance * step;
-    } else if (distance <= 54 && this.scene.time.now >= this.nextAttackAt) {
-      this.nextAttackAt = this.scene.time.now + 1350;
-      this.onPlayerHit();
+    } else if (distance <= 54) {
+      if (!this.windupUntil && this.scene.time.now >= this.nextAttackAt) {
+        this.windupUntil = this.scene.time.now + 700;
+        this.warning.setPosition(this.art.x, this.art.y + 12).setScale(0.55).setAlpha(0.9).setVisible(true);
+        this.scene.tweens.add({ targets: this.warning, scale: 1.15, alpha: 0.18, duration: 700, ease: "Cubic.easeOut" });
+      } else if (this.windupUntil && this.scene.time.now >= this.windupUntil) {
+        this.windupUntil = 0;
+        this.nextAttackAt = this.scene.time.now + 1600;
+        this.warning.setVisible(false);
+        this.onPlayerHit();
+      }
+    } else if (distance > 78 && this.windupUntil) {
+      this.windupUntil = 0;
+      this.warning.setVisible(false);
+      this.scene.tweens.killTweensOf(this.warning);
     }
+    this.warning.setPosition(this.art.x, this.art.y + 12);
+    this.warning.setDepth(this.art.y + 2);
     this.label.setPosition(this.art.x, this.art.y + 43);
     this.track.setPosition(this.art.x - 25, this.art.y - 48);
     this.fill.setPosition(this.art.x - 23, this.art.y - 48);
@@ -62,6 +79,8 @@ export class HostileWisp {
       this.label.setAlpha(0.45);
       this.track.setAlpha(0.25);
       this.fill.setAlpha(0.25);
+      this.warning.setVisible(false);
+      this.scene.tweens.killTweensOf(this.warning);
     }
     return true;
   }
@@ -72,6 +91,8 @@ export class HostileWisp {
     this.fill.setSize(46, 3).setAlpha(1);
     this.label.setText("FROST WISP · 4").setAlpha(1);
     this.track.setAlpha(1);
+    this.windupUntil = 0;
+    this.warning.setVisible(false).setPosition(1450, 652).setScale(1);
     this.art.setAlpha(1).setPosition(1450, 640);
   }
 }
