@@ -141,3 +141,5 @@ Added `environment.sanctuary-fountain`, a 512×512 original SVG landmark with la
 - Grand Library, Familiar Sanctuary, and Merchant Hall interactions record local discoveries. Merchant Hall explicitly explains that buying/trading is not implemented yet; no fake purchase flow is shown.
 - The public noticeboard has been shifted away from the Inn's rest point so the approach remains accessible.
 - Browser smoke tests cover Academy target restoration and Inn healing. These tests are part of CI and await a passing run.
+
+- The Frost Wisp browser test now waits for the enemy's actual telegraphed hit instead of assuming a fixed elapsed frame count, making the combat assertion robust under slower headless frame rates.

@@ -219,7 +219,8 @@ try {
   // The Frost Wisp should then pursue, land a fair close-range strike, and be
   // dispellable by aimed Arcane Bolts.
   await desktop.evaluate(() => window.arcaneTest.setPlayerPosition(1450, 760, 0, -1));
-  await delay(2400); // Allow pursuit, the next telegraph, and the attack to resolve.
+  // Wait for the actual attack rather than assuming a fixed number of headless frames.
+  await desktop.waitForFunction(() => window.arcaneTest.getPlayerHealth() < 5, undefined, { timeout: 6000, polling: 50 });
   const hostileHealthBefore = await desktop.evaluate(() => window.arcaneTest.getHostileWispHealth());
   assert.equal(hostileHealthBefore, 4, "hostile Frost Wisp should begin with four health");
   const healthBeforeFrostDefeat = await desktop.evaluate(() => window.arcaneTest.getPlayerHealth());
