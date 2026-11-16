@@ -80,6 +80,7 @@ try {
   await desktop.keyboard.up("d");
   const diagonalEnd = await desktop.evaluate(() => window.arcaneTest.getPlayerPosition());
   const diagonalDistance = Math.hypot(diagonalEnd.x - diagonalStart.x, diagonalEnd.y - diagonalStart.y);
+  console.log("Movement speed sample", { cardinalDistance, diagonalDistance, cardinalStart, cardinalEnd, diagonalStart, diagonalEnd });
   assert.ok(Math.abs(cardinalDistance - diagonalDistance) / Math.max(cardinalDistance, diagonalDistance) < 0.2,
     "cardinal and diagonal movement should not have a speed penalty");
   await desktop.locator("#pause-game").click();
