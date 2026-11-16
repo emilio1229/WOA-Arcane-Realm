@@ -440,6 +440,43 @@
         "lighting"
       ],
       "status": "prototype-integrated"
+    },
+    {
+      "id": "environment.sanctuary-atmosphere",
+      "path": "/assets/environment/sanctuary-atmosphere.svg",
+      "category": "environment",
+      "format": "svg",
+      "source": true,
+      "width": 1800,
+      "height": 1250,
+      "tags": [
+        "sanctuary",
+        "environment",
+        "moonlight",
+        "crystal-garden",
+        "runes",
+        "atmosphere"
+      ],
+      "status": "prototype-integrated",
+      "provenance": "Original in-repository SVG artwork; CC0-1.0"
+    },
+    {
+      "id": "environment.portal-rune-crown",
+      "path": "/assets/environment/portal-rune-crown.svg",
+      "category": "environment",
+      "format": "svg",
+      "source": true,
+      "width": 512,
+      "height": 512,
+      "tags": [
+        "grand-portal",
+        "runes",
+        "ornament",
+        "arcane",
+        "overlay"
+      ],
+      "status": "prototype-integrated",
+      "provenance": "Original in-repository SVG artwork; CC0-1.0"
     }
   ]
 }

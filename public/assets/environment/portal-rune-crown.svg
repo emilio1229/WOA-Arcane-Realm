@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<defs>
+ <radialGradient id="halo"><stop stop-color="#f4dfff" stop-opacity=".42"/><stop offset=".55" stop-color="#b68bff" stop-opacity=".18"/><stop offset="1" stop-color="#a06be8" stop-opacity="0"/></radialGradient>
+ <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff0ca"/><stop offset=".32" stop-color="#d6b4f3"/><stop offset=".7" stop-color="#8b6ab5"/><stop offset="1" stop-color="#38294e"/></linearGradient>
+ <filter id="glow"><feGaussianBlur stdDeviation="7"/></filter>
+</defs>
+<ellipse cx="256" cy="252" rx="208" ry="220" fill="url(#halo)"/>
+<ellipse cx="256" cy="252" rx="181" ry="196" fill="none" stroke="#cda8f1" stroke-opacity=".2" stroke-width="2" stroke-dasharray="2 13"/>
+<ellipse cx="256" cy="252" rx="168" ry="183" fill="none" stroke="#f2d8ff" stroke-opacity=".34" stroke-width="3"/>
+<ellipse cx="256" cy="252" rx="157" ry="172" fill="none" stroke="#9fe7f2" stroke-opacity=".25" stroke-width="1.5" stroke-dasharray="18 9 3 9"/>
+<g fill="none" stroke="url(#metal)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+ <path d="M256 32 270 69 308 83 270 97 256 134 242 97 204 83 242 69Z"/>
+ <path d="M256 370 267 398 296 409 267 420 256 448 245 420 216 409 245 398Z"/>
+ <path d="M80 252 108 241 119 213 130 241 158 252 130 263 119 291 108 263Z"/>
+ <path d="M354 252 382 241 393 213 404 241 432 252 404 263 393 291 382 263Z"/>
+</g>
+<g fill="#f6dfa9" stroke="#fff1d7" stroke-width="2">
+ <path d="M256 12 266 32 256 52 246 32Z"/><path d="M256 460 266 480 256 500 246 480Z"/>
+ <path d="M54 252 74 242 94 252 74 262Z"/><path d="M418 252 438 242 458 252 438 262Z"/>
+</g>
+<g fill="#caa4f0" opacity=".88">
+ <circle cx="145" cy="105" r="5"/><circle cx="367" cy="105" r="5"/><circle cx="145" cy="399" r="5"/><circle cx="367" cy="399" r="5"/>
+ <circle cx="256" cy="64" r="4"/><circle cx="256" cy="440" r="4"/>
+</g>
+<g fill="none" stroke="#e8d1ff" stroke-width="2" opacity=".8">
+ <path d="M128 154Q160 125 190 116M384 154Q352 125 322 116M128 350Q160 379 190 388M384 350Q352 379 322 388"/>
+ <path d="M256 150V178M242 164H270M256 328V356M242 342H270"/>
+</g>
+</svg>
