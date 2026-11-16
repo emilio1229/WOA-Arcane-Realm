@@ -130,10 +130,14 @@ try {
   await desktop.evaluate(() => window.arcaneTest.setPlayerPosition(340, 900, 0, 1));
   const healthBeforeFireOrb = await desktop.evaluate(() => window.arcaneTest.getPlayerHealth());
   await delay(760); // 620ms telegraph plus a short projectile travel window.
+  const beforeDodge = await desktop.evaluate(() => window.arcaneTest.getPlayerPosition());
   await desktop.evaluate(() => window.arcaneTest.performDodge());
+  await delay(120);
+  const afterDodge = await desktop.evaluate(() => window.arcaneTest.getPlayerPosition());
+  assert.ok(Math.hypot(afterDodge.x - beforeDodge.x, afterDodge.y - beforeDodge.y) > 30, "dodge should create a noticeable movement burst");
   const dodgeCooldown = await desktop.evaluate(() => window.arcaneTest.getDodgeCooldownMs());
   assert.ok(dodgeCooldown > 900, "dodge should start a meaningful cooldown");
-  await delay(620);
+  await delay(500);
   const healthAfterFireOrb = await desktop.evaluate(() => window.arcaneTest.getPlayerHealth());
   assert.equal(healthAfterFireOrb, healthBeforeFireOrb, "a correctly timed dodge should evade the Ember Sentry fire orb");
 
