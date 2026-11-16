@@ -36,7 +36,7 @@ const NPCS: NPC[] = [
 class SanctuaryScene extends Phaser.Scene {
   private player!: Phaser.Physics.Arcade.Image;
   private playerArt!: Phaser.GameObjects.Container;
-  private wizardSprite!: Phaser.GameObjects.Image;
+  private wizardSprite!: Phaser.GameObjects.Sprite;
   private familiarArt!: Phaser.GameObjects.Image;
   private familiarGlow!: Phaser.GameObjects.Ellipse;
   private practiceWisp!: Phaser.GameObjects.Container;
@@ -64,6 +64,7 @@ class SanctuaryScene extends Phaser.Scene {
   preload() {
     this.load.svg("wizard-arcane", "/assets/characters/wizard-arcane.svg", { width: 128, height: 160 });
     this.load.svg("wizard-arcane-cast", "/assets/characters/wizard-arcane-cast.svg", { width: 128, height: 160 });
+    this.load.spritesheet("wizard-arcane-walk", "/assets/characters/wizard-arcane-walk.svg", { frameWidth: 256, frameHeight: 320 });
     this.load.svg("wizard-ember", "/assets/characters/wizard-ember.svg", { width: 128, height: 160 });
     this.load.svg("wizard-frost", "/assets/characters/wizard-frost.svg", { width: 128, height: 160 });
     this.load.svg("wizard-verdant", "/assets/characters/wizard-verdant.svg", { width: 128, height: 160 });
@@ -97,6 +98,7 @@ class SanctuaryScene extends Phaser.Scene {
     this.createAssetShowcase();
     this.createAmbientMagic();
     this.anims.create({ key: "arcane-impact-burst", frames: this.anims.generateFrameNumbers("arcane-burst", { start: 0, end: 5 }), frameRate: 15, repeat: 0 });
+    this.anims.create({ key: "wizard-arcane-walk-cycle", frames: this.anims.generateFrameNumbers("wizard-arcane-walk", { start: 0, end: 3 }), frameRate: 8, repeat: -1 });
 
     this.player = this.physics.add.image(900, 760, "__WHITE");
     this.player.setDisplaySize(18, 18).setTint(0xffffff).setAlpha(0);
@@ -263,7 +265,7 @@ class SanctuaryScene extends Phaser.Scene {
 
 
   private drawWizard(container: Phaser.GameObjects.Container) {
-    this.wizardSprite = this.add.image(0, 0, "wizard-arcane").setDisplaySize(78, 98).setOrigin(0.5, 0.9);
+    this.wizardSprite = this.add.sprite(0, 0, "wizard-arcane-walk", 0).setDisplaySize(78, 98).setOrigin(0.5, 0.9);
     container.add(this.wizardSprite);
   }
 
@@ -328,8 +330,9 @@ class SanctuaryScene extends Phaser.Scene {
         else if (hitsPracticeWisp) this.damagePracticeWisp();
       },
     });
+    this.wizardSprite.anims.stop();
     this.wizardSprite.setTexture("wizard-arcane-cast").setTint(0xe9d2ff);
-    this.time.delayedCall(250, () => this.wizardSprite.setTexture("wizard-arcane"));
+    this.time.delayedCall(250, () => this.wizardSprite.setTexture("wizard-arcane-walk", 0));
     this.tweens.add({
       targets: this.wizardSprite, alpha: 0.65, duration: 90, yoyo: true,
       onComplete: () => this.wizardSprite.clearTint(),
@@ -465,7 +468,17 @@ class SanctuaryScene extends Phaser.Scene {
     this.player.setPosition(resolvedX, resolvedY);
     this.player.body!.reset(resolvedX, resolvedY);
     this.playerArt.setPosition(resolvedX, resolvedY);
-    this.wizardSprite.setRotation(vector.lengthSq() > 0.001 ? Math.sin(this.time.now / 75) * 0.035 : Math.sin(this.time.now / 520) * 0.012);
+    const isWalking = vector.lengthSq() > 0.001 && this.wizardSprite.texture.key === "wizard-arcane-walk";
+    if (this.wizardSprite.texture.key === "wizard-arcane-walk") {
+      if (isWalking) {
+        if (this.wizardSprite.anims.currentAnim?.key !== "wizard-arcane-walk-cycle") this.wizardSprite.play("wizard-arcane-walk-cycle");
+      } else {
+        this.wizardSprite.anims.stop();
+        this.wizardSprite.setFrame(0);
+      }
+    }
+    if (Math.abs(vector.x) > 0.01 && this.wizardSprite.texture.key === "wizard-arcane-walk") this.wizardSprite.setFlipX(vector.x < 0);
+    this.wizardSprite.setRotation(isWalking ? Math.sin(this.time.now / 75) * 0.012 : Math.sin(this.time.now / 520) * 0.008);
     this.playerArt.setDepth(this.player.y + 20);
     // Glimmer trails the wizard, eases into turns, and floats independently.
     const familiarTargetX = this.player.x - this.lastFacing.x * 44 - 8;

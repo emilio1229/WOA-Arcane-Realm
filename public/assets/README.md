@@ -16,6 +16,7 @@ Original, editable SVG source assets for the Arcane Realm prototype.
 
 | Asset | Stable ID | Use |
 |---|---|---|
+| Arcane wizard walk cycle | `character.wizard.arcane.walk` | Four-frame transparent locomotion sheet (256×320 cells at 8 fps) |
 | Arcane wizard | `character.wizard.arcane` | Player idle pose/reusable base tradition |\n| Arcane wizard casting pose | `character.wizard.arcane.cast` | Temporary spell-casting pose with the same robe silhouette |
 | Ember wizard | `character.wizard.ember` | NPC/tradition appearance |
 | Frost wizard | `character.wizard.frost` | NPC/tradition appearance |
@@ -46,7 +47,7 @@ Original, editable SVG source assets for the Arcane Realm prototype.
 5. Review at the smallest target mobile size.
 6. Keep source and runtime variants linked by stable ID.
 
-The pack is integrated into the Sanctuary prototype: all five building exteriors, lanterns, rune obelisk, crystal cluster, Arcane wizard, Glimmer, Ember Wisp, and Grand Portal are loaded by the scene. Arcane Bolt, Arcane Impact, and Arcane Mote now power the first local spell-casting prototype and ambient magic layer. Sigil remains catalogued for the upcoming HUD/economy pass. Use Space or the mobile Cast control to launch the Arcane Bolt.
+The pack is integrated into the Sanctuary prototype: all five building exteriors, lanterns, rune obelisk, crystal cluster, Arcane wizard and walk cycle, Glimmer, Ember Wisp, and Grand Portal are loaded by the scene. Arcane Bolt, Arcane Impact, and Arcane Mote now power the first local spell-casting prototype and ambient magic layer. Sigil remains catalogued for the upcoming HUD/economy pass. Use Space or the mobile Cast control to launch the Arcane Bolt.
 
 ## Creating a new asset scaffold
 

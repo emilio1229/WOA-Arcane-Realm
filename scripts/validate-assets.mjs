@@ -21,6 +21,15 @@ for (const asset of manifest.assets) {
   const width = Number(root[1].match(/\bwidth="(\d+)"/)?.[1]);
   const height = Number(root[1].match(/\bheight="(\d+)"/)?.[1]);
   if (width !== asset.width || height !== asset.height) failures.push(`Manifest dimensions mismatch: ${asset.path} (manifest ${asset.width}x${asset.height}, SVG ${width}x${height})`);
+  if (asset.frameWidth !== undefined || asset.frameHeight !== undefined || asset.frameCount !== undefined) {
+    const validFrames = Number.isInteger(asset.frameWidth) && asset.frameWidth > 0
+      && Number.isInteger(asset.frameHeight) && asset.frameHeight > 0
+      && Number.isInteger(asset.frameCount) && asset.frameCount > 0
+      && width % asset.frameWidth === 0 && height % asset.frameHeight === 0
+      && (width / asset.frameWidth) * (height / asset.frameHeight) === asset.frameCount;
+    if (!validFrames) failures.push(`Invalid sprite sheet metadata: ${asset.path}`);
+    if (!Number.isFinite(asset.frameRate) || asset.frameRate <= 0) failures.push(`Invalid sprite frame rate: ${asset.path}`);
+  }
   if (/<script\b|javascript:|(?:href|xlink:href)="(?:https?:)?\/\//i.test(source)) failures.push(`External/script content is not allowed in game SVG: ${asset.path}`);
 }
 if (failures.length) {
