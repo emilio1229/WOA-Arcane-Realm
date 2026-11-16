@@ -161,6 +161,26 @@ try {
   assert.ok((await desktop.locator("#npc-line").textContent()).includes("sealed atlas room"));
   await desktop.locator("#close-dialogue").click();
 
+  // Academy interaction repairs the practice target; the inn is a real safe-rest point.
+  await desktop.evaluate(() => window.arcaneTest.setPlayerPosition(560, 835));
+  await desktop.evaluate(() => { window.arcaneTest.damagePracticeWisp(); window.arcaneTest.damagePracticeWisp(); });
+  assert.equal(await desktop.evaluate(() => window.arcaneTest.getPracticeWispHealth()), 1);
+  await desktop.keyboard.press("e");
+  assert.equal(await desktop.evaluate(() => window.arcaneTest.getPracticeWispHealth()), 3,
+    "Spell Academy interaction should restore the training target");
+  await desktop.locator("#close-dialogue").click();
+
+  await desktop.evaluate(() => window.arcaneTest.forcePlayerHit());
+  assert.equal(await desktop.evaluate(() => window.arcaneTest.getPlayerHealth()), 4);
+  await desktop.evaluate(() => window.arcaneTest.setPlayerPosition(900, 1080));
+  assert.equal(await desktop.evaluate(() => window.arcaneTest.getNearestTownLocation()), "Adventurer's Inn");
+  await desktop.keyboard.press("e");
+  assert.equal(await desktop.evaluate(() => window.arcaneTest.getPlayerHealth()), 5,
+    "resting at the Adventurer's Inn should restore full vitality");
+  assert.equal(await desktop.evaluate(() => window.arcaneTest.getHitRecoveryMs()), 0,
+    "resting at the Inn should clear hit recovery");
+  await desktop.locator("#close-dialogue").click();
+
   await desktop.evaluate(() => window.arcaneTest.setPlayerPosition(900, 480));
   await desktop.locator("#cast-spell").click();
   await desktop.keyboard.press("Space");

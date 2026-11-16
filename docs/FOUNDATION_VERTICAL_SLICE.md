@@ -133,3 +133,11 @@ Added `environment.sanctuary-fountain`, a 512×512 original SVG landmark with la
 - The contextual interaction is proximity-based and uses the existing E/Interact control and dialogue panel. No fake inventory, shop purchase, training reward, or interior transition is presented as implemented.
 - Corrected the virtual joystick's analog response. The projected isometric direction is normalized, then the original input magnitude is restored, so gentle stick movement no longer snaps to full walking speed.
 - Added browser regression assertions for half-stick speed and the Grand Library interaction. Tests are authored but have not yet run in a browser in this session.
+
+
+## First functional town services
+- Spell Academy interaction restores the practice Ember Wisp and its health bar, creating a repeatable training loop.
+- Adventurer's Inn is a safe-rest point: interacting restores all five vitality and clears the local hit-recovery timer.
+- Grand Library, Familiar Sanctuary, and Merchant Hall interactions record local discoveries. Merchant Hall explicitly explains that buying/trading is not implemented yet; no fake purchase flow is shown.
+- The public noticeboard has been shifted away from the Inn's rest point so the approach remains accessible.
+- Browser smoke tests cover Academy target restoration and Inn healing. These tests are part of CI and await a passing run.

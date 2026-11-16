@@ -96,3 +96,7 @@ Five original transparent SVG overlays enrich the existing Library, Familiar San
 
 ## Sanctuary landmark interactions
 The five main buildings now have proximity-based contextual interactions through the existing Interact/E control. Each landmark has its own action prompt and location lore. Nearby residents retain priority for direct conversation. These are exploration/lore interactions only; shops, training rewards, familiar adoption, and building interiors are not yet implemented.
+
+
+## Town service interactions
+The Spell Academy restores the practice Ember Wisp for repeatable combat training. The Adventurer's Inn restores player vitality as a safe-rest interaction. The Grand Library, Familiar Sanctuary, and Merchant Hall can be recorded as local discoveries; Merchant Hall is explicitly marked as not yet selling items. These local prototype services are not server-persistent.

@@ -15,6 +15,7 @@ declare global {
       getPlayerPosition: () => { x: number; y: number };
       getFamiliarPosition: () => { x: number; y: number };
       getPracticeWispHealth: () => number;
+      damagePracticeWisp: () => void;
       getHostileWispHealth: () => number;
       getEmberSentryHealth: () => number;
       getPlayerHealth: () => number;
@@ -178,6 +179,7 @@ class SanctuaryScene extends Phaser.Scene {
         getPlayerPosition: () => ({ x: this.player.x, y: this.player.y }),
         getFamiliarPosition: () => ({ x: this.familiarArt.x, y: this.familiarArt.y }),
         getPracticeWispHealth: () => this.practiceWispHealth,
+        damagePracticeWisp: () => this.damagePracticeWisp(),
         getHostileWispHealth: () => this.hostileWisp.currentHealth,
         getEmberSentryHealth: () => this.emberSentry.currentHealth,
         getPlayerHealth: () => this.playerHealth,
@@ -326,9 +328,9 @@ class SanctuaryScene extends Phaser.Scene {
     }
     const obelisk = this.add.image(760, 670, "prop-obelisk").setDisplaySize(92, 92).setDepth(680);
     this.add.image(410, 550, "prop-signpost").setDisplaySize(92, 115).setDepth(550);
-    this.add.image(900, 1080, "prop-noticeboard").setDisplaySize(112, 112).setDepth(1080);
+    this.add.image(1010, 1080, "prop-noticeboard").setDisplaySize(112, 112).setDepth(1080);
     this.add.image(1455, 900, "prop-crystals").setDisplaySize(112, 112).setDepth(910);
-    this.obstacles.push(new Phaser.Geom.Rectangle(390, 540, 40, 28), new Phaser.Geom.Rectangle(875, 1072, 50, 20));
+    this.obstacles.push(new Phaser.Geom.Rectangle(390, 540, 40, 28), new Phaser.Geom.Rectangle(985, 1072, 50, 20));
     this.tweens.add({ targets: obelisk, alpha: { from: 0.86, to: 1 }, duration: 2200, yoyo: true, repeat: -1 });
   }
 
@@ -539,11 +541,34 @@ class SanctuaryScene extends Phaser.Scene {
   }
 
   private showLocationDialogue(location: { name: string; line: string }) {
+    let message = location.line;
+    if (location.name === "Spell Academy") {
+      this.practiceWispHealth = 3;
+      this.practiceWispFill.setSize(48, 3);
+      this.practiceWispLabel.setText("EMBER WISP · 3");
+      this.practiceWisp.setAlpha(1);
+      message += " The practice wisp has been restored to full strength for another training round.";
+    } else if (location.name === "Adventurer's Inn") {
+      this.playerHealth = 5;
+      this.hitRecoveryUntil = 0;
+      this.updateHealthHud();
+      this.updateRecoveryHud();
+      message += " A warm rest restores your vitality completely.";
+    } else if (location.name === "Grand Library") {
+      localStorage.setItem("arcane.discovery.grand-library", "true");
+      message += " Landmark recorded in your local journal.";
+    } else if (location.name === "Familiar Sanctuary") {
+      localStorage.setItem("arcane.discovery.familiar-sanctuary", "true");
+      message += " Sanctuary landmark recorded. Glimmer flutters closer as if it recognizes the place.";
+    } else if (location.name === "Merchant Hall") {
+      localStorage.setItem("arcane.discovery.merchant-hall", "true");
+      message += " The market is not open for purchases yet, but the hall has been added to your discoveries.";
+    }
     const name = document.querySelector("#npc-name");
     const line = document.querySelector("#npc-line");
     const panel = document.querySelector("#dialogue");
     if (name) name.textContent = location.name;
-    if (line) line.textContent = location.line;
+    if (line) line.textContent = message;
     panel?.classList.remove("hidden");
   }
 
