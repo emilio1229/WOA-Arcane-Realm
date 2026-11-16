@@ -15,6 +15,8 @@ Official reference: https://docs.phaser.io/phaser/getting-started/installation
 - Controllable wizard with WASD/arrow movement, subtle idle/movement motion, and direction-aware facing.
 - First local spell-casting interaction: Space or the mobile Cast button launches an Arcane Bolt with an impact burst and a short local cast throttle.
 - Aimed Arcane Bolts can damage the three-health Ember Wisp practice target; its health bar updates, it is briefly dispelled at zero health, and it respawns after a short delay.
+- A hostile Frost Wisp now detects the player within its local aggro radius, pursues at a controlled speed, attacks at close range, has four health, and respawns after defeat. Player vitality is displayed in the HUD; taking damage produces a brief hit flash and camera shake, and reaching zero vitality returns the wizard to the sanctuary spawn with full vitality.
+- The headless browser smoke test now includes the hostile Wisp combat loop and player damage checks.
 - Ambient floating magic motes around the Sanctuary; touch controls now include both Interact and Cast.
 - NPCs with names, idle bobbing, proximity detection, and E/Enter interaction.
 - Responsive HUD and a contextual dialogue panel.
@@ -58,7 +60,7 @@ npm run preview
 ## Next validation
 
 1. Test touch joystick and interaction on a real phone.
-2. Extend combat with hostile enemy behavior, player health, damage feedback, and authoritative validation before adding rewards.
+2. Expand combat with enemy telegraphs, varied attack patterns, player recovery, and more encounter types; implement authoritative validation before adding rewards.
 3. Validate camera framing and resize behavior across phone, tablet, and desktop aspect ratios.
 4. Evaluate the visual result against the dimensional/isometric target; if 2.5D is insufficient, stop expanding Phaser and evaluate a true 3D browser renderer.
 5. Replace vector placeholders with original, licensed assets after the rendering direction is approved.
