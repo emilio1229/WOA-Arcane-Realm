@@ -20,7 +20,13 @@ export class HostileWisp {
     this.track = scene.add.rectangle(x - 25, y - 48, 50, 5, 0x21172e, 0.9).setOrigin(0, 0.5).setDepth(y + 12);
     this.fill = scene.add.rectangle(x - 23, y - 48, 46, 3, 0x8bd9ee, 1).setOrigin(0, 0.5).setDepth(y + 13);
     this.warning = scene.add.circle(x, y, 46, 0x8bd9ee, 0.08).setStrokeStyle(2, 0x9be8ff, 0.9).setVisible(false).setDepth(y + 2);
-    scene.tweens.add({ targets: this.art, y: y - 14, alpha: { from: 0.82, to: 1 }, duration: 1450, yoyo: true, repeat: -1, ease: "Sine.easeInOut" });
+    // Do not tween the enemy's world Y coordinate: pursuit also updates that
+    // coordinate, and competing tweens would silently cancel its movement.
+    scene.tweens.add({
+      targets: this.art, alpha: { from: 0.82, to: 1 },
+      scaleX: { from: 0.96, to: 1.04 }, scaleY: { from: 0.96, to: 1.04 },
+      duration: 1450, yoyo: true, repeat: -1, ease: "Sine.easeInOut",
+    });
   }
 
   get x() { return this.art.x; }
