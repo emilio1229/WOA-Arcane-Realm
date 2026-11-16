@@ -85,9 +85,11 @@ try {
   assert.ok(afterCollision.x < 575, "wall sliding should keep the wizard outside the library footprint");
   assert.ok(afterCollision.y > 450, "the wizard should travel along the library wall");
 
+  // Exercise casting from a neutral spot, away from the practice target so
+  // this smoke check cannot consume one of its three test health points.
+  await desktop.evaluate(() => window.arcaneTest.setPlayerPosition(900, 480));
   await desktop.keyboard.press("Space");
   await delay(500);
-  await desktop.evaluate(() => window.arcaneTest.setPlayerPosition(900, 480));
   await desktop.keyboard.down("e");
   await delay(120);
   await desktop.keyboard.up("e");
