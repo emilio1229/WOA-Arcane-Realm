@@ -36,7 +36,7 @@ npm run preview
 
 ## Current foundation
 
-The first playable foundation has been added: isometric-style sanctuary environment, camera follow, keyboard movement, building collision footprints, NPCs and proximity interaction, HUD, and mobile joystick/touch interaction. Art is currently procedural placeholder geometry. This slice has not yet been browser- or device-tested in this environment; see `docs/FOUNDATION_VERTICAL_SLICE.md` for limitations and next validation steps.
+The playable foundation now includes an isometric-style sanctuary, camera follow, keyboard and mobile movement, building collision, NPC interaction, Glimmer following, Arcane Bolt casting, a practice Ember Wisp, and a hostile Frost Wisp with proximity pursuit, contact damage, player vitality, defeat, and respawn. This remains a local prototype: health is not persistent and no rewards are granted. The latest hostile-combat changes have not yet been executed in a browser in this environment; see `docs/FOUNDATION_VERTICAL_SLICE.md` for limitations and next validation steps.
 
 ## Repository boundaries
 
