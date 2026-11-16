@@ -521,5 +521,6 @@ if (stick && knob) {
 }
 document.querySelector("#interact")?.addEventListener("click", () => window.arcaneInteract?.());
 document.querySelector("#cast")?.addEventListener("click", () => window.arcaneCast?.());
+document.querySelector("#dodge")?.addEventListener("click", () => window.arcaneDodge?.());
 document.querySelector("#close-dialogue")?.addEventListener("click", () => document.querySelector("#dialogue")?.classList.add("hidden"));
 window.addEventListener("beforeunload", () => game.destroy(true));
