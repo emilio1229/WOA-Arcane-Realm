@@ -537,7 +537,9 @@
         "sprite-sheet"
       ],
       "status": "prototype-integrated",
-      "provenance": "Original project Arcane wizard cast pose, recolored by robe tradition while preserving shared silhouette; CC0-1.0"
+      "provenance": "Original project Arcane wizard cast pose, recolored by robe tradition while preserving shared silhouette; CC0-1.0",
+      "frameRate": 1,
+      "animation": "static-pose-atlas"
     },
     {
       "id": "environment.sanctuary-townlife",
