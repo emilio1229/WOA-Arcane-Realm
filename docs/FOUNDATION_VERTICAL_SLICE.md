@@ -99,3 +99,12 @@ The first `arcane-realm-asset-forge` implementation batch adds two original SVG 
 ## Sanctuary town-life pass
 
 The Asset Forge town-life pass adds a transparent, original SVG layer with market awnings, benches, warm street lanterns, pennants, a public noticeboard, wayfinding, and doorstep planters. The layer is registered in the asset manifest and loaded beneath actors/building exteriors. Placement favors the outer edges and lower gathering spaces to preserve the central plaza and existing combat lanes. This is an additive environmental dressing pass; the current map remains the Sanctuary prototype rather than the canonical Gloamwick story opening. Visual review in a running browser remains pending.
+
+
+## Movement and tradition fidelity follow-up
+- Normalized all non-zero movement input after the isometric projection so cardinal and diagonal input use the same world-space speed.
+- Added frame-rate-independent acceleration/deceleration and reduced the movement delta clamp to 33.3ms to limit large steps after slow frames.
+- Collision resolution now removes velocity only on the blocked axis, preserving reliable wall sliding without accumulating blocked movement.
+- Walking animation now reflects actual resolved movement, not merely held input; idle frames are selected from the active tradition's sprite-sheet row.
+- Arcane Bolt impact bursts inherit the chosen magic color as well as the projectile.
+- Browser smoke coverage now checks all six idle robe rows and compares cardinal/diagonal travel distance. These tests are authored but not yet run in this environment.

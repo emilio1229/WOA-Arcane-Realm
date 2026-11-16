@@ -45,6 +45,38 @@ try {
     height: canvas.height,
   }));
   assert.ok(canvasSize.width > 0 && canvasSize.height > 0, "game canvas should have a real drawing surface");
+
+  // Every tradition must retain its own robe palette while idle. A previous
+  // regression reset every idle wizard to the first sprite-sheet row.
+  const traditions = ["storm-herald", "ember-mage", "frostweaver", "verdant-warden", "voidcaller", "sigilbinder"];
+  for (let index = 0; index < traditions.length; index++) {
+    await desktop.evaluate(name => window.arcaneSetCharacter(name, "#b98bea"), traditions[index]);
+    await delay(80);
+    assert.equal(await desktop.evaluate(() => window.arcaneTest.getWizardTexture()), "wizard-traditions-walk");
+    assert.equal(await desktop.evaluate(() => window.arcaneTest.getWizardFrame()), index * 4,
+      `${traditions[index]} should display its own idle sprite row`);
+  }
+  await desktop.evaluate(() => window.arcaneSetCharacter("storm-herald", "#b98bea"));
+
+  // Cardinal and diagonal travel should have comparable world-space speed.
+  await desktop.evaluate(() => window.arcaneTest.setPlayerPosition(900, 760));
+  const cardinalStart = await desktop.evaluate(() => window.arcaneTest.getPlayerPosition());
+  await desktop.keyboard.down("w");
+  await delay(350);
+  await desktop.keyboard.up("w");
+  const cardinalEnd = await desktop.evaluate(() => window.arcaneTest.getPlayerPosition());
+  const cardinalDistance = Math.hypot(cardinalEnd.x - cardinalStart.x, cardinalEnd.y - cardinalStart.y);
+  await desktop.evaluate(() => window.arcaneTest.setPlayerPosition(900, 760));
+  const diagonalStart = await desktop.evaluate(() => window.arcaneTest.getPlayerPosition());
+  await desktop.keyboard.down("w");
+  await desktop.keyboard.down("d");
+  await delay(350);
+  await desktop.keyboard.up("w");
+  await desktop.keyboard.up("d");
+  const diagonalEnd = await desktop.evaluate(() => window.arcaneTest.getPlayerPosition());
+  const diagonalDistance = Math.hypot(diagonalEnd.x - diagonalStart.x, diagonalEnd.y - diagonalStart.y);
+  assert.ok(Math.abs(cardinalDistance - diagonalDistance) / Math.max(cardinalDistance, diagonalDistance) < 0.2,
+    "cardinal and diagonal movement should not have a speed penalty");
   await desktop.locator("#pause-game").click();
   await desktop.locator("#pause-overlay").waitFor({ state: "visible" });
   await desktop.locator("[data-menu-tab=journal]").click();

@@ -20,6 +20,8 @@ declare global {
       getPlayerHealth: () => number;
       getDodgeCooldownMs: () => number;
       getHitRecoveryMs: () => number;
+      getWizardFrame: () => number;
+      getWizardTexture: () => string;
       performDodge: () => void;
       forcePlayerHit: () => void;
       setPlayerPosition: (x: number, y: number, facingX?: number, facingY?: number) => void;
@@ -52,6 +54,7 @@ class SanctuaryScene extends Phaser.Scene {
   private playerHealth = 5;
   private lastFacing = new Phaser.Math.Vector2(0, -1);
   private dodgeVector = new Phaser.Math.Vector2(0, -1);
+  private movementVelocity = new Phaser.Math.Vector2(0, 0);
   private dodgeUntil = 0;
   private invulnerableUntil = 0;
   private hitRecoveryUntil = 0;
@@ -159,6 +162,8 @@ class SanctuaryScene extends Phaser.Scene {
         getPlayerHealth: () => this.playerHealth,
         getDodgeCooldownMs: () => Math.max(0, this.nextDodgeAt - this.time.now),
         getHitRecoveryMs: () => Math.max(0, this.hitRecoveryUntil - this.time.now),
+        getWizardFrame: () => Number(this.wizardSprite.frame.name),
+        getWizardTexture: () => this.wizardSprite.texture.key,
         performDodge: () => this.dodge(),
         forcePlayerHit: () => this.damagePlayer(),
         setPlayerPosition: (x, y, facingX = 0, facingY = -1) => {
@@ -305,7 +310,8 @@ class SanctuaryScene extends Phaser.Scene {
     const names = ["storm-herald","ember-mage","frostweaver","verdant-warden","voidcaller","sigilbinder"];
     this.currentTradition = localStorage.getItem("arcane.character.tradition") || "storm-herald";
     this.currentTraditionIndex = Math.max(0, names.indexOf(this.currentTradition));
-    this.magicColor = localStorage.getItem("arcane.character.magicColor") || "#b98bea";
+    const savedMagicColor = localStorage.getItem("arcane.character.magicColor") || "#b98bea";
+    this.magicColor = /^#[0-9a-fA-F]{6}$/.test(savedMagicColor) ? savedMagicColor : "#b98bea";
     this.wizardSprite = this.add.sprite(0, 0, "wizard-traditions-walk", this.currentTraditionIndex * 4).setDisplaySize(78, 98).setOrigin(0.5, 0.9);
     container.add(this.wizardSprite);
   }
@@ -364,7 +370,8 @@ class SanctuaryScene extends Phaser.Scene {
       onComplete: () => {
         bolt.destroy();
         const impact = this.add.sprite(impactX, impactY, "arcane-burst", 0)
-          .setDisplaySize(112, 112).setDepth(impactY + 90).setAlpha(0.95);
+          .setDisplaySize(112, 112).setDepth(impactY + 90).setAlpha(0.95)
+          .setTint(Phaser.Display.Color.HexStringToColor(this.magicColor).color);
         impact.play("arcane-impact-burst");
         impact.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => impact.destroy());
         if (hitSentryFirst) this.emberSentry.damage();
@@ -511,12 +518,20 @@ class SanctuaryScene extends Phaser.Scene {
     x += window.arcaneMove?.x ?? 0;
     y += window.arcaneMove?.y ?? 0;
     const vector = new Phaser.Math.Vector2((x - y) * 0.7071, (x + y) * 0.5);
-    if (vector.length() > 1) vector.normalize();
+    // Normalize every non-zero input after the isometric projection. Without
+    // this, cardinal directions travel slower than diagonals on the diamond grid.
+    if (vector.lengthSq() > 0.001) vector.normalize();
     const isDodging = this.time.now < this.dodgeUntil;
-    if (isDodging) vector.copy(this.dodgeVector);
+    const delta = Math.min(this.game.loop.delta, 33.333) / 1000;
     const speed = isDodging ? 470 : 190;
-    const delta = Math.min(this.game.loop.delta, 50) / 1000;
-    if (vector.lengthSq() > 0.001 && !isDodging) this.lastFacing.copy(vector).normalize();
+    const desiredVelocity = isDodging
+      ? this.dodgeVector.clone().scale(speed)
+      : vector.clone().scale(speed);
+    // Exponential acceleration/deceleration is frame-rate independent and
+    // makes keyboard and touch movement feel less abrupt without adding drift.
+    const response = 1 - Math.exp(-delta * (vector.lengthSq() > 0.001 ? 16 : 20));
+    if (isDodging) this.movementVelocity.copy(desiredVelocity);
+    else this.movementVelocity.lerp(desiredVelocity, response);
     const radius = 9;
     const minX = 70 + radius, maxX = WORLD.width - 70 - radius;
     const minY = 70 + radius, maxY = WORLD.height - 70 - radius;
@@ -527,12 +542,16 @@ class SanctuaryScene extends Phaser.Scene {
 
     // Resolve each axis independently. This gives the player a reliable slide along
     // building footprints instead of freezing on a diagonal corner.
-    const wantedX = Phaser.Math.Clamp(this.player.x + vector.x * speed * delta, minX, maxX);
-    const wantedY = Phaser.Math.Clamp(this.player.y + vector.y * speed * delta, minY, maxY);
-    let resolvedX = this.player.x;
-    let resolvedY = this.player.y;
+    const startX = this.player.x;
+    const startY = this.player.y;
+    const wantedX = Phaser.Math.Clamp(startX + this.movementVelocity.x * delta, minX, maxX);
+    const wantedY = Phaser.Math.Clamp(startY + this.movementVelocity.y * delta, minY, maxY);
+    let resolvedX = startX;
+    let resolvedY = startY;
     if (!collidesAt(wantedX, resolvedY)) resolvedX = wantedX;
+    else this.movementVelocity.x = 0;
     if (!collidesAt(resolvedX, wantedY)) resolvedY = wantedY;
+    else this.movementVelocity.y = 0;
 
     // This is a kinematic character controller: physics supplies the body, while
     // movement and collision resolution stay deterministic across frame rates.
@@ -540,16 +559,19 @@ class SanctuaryScene extends Phaser.Scene {
     this.player.setPosition(resolvedX, resolvedY);
     this.player.body!.reset(resolvedX, resolvedY);
     this.playerArt.setPosition(resolvedX, resolvedY);
-    const isWalking = vector.lengthSq() > 0.001 && this.wizardSprite.texture.key === "wizard-traditions-walk";
+    const movedX = resolvedX - startX;
+    const movedY = resolvedY - startY;
+    const isWalking = Math.hypot(movedX, movedY) > 0.1 && this.wizardSprite.texture.key === "wizard-traditions-walk";
+    if (isWalking) this.lastFacing.set(movedX, movedY).normalize();
     if (this.wizardSprite.texture.key === "wizard-traditions-walk") {
       if (isWalking) {
         if (this.wizardSprite.anims.currentAnim?.key !== `wizard-${this.currentTradition}-walk-cycle`) this.wizardSprite.play(`wizard-${this.currentTradition}-walk-cycle`);
       } else {
         this.wizardSprite.anims.stop();
-        this.wizardSprite.setFrame(0);
+        this.wizardSprite.setFrame(this.currentTraditionIndex * 4);
       }
     }
-    if (Math.abs(vector.x) > 0.01 && this.wizardSprite.texture.key === "wizard-traditions-walk") this.wizardSprite.setFlipX(vector.x < 0);
+    if (Math.abs(movedX) > 0.01 && this.wizardSprite.texture.key === "wizard-traditions-walk") this.wizardSprite.setFlipX(movedX < 0);
     this.wizardSprite.setRotation(isWalking ? Math.sin(this.time.now / 75) * 0.012 : Math.sin(this.time.now / 520) * 0.008);
     this.playerArt.setDepth(this.player.y + 20);
     // Glimmer trails the wizard, eases into turns, and floats independently.
