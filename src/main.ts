@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import { HostileWisp } from "./game/HostileWisp";
+import { EmberSentry } from "./game/EmberSentry";
 import "./style.css";
 
 declare global {
@@ -7,13 +8,17 @@ declare global {
     arcaneMove?: { x: number; y: number };
     arcaneInteract?: () => void;
     arcaneCast?: () => void;
+    arcaneDodge?: () => void;
     /** Development-only hooks used by the headless browser smoke test. */
     arcaneTest?: {
       getPlayerPosition: () => { x: number; y: number };
       getFamiliarPosition: () => { x: number; y: number };
       getPracticeWispHealth: () => number;
       getHostileWispHealth: () => number;
+      getEmberSentryHealth: () => number;
       getPlayerHealth: () => number;
+      getDodgeCooldownMs: () => number;
+      performDodge: () => void;
       setPlayerPosition: (x: number, y: number, facingX?: number, facingY?: number) => void;
     };
   }
@@ -40,8 +45,13 @@ class SanctuaryScene extends Phaser.Scene {
   private practiceWispFill!: Phaser.GameObjects.Rectangle;
   private practiceWispLabel!: Phaser.GameObjects.Text;
   private hostileWisp!: HostileWisp;
+  private emberSentry!: EmberSentry;
   private playerHealth = 5;
   private lastFacing = new Phaser.Math.Vector2(0, -1);
+  private dodgeVector = new Phaser.Math.Vector2(0, -1);
+  private dodgeUntil = 0;
+  private invulnerableUntil = 0;
+  private nextDodgeAt = 0;
   private nextCastAt = 0;
   private keys!: Record<string, Phaser.Input.Keyboard.Key>;
   private obstacles: Phaser.Geom.Rectangle[] = [];
@@ -95,12 +105,18 @@ class SanctuaryScene extends Phaser.Scene {
     this.familiarArt = this.add.image(this.player.x - 8, this.player.y + 24, "glimmer")
       .setDisplaySize(42, 42).setDepth(this.player.y + 18);
     this.hostileWisp = new HostileWisp(this, 1450, 640, () => this.damagePlayer());
+    this.emberSentry = new EmberSentry(
+      this, 340, 760,
+      () => this.damagePlayer(),
+      () => this.time.now < this.invulnerableUntil,
+      () => ({ x: this.player.x, y: this.player.y }),
+    );
     this.cameras.main.setBounds(0, 0, WORLD.width, WORLD.height);
     this.cameras.main.startFollow(this.player, true, 0.08, 0.08);
     this.cameras.main.setZoom(Math.min(1, this.scale.width / 1100));
     this.physics.world.setBounds(70, 70, WORLD.width - 140, WORLD.height - 140);
 
-    this.keys = this.input.keyboard!.addKeys("W,A,S,D,UP,DOWN,LEFT,RIGHT,E,ENTER,SPACE") as Record<string, Phaser.Input.Keyboard.Key>;
+    this.keys = this.input.keyboard!.addKeys("W,A,S,D,UP,DOWN,LEFT,RIGHT,E,ENTER,SPACE,SHIFT") as Record<string, Phaser.Input.Keyboard.Key>;
     this.prompt = this.add.text(0, 0, "E  SPEAK", {
       fontFamily: "Manrope, sans-serif", fontSize: "11px", color: "#fff4d9",
       backgroundColor: "#2c1e40", padding: { x: 9, y: 6 }, stroke: "#d5a5ef", strokeThickness: 1,
@@ -111,13 +127,17 @@ class SanctuaryScene extends Phaser.Scene {
     });
     window.arcaneInteract = this.interactHandler;
     window.arcaneCast = () => this.castSpell();
+    window.arcaneDodge = () => this.dodge();
     if (import.meta.env.DEV) {
       window.arcaneTest = {
         getPlayerPosition: () => ({ x: this.player.x, y: this.player.y }),
         getFamiliarPosition: () => ({ x: this.familiarArt.x, y: this.familiarArt.y }),
         getPracticeWispHealth: () => this.practiceWispHealth,
         getHostileWispHealth: () => this.hostileWisp.currentHealth,
+        getEmberSentryHealth: () => this.emberSentry.currentHealth,
         getPlayerHealth: () => this.playerHealth,
+        getDodgeCooldownMs: () => Math.max(0, this.nextDodgeAt - this.time.now),
+        performDodge: () => this.dodge(),
         setPlayerPosition: (x, y, facingX = 0, facingY = -1) => {
           this.player.setVelocity(0, 0);
           this.player.setPosition(x, y);
@@ -130,6 +150,7 @@ class SanctuaryScene extends Phaser.Scene {
     this.events.once("shutdown", () => {
       window.arcaneInteract = undefined;
       window.arcaneCast = undefined;
+      window.arcaneDodge = undefined;
       window.arcaneTest = undefined;
     });
     this.scale.on("resize", (size: Phaser.Structs.Size) => this.cameras.main.setZoom(Math.min(1, size.width / 1100)));
@@ -280,9 +301,15 @@ class SanctuaryScene extends Phaser.Scene {
     const hostileAlong = hostileDx * this.lastFacing.x + hostileDy * this.lastFacing.y;
     const hostileOff = Math.abs(hostileDx * this.lastFacing.y - hostileDy * this.lastFacing.x);
     const hitsHostileWisp = this.hostileWisp.isAlive && hostileAlong >= 0 && hostileAlong <= 270 && hostileOff <= 42;
-    const hitHostileFirst = hitsHostileWisp && (!hitsPracticeWisp || hostileAlong < alongShot);
-    const impactX = hitHostileFirst ? this.hostileWisp.x : hitsPracticeWisp ? this.practiceWisp.x : targetX;
-    const impactY = hitHostileFirst ? this.hostileWisp.y : hitsPracticeWisp ? this.practiceWisp.y : targetY;
+    const sentryDx = this.emberSentry.x - startX;
+    const sentryDy = this.emberSentry.y - startY;
+    const sentryAlong = sentryDx * this.lastFacing.x + sentryDy * this.lastFacing.y;
+    const sentryOff = Math.abs(sentryDx * this.lastFacing.y - sentryDy * this.lastFacing.x);
+    const hitsSentry = this.emberSentry.isAlive && sentryAlong >= 0 && sentryAlong <= 270 && sentryOff <= 44;
+    const hitSentryFirst = hitsSentry && (!hitsHostileWisp || sentryAlong < hostileAlong) && (!hitsPracticeWisp || sentryAlong < alongShot);
+    const hitHostileFirst = hitsHostileWisp && (!hitsSentry || hostileAlong < sentryAlong) && (!hitsPracticeWisp || hostileAlong < alongShot);
+    const impactX = hitSentryFirst ? this.emberSentry.x : hitHostileFirst ? this.hostileWisp.x : hitsPracticeWisp ? this.practiceWisp.x : targetX;
+    const impactY = hitSentryFirst ? this.emberSentry.y : hitHostileFirst ? this.hostileWisp.y : hitsPracticeWisp ? this.practiceWisp.y : targetY;
     this.tweens.add({
       targets: bolt, x: impactX, y: impactY, alpha: 0.25, scale: 0.45,
       duration: 390, ease: "Cubic.easeOut",
@@ -295,7 +322,8 @@ class SanctuaryScene extends Phaser.Scene {
           angle: 35, duration: 320, ease: "Cubic.easeOut",
           onComplete: () => impact.destroy(),
         });
-        if (hitHostileFirst) this.hostileWisp.damage();
+        if (hitSentryFirst) this.emberSentry.damage();
+        else if (hitHostileFirst) this.hostileWisp.damage();
         else if (hitsPracticeWisp) this.damagePracticeWisp();
       },
     });
@@ -307,8 +335,35 @@ class SanctuaryScene extends Phaser.Scene {
     });
   }
 
+  private dodge() {
+    if (this.time.now < this.nextDodgeAt) return;
+    let x = Number(this.keys.A.isDown || this.keys.LEFT.isDown) * -1 + Number(this.keys.D.isDown || this.keys.RIGHT.isDown);
+    let y = Number(this.keys.W.isDown || this.keys.UP.isDown) * -1 + Number(this.keys.S.isDown || this.keys.DOWN.isDown);
+    x += window.arcaneMove?.x ?? 0;
+    y += window.arcaneMove?.y ?? 0;
+    const direction = new Phaser.Math.Vector2((x - y) * 0.7071, (x + y) * 0.5);
+    if (direction.lengthSq() > 0.001) this.dodgeVector.copy(direction).normalize();
+    else this.dodgeVector.copy(this.lastFacing);
+    this.lastFacing.copy(this.dodgeVector);
+    this.dodgeUntil = this.time.now + 210;
+    this.invulnerableUntil = this.time.now + 310;
+    this.nextDodgeAt = this.time.now + 1250;
+    this.wizardSprite.setTint(0xc8a7ff);
+    this.cameras.main.flash(65, 165, 120, 255, false);
+    this.updateDodgeHud();
+    this.time.delayedCall(230, () => this.wizardSprite.clearTint());
+  }
+
+  private updateDodgeHud() {
+    const fill = document.querySelector<HTMLElement>("#dodge-fill");
+    const label = document.querySelector<HTMLElement>("#dodge-label");
+    const remaining = Math.max(0, this.nextDodgeAt - this.time.now);
+    if (fill) fill.style.width = `${(1 - remaining / 1250) * 100}%`;
+    if (label) label.textContent = remaining > 0 ? `DODGE · ${(remaining / 1000).toFixed(1)}s` : "DODGE READY";
+  }
+
   private damagePlayer() {
-    if (this.playerHealth <= 0) return;
+    if (this.playerHealth <= 0 || this.time.now < this.invulnerableUntil) return;
     this.playerHealth = Math.max(0, this.playerHealth - 1);
     this.updateHealthHud();
     this.cameras.main.shake(120, 0.003);
@@ -373,15 +428,19 @@ class SanctuaryScene extends Phaser.Scene {
   update() {
     const keyboard = this.keys;
     this.hostileWisp.update(this.player.x, this.player.y, Math.min(this.game.loop.delta, 50) / 1000);
+    this.emberSentry.update(this.player.x, this.player.y);
+    this.updateDodgeHud();
     let x = Number(keyboard.A.isDown || keyboard.LEFT.isDown) * -1 + Number(keyboard.D.isDown || keyboard.RIGHT.isDown);
     let y = Number(keyboard.W.isDown || keyboard.UP.isDown) * -1 + Number(keyboard.S.isDown || keyboard.DOWN.isDown);
     x += window.arcaneMove?.x ?? 0;
     y += window.arcaneMove?.y ?? 0;
     const vector = new Phaser.Math.Vector2((x - y) * 0.7071, (x + y) * 0.5);
     if (vector.length() > 1) vector.normalize();
-    const speed = 190;
+    const isDodging = this.time.now < this.dodgeUntil;
+    if (isDodging) vector.copy(this.dodgeVector);
+    const speed = isDodging ? 470 : 190;
     const delta = Math.min(this.game.loop.delta, 50) / 1000;
-    if (vector.lengthSq() > 0.001) this.lastFacing.copy(vector).normalize();
+    if (vector.lengthSq() > 0.001 && !isDodging) this.lastFacing.copy(vector).normalize();
     const radius = 9;
     const minX = 70 + radius, maxX = WORLD.width - 70 - radius;
     const minY = 70 + radius, maxY = WORLD.height - 70 - radius;
@@ -424,6 +483,7 @@ class SanctuaryScene extends Phaser.Scene {
     }
     if (Phaser.Input.Keyboard.JustDown(keyboard.E) || Phaser.Input.Keyboard.JustDown(keyboard.ENTER)) this.interact();
     if (Phaser.Input.Keyboard.JustDown(keyboard.SPACE)) this.castSpell();
+    if (Phaser.Input.Keyboard.JustDown(keyboard.SHIFT)) this.dodge();
   }
 }
 
