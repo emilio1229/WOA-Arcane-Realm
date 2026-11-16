@@ -360,6 +360,46 @@
         "ice"
       ],
       "status": "prototype-integrated"
+    },
+    {
+      "id": "environment.sanctuary-ground",
+      "path": "/assets/environment/sanctuary-ground.svg",
+      "category": "environment",
+      "format": "svg",
+      "source": true,
+      "width": 1800,
+      "height": 1250,
+      "tags": [
+        "sanctuary",
+        "terrain",
+        "isometric",
+        "grass",
+        "stone-path",
+        "runes"
+      ],
+      "status": "prototype-integrated"
+    },
+    {
+      "id": "vfx.arcane-burst-sheet",
+      "path": "/assets/vfx/arcane-burst-sheet.svg",
+      "category": "vfx",
+      "format": "svg",
+      "source": true,
+      "width": 576,
+      "height": 96,
+      "frameWidth": 96,
+      "frameHeight": 96,
+      "frameCount": 6,
+      "frameRate": 15,
+      "tags": [
+        "spell",
+        "arcane",
+        "impact",
+        "animation",
+        "sprite-sheet",
+        "mobile"
+      ],
+      "status": "prototype-integrated"
     }
   ]
 }

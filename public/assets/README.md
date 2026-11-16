@@ -34,6 +34,8 @@ Original, editable SVG source assets for the Arcane Realm prototype.
 | Sanctuary lantern | `environment.prop.lantern` | Path lighting prop |
 | Rune obelisk | `environment.prop.rune-obelisk` | Arcane landmark prop |
 | Crystal cluster | `environment.prop.crystal-cluster` | Magical garden prop |
+| Sanctuary ground | `environment.sanctuary-ground` | Single-layer isometric grass, flowering terrain, engraved plaza stones, and a rune-inlaid sanctuary path |
+| Arcane burst sheet | `vfx.arcane-burst-sheet` | Six-frame, transparent spell impact animation (96×96 cells at 15 fps) |
 
 ## Validation workflow
 
@@ -56,3 +58,5 @@ npm run assets:validate
 ```
 
 Supported categories: `character`, `familiar`, `creature`, `environment`, `vfx`, `ui`, `building`, and `prop`. The generator rejects duplicate IDs/files and marks generated artwork as `scaffold`; replace the placeholder geometry and visually review it before integration. It never overwrites existing source art.
+
+

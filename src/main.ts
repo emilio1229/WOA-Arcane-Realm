@@ -85,6 +85,8 @@ class SanctuaryScene extends Phaser.Scene {
     this.load.svg("prop-lantern", "/assets/props/sanctuary-lantern.svg", { width: 64, height: 128 });
     this.load.svg("prop-obelisk", "/assets/props/rune-obelisk.svg", { width: 128, height: 128 });
     this.load.svg("prop-crystals", "/assets/props/crystal-cluster.svg", { width: 128, height: 128 });
+    this.load.svg("sanctuary-ground", "/assets/environment/sanctuary-ground.svg", { width: 1800, height: 1250 });
+    this.load.spritesheet("arcane-burst", "/assets/vfx/arcane-burst-sheet.svg", { frameWidth: 96, frameHeight: 96 });
   }
 
   create() {
@@ -94,6 +96,7 @@ class SanctuaryScene extends Phaser.Scene {
     this.createNPCs();
     this.createAssetShowcase();
     this.createAmbientMagic();
+    this.anims.create({ key: "arcane-impact-burst", frames: this.anims.generateFrameNumbers("arcane-burst", { start: 0, end: 5 }), frameRate: 15, repeat: 0 });
 
     this.player = this.physics.add.image(900, 760, "__WHITE");
     this.player.setDisplaySize(18, 18).setTint(0xffffff).setAlpha(0);
@@ -159,15 +162,16 @@ class SanctuaryScene extends Phaser.Scene {
   private drawWorld() {
     const g = this.add.graphics();
     const tileW = 96, tileH = 48, cols = 28, rows = 28;
+    this.add.image(0, 0, "sanctuary-ground").setOrigin(0).setDisplaySize(WORLD.width, WORLD.height).setDepth(-1);
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
         const x = 90 + (col - row) * tileW / 2 + WORLD.width / 2 - cols * tileW / 4;
         const y = 80 + (col + row) * tileH / 2;
         const plaza = col > 8 && col < 20 && row > 8 && row < 20;
-        const color = plaza ? ((col + row) % 3 === 0 ? 0x66537a : 0x594b6e) : ((col + row) % 2 ? 0x294b43 : 0x315448);
-        g.fillStyle(color, 1);
-        g.lineStyle(1, 0x8c83a0, 0.16);
-        g.beginPath(); g.moveTo(x, y - tileH / 2); g.lineTo(x + tileW / 2, y); g.lineTo(x, y + tileH / 2); g.lineTo(x - tileW / 2, y); g.closePath(); g.fillPath(); g.strokePath();
+        if (!plaza && (col * 13 + row * 7) % 9 === 0) {
+          g.fillStyle(0x8ce6b8, 0.18);
+          g.fillCircle(x + ((col * 11) % 19) - 9, y + ((row * 5) % 9) - 4, 2);
+        }
       }
     }
     // Garden beds and lantern-lit paths.
@@ -315,13 +319,10 @@ class SanctuaryScene extends Phaser.Scene {
       duration: 390, ease: "Cubic.easeOut",
       onComplete: () => {
         bolt.destroy();
-        const impact = this.add.image(impactX, impactY, "arcane-impact")
-          .setDisplaySize(18, 18).setDepth(impactY + 90).setAlpha(0.95);
-        this.tweens.add({
-          targets: impact, displayWidth: 112, displayHeight: 112, alpha: 0,
-          angle: 35, duration: 320, ease: "Cubic.easeOut",
-          onComplete: () => impact.destroy(),
-        });
+        const impact = this.add.sprite(impactX, impactY, "arcane-burst", 0)
+          .setDisplaySize(112, 112).setDepth(impactY + 90).setAlpha(0.95);
+        impact.play("arcane-impact-burst");
+        impact.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => impact.destroy());
         if (hitSentryFirst) this.emberSentry.damage();
         else if (hitHostileFirst) this.hostileWisp.damage();
         else if (hitsPracticeWisp) this.damagePracticeWisp();
