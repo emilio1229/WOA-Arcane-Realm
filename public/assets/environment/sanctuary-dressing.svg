@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1250" viewBox="0 0 1800 1250">
+<defs>
+ <linearGradient id="leaf" x2="0.8" y2="1"><stop stop-color="#6fb98b"/><stop offset="1" stop-color="#183d38"/></linearGradient>
+ <linearGradient id="stone" x2="0" y2="1"><stop stop-color="#a99abb"/><stop offset="1" stop-color="#4c4262"/></linearGradient>
+ <radialGradient id="glow"><stop stop-color="#d9b3ff" stop-opacity=".48"/><stop offset="1" stop-color="#b47be8" stop-opacity="0"/></radialGradient>
+ <filter id="soft"><feGaussianBlur stdDeviation="12"/></filter>
+ <g id="tree">
+  <ellipse cx="0" cy="15" rx="58" ry="24" fill="#101e26" opacity=".48"/>
+  <path d="M-5 22Q-1-10 3-37L17-57 7-8 13 20Z" fill="#6a4c53"/>
+  <path d="M0-20Q-54-17-62-58Q-57-95-19-86Q-8-122 28-101Q69-93 57-53Q42-22 0-20Z" fill="url(#leaf)" stroke="#a6d7a5" stroke-opacity=".25" stroke-width="3"/>
+  <path d="M-35-57Q-21-88 1-73M8-72Q35-92 44-63M-16-39Q8-60 31-43" fill="none" stroke="#b5e5b2" stroke-opacity=".42" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="-35" cy="-63" r="5" fill="#d9a6f3"/><circle cx="32" cy="-83" r="4" fill="#e9c77d"/><circle cx="42" cy="-43" r="4" fill="#a6e4d0"/>
+ </g>
+ <g id="rune-stone">
+  <path d="M0-13 15-5 15 8 0 17-15 8-15-5Z" fill="url(#stone)" stroke="#d9c7e7" stroke-opacity=".55" stroke-width="2"/>
+  <path d="M0-7V9M-6-1 0-7 6-1" fill="none" stroke="#e9d8ff" stroke-width="2" stroke-linecap="round"/>
+ </g>
+ <g id="flower">
+  <circle r="4" fill="#e7b8ef"/><circle cx="-5" cy="0" r="3" fill="#c89be9"/><circle cx="5" cy="0" r="3" fill="#f1d59a"/><circle cy="-5" r="3" fill="#e8c2ef"/><circle cy="5" r="3" fill="#c89be9"/><circle r="1.8" fill="#fff0c7"/>
+ </g>
+</defs>
+<!-- Soft pools of sanctuary light -->
+<ellipse cx="900" cy="620" rx="310" ry="185" fill="url(#glow)" opacity=".48"/>
+<ellipse cx="420" cy="470" rx="180" ry="95" fill="#8fd5b4" opacity=".055" filter="url(#soft)"/>
+<ellipse cx="1390" cy="930" rx="210" ry="105" fill="#a7e4ce" opacity=".05" filter="url(#soft)"/>
+<!-- Corner groves, kept clear of the central paths -->
+<use href="#tree" transform="translate(135 175) scale(1.16)"/>
+<use href="#tree" transform="translate(300 135) scale(.82)"/>
+<use href="#tree" transform="translate(1640 175) scale(1.14)"/>
+<use href="#tree" transform="translate(1740 410) scale(.78)"/>
+<use href="#tree" transform="translate(120 920) scale(.92)"/>
+<use href="#tree" transform="translate(260 1110) scale(1.08)"/>
+<use href="#tree" transform="translate(1570 1110) scale(1.08)"/>
+<use href="#tree" transform="translate(1710 900) scale(.92)"/>
+<!-- Layered shrubs and glowing mushrooms -->
+<g fill="#285a4b" stroke="#77b99a" stroke-opacity=".25" stroke-width="2">
+ <ellipse cx="225" cy="270" rx="50" ry="22"/><ellipse cx="1550" cy="300" rx="62" ry="25"/>
+ <ellipse cx="250" cy="1010" rx="64" ry="27"/><ellipse cx="1530" cy="1010" rx="60" ry="25"/>
+ <ellipse cx="1660" cy="760" rx="46" ry="20"/><ellipse cx="150" cy="740" rx="48" ry="21"/>
+</g>
+<g fill="#e7b4ef" opacity=".85"><path d="M215 263v-14q10-13 20 0v14Z"/><path d="M1537 292v-14q11-14 22 0v14Z"/><path d="M1517 1002v-12q9-12 18 0v12Z"/><path d="M1650 753v-12q9-12 18 0v12Z"/></g>
+<g fill="#f3dca0"><circle cx="225" cy="246" r="3"/><circle cx="1548" cy="275" r="3"/><circle cx="1526" cy="985" r="3"/><circle cx="1659" cy="736" r="3"/></g>
+<!-- Inlaid stone ribbons and engraved wayfinding -->
+<g fill="none" stroke-linecap="round" stroke-linejoin="round">
+ <path d="M900 340V420M900 820V920M600 620H710M1090 620H1200" stroke="#c9b4d8" stroke-opacity=".2" stroke-width="7"/>
+ <path d="M900 340V420M900 820V920M600 620H710M1090 620H1200" stroke="#e8d4f5" stroke-opacity=".22" stroke-width="2" stroke-dasharray="3 12"/>
+ <path d="M785 500Q900 445 1015 500M785 740Q900 795 1015 740" stroke="#d8b6e9" stroke-opacity=".26" stroke-width="3"/>
+ <path d="M760 620Q900 555 1040 620Q900 685 760 620Z" stroke="#d6b5e6" stroke-opacity=".2" stroke-width="2"/>
+</g>
+<g opacity=".72">
+ <use href="#rune-stone" transform="translate(900 390) scale(.75)"/>
+ <use href="#rune-stone" transform="translate(900 850) scale(.75)"/>
+ <use href="#rune-stone" transform="translate(650 620) scale(.7)"/>
+ <use href="#rune-stone" transform="translate(1150 620) scale(.7)"/>
+</g>
+<!-- Fine stepping stones and flower clusters -->
+<g fill="#b4a5c2" opacity=".22">
+ <ellipse cx="790" cy="435" rx="19" ry="7" transform="rotate(-22 790 435)"/><ellipse cx="1015" cy="435" rx="19" ry="7" transform="rotate(22 1015 435)"/>
+ <ellipse cx="790" cy="805" rx="19" ry="7" transform="rotate(22 790 805)"/><ellipse cx="1015" cy="805" rx="19" ry="7" transform="rotate(-22 1015 805)"/>
+ <ellipse cx="520" cy="565" rx="16" ry="6"/><ellipse cx="1280" cy="685" rx="16" ry="6"/>
+</g>
+<g opacity=".9">
+ <use href="#flower" transform="translate(330 500) scale(1.1)"/><use href="#flower" transform="translate(350 515) scale(.75)"/>
+ <use href="#flower" transform="translate(1450 500) scale(1.1)"/><use href="#flower" transform="translate(1472 515) scale(.75)"/>
+ <use href="#flower" transform="translate(330 900) scale(.9)"/><use href="#flower" transform="translate(1470 900) scale(.9)"/>
+ <use href="#flower" transform="translate(155 650) scale(.8)"/><use href="#flower" transform="translate(1640 650) scale(.8)"/>
+</g>
+<!-- Small gold inlays at the sanctuary's cardinal points -->
+<g fill="#f0d49b" opacity=".42">
+ <path d="m900 325 5 10-5 10-5-10Z"/><path d="m900 895 5 10-5 10-5-10Z"/>
+ <path d="m585 620 10 5 10-5-10-5Z"/><path d="m1195 620 10 5 10-5-10-5Z"/>
+</g>
+</svg>
