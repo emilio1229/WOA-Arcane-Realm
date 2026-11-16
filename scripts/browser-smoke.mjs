@@ -166,8 +166,9 @@ try {
   const healthAfterFireOrb = await desktop.evaluate(() => window.arcaneTest.getPlayerHealth());
   assert.equal(healthAfterFireOrb, healthBeforeFireOrb, "a correctly timed dodge should evade the Ember Sentry fire orb");
 
-  // The ranged Ember Sentry should also be a valid Arcane Bolt target.
-  await desktop.evaluate(() => window.arcaneTest.setPlayerPosition(340, 900, -1, 0));
+  // Stand just outside the Sentry's aggro radius while remaining within
+  // Arcane Bolt range, so its return fire cannot interrupt the targetability check.
+  await desktop.evaluate(() => window.arcaneTest.setPlayerPosition(440, 900, -1, 0));
   for (let hit = 0; hit < 5; hit++) {
     await desktop.keyboard.down("Space");
     await delay(120);
