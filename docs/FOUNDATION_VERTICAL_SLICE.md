@@ -15,8 +15,11 @@ Official reference: https://docs.phaser.io/phaser/getting-started/installation
 - Controllable wizard with WASD/arrow movement, subtle idle/movement motion, and direction-aware facing.
 - First local spell-casting interaction: Space or the mobile Cast button launches an Arcane Bolt with an impact burst and a short local cast throttle.
 - Aimed Arcane Bolts can damage the three-health Ember Wisp practice target; its health bar updates, it is briefly dispelled at zero health, and it respawns after a short delay.
-- A hostile Frost Wisp now detects the player within its local aggro radius, pursues at a controlled speed, telegraphs its close-range attack with a visible warning ring, has four health, and respawns after defeat. Player vitality is displayed in the HUD; taking damage produces a brief hit flash and camera shake, and reaching zero vitality returns the wizard to the sanctuary spawn with full vitality.
-- The headless browser smoke test now includes the hostile Wisp combat loop and player damage checks.
+- A hostile Frost Wisp detects the player within its local aggro radius, pursues at a controlled speed, telegraphs its close-range attack with a visible warning ring, has four health, and respawns after defeat.
+- Player vitality is displayed in the HUD; taking damage produces a brief hit flash and camera shake, and reaching zero vitality returns the wizard to the sanctuary spawn with full vitality.
+- A player dodge/evade burst is available through Shift on desktop and a dedicated mobile button. It moves in the current movement direction (or the last facing direction), lasts 210ms, grants 310ms of local invulnerability, and has a 1,250ms cooldown shown in the HUD.
+- The Ember Sentry is a ranged enemy prototype. It holds its ground, marks the player's position during a 620ms warning, then launches a slow fire orb toward that location. The orb checks the player's actual position on impact, so movement and a well-timed dodge can avoid it. The Sentry has five health and can be damaged by Arcane Bolts.
+- The headless browser smoke test now covers Frost Wisp combat, player damage, dodge movement/cooldown, an Ember Sentry fire-orb dodge, Sentry damage, and mobile dodge activation.
 - Ambient floating magic motes around the Sanctuary; touch controls now include both Interact and Cast.
 - NPCs with names, idle bobbing, proximity detection, and E/Enter interaction.
 - Responsive HUD and a contextual dialogue panel.
@@ -33,11 +36,11 @@ The repository now includes an original SVG asset library under `public/assets/`
 ## Deliberate limitations
 
 - This is a playable foundation prototype, not the complete Stage 1 acceptance milestone.
-- Original SVG character, familiar, creature, portal, spell, and UI assets now replace several initial primitives; building architecture, garden dressing, and some environment details remain procedural placeholders. All current art is prototype quality, not final release art. Wizard motion is procedural rather than a frame-based walk cycle; combat is a local prototype: the Ember Wisp is a stationary practice target with three health and timed respawn. There is no hostile enemy AI, progression-based cooldown system, or server authority; the short cast throttle only limits visual spam.
+- Original SVG character, familiar, creature, portal, spell, and UI assets now replace several initial primitives; building architecture, garden dressing, and some environment details remain procedural placeholders. All current art is prototype quality, not final release art. Wizard motion is procedural rather than a frame-based walk cycle. Combat remains local prototype logic: Frost Wisp pursuit and Ember Sentry projectiles are simple scripted behaviors, and player health, dodge cooldowns, and enemy health are not server-authoritative or persistent.
 - Collision uses simple rectangular building footprints with axis-separated wall sliding; environment boundaries and pathing need refinement.
 - Movement currently uses local client simulation. No server authority or persistent character save exists.
 - The quest panel is informational only; no quest engine is implemented.
-- Desktop and mobile-viewport controls, including familiar following and building wall-sliding, pass a headless Chromium play test in CI. Real-device touch feel, camera behavior across phones/tablets, and broader browser compatibility still require manual testing.
+- Desktop and mobile-viewport controls, including familiar following, building wall-sliding, dodge input, and combat interactions, are covered by the headless Chromium play test. The latest additions must still pass the next CI/browser run; real-device touch feel, camera behavior across phones/tablets, and broader browser compatibility still require manual testing.
 - No backend, database, multiplayer, Discord Activity, or Sigil integration is included.
 
 ## Run locally
@@ -60,7 +63,7 @@ npm run preview
 ## Next validation
 
 1. Test touch joystick and interaction on a real phone.
-2. Expand combat with enemy telegraphs, varied attack patterns, player recovery, and more encounter types; implement authoritative validation before adding rewards.
+2. Add enemy attack variety, defensive recovery, and clear encounter telegraphs; implement server-authoritative combat and player-state validation before adding rewards or progression.
 3. Validate camera framing and resize behavior across phone, tablet, and desktop aspect ratios.
 4. Evaluate the visual result against the dimensional/isometric target; if 2.5D is insufficient, stop expanding Phaser and evaluate a true 3D browser renderer.
 5. Replace vector placeholders with original, licensed assets after the rendering direction is approved.
