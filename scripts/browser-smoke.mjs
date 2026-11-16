@@ -48,6 +48,8 @@ try {
     height: canvas.height,
   }));
   assert.ok(canvasSize.width > 0 && canvasSize.height > 0, "game canvas should have a real drawing surface");
+  assert.equal(await desktop.evaluate(() => window.arcaneTest.getBuildingDetailsLoaded()), true,
+    "all five detailed architectural overlays should be loaded into the Sanctuary scene");
 
   // Every tradition must retain its own robe palette while idle. A previous
   // regression reset every idle wizard to the first sprite-sheet row.
