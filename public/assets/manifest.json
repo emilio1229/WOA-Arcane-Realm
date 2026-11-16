@@ -422,6 +422,24 @@
         "mobile"
       ],
       "status": "prototype-integrated"
+    },
+    {
+      "id": "environment.sanctuary-dressing",
+      "path": "/assets/environment/sanctuary-dressing.svg",
+      "category": "environment",
+      "format": "svg",
+      "source": true,
+      "width": 1800,
+      "height": 1250,
+      "tags": [
+        "sanctuary",
+        "environment",
+        "foliage",
+        "decor",
+        "runes",
+        "lighting"
+      ],
+      "status": "prototype-integrated"
     }
   ]
 }
