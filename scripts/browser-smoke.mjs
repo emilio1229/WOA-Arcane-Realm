@@ -67,25 +67,23 @@ try {
   }
   await desktop.evaluate(() => window.arcaneSetCharacter("storm-herald", "#b98bea"));
 
-  // Cardinal and diagonal travel should have comparable world-space speed.
+  // Verify the live movement controller reaches the same world-space speed
+  // for a cardinal and a diagonal input. This avoids timing noise from CI FPS.
   await desktop.evaluate(() => window.arcaneTest.setPlayerPosition(900, 760));
-  const cardinalStart = await desktop.evaluate(() => window.arcaneTest.getPlayerPosition());
-  await desktop.keyboard.down("w");
-  await delay(600);
-  await desktop.keyboard.up("w");
-  const cardinalEnd = await desktop.evaluate(() => window.arcaneTest.getPlayerPosition());
-  const cardinalDistance = Math.hypot(cardinalEnd.x - cardinalStart.x, cardinalEnd.y - cardinalStart.y);
+  await desktop.evaluate(() => { window.arcaneMove = { x: 0, y: -1 }; });
+  await desktop.waitForFunction(() => window.arcaneTest.getMovementSpeed() > 180, { timeout: 3000, polling: 50 });
+  const cardinalSpeed = await desktop.evaluate(() => window.arcaneTest.getMovementSpeed());
+  await desktop.evaluate(() => { window.arcaneMove = { x: 0, y: 0 }; });
+  await desktop.waitForFunction(() => window.arcaneTest.getMovementSpeed() < 1, { timeout: 3000, polling: 50 });
   await desktop.evaluate(() => window.arcaneTest.setPlayerPosition(900, 760));
-  const diagonalStart = await desktop.evaluate(() => window.arcaneTest.getPlayerPosition());
-  await desktop.keyboard.down("w");
-  await desktop.keyboard.down("d");
-  await delay(350);
-  await desktop.keyboard.up("w");
-  await desktop.keyboard.up("d");
-  const diagonalEnd = await desktop.evaluate(() => window.arcaneTest.getPlayerPosition());
-  const diagonalDistance = Math.hypot(diagonalEnd.x - diagonalStart.x, diagonalEnd.y - diagonalStart.y);
-  assert.ok(Math.abs(cardinalDistance - diagonalDistance) / Math.max(cardinalDistance, diagonalDistance) < 0.2,
-    "cardinal and diagonal movement should not have a speed penalty");
+  await desktop.evaluate(() => { window.arcaneMove = { x: 1, y: -1 }; });
+  await desktop.waitForFunction(() => window.arcaneTest.getMovementSpeed() > 180, { timeout: 3000, polling: 50 });
+  const diagonalSpeed = await desktop.evaluate(() => window.arcaneTest.getMovementSpeed());
+  await desktop.evaluate(() => { window.arcaneMove = { x: 0, y: 0 }; });
+  await desktop.waitForFunction(() => window.arcaneTest.getMovementSpeed() < 1, { timeout: 3000, polling: 50 });
+  assert.ok(Math.abs(cardinalSpeed - diagonalSpeed) < 2,
+    "cardinal and diagonal movement should have the same world-space speed");
+
   await desktop.locator("#pause-game").click();
   await desktop.locator("#pause-overlay").waitFor({ state: "visible" });
   await desktop.locator("[data-menu-tab=journal]").click();

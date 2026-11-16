@@ -107,7 +107,7 @@ The Asset Forge town-life pass adds a transparent, original SVG layer with marke
 - Collision resolution now removes velocity only on the blocked axis, preserving reliable wall sliding without accumulating blocked movement.
 - Walking animation now reflects actual resolved movement, not merely held input; idle frames are selected from the active tradition's sprite-sheet row.
 - Arcane Bolt impact bursts inherit the chosen magic color as well as the projectile.
-- Browser smoke coverage now checks all six idle robe rows and compares cardinal/diagonal travel distance. These tests are authored but not yet run in this environment.
+- Browser smoke coverage now checks all six idle robe rows and compares the live controller's cardinal/diagonal world-space velocity without relying on frame timing. These tests are authored but not yet run in this environment.
 
 
 ## Sanctuary architecture detail pass

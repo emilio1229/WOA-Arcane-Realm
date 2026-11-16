@@ -22,6 +22,7 @@ declare global {
       getHitRecoveryMs: () => number;
       getWizardFrame: () => number;
       getWizardTexture: () => string;
+      getMovementSpeed: () => number;
       getBuildingDetailsLoaded: () => boolean;
       performDodge: () => void;
       forcePlayerHit: () => void;
@@ -171,6 +172,7 @@ class SanctuaryScene extends Phaser.Scene {
         getHitRecoveryMs: () => Math.max(0, this.hitRecoveryUntil - this.time.now),
         getWizardFrame: () => Number(this.wizardSprite.frame.name),
         getWizardTexture: () => this.wizardSprite.texture.key,
+        getMovementSpeed: () => this.movementVelocity.length(),
         getBuildingDetailsLoaded: () => ["detail-library","detail-familiar","detail-academy","detail-merchant","detail-inn","sanctuary-fountain"].every(key => this.textures.exists(key)),
         performDodge: () => this.dodge(),
         forcePlayerHit: () => this.damagePlayer(),
