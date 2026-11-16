@@ -110,6 +110,22 @@ try {
   const wispHealthRespawned = await desktop.evaluate(() => window.arcaneTest.getPracticeWispHealth());
   assert.equal(wispHealthRespawned, 3, "the practice wisp should respawn with full health");
 
+  // The Frost Wisp should pursue, damage, and be dispellable by aimed Arcane Bolts.
+  await desktop.evaluate(() => window.arcaneTest.setPlayerPosition(1450, 760, 0, -1));
+  await delay(900);
+  const hostileHealthBefore = await desktop.evaluate(() => window.arcaneTest.getHostileWispHealth());
+  assert.equal(hostileHealthBefore, 4, "hostile Frost Wisp should begin with four health");
+  for (let hit = 0; hit < 4; hit++) {
+    await desktop.keyboard.down("Space");
+    await delay(120);
+    await desktop.keyboard.up("Space");
+    await delay(650);
+  }
+  const hostileHealthAfter = await desktop.evaluate(() => window.arcaneTest.getHostileWispHealth());
+  assert.equal(hostileHealthAfter, 0, "four aimed Arcane Bolts should dispel the Frost Wisp");
+  const playerHealthAfterEncounter = await desktop.evaluate(() => window.arcaneTest.getPlayerHealth());
+  assert.ok(playerHealthAfterEncounter < 5, "the hostile Wisp should be able to damage the player");
+
   assert.deepEqual(pageErrors, [], "desktop play session should not throw browser errors");
 
   const mobile = await browser.newPage({
