@@ -28,7 +28,10 @@ async function waitForGame(page) {
   await page.locator("#realm-intro").waitFor({ state: "visible" });
   await page.locator("#enter-realm").waitFor({ state: "enabled", timeout: 15000 });
   await page.locator("#enter-realm").click();
-  await page.locator("#realm-intro").waitFor({ state: "hidden" });
+  await page.locator("#creator-screen").waitFor({ state: "visible" });
+  await page.locator("#character-name").fill("Playtester");
+  await page.locator("#begin-journey").click();
+  await page.waitForFunction(() => document.querySelector("#realm-intro")?.classList.contains("dismissed"));
 }
 
 try {

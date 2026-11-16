@@ -168,6 +168,7 @@ class SanctuaryScene extends Phaser.Scene {
         forcePlayerHit: () => this.damagePlayer(),
         setPlayerPosition: (x, y, facingX = 0, facingY = -1) => {
           this.player.setVelocity(0, 0);
+          this.movementVelocity.set(0, 0);
           this.player.setPosition(x, y);
           this.player.body!.reset(x, y);
           this.playerArt.setPosition(x, y);
