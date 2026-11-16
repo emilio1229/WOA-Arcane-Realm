@@ -67,3 +67,8 @@ npm run preview
 3. Validate camera framing and resize behavior across phone, tablet, and desktop aspect ratios.
 4. Evaluate the visual result against the dimensional/isometric target; if 2.5D is insufficient, stop expanding Phaser and evaluate a true 3D browser renderer.
 5. Replace vector placeholders with original, licensed assets after the rendering direction is approved.
+
+
+## Asset Forge visual pass — sanctuary atmosphere
+
+The first `arcane-realm-asset-forge` implementation batch adds two original SVG layers: `environment.sanctuary-atmosphere` (moonlit plaza engraving, rune markers, crystal beds, and framing groves) and `environment.portal-rune-crown` (ornamental portal ring and cardinal runes). Both are registered in `public/assets/manifest.json`, loaded by `src/main.ts`, and used as transparent layers so the existing ground, collision, movement, and combat systems remain unchanged. The HUD and overlay panels also receive a restrained glass-and-metal visual polish in `src/style.css`. These changes are marked prototype-integrated; a real browser visual pass and mobile-device review remain required before calling them validated.
