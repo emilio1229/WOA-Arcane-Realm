@@ -263,7 +263,7 @@ class SanctuaryScene extends Phaser.Scene {
     if (this.time.now < this.nextCastAt) return;
     this.nextCastAt = this.time.now + 350;
     const startX = this.player.x + this.lastFacing.x * 30;
-    const startY = this.player.y - 28 + this.lastFacing.y * 30;
+    const startY = this.player.y - 12 + this.lastFacing.y * 30;
     const bolt = this.add.image(startX, startY, "arcane-bolt")
       .setDisplaySize(42, 42)
       .setDepth(this.player.y + 80)
