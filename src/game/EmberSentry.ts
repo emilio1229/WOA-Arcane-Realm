@@ -43,7 +43,7 @@ export class EmberSentry {
   update(playerX: number, playerY: number) {
     if (!this.isAlive) return;
     const distance = Phaser.Math.Distance.Between(this.art.x, this.art.y, playerX, playerY);
-    if (!this.windupUntil && distance < 570 && this.scene.time.now >= this.nextShotAt) {
+    if (!this.windupUntil && distance < 260 && this.scene.time.now >= this.nextShotAt) {
       this.shotTarget.set(playerX, playerY);
       this.windupUntil = this.scene.time.now + 620;
       this.targetMark.setPosition(this.shotTarget.x, this.shotTarget.y).setScale(0.55).setAlpha(0.9).setVisible(true);
