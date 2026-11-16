@@ -9,6 +9,7 @@
     "preview": "vite preview --host 0.0.0.0",
     "typecheck": "tsc --noEmit",
     "assets:validate": "node scripts/validate-assets.mjs",
+    "assets:architecture": "node scripts/generate-sanctuary-architecture.mjs",
     "assets:new": "node scripts/new-asset.mjs",
     "test:browser": "node scripts/browser-smoke.mjs"
   },

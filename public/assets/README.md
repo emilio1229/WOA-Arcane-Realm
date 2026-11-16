@@ -47,6 +47,10 @@ Original, editable SVG source assets for the Arcane Realm prototype.
 5. Review at the smallest target mobile size.
 6. Keep source and runtime variants linked by stable ID.
 
+## Sanctuary architecture set
+
+The five building exteriors share a faceted stone plinth, shaded front and side walls, layered shingle roofs, arched window reveals, lit glass, and raised entry steps. Each building uses its own jewel-tone palette and crest so players can recognize the Library, Familiar Sanctuary, Spell Academy, Merchant Hall, and Inn at the current camera distance. The editable SVGs are generated from the palette and crest definitions in `scripts/generate-sanctuary-architecture.mjs`; regenerate the full consistent set with `npm run assets:architecture`.
+
 The pack is integrated into the Sanctuary prototype: all five building exteriors, lanterns, rune obelisk, crystal cluster, Arcane wizard and walk cycle, Glimmer, Ember Wisp, and Grand Portal are loaded by the scene. Arcane Bolt, Arcane Impact, and Arcane Mote now power the first local spell-casting prototype and ambient magic layer. Sigil remains catalogued for the upcoming HUD/economy pass. Use Space or the mobile Cast control to launch the Arcane Bolt.
 
 ## Creating a new asset scaffold

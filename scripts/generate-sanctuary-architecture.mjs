@@ -1,0 +1,107 @@
+import { writeFileSync } from "node:fs";
+import { resolve } from "node:path";
+
+const buildings = [
+  { file: "grand-library.svg", name: "Grand Library", wall: "#705889", wallDark: "#392d52", roof: "#a77cc8", roofDark: "#503566", light: "#ffe5a5", accent: "#e4bd78", aura: "#c79bff", mark: "library" },
+  { file: "familiar-sanctuary.svg", name: "Familiar Sanctuary", wall: "#557964", wallDark: "#293f3c", roof: "#6b997e", roofDark: "#315748", light: "#d8ffc1", accent: "#efc780", aura: "#9be4c2", mark: "familiar" },
+  { file: "spell-academy.svg", name: "Spell Academy", wall: "#5d5793", wallDark: "#302b58", roof: "#817bd3", roofDark: "#40366f", light: "#b8edff", accent: "#dfc0ff", aura: "#9f8cff", mark: "academy" },
+  { file: "merchant-hall.svg", name: "Merchant Hall", wall: "#8a5945", wallDark: "#50362f", roof: "#bf8054", roofDark: "#704339", light: "#ffe2a2", accent: "#91d1b5", aura: "#ffc47c", mark: "merchant" },
+  { file: "adventurer-inn.svg", name: "Adventurer Inn", wall: "#80504d", wallDark: "#492e3b", roof: "#aa665d", roofDark: "#57364a", light: "#ffdfa1", accent: "#e2b56e", aura: "#ffad82", mark: "inn" },
+];
+
+function crest(mark, accent) {
+  const marks = {
+    library: `<path d="M0-17 5-5 18 0 5 5 0 18-5 5-18 0-5-5Z"/><circle r="4" fill="#fff4d8" stroke="none"/>`,
+    familiar: `<path d="M0 16C-3 4-16 1-15-10-4-12 0-4 0 1 0-4 5-12 15-10 16 1 3 4 0 16Z"/><circle cy="2" r="3" fill="#fff4d8" stroke="none"/>`,
+    academy: `<path d="M0-18 4-5 17 0 4 5 0 18-4 5-17 0-4-5Z"/><path d="M-9 0H9M0-9V9" stroke="#fff4d8" stroke-width="2"/>`,
+    merchant: `<path d="M-15-11H15L12-3H-12Z M-12-3V13H12V-3 M-19-14H19V-10H-19Z"/><path d="M-5-11V-3M5-11V-3"/>`,
+    inn: `<path d="M-12-14V11Q0 20 12 11V-14 M-12-5Q0 1 12-5 M-12 4Q0 10 12 4"/><path d="M-16-14H16"/>`,
+  };
+  return `<g transform="translate(0 0)" fill="none" stroke="${accent}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">${marks[mark]}</g>`;
+}
+
+function makeBuilding(building) {
+  const { wall, wallDark, roof, roofDark, light, accent, aura, mark } = building;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="${building.name}">
+<defs>
+  <linearGradient id="wallFront" x1="0" y1="0" x2="1" y2="1"><stop stop-color="${wall}"/><stop offset=".62" stop-color="${wall}"/><stop offset="1" stop-color="${wallDark}"/></linearGradient>
+  <linearGradient id="wallSide" x1="0" y1="0" x2="1" y2=".4"><stop stop-color="${wallDark}"/><stop offset="1" stop-color="#171526"/></linearGradient>
+  <linearGradient id="roofFront" x1="0" y1="0" x2=".2" y2="1"><stop stop-color="${roof}"/><stop offset="1" stop-color="${roofDark}"/></linearGradient>
+  <linearGradient id="roofSide" x1="0" y1="0" x2="1" y2=".5"><stop stop-color="${roofDark}"/><stop offset="1" stop-color="#21182f"/></linearGradient>
+  <linearGradient id="stone" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#d9c8e2"/><stop offset=".45" stop-color="#8b789d"/><stop offset="1" stop-color="#4a405f"/></linearGradient>
+  <linearGradient id="glass" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff4cb"/><stop offset=".35" stop-color="${light}"/><stop offset="1" stop-color="${aura}"/></linearGradient>
+  <radialGradient id="windowGlow"><stop stop-color="${light}" stop-opacity=".55"/><stop offset="1" stop-color="${light}" stop-opacity="0"/></radialGradient>
+  <pattern id="roofTiles" width="32" height="22" patternUnits="userSpaceOnUse"><path d="M0 21H32M0 0V21M16 0V21" fill="none" stroke="#fff4dc" stroke-opacity=".16" stroke-width="2"/><path d="M1 2Q8-1 15 2M17 2Q24-1 31 2" fill="none" stroke="#fff4dc" stroke-opacity=".14" stroke-width="2"/></pattern>
+  <clipPath id="frontRoofClip"><path d="M75 228 244 82 377 211 359 243 127 243Z"/></clipPath>
+  <clipPath id="sideRoofClip"><path d="M244 82 438 157 410 225 377 211Z"/></clipPath>
+  <filter id="softGlow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="12"/></filter>
+  <filter id="drop" x="-30%" y="-30%" width="160%" height="180%"><feGaussianBlur in="SourceAlpha" stdDeviation="8"/><feOffset dy="10"/><feComponentTransfer><feFuncA type="linear" slope=".5"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+
+<ellipse cx="256" cy="463" rx="201" ry="34" fill="#070a12" opacity=".48"/>
+<ellipse cx="256" cy="408" rx="158" ry="40" fill="${aura}" opacity=".13" filter="url(#softGlow)"/>
+
+<!-- Raised faceted foundation gives the building a readable isometric footprint. -->
+<path d="M66 390 256 328 446 390 256 456Z" fill="url(#stone)" stroke="#e9d9ef" stroke-opacity=".7" stroke-width="3"/>
+<path d="M66 390 256 456V479L66 414Z" fill="#4b405d" stroke="#9c8bac" stroke-width="3"/>
+<path d="M256 456 446 390V414L256 479Z" fill="#302a43" stroke="#786c8c" stroke-width="3"/>
+<path d="M82 392 256 448 429 391M256 456V473" fill="none" stroke="#f4e8f8" stroke-opacity=".42" stroke-width="3"/>
+<path d="M104 402 141 414M166 421 204 433M309 431 350 417M376 407 410 396" stroke="${accent}" stroke-opacity=".42" stroke-width="3" stroke-linecap="round"/>
+
+<!-- Front and right walls use separate values to keep the volume legible at game scale. -->
+<path d="M126 221 356 221V392L126 382Z" fill="url(#wallFront)" stroke="${accent}" stroke-opacity=".8" stroke-width="4"/>
+<path d="M356 221 414 242V402L356 392Z" fill="url(#wallSide)" stroke="#d9c4de" stroke-opacity=".5" stroke-width="4"/>
+<path d="M134 235 348 235M135 372 348 381" stroke="#fff5dc" stroke-opacity=".2" stroke-width="4"/>
+<path d="M143 242V368M339 242V376" stroke="${accent}" stroke-opacity=".6" stroke-width="7"/>
+<path d="M365 240V382M405 254V393" stroke="#e7d8ed" stroke-opacity=".28" stroke-width="4"/>
+<path d="M126 258H356M126 338H356" stroke="#211b30" stroke-opacity=".3" stroke-width="3"/>
+<path d="M132 263H350M132 343H350" stroke="#f4e9fb" stroke-opacity=".14" stroke-width="2"/>
+<path d="M159 247V265M324 247V265M159 329V346M324 329V346" stroke="#f3dba4" stroke-opacity=".65" stroke-width="3"/>
+
+<!-- Arched windows: deep stone reveal, warm glass, heavy mullions and a small sill. -->
+<g filter="url(#drop)">
+  <ellipse cx="180" cy="293" rx="38" ry="44" fill="url(#windowGlow)" filter="url(#softGlow)"/>
+  <path d="M149 318V293A31 31 0 0 1 211 293V318Z" fill="#211a32" stroke="#e8d5e8" stroke-width="5"/>
+  <path d="M156 314V294A24 24 0 0 1 204 294V314Z" fill="url(#glass)"/>
+  <path d="M180 270V317M156 296H204" stroke="#5e496c" stroke-width="5"/>
+  <path d="M145 321H215L209 328H151Z" fill="url(#stone)" stroke="#ecdcf2" stroke-width="2"/>
+  <ellipse cx="304" cy="293" rx="35" ry="42" fill="url(#windowGlow)" filter="url(#softGlow)"/>
+  <path d="M276 318V293A28 28 0 0 1 332 293V318Z" fill="#211a32" stroke="#dfcbe2" stroke-width="5"/>
+  <path d="M282 314V294A22 22 0 0 1 326 294V314Z" fill="url(#glass)"/>
+  <path d="M304 272V317M282 296H326" stroke="#594768" stroke-width="5"/>
+  <path d="M272 321H336L330 328H278Z" fill="url(#stone)" stroke="#ecdcf2" stroke-width="2"/>
+</g>
+
+<!-- Deep arched doorway, glowing threshold and three dimensional steps. -->
+<path d="M211 390V329A45 45 0 0 1 301 329V390Z" fill="#21162e" stroke="${accent}" stroke-width="7"/>
+<path d="M222 390V330A34 34 0 0 1 290 330V390Z" fill="#120f21" stroke="#f3dfb5" stroke-opacity=".8" stroke-width="3"/>
+<path d="M233 390V337A23 23 0 0 1 279 337V390Z" fill="#261b36"/>
+<path d="M238 388V338A18 18 0 0 1 274 338V388" fill="none" stroke="${aura}" stroke-opacity=".7" stroke-width="3"/>
+<circle cx="270" cy="359" r="4" fill="${light}"/><path d="M216 391H296L308 400H204Z" fill="url(#stone)" stroke="#f1e1f4" stroke-width="2"/><path d="M201 402H309L322 412H188Z" fill="#83718e" stroke="#ded0e7" stroke-width="2"/>
+
+<!-- Gabled roof with individually clipped shingle facets and jewel-like ridge trim. -->
+<path d="M75 228 244 82 377 211 359 243 127 243Z" fill="url(#roofFront)" stroke="${accent}" stroke-width="7" stroke-linejoin="round"/>
+<path d="M244 82 438 157 410 225 377 211Z" fill="url(#roofSide)" stroke="${accent}" stroke-opacity=".78" stroke-width="6" stroke-linejoin="round"/>
+<g clip-path="url(#frontRoofClip)"><path d="M64 176Q221 141 386 190M62 201Q226 164 394 216M73 226Q236 188 385 239" fill="none" stroke="#fff2d9" stroke-opacity=".27" stroke-width="4"/><path d="M75 228 244 82 377 211 359 243 127 243Z" fill="url(#roofTiles)"/></g>
+<g clip-path="url(#sideRoofClip)"><path d="M260 103 431 170M253 129 423 194M249 155 415 218" fill="none" stroke="#fff2d9" stroke-opacity=".19" stroke-width="4"/><path d="M244 82 438 157 410 225 377 211Z" fill="url(#roofTiles)" opacity=".6"/></g>
+<path d="M75 228 127 243M359 243 377 211 410 225" fill="none" stroke="#fff0d0" stroke-width="8" stroke-linecap="round"/>
+<path d="M244 82V58" stroke="${accent}" stroke-width="7"/><path d="M244 50 251 63 266 66 251 72 244 85 237 72 222 66 237 63Z" fill="${light}" stroke="#fff4da" stroke-width="3"/>
+
+<!-- A different crest turns each shared architectural family member into a landmark. -->
+<path d="M244 113 286 130V169Q286 193 244 209Q202 193 202 169V130Z" fill="#21182f" stroke="${accent}" stroke-width="5"/>
+<path d="M244 121 278 135V168Q278 187 244 199Q210 187 210 168V135Z" fill="${wallDark}" stroke="#fff0d0" stroke-opacity=".48" stroke-width="2"/>
+<g transform="translate(244 160)">${crest(mark, accent)}</g>
+<path d="M244 209V221" stroke="${accent}" stroke-width="5"/><circle cx="244" cy="226" r="5" fill="${light}"/>
+
+<!-- Small side vent, foundation brackets and foreground rune pavers finish the silhouette. -->
+<path d="M371 280Q384 269 397 280V309H371Z" fill="#20182e" stroke="${accent}" stroke-width="3"/><path d="M384 277V310M373 293H396" stroke="${light}" stroke-opacity=".68" stroke-width="3"/>
+<path d="M136 382 149 383V397L136 396ZM328 390 343 391V405L328 404Z" fill="${accent}" opacity=".78"/>
+<g fill="none" stroke="${aura}" stroke-width="3" opacity=".8"><path d="M157 424 166 421 175 424 166 427Z"/><path d="M342 415 351 412 360 415 351 418Z"/></g>
+</svg>`;
+}
+
+const outputDirectory = resolve("public/assets/buildings");
+for (const building of buildings) {
+  writeFileSync(resolve(outputDirectory, building.file), `${makeBuilding(building)}\n`, "utf8");
+}
+console.log(`Generated ${buildings.length} original isometric sanctuary exteriors.`);
