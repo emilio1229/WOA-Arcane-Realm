@@ -28,3 +28,4 @@
 .dodge-status>small{display:block;margin-top:5px;font-size:8px;color:#ad9abb}
 .touch-dodge{display:none}
 @media(max-width:700px){.dodge-status{top:126px;left:10px;width:135px;padding:7px 9px}.dodge-status>b{font-size:8px}.dodge-status>small{font-size:7px}.touch-dodge{display:block;position:absolute;right:146px;bottom:18px;width:56px;height:56px;border-radius:50%;border:1px solid #b99df799;background:#302447e8;color:#e7d2ff;font-size:20px;pointer-events:auto;touch-action:manipulation}.touch-dodge small{display:block;font-size:7px;letter-spacing:1px}}
+#health-status.recovering{color:#ffb1c0}

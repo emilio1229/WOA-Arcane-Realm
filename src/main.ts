@@ -18,7 +18,9 @@ declare global {
       getEmberSentryHealth: () => number;
       getPlayerHealth: () => number;
       getDodgeCooldownMs: () => number;
+      getHitRecoveryMs: () => number;
       performDodge: () => void;
+      forcePlayerHit: () => void;
       setPlayerPosition: (x: number, y: number, facingX?: number, facingY?: number) => void;
     };
   }
@@ -51,6 +53,7 @@ class SanctuaryScene extends Phaser.Scene {
   private dodgeVector = new Phaser.Math.Vector2(0, -1);
   private dodgeUntil = 0;
   private invulnerableUntil = 0;
+  private hitRecoveryUntil = 0;
   private nextDodgeAt = 0;
   private nextCastAt = 0;
   private keys!: Record<string, Phaser.Input.Keyboard.Key>;
@@ -113,7 +116,7 @@ class SanctuaryScene extends Phaser.Scene {
     this.emberSentry = new EmberSentry(
       this, 180, 900,
       () => this.damagePlayer(),
-      () => this.time.now < this.invulnerableUntil,
+      () => this.time.now < Math.max(this.invulnerableUntil, this.hitRecoveryUntil),
       () => ({ x: this.player.x, y: this.player.y }),
     );
     this.cameras.main.setBounds(0, 0, WORLD.width, WORLD.height);
@@ -142,7 +145,9 @@ class SanctuaryScene extends Phaser.Scene {
         getEmberSentryHealth: () => this.emberSentry.currentHealth,
         getPlayerHealth: () => this.playerHealth,
         getDodgeCooldownMs: () => Math.max(0, this.nextDodgeAt - this.time.now),
+        getHitRecoveryMs: () => Math.max(0, this.hitRecoveryUntil - this.time.now),
         performDodge: () => this.dodge(),
+        forcePlayerHit: () => this.damagePlayer(),
         setPlayerPosition: (x, y, facingX = 0, facingY = -1) => {
           this.player.setVelocity(0, 0);
           this.player.setPosition(x, y);
@@ -367,9 +372,13 @@ class SanctuaryScene extends Phaser.Scene {
   }
 
   private damagePlayer() {
-    if (this.playerHealth <= 0 || this.time.now < this.invulnerableUntil) return;
+    // A successful hit grants a short recovery window. This prevents two
+    // overlapping enemy callbacks from draining multiple hearts at once.
+    if (this.playerHealth <= 0 || this.time.now < Math.max(this.invulnerableUntil, this.hitRecoveryUntil)) return;
+    this.hitRecoveryUntil = this.time.now + 650;
     this.playerHealth = Math.max(0, this.playerHealth - 1);
     this.updateHealthHud();
+    this.updateRecoveryHud();
     this.cameras.main.shake(120, 0.003);
     this.wizardSprite.setTint(0xff8c9d);
     this.time.delayedCall(180, () => this.wizardSprite.clearTint());
@@ -387,6 +396,17 @@ class SanctuaryScene extends Phaser.Scene {
     const fill = document.querySelector<HTMLElement>("#health-fill");
     if (value) value.textContent = `${this.playerHealth} / 5`;
     if (fill) fill.style.width = `${this.playerHealth * 20}%`;
+  }
+
+  private updateRecoveryHud() {
+    const status = document.querySelector("#health-status");
+    const remaining = Math.max(0, this.hitRecoveryUntil - this.time.now);
+    if (status) {
+      status.textContent = remaining > 0
+        ? `HIT RECOVERY · ${(remaining / 1000).toFixed(1)}s`
+        : "Sanctuary ward";
+      status.classList.toggle("recovering", remaining > 0);
+    }
   }
 
   private damagePracticeWisp() {
@@ -434,6 +454,7 @@ class SanctuaryScene extends Phaser.Scene {
     this.hostileWisp.update(this.player.x, this.player.y, Math.min(this.game.loop.delta, 50) / 1000);
     this.emberSentry.update(this.player.x, this.player.y);
     this.updateDodgeHud();
+    this.updateRecoveryHud();
     let x = Number(keyboard.A.isDown || keyboard.LEFT.isDown) * -1 + Number(keyboard.D.isDown || keyboard.RIGHT.isDown);
     let y = Number(keyboard.W.isDown || keyboard.UP.isDown) * -1 + Number(keyboard.S.isDown || keyboard.DOWN.isDown);
     x += window.arcaneMove?.x ?? 0;

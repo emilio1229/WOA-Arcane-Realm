@@ -110,13 +110,39 @@ try {
   const wispHealthRespawned = await desktop.evaluate(() => window.arcaneTest.getPracticeWispHealth());
   assert.equal(wispHealthRespawned, 3, "the practice wisp should respawn with full health");
 
-  // The Frost Wisp should pursue, damage, and be dispellable by aimed Arcane Bolts.
+  // The Frost Wisp's melee tell is escapable: it pauses pursuit and misses
+  // when the wizard steps outside contact range before the 700ms windup ends.
+  await desktop.evaluate(() => window.arcaneTest.setPlayerPosition(1450, 690, 0, 1));
+  await delay(180);
+  await desktop.evaluate(() => window.arcaneTest.setPlayerPosition(1450, 710, 0, 1));
+  await delay(620);
+  assert.equal(await desktop.evaluate(() => window.arcaneTest.getPlayerHealth()), 5,
+    "the Frost Wisp should miss when the player leaves its contact radius during the tell");
+
+  // The Frost Wisp should then pursue, land a fair close-range strike, and be
+  // dispellable by aimed Arcane Bolts.
   await desktop.evaluate(() => window.arcaneTest.setPlayerPosition(1450, 760, 0, -1));
-  await delay(2400); // Allow the pursuer to close distance, telegraph, and land a fair attack.
+  await delay(2400); // Allow pursuit, the next telegraph, and the attack to resolve.
   const hostileHealthBefore = await desktop.evaluate(() => window.arcaneTest.getHostileWispHealth());
   assert.equal(hostileHealthBefore, 4, "hostile Frost Wisp should begin with four health");
   const healthBeforeFrostDefeat = await desktop.evaluate(() => window.arcaneTest.getPlayerHealth());
   assert.ok(healthBeforeFrostDefeat < 5, "the hostile Wisp should land its telegraphed attack before it is defeated");
+  assert.ok(await desktop.evaluate(() => window.arcaneTest.getHitRecoveryMs()) > 0,
+    "a successful enemy hit should start the player recovery window");
+  assert.match(await desktop.locator("#health-status").textContent(), /HIT RECOVERY/,
+    "the vitality HUD should clearly show hit recovery");
+
+  const healthDuringRecovery = await desktop.evaluate(() => window.arcaneTest.getPlayerHealth());
+  await desktop.evaluate(() => { window.arcaneTest.forcePlayerHit(); window.arcaneTest.forcePlayerHit(); });
+  assert.equal(await desktop.evaluate(() => window.arcaneTest.getPlayerHealth()), healthDuringRecovery,
+    "overlapping hits should not remove multiple health during recovery");
+  await delay(700);
+  await desktop.evaluate(() => window.arcaneTest.forcePlayerHit());
+  assert.equal(await desktop.evaluate(() => window.arcaneTest.getPlayerHealth()), healthDuringRecovery - 1,
+    "a new hit should be accepted after recovery expires");
+  await delay(700);
+  assert.equal(await desktop.evaluate(() => window.arcaneTest.getHitRecoveryMs()), 0,
+    "the recovery window should expire cleanly");
   for (let hit = 0; hit < 4; hit++) {
     await desktop.keyboard.down("Space");
     await delay(120);

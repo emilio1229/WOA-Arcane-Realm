@@ -42,25 +42,27 @@ export class HostileWisp {
     const dx = playerX - this.art.x;
     const dy = playerY - this.art.y;
     const distance = Math.hypot(dx, dy);
-    if (distance < 430 && distance > 54) {
-      const step = Math.min(distance - 54, 68 * delta);
-      this.art.x += dx / distance * step;
-      this.art.y += dy / distance * step;
-    } else if (distance <= 54) {
-      if (!this.windupUntil && this.scene.time.now >= this.nextAttackAt) {
-        this.windupUntil = this.scene.time.now + 700;
-        this.warning.setPosition(this.art.x, this.art.y + 12).setScale(0.55).setAlpha(0.9).setVisible(true);
-        this.scene.tweens.add({ targets: this.warning, scale: 1.15, alpha: 0.18, duration: 700, ease: "Cubic.easeOut" });
-      } else if (this.windupUntil && this.scene.time.now >= this.windupUntil) {
+    // Lock pursuit during the tell. The player must be able to read the windup
+    // and step outside the contact radius before the strike resolves.
+    if (this.windupUntil) {
+      if (distance > 78) {
+        this.windupUntil = 0;
+        this.warning.setVisible(false);
+        this.scene.tweens.killTweensOf(this.warning);
+      } else if (this.scene.time.now >= this.windupUntil) {
         this.windupUntil = 0;
         this.nextAttackAt = this.scene.time.now + 1600;
         this.warning.setVisible(false);
-        this.onPlayerHit();
+        if (distance <= 54) this.onPlayerHit();
       }
-    } else if (distance > 78 && this.windupUntil) {
-      this.windupUntil = 0;
-      this.warning.setVisible(false);
-      this.scene.tweens.killTweensOf(this.warning);
+    } else if (distance < 430 && distance > 54) {
+      const step = Math.min(distance - 54, 68 * delta);
+      this.art.x += dx / distance * step;
+      this.art.y += dy / distance * step;
+    } else if (distance <= 54 && this.scene.time.now >= this.nextAttackAt) {
+      this.windupUntil = this.scene.time.now + 700;
+      this.warning.setPosition(this.art.x, this.art.y + 12).setScale(0.55).setAlpha(0.9).setVisible(true);
+      this.scene.tweens.add({ targets: this.warning, scale: 1.15, alpha: 0.18, duration: 700, ease: "Cubic.easeOut" });
     }
     this.warning.setPosition(this.art.x, this.art.y + 12);
     this.warning.setDepth(this.art.y + 2);
