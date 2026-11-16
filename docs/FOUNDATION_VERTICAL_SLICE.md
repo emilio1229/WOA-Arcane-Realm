@@ -72,3 +72,11 @@ npm run preview
 ## Asset Forge visual pass — sanctuary atmosphere
 
 The first `arcane-realm-asset-forge` implementation batch adds two original SVG layers: `environment.sanctuary-atmosphere` (moonlit plaza engraving, rune markers, crystal beds, and framing groves) and `environment.portal-rune-crown` (ornamental portal ring and cardinal runes). Both are registered in `public/assets/manifest.json`, loaded by `src/main.ts`, and used as transparent layers so the existing ground, collision, movement, and combat systems remain unchanged. The HUD and overlay panels also receive a restrained glass-and-metal visual polish in `src/style.css`. These changes are marked prototype-integrated; a real browser visual pass and mobile-device review remain required before calling them validated.
+
+
+## Realm arrival, title screen, and GameUI pass
+- Added an original 1600×900 title-screen landscape registered as `ui.realm-title-backdrop`.
+- The cinematic arrival screen reports real Phaser asset-loader progress and enables entry after the Sanctuary scene completes creation.
+- Added an in-game pause overlay with Resume and desktop control reminders. The menu button and Escape key pause/resume the Sanctuary scene; Escape closes open dialogue first.
+- Added responsive mobile layouts, focus-visible keyboard styling, and reduced-motion support. Existing combat, movement, NPC, and mobile control logic is unchanged.
+- Browser smoke coverage for title-screen entry and pause/resume is added. CI must run before this change is considered validated; no real-device visual review has been performed.

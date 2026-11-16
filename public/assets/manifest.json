@@ -477,6 +477,24 @@
       ],
       "status": "prototype-integrated",
       "provenance": "Original in-repository SVG artwork; CC0-1.0"
+    },
+    {
+      "id": "ui.realm-title-backdrop",
+      "path": "/assets/ui/realm-title-backdrop.svg",
+      "category": "ui",
+      "format": "svg",
+      "source": true,
+      "width": 1600,
+      "height": 900,
+      "tags": [
+        "title-screen",
+        "loading-screen",
+        "main-menu",
+        "portal",
+        "mountains"
+      ],
+      "status": "prototype-integrated",
+      "provenance": "Original in-repository SVG artwork; CC0-1.0"
     }
   ]
 }

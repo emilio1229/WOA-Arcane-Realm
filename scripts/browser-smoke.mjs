@@ -25,6 +25,10 @@ async function waitForGame(page) {
   await page.goto(origin, { waitUntil: "domcontentloaded" });
   await page.waitForSelector("#game canvas", { state: "visible", timeout: 15000 });
   await page.waitForFunction(() => Boolean(window.arcaneTest), { timeout: 15000 });
+  await page.locator("#realm-intro").waitFor({ state: "visible" });
+  await page.locator("#enter-realm").waitFor({ state: "enabled", timeout: 15000 });
+  await page.locator("#enter-realm").click();
+  await page.locator("#realm-intro").waitFor({ state: "hidden" });
 }
 
 try {
@@ -41,6 +45,10 @@ try {
     height: canvas.height,
   }));
   assert.ok(canvasSize.width > 0 && canvasSize.height > 0, "game canvas should have a real drawing surface");
+  await desktop.locator("#pause-game").click();
+  await desktop.locator("#pause-overlay").waitFor({ state: "visible" });
+  await desktop.locator("#resume-game").click();
+  await desktop.locator("#pause-overlay").waitFor({ state: "hidden" });
   await desktop.setViewportSize({ width: 980, height: 720 });
   await delay(300);
   const resizedCanvas = await desktop.locator("#game canvas").evaluate(canvas => ({ width: canvas.width, height: canvas.height }));

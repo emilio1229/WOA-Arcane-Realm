@@ -9,12 +9,22 @@
   </head>
   <body>
     <main id="app">
+      <section class="realm-intro" id="realm-intro" aria-label="Arcane Realm title screen"><div class="intro-vignette"></div><div class="intro-content">
+        <div class="intro-crest">✧</div><p class="intro-eyebrow">WIZARDS OF ARK PRESENTS</p><h1>ARCANE <em>REALM</em></h1>
+        <p class="intro-subtitle">Beyond the veil, a world remembers your name.</p><div class="intro-divider">✦</div>
+        <div class="intro-loading"><div class="loading-meta"><span id="loading-label">AWAKENING THE SANCTUARY</span><b id="loading-percent">0%</b></div><div class="loading-track"><i id="loading-fill"></i></div></div>
+        <button class="enter-realm" id="enter-realm" type="button" disabled>ENTER THE SANCTUARY <span>↗</span></button><small class="intro-note" id="loading-note">Preparing the portal and gathering the light...</small>
+      </div><div class="intro-footer">✧ EXPLORE · DISCOVER · BECOME ✧</div></section>
       <header class="topbar">
         <div class="brand"><span class="brand-mark">✧</span><div><strong>ARCANE REALM</strong><small>WIZARDS OF ARK</small></div></div>
         <div class="realm-status"><span class="status-dot"></span> SANCTUARY <span class="divider">/</span> EXPLORATION</div>
-        <div class="profile"><span class="avatar">✦</span><span><b>Wayfarer</b><small>Novice · Level 1</small></span></div>
+        <div class="profile"><span class="avatar">✦</span><span><b>Wayfarer</b><small>Novice · Level 1</small></span></div><button class="pause-button" id="pause-game" type="button" aria-label="Open game menu" aria-expanded="false">Ⅱ <small>MENU</small></button>
       </header>
-      <section class="game-shell">
+      <section class="game-shell"><div class="pause-overlay hidden" id="pause-overlay" aria-hidden="true"><div class="pause-card">
+        <p class="pause-kicker">✧ THE SANCTUARY IS SAFE</p><h2>Take a moment, Wayfarer.</h2><p>Your journey is paused. Catch your breath, then return to the path.</p>
+        <div class="pause-controls"><span><kbd>W A S D</kbd> Move</span><span><kbd>SHIFT</kbd> Dodge</span><span><kbd>E</kbd> Interact</span><span><kbd>SPACE</kbd> Cast</span></div>
+        <button id="resume-game" type="button">RETURN TO YOUR JOURNEY <span>↗</span></button><small>Press ESC to resume</small>
+      </div></div>
         <div id="game" aria-label="Playable Arcane Sanctuary game world"></div>
         <div class="location-tag"><span class="sigil-mark" aria-hidden="true"><img src="/assets/ui/sigil.svg" alt=""></span><div><b>ARCANE SANCTUARY</b><small>The last light before the unknown</small></div></div>
         <div class="combat-status" aria-label="Player vitality"><span>VITALITY</span><b id="player-health">5 / 5</b><div class="health-track"><i id="health-fill"></i></div><small id="health-status">Sanctuary ward</small></div>

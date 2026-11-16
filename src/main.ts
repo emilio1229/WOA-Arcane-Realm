@@ -167,6 +167,7 @@ class SanctuaryScene extends Phaser.Scene {
       window.arcaneTest = undefined;
     });
     this.scale.on("resize", (size: Phaser.Structs.Size) => this.cameras.main.setZoom(Math.min(1, size.width / 1100)));
+    this.game.events.emit("arcane:ready");
   }
 
   private drawWorld() {
@@ -537,6 +538,48 @@ const game = new Phaser.Game({
   physics: { default: "arcade", arcade: { debug: false } },
   render: { antialias: true, pixelArt: false, roundPixels: false },
   scene: [SanctuaryScene],
+});
+
+const intro = document.querySelector<HTMLElement>("#realm-intro");
+const enterRealm = document.querySelector<HTMLButtonElement>("#enter-realm");
+const loadingFill = document.querySelector<HTMLElement>("#loading-fill");
+const loadingPercent = document.querySelector<HTMLElement>("#loading-percent");
+const loadingLabel = document.querySelector<HTMLElement>("#loading-label");
+const loadingNote = document.querySelector<HTMLElement>("#loading-note");
+window.addEventListener("arcane:loading", event => {
+  const progress = Phaser.Math.Clamp((event as CustomEvent<number>).detail, 0, 1);
+  if (loadingFill) loadingFill.style.width = `${Math.round(progress * 100)}%`;
+  if (loadingPercent) loadingPercent.textContent = `${Math.round(progress * 100)}%`;
+  if (loadingLabel) loadingLabel.textContent = progress < 1 ? "AWAKENING THE SANCTUARY" : "SETTING THE FINAL SIGILS";
+});
+game.events.once("arcane:ready", () => {
+  if (loadingFill) loadingFill.style.width = "100%";
+  if (loadingPercent) loadingPercent.textContent = "100%";
+  if (loadingLabel) loadingLabel.textContent = "THE PORTAL IS OPEN";
+  if (loadingNote) loadingNote.textContent = "Your path is ready. The Sanctuary awaits.";
+  if (enterRealm) enterRealm.disabled = false;
+});
+enterRealm?.addEventListener("click", () => {
+  if (enterRealm.disabled) return;
+  intro?.classList.add("dismissed");
+  intro?.setAttribute("aria-hidden", "true");
+});
+const pauseButton = document.querySelector<HTMLButtonElement>("#pause-game");
+const pauseOverlay = document.querySelector<HTMLElement>("#pause-overlay");
+const setPaused = (paused: boolean) => {
+  if (!pauseOverlay) return;
+  pauseOverlay.classList.toggle("hidden", !paused);
+  pauseOverlay.setAttribute("aria-hidden", String(!paused));
+  pauseButton?.setAttribute("aria-expanded", String(paused));
+  if (paused) game.scene.pause("Sanctuary"); else game.scene.resume("Sanctuary");
+};
+pauseButton?.addEventListener("click", () => setPaused(pauseOverlay?.classList.contains("hidden") ?? true));
+document.querySelector("#resume-game")?.addEventListener("click", () => setPaused(false));
+window.addEventListener("keydown", event => {
+  if (event.key !== "Escape" || !intro?.classList.contains("dismissed")) return;
+  const dialogue = document.querySelector<HTMLElement>("#dialogue");
+  if (dialogue && !dialogue.classList.contains("hidden")) { dialogue.classList.add("hidden"); return; }
+  setPaused(pauseOverlay?.classList.contains("hidden") ?? true);
 });
 
 const stick = document.querySelector<HTMLElement>("#stick");

@@ -69,3 +69,9 @@ Supported categories: `character`, `familiar`, `creature`, `environment`, `vfx`,
 - `environment.sanctuary-atmosphere` adds a moonlit ceremonial plaza ring, rune wayfinding, crystal garden beds, and layered perimeter groves as a transparent world-space layer.
 - `environment.portal-rune-crown` adds a rotating metallic rune crown and luminous cardinal markers over the Grand Portal.
 - Both are original editable SVG sources, registered in `manifest.json` and loaded by the Sanctuary scene. Their status is prototype-integrated pending in-game visual review.
+
+
+## Realm arrival experience
+- `ui.realm-title-backdrop` is the original 1600×900 SVG title-screen landscape, registered in the manifest.
+- The title screen reports Phaser's real asset-loader progress and unlocks entry only after the Sanctuary scene finishes creating.
+- The pause overlay is a player-facing control; asset workflows and developer tools remain backstage.
