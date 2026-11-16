@@ -29,3 +29,29 @@
 .touch-dodge{display:none}
 @media(max-width:700px){.dodge-status{top:126px;left:10px;width:135px;padding:7px 9px}.dodge-status>b{font-size:8px}.dodge-status>small{font-size:7px}.touch-dodge{display:block;position:absolute;right:146px;bottom:18px;width:56px;height:56px;border-radius:50%;border:1px solid #b99df799;background:#302447e8;color:#e7d2ff;font-size:20px;pointer-events:auto;touch-action:manipulation}.touch-dodge small{display:block;font-size:7px;letter-spacing:1px}}
 #health-status.recovering{color:#ffb1c0}
+
+
+/* Arcane Realm visual polish pass — layered glass, metallic edging, and responsive hierarchy. */
+.topbar{position:relative;border-bottom-color:#c9a5e52b}
+.topbar:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:linear-gradient(90deg,transparent,#cda7ed55 22%,#f0d39b66 50%,#cda7ed55 78%,transparent)}
+.brand-mark{filter:drop-shadow(0 0 10px #c79af0aa)}
+.brand strong{background:linear-gradient(110deg,#fff0d4,#e7c7ff 52%,#d5a5f1);-webkit-background-clip:text;background-clip:text;color:transparent}
+.game-shell{border-color:#d4b1ef55;box-shadow:0 22px 80px #05030d99,inset 0 0 0 1px #fff1,inset 0 0 90px #a879d51b}
+.location-tag,.quest-card,.combat-status,.dodge-status{background:linear-gradient(145deg,#201832eF,#11101feF);border-color:#d4b1ef55;box-shadow:0 10px 34px #07040d66,inset 0 1px #fff2}
+.location-tag{border-left:2px solid #d9b4f2}
+.location-tag>span{filter:drop-shadow(0 0 8px #d7a5f2aa)}
+.quest-card{border-top:1px solid #f3d9a877}
+.quest-kicker{color:#f0d39b}
+.quest-card>b{color:#f8edff;text-shadow:0 1px 12px #c79af033}
+.quest-progress{height:4px;background:#493b58}
+.quest-progress i{background:linear-gradient(90deg,#9f79d4,#e5b9f4 62%,#f0d39b);box-shadow:0 0 10px #c79af088}
+.combat-status,.dodge-status{box-shadow:0 8px 28px #05030d66,inset 0 1px #fff2}
+.dialogue{background:linear-gradient(145deg,#241a35f5,#12101ff5);border-color:#d9b5ef88;box-shadow:0 18px 55px #05030dcc,inset 0 1px #fff2}
+.dialogue-icon{filter:drop-shadow(0 0 9px #e8c17a88)}
+.controls-hint{border:1px solid #c6a5dc33;box-shadow:0 6px 22px #08050d55}
+kbd{box-shadow:inset 0 1px #fff2,0 2px 0 #171021}
+.avatar{box-shadow:0 0 18px #a975d833,inset 0 1px #fff2}
+@media(max-width:700px){
+ .location-tag,.quest-card,.combat-status,.dodge-status{box-shadow:0 8px 25px #05030dcc,inset 0 1px #fff2}
+ .game-shell{border-color:#d4b1ef66;box-shadow:0 12px 35px #05030d99,inset 0 0 50px #a879d51b}
+}
