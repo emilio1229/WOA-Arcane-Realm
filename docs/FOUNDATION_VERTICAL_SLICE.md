@@ -120,3 +120,9 @@ Added five original 512×512 transparent SVG overlay assets for the Grand Librar
 Added `environment.sanctuary-fountain`, a 512×512 original SVG landmark with layered carved stonework, a reflective water basin, a faceted crystal crown, and engraved runes. The previous procedural fountain ellipse stack is replaced with the asset, with a restrained pulse and five small ambient glints. Manifest status is `needs-review` pending visual inspection in a running game and mobile viewports.
 
 - The headless Chromium playtest disables background throttling so timed movement assertions measure gameplay rather than a hidden-tab frame-rate policy.
+
+
+## Compendium navigation interaction fix
+- Connected the Character, Journal, World, and Controls tabs to their matching content panels, including synchronized active and ARIA-selected states.
+- Wired the Compendium's "Return to Your Journey" action to resume the paused Sanctuary scene, matching the close control.
+- The existing desktop browser playtest exercises Journal/Controls navigation and resume behavior.

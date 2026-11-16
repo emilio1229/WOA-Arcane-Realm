@@ -662,6 +662,18 @@ const setPaused = (paused: boolean) => {
 };
 pauseButton?.addEventListener("click", () => setPaused(pauseOverlay?.classList.contains("hidden") ?? true));
 document.querySelector("#resume-game")?.addEventListener("click", () => setPaused(false));
+const menuTabs = document.querySelectorAll<HTMLButtonElement>("[data-menu-tab]");
+const menuPages = document.querySelectorAll<HTMLElement>("[data-menu-page]");
+const setMenuPage = (page: string) => {
+  menuTabs.forEach(tab => {
+    const active = tab.dataset.menuTab === page;
+    tab.classList.toggle("active", active);
+    tab.setAttribute("aria-selected", String(active));
+  });
+  menuPages.forEach(panel => panel.classList.toggle("hidden", panel.dataset.menuPage !== page));
+};
+menuTabs.forEach(tab => tab.addEventListener("click", () => setMenuPage(tab.dataset.menuTab || "character")));
+document.querySelector("#resume-journey")?.addEventListener("click", () => setPaused(false));
 window.addEventListener("keydown", event => {
   if (event.key !== "Escape" || !intro?.classList.contains("dismissed")) return;
   const dialogue = document.querySelector<HTMLElement>("#dialogue");
