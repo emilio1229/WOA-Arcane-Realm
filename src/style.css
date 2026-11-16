@@ -86,3 +86,22 @@ kbd{box-shadow:inset 0 1px #fff2,0 2px 0 #171021}
 @media(max-width:700px){.spell-dock{display:none}.realm-menu{padding:17px 14px;max-height:calc(100% - 18px)}.menu-heading h2{font-size:23px}.menu-tabs{gap:2px;margin:16px 0 13px}.menu-tab{font-size:7px;letter-spacing:.6px;padding:9px 2px}.character-banner{padding:12px;gap:10px}.character-emblem{width:44px;height:44px;font-size:24px}.character-banner h3{font-size:17px}.menu-stat-grid{gap:7px}.menu-stat-grid article{padding:10px}.menu-stat-grid b{font-size:12px}.control-list{grid-template-columns:1fr}.menu-footer{align-items:stretch;flex-direction:column}.menu-footer button{width:100%;min-height:48px}.menu-footer>span{text-align:center}}
 @media(max-height:520px){.realm-menu{padding:12px 16px}.menu-tabs{margin:10px 0}.menu-page{min-height:140px}.character-banner{padding:9px}.menu-stat-grid{gap:6px}.menu-stat-grid article{padding:8px}.menu-footer{margin-top:10px;padding-top:9px}}
 @media(prefers-reduced-motion:reduce){.spell-slot{transition:none}}
+
+/* Full character creation flow */
+.creator-screen{position:absolute;inset:0;z-index:8;display:grid;place-items:center;padding:18px;background:linear-gradient(135deg,#0b0914f5,#171126f2 60%,#0b0914f5);overflow:auto}.creator-screen.hidden{display:none}
+.creator-card{width:min(720px,100%);max-height:100%;overflow:auto;padding:26px 30px;background:linear-gradient(145deg,#211831,#100d1f);border:1px solid #d9b77b99;box-shadow:0 28px 100px #000c,inset 0 1px #fff2}
+.creator-card h2{margin:0 0 18px;text-align:center;color:#f6e9ff;font:600 25px Cinzel,serif;letter-spacing:2px}.creator-card h2 em{color:#e6c18d;font-style:normal}
+.creator-field{display:grid;gap:7px;color:#c9afd8;font-size:9px;letter-spacing:1.6px}.creator-field input{width:100%;height:42px;padding:0 12px;border:1px solid #c9a4dd55;border-radius:5px;background:#120e1d;color:#fff0dc;font:500 14px Manrope,sans-serif;letter-spacing:0}
+.creator-group{margin-top:17px}.creator-label{display:block;margin-bottom:9px;color:#e6c18d;font-size:9px;letter-spacing:1.6px}
+.creator-options{display:grid;gap:7px}.creator-options.two{grid-template-columns:1fr 1fr}.creator-options.three{grid-template-columns:repeat(3,1fr)}
+.creator-choice{min-height:38px;border:1px solid #c9a4dd44;border-radius:5px;background:#171326;color:#c7b6d3;font-size:9px;letter-spacing:1px;cursor:pointer}.creator-choice.selected{border-color:#e4c18d;background:#493354;color:#fff0d7;box-shadow:inset 0 -2px #e4c18d}
+.tradition-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tradition-choice{display:grid;grid-template-columns:35px 1fr;grid-template-rows:auto auto;align-items:center;column-gap:9px;min-height:66px;padding:9px;text-align:left;border:1px solid #c9a4dd44;border-radius:6px;background:linear-gradient(135deg,#20182f,#171326);color:#eee0f7;cursor:pointer}
+.tradition-choice i{grid-row:1/3;display:grid;place-items:center;width:32px;height:32px;border:1px solid color-mix(in srgb,var(--sigil) 60%,transparent);border-radius:50%;color:var(--sigil);font-size:19px;font-style:normal;text-shadow:0 0 12px var(--sigil)}
+.tradition-choice b{font:600 10px Cinzel,serif}.tradition-choice small{margin-top:3px;color:#a997b8;font-size:8px}
+.tradition-choice.selected{border-color:#e4c18d;background:linear-gradient(135deg,#493354,#21182f);box-shadow:inset 0 -2px #e4c18d}
+.creator-note{display:block;margin:8px 0 0;color:#94849f;font-size:9px;line-height:1.6}
+.creator-bottom{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:17px;padding-top:15px;border-top:1px solid #d4b1ef33}
+.creator-color{display:flex;align-items:center;gap:10px;color:#d5c4df;font-size:9px;letter-spacing:1px}.creator-color input{width:38px;height:34px;padding:2px;border:1px solid #d9b77b88;border-radius:5px;background:#171326;cursor:pointer}
+.creator-bottom button{min-height:44px;padding:0 18px;border:1px solid #e5c58e;background:linear-gradient(110deg,#5c3e78,#91639d);color:#fff2dc;font:600 9px Cinzel,serif;letter-spacing:1px;cursor:pointer}
+@media(max-width:620px){.creator-screen{padding:8px}.creator-card{padding:17px 13px}.creator-card h2{font-size:20px}.tradition-grid{grid-template-columns:repeat(2,1fr);gap:6px}.tradition-choice{min-height:61px;padding:7px}.creator-bottom{align-items:stretch;flex-direction:column}.creator-bottom button{width:100%;min-height:48px}.creator-options.three{gap:5px}.creator-choice{font-size:8px}}

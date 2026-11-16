@@ -495,6 +495,49 @@
       ],
       "status": "prototype-integrated",
       "provenance": "Original in-repository SVG artwork; CC0-1.0"
+    },
+    {
+      "id": "character.wizard.traditions.walk",
+      "path": "/assets/characters/wizard-traditions-walk.svg",
+      "category": "character",
+      "format": "svg",
+      "source": true,
+      "width": 1024,
+      "height": 1920,
+      "frameWidth": 256,
+      "frameHeight": 320,
+      "frameCount": 24,
+      "frameRate": 8,
+      "tags": [
+        "player",
+        "wizard",
+        "six-traditions",
+        "walk-cycle",
+        "sprite-sheet"
+      ],
+      "status": "prototype-integrated",
+      "provenance": "Original project Arcane wizard walk cycle, recolored by robe tradition while preserving shared silhouette; CC0-1.0"
+    },
+    {
+      "id": "character.wizard.traditions.cast",
+      "path": "/assets/characters/wizard-traditions-cast.svg",
+      "category": "character",
+      "format": "svg",
+      "source": true,
+      "width": 1536,
+      "height": 320,
+      "frameWidth": 256,
+      "frameHeight": 320,
+      "frameCount": 6,
+      "tags": [
+        "player",
+        "wizard",
+        "six-traditions",
+        "cast-pose",
+        "sprite-sheet"
+      ],
+      "status": "prototype-integrated",
+      "provenance": "Original project Arcane wizard cast pose, recolored by robe tradition while preserving shared silhouette; CC0-1.0"
     }
   ]
 }

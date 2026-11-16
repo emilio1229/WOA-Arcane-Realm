@@ -9,6 +9,7 @@ declare global {
     arcaneInteract?: () => void;
     arcaneCast?: () => void;
     arcaneDodge?: () => void;
+    arcaneSetCharacter?: (tradition: string, magicColor: string) => void;
     /** Development-only hooks used by the headless browser smoke test. */
     arcaneTest?: {
       getPlayerPosition: () => { x: number; y: number };
@@ -56,6 +57,9 @@ class SanctuaryScene extends Phaser.Scene {
   private hitRecoveryUntil = 0;
   private nextDodgeAt = 0;
   private nextCastAt = 0;
+  private currentTradition = "storm-herald";
+  private currentTraditionIndex = 0;
+  private magicColor = "#b98bea";
   private keys!: Record<string, Phaser.Input.Keyboard.Key>;
   private obstacles: Phaser.Geom.Rectangle[] = [];
   private npcs: Array<{ data: NPC; art: Phaser.GameObjects.Container }> = [];
@@ -69,6 +73,8 @@ class SanctuaryScene extends Phaser.Scene {
     this.load.svg("wizard-arcane", "/assets/characters/wizard-arcane.svg", { width: 128, height: 160 });
     this.load.svg("wizard-arcane-cast", "/assets/characters/wizard-arcane-cast.svg", { width: 128, height: 160 });
     this.load.spritesheet("wizard-arcane-walk", "/assets/characters/wizard-arcane-walk.svg", { frameWidth: 256, frameHeight: 320 });
+    this.load.spritesheet("wizard-traditions-walk", "/assets/characters/wizard-traditions-walk.svg", { frameWidth: 256, frameHeight: 320 });
+    this.load.spritesheet("wizard-traditions-cast", "/assets/characters/wizard-traditions-cast.svg", { frameWidth: 256, frameHeight: 320 });
     this.load.svg("wizard-ember", "/assets/characters/wizard-ember.svg", { width: 128, height: 160 });
     this.load.svg("wizard-frost", "/assets/characters/wizard-frost.svg", { width: 128, height: 160 });
     this.load.svg("wizard-verdant", "/assets/characters/wizard-verdant.svg", { width: 128, height: 160 });
@@ -106,6 +112,7 @@ class SanctuaryScene extends Phaser.Scene {
     this.createAmbientMagic();
     this.anims.create({ key: "arcane-impact-burst", frames: this.anims.generateFrameNumbers("arcane-burst", { start: 0, end: 5 }), frameRate: 15, repeat: 0 });
     this.anims.create({ key: "wizard-arcane-walk-cycle", frames: this.anims.generateFrameNumbers("wizard-arcane-walk", { start: 0, end: 3 }), frameRate: 8, repeat: -1 });
+    ["storm-herald","ember-mage","frostweaver","verdant-warden","voidcaller","sigilbinder"].forEach((name,index) => this.anims.create({ key: `wizard-${name}-walk-cycle`, frames: this.anims.generateFrameNumbers("wizard-traditions-walk", { start: index * 4, end: index * 4 + 3 }), frameRate: 8, repeat: -1 }));
 
     this.player = this.physics.add.image(900, 760, "__WHITE");
     this.player.setDisplaySize(18, 18).setTint(0xffffff).setAlpha(0);
@@ -140,6 +147,7 @@ class SanctuaryScene extends Phaser.Scene {
     window.arcaneInteract = this.interactHandler;
     window.arcaneCast = () => this.castSpell();
     window.arcaneDodge = () => this.dodge();
+    window.arcaneSetCharacter = (tradition, magicColor) => this.setCharacter(tradition, magicColor);
     if (import.meta.env.DEV) {
       window.arcaneTest = {
         getPlayerPosition: () => ({ x: this.player.x, y: this.player.y }),
@@ -165,6 +173,7 @@ class SanctuaryScene extends Phaser.Scene {
       window.arcaneInteract = undefined;
       window.arcaneCast = undefined;
       window.arcaneDodge = undefined;
+      window.arcaneSetCharacter = undefined;
       window.arcaneTest = undefined;
     });
     this.scale.on("resize", (size: Phaser.Structs.Size) => this.cameras.main.setZoom(Math.min(1, size.width / 1100)));
@@ -278,8 +287,24 @@ class SanctuaryScene extends Phaser.Scene {
   }
 
 
+  private setCharacter(tradition: string, magicColor: string) {
+    const names = ["storm-herald","ember-mage","frostweaver","verdant-warden","voidcaller","sigilbinder"];
+    const index = names.indexOf(tradition);
+    if (index < 0) return;
+    this.currentTradition = tradition;
+    this.currentTraditionIndex = index;
+    this.magicColor = /^#[0-9a-fA-F]{6}$/.test(magicColor) ? magicColor : "#b98bea";
+    if (this.wizardSprite) { this.wizardSprite.anims.stop(); this.wizardSprite.setTexture("wizard-traditions-walk", index * 4).clearTint(); }
+    localStorage.setItem("arcane.character.tradition", tradition);
+    localStorage.setItem("arcane.character.magicColor", this.magicColor);
+  }
+
   private drawWizard(container: Phaser.GameObjects.Container) {
-    this.wizardSprite = this.add.sprite(0, 0, "wizard-arcane-walk", 0).setDisplaySize(78, 98).setOrigin(0.5, 0.9);
+    const names = ["storm-herald","ember-mage","frostweaver","verdant-warden","voidcaller","sigilbinder"];
+    this.currentTradition = localStorage.getItem("arcane.character.tradition") || "storm-herald";
+    this.currentTraditionIndex = Math.max(0, names.indexOf(this.currentTradition));
+    this.magicColor = localStorage.getItem("arcane.character.magicColor") || "#b98bea";
+    this.wizardSprite = this.add.sprite(0, 0, "wizard-traditions-walk", this.currentTraditionIndex * 4).setDisplaySize(78, 98).setOrigin(0.5, 0.9);
     container.add(this.wizardSprite);
   }
 
@@ -306,6 +331,7 @@ class SanctuaryScene extends Phaser.Scene {
     const startX = this.player.x + this.lastFacing.x * 30;
     const startY = this.player.y - 12 + this.lastFacing.y * 30;
     const bolt = this.add.image(startX, startY, "arcane-bolt")
+      .setTint(Phaser.Display.Color.HexStringToColor(this.magicColor).color)
       .setDisplaySize(42, 42)
       .setDepth(this.player.y + 80)
       .setRotation(Math.atan2(this.lastFacing.y, this.lastFacing.x) + Math.PI / 2);
@@ -345,8 +371,8 @@ class SanctuaryScene extends Phaser.Scene {
       },
     });
     this.wizardSprite.anims.stop();
-    this.wizardSprite.setTexture("wizard-arcane-cast").setTint(0xe9d2ff);
-    this.time.delayedCall(250, () => this.wizardSprite.setTexture("wizard-arcane-walk", 0));
+    this.wizardSprite.setTexture("wizard-traditions-cast", this.currentTraditionIndex).setTint(0xffffff);
+    this.time.delayedCall(250, () => this.wizardSprite.setTexture("wizard-traditions-walk", this.currentTraditionIndex * 4));
     this.tweens.add({
       targets: this.wizardSprite, alpha: 0.65, duration: 90, yoyo: true,
       onComplete: () => this.wizardSprite.clearTint(),
@@ -512,16 +538,16 @@ class SanctuaryScene extends Phaser.Scene {
     this.player.setPosition(resolvedX, resolvedY);
     this.player.body!.reset(resolvedX, resolvedY);
     this.playerArt.setPosition(resolvedX, resolvedY);
-    const isWalking = vector.lengthSq() > 0.001 && this.wizardSprite.texture.key === "wizard-arcane-walk";
-    if (this.wizardSprite.texture.key === "wizard-arcane-walk") {
+    const isWalking = vector.lengthSq() > 0.001 && this.wizardSprite.texture.key === "wizard-traditions-walk";
+    if (this.wizardSprite.texture.key === "wizard-traditions-walk") {
       if (isWalking) {
-        if (this.wizardSprite.anims.currentAnim?.key !== "wizard-arcane-walk-cycle") this.wizardSprite.play("wizard-arcane-walk-cycle");
+        if (this.wizardSprite.anims.currentAnim?.key !== `wizard-${this.currentTradition}-walk-cycle`) this.wizardSprite.play(`wizard-${this.currentTradition}-walk-cycle`);
       } else {
         this.wizardSprite.anims.stop();
         this.wizardSprite.setFrame(0);
       }
     }
-    if (Math.abs(vector.x) > 0.01 && this.wizardSprite.texture.key === "wizard-arcane-walk") this.wizardSprite.setFlipX(vector.x < 0);
+    if (Math.abs(vector.x) > 0.01 && this.wizardSprite.texture.key === "wizard-traditions-walk") this.wizardSprite.setFlipX(vector.x < 0);
     this.wizardSprite.setRotation(isWalking ? Math.sin(this.time.now / 75) * 0.012 : Math.sin(this.time.now / 520) * 0.008);
     this.playerArt.setDepth(this.player.y + 20);
     // Glimmer trails the wizard, eases into turns, and floats independently.
@@ -624,3 +650,50 @@ document.querySelector("#cast")?.addEventListener("click", () => window.arcaneCa
 document.querySelector("#dodge")?.addEventListener("click", () => window.arcaneDodge?.());
 document.querySelector("#close-dialogue")?.addEventListener("click", () => document.querySelector("#dialogue")?.classList.add("hidden"));
 window.addEventListener("beforeunload", () => game.destroy(true));
+
+const creator = document.querySelector<HTMLElement>("#creator-screen");
+const characterNameInput = document.querySelector<HTMLInputElement>("#character-name");
+const magicColorInput = document.querySelector<HTMLInputElement>("#magic-color");
+let selectedTradition = localStorage.getItem("arcane.character.tradition") || "storm-herald";
+let selectedGender = localStorage.getItem("arcane.character.gender") || "male";
+let selectedDiscipline = localStorage.getItem("arcane.character.discipline") || "arcanist";
+const savedCharacterName = localStorage.getItem("arcane.character.name") || "Wayfarer";
+if (characterNameInput) characterNameInput.value = savedCharacterName;
+if (magicColorInput) magicColorInput.value = localStorage.getItem("arcane.character.magicColor") || "#b98bea";
+const setChoice = (selector: string, key: string, value: string) => {
+  document.querySelectorAll<HTMLButtonElement>(selector).forEach(button => {
+    const active = button.dataset[key] === value;
+    button.classList.toggle("selected", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+};
+setChoice("[data-tradition]", "tradition", selectedTradition);
+setChoice("[data-gender]", "gender", selectedGender);
+setChoice("[data-discipline]", "discipline", selectedDiscipline);
+document.querySelectorAll<HTMLButtonElement>("[data-tradition]").forEach(button => button.addEventListener("click", () => { selectedTradition = button.dataset.tradition || "storm-herald"; setChoice("[data-tradition]", "tradition", selectedTradition); }));
+document.querySelectorAll<HTMLButtonElement>("[data-gender]").forEach(button => button.addEventListener("click", () => { selectedGender = button.dataset.gender || "male"; setChoice("[data-gender]", "gender", selectedGender); }));
+document.querySelectorAll<HTMLButtonElement>("[data-discipline]").forEach(button => button.addEventListener("click", () => { selectedDiscipline = button.dataset.discipline || "arcanist"; setChoice("[data-discipline]", "discipline", selectedDiscipline); }));
+enterRealm?.addEventListener("click", () => {
+  if (enterRealm.disabled || !creator) return;
+  creator.classList.remove("hidden");
+  characterNameInput?.focus();
+});
+document.querySelector("#begin-journey")?.addEventListener("click", () => {
+  const name = (characterNameInput?.value || "").trim().slice(0,18);
+  if (!name) { characterNameInput?.focus(); if (loadingNote) loadingNote.textContent = "Choose a name before entering the realm."; return; }
+  const magicColor = magicColorInput?.value || "#b98bea";
+  localStorage.setItem("arcane.character.name", name);
+  localStorage.setItem("arcane.character.gender", selectedGender);
+  localStorage.setItem("arcane.character.tradition", selectedTradition);
+  localStorage.setItem("arcane.character.discipline", selectedDiscipline);
+  localStorage.setItem("arcane.character.magicColor", magicColor);
+  window.arcaneSetCharacter?.(selectedTradition, magicColor);
+  const title = selectedTradition.split("-").map(part => part[0].toUpperCase()+part.slice(1)).join(" ");
+  document.querySelector("#profile-name")!.textContent = name;
+  document.querySelector("#menu-character-name")!.textContent = name;
+  document.querySelector("#menu-tradition")!.textContent = title;
+  document.querySelector("#profile-class")!.textContent = `${selectedDiscipline[0].toUpperCase()+selectedDiscipline.slice(1)} · Level 1`;
+  creator?.classList.add("hidden");
+  intro?.classList.add("dismissed");
+  intro?.setAttribute("aria-hidden", "true");
+});

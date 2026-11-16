@@ -87,3 +87,10 @@ The first `arcane-realm-asset-forge` implementation batch adds two original SVG 
 - The journal labels the Sanctuary prompt as exploration guidance, not a reward-bearing quest. The menu explicitly notes that progress is not saved.
 - Added a desktop Arcane Bolt quickbar button and a live local cooldown label; Space and 1 both cast the existing spell. Mobile continues to use the dedicated Cast touch button.
 - Browser smoke coverage now opens multiple menu sections, returns to play, and activates the spell quickbar. This coverage is authored but has not yet been run in this environment.
+
+
+## Character creation foundation
+- Added a character-creation screen before entering the playable prototype. It captures a character name, masculine/feminine presentation preference, one of the six established wizard traditions, one of the three combat disciplines (Arcanist, Spellblade, Warden), and a custom magic color.
+- Added six recolored wizard walk cycles and matching cast poses in shared sprite sheets. Tradition selection changes the robe palette and matching walk/cast artwork while preserving the existing wizard silhouette; magic color separately tints the spell projectile.
+- Choices persist locally in this browser. This is not yet account-backed or synchronized with Discord, and the current Sanctuary scene remains a development scene rather than the canonical Gloamwick story opening.
+- Gender presentation is captured as a character-creation choice, but distinct male/female body and hair artwork is still outstanding. The opening village and Matthias encounter are also not yet restored in this build.
