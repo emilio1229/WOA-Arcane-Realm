@@ -17,7 +17,8 @@ export class EmberSentry {
     x: number,
     y: number,
     private readonly onPlayerHit: () => void,
-    private readonly isPlayerDodging: () => boolean,
+    private readonly isPlayerInvulnerable: () => boolean,
+    private readonly getPlayerPosition: () => { x: number; y: number },
   ) {
     this.art = scene.add.image(x, y, "ember-wisp").setDisplaySize(82, 82).setDepth(y + 5);
     this.label = scene.add.text(x, y + 45, "EMBER SENTRY · 5", {
@@ -60,8 +61,7 @@ export class EmberSentry {
     const startY = this.art.y - 8;
     const orb = this.scene.add.circle(startX, startY, 12, 0xffa45c, 0.95)
       .setStrokeStyle(3, 0xffe1a8, 0.95).setDepth(5200);
-    this.scene.add.circle(startX, startY, 22, 0xff8a45, 0.12).setDepth(5199);
-    const dx = this.shotTarget.x - startX;
+     const dx = this.shotTarget.x - startX;
     const dy = this.shotTarget.y - startY;
     const duration = Phaser.Math.Clamp(Math.hypot(dx, dy) / 0.48, 420, 1050);
     this.scene.tweens.add({
@@ -70,8 +70,9 @@ export class EmberSentry {
       onComplete: () => {
         const impact = this.scene.add.circle(orb.x, orb.y, 30, 0xff9a4e, 0.3).setDepth(5201);
         this.scene.tweens.add({ targets: impact, scale: 2.2, alpha: 0, duration: 260, onComplete: () => impact.destroy() });
-        const closeEnough = Phaser.Math.Distance.Between(this.shotTarget.x, this.shotTarget.y, orb.x, orb.y) < 48;
-        if (closeEnough && !this.isPlayerDodging()) this.onPlayerHit();
+        const player = this.getPlayerPosition();
+        const closeEnough = Phaser.Math.Distance.Between(player.x, player.y, orb.x, orb.y) < 42;
+        if (closeEnough && !this.isPlayerInvulnerable()) this.onPlayerHit();
         orb.destroy();
       },
     });
