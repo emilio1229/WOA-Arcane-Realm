@@ -22,7 +22,7 @@ You are collaborating on a standalone game project in this repository. Read the 
 - The game should own and validate its gameplay state. Discord integration, if later approved, is a bridge—not the authority for inventory, battles, quests, or currency.
 - Sigils are the Discord RPG/game currency concept. Do not add ARK dinos or blueprints as game rewards at this stage.
 
-## Internal tools are not game features
+## Reusable Claude skills\n\n- `.claude/skills/arcane-realm-asset-forge/SKILL.md` — complete asset art direction, production, enhancement, animation, technical integration, QA, and asset-library workflow. Invoke it for game-art and asset-pipeline work; its reference checklists and templates are stored alongside the skill.\n\n## Internal tools are not game features
 
 The Engineering Skills Blueprint and Arcane Artificer are development workflows for Claude/AI/staff. They must not appear as player-facing menus, NPCs, shops, crafting stations, or gameplay systems unless the user explicitly changes this rule. Do not expose secrets, diagnostics, admin controls, or asset-generation controls to ordinary players.
 
