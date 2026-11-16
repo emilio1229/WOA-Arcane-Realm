@@ -400,6 +400,28 @@
         "mobile"
       ],
       "status": "prototype-integrated"
+    },
+    {
+      "id": "character.wizard.arcane.walk",
+      "path": "/assets/characters/wizard-arcane-walk.svg",
+      "category": "character",
+      "format": "svg",
+      "source": true,
+      "width": 1024,
+      "height": 320,
+      "frameWidth": 256,
+      "frameHeight": 320,
+      "frameCount": 4,
+      "frameRate": 8,
+      "tags": [
+        "player",
+        "wizard",
+        "arcane",
+        "walk-cycle",
+        "sprite-sheet",
+        "mobile"
+      ],
+      "status": "prototype-integrated"
     }
   ]
 }
