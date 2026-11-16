@@ -80,3 +80,10 @@ The first `arcane-realm-asset-forge` implementation batch adds two original SVG 
 - Added an in-game pause overlay with Resume and desktop control reminders. The menu button and Escape key pause/resume the Sanctuary scene; Escape closes open dialogue first.
 - Added responsive mobile layouts, focus-visible keyboard styling, and reduced-motion support. Existing combat, movement, NPC, and mobile control logic is unchanged.
 - Browser smoke coverage for title-screen entry and pause/resume is added. CI must run before this change is considered validated; no real-device visual review has been performed.
+
+
+## Player interface follow-up
+- Expanded the pause surface into a responsive Wayfarer's Compendium with Character, Journal, World, and Controls sections. Values shown are limited to the current local prototype (Wayfarer, level 1, Arcane tradition, Glimmer, current vitality, one known spell, Sanctuary).
+- The journal labels the Sanctuary prompt as exploration guidance, not a reward-bearing quest. The menu explicitly notes that progress is not saved.
+- Added a desktop Arcane Bolt quickbar button and a live local cooldown label; Space and 1 both cast the existing spell. Mobile continues to use the dedicated Cast touch button.
+- Browser smoke coverage now opens multiple menu sections, returns to play, and activates the spell quickbar. This coverage is authored but has not yet been run in this environment.

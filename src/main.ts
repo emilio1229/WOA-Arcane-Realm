@@ -128,7 +128,7 @@ class SanctuaryScene extends Phaser.Scene {
     this.cameras.main.setZoom(Math.min(1, this.scale.width / 1100));
     this.physics.world.setBounds(70, 70, WORLD.width - 140, WORLD.height - 140);
 
-    this.keys = this.input.keyboard!.addKeys("W,A,S,D,UP,DOWN,LEFT,RIGHT,E,ENTER,SPACE,SHIFT") as Record<string, Phaser.Input.Keyboard.Key>;
+    this.keys = this.input.keyboard!.addKeys("W,A,S,D,UP,DOWN,LEFT,RIGHT,E,ENTER,SPACE,SHIFT,ONE") as Record<string, Phaser.Input.Keyboard.Key>;
     this.prompt = this.add.text(0, 0, "E  SPEAK", {
       fontFamily: "Manrope, sans-serif", fontSize: "11px", color: "#fff4d9",
       backgroundColor: "#2c1e40", padding: { x: 9, y: 6 }, stroke: "#d5a5ef", strokeThickness: 1,
@@ -372,6 +372,15 @@ class SanctuaryScene extends Phaser.Scene {
     this.time.delayedCall(230, () => this.wizardSprite.clearTint());
   }
 
+  private updateCastHud() {
+    const status = document.querySelector<HTMLElement>("#cast-status");
+    const slot = document.querySelector<HTMLButtonElement>("#cast-spell");
+    const remaining = Math.max(0, this.nextCastAt - this.time.now);
+    if (status) status.textContent = remaining > 0 ? `RECHARGING · ${(remaining / 1000).toFixed(1)}s` : "READY · SPACE / 1";
+    slot?.classList.toggle("recharging", remaining > 0);
+    slot?.classList.toggle("ready", remaining <= 0);
+  }
+
   private updateDodgeHud() {
     const fill = document.querySelector<HTMLElement>("#dodge-fill");
     const label = document.querySelector<HTMLElement>("#dodge-label");
@@ -401,6 +410,10 @@ class SanctuaryScene extends Phaser.Scene {
   }
 
   private updateHealthHud() {
+    const menuValue = document.querySelector("#menu-health");
+    const menuFill = document.querySelector<HTMLElement>("#menu-health-fill");
+    if (menuValue) menuValue.textContent = `${this.playerHealth} / 5`;
+    if (menuFill) menuFill.style.width = `${this.playerHealth * 20}%`;
     const value = document.querySelector("#player-health");
     const fill = document.querySelector<HTMLElement>("#health-fill");
     if (value) value.textContent = `${this.playerHealth} / 5`;
@@ -463,6 +476,7 @@ class SanctuaryScene extends Phaser.Scene {
     this.hostileWisp.update(this.player.x, this.player.y, Math.min(this.game.loop.delta, 50) / 1000);
     this.emberSentry.update(this.player.x, this.player.y);
     this.updateDodgeHud();
+    this.updateCastHud();
     this.updateRecoveryHud();
     let x = Number(keyboard.A.isDown || keyboard.LEFT.isDown) * -1 + Number(keyboard.D.isDown || keyboard.RIGHT.isDown);
     let y = Number(keyboard.W.isDown || keyboard.UP.isDown) * -1 + Number(keyboard.S.isDown || keyboard.DOWN.isDown);
@@ -526,7 +540,7 @@ class SanctuaryScene extends Phaser.Scene {
       this.prompt.setPosition(this.scale.width / 2, this.scale.height - 105);
     }
     if (Phaser.Input.Keyboard.JustDown(keyboard.E) || Phaser.Input.Keyboard.JustDown(keyboard.ENTER)) this.interact();
-    if (Phaser.Input.Keyboard.JustDown(keyboard.SPACE)) this.castSpell();
+    if (Phaser.Input.Keyboard.JustDown(keyboard.SPACE) || Phaser.Input.Keyboard.JustDown(keyboard.ONE)) this.castSpell();
     if (Phaser.Input.Keyboard.JustDown(keyboard.SHIFT)) this.dodge();
   }
 }

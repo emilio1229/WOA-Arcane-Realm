@@ -47,7 +47,11 @@ try {
   assert.ok(canvasSize.width > 0 && canvasSize.height > 0, "game canvas should have a real drawing surface");
   await desktop.locator("#pause-game").click();
   await desktop.locator("#pause-overlay").waitFor({ state: "visible" });
-  await desktop.locator("#resume-game").click();
+  await desktop.locator("[data-menu-tab=journal]").click();
+  await desktop.locator("[data-menu-page=journal]").waitFor({ state: "visible" });
+  await desktop.locator("[data-menu-tab=controls]").click();
+  await desktop.locator("[data-menu-page=controls]").waitFor({ state: "visible" });
+  await desktop.locator("#resume-journey").click();
   await desktop.locator("#pause-overlay").waitFor({ state: "hidden" });
   await desktop.setViewportSize({ width: 980, height: 720 });
   await delay(300);
@@ -96,6 +100,7 @@ try {
   // Exercise casting from a neutral spot, away from the practice target so
   // this smoke check cannot consume one of its three test health points.
   await desktop.evaluate(() => window.arcaneTest.setPlayerPosition(900, 480));
+  await desktop.locator("#cast-spell").click();
   await desktop.keyboard.press("Space");
   await delay(500);
   await desktop.keyboard.down("e");
