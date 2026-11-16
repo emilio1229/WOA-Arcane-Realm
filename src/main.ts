@@ -91,6 +91,8 @@ class SanctuaryScene extends Phaser.Scene {
     this.load.svg("prop-crystals", "/assets/props/crystal-cluster.svg", { width: 128, height: 128 });
     this.load.svg("sanctuary-ground", "/assets/environment/sanctuary-ground.svg", { width: 1800, height: 1250 });
     this.load.svg("sanctuary-dressing", "/assets/environment/sanctuary-dressing.svg", { width: 1800, height: 1250 });
+    this.load.svg("sanctuary-atmosphere", "/assets/environment/sanctuary-atmosphere.svg", { width: 1800, height: 1250 });
+    this.load.svg("portal-rune-crown", "/assets/environment/portal-rune-crown.svg", { width: 512, height: 512 });
     this.load.spritesheet("arcane-burst", "/assets/vfx/arcane-burst-sheet.svg", { frameWidth: 96, frameHeight: 96 });
   }
 
@@ -172,6 +174,7 @@ class SanctuaryScene extends Phaser.Scene {
     const tileW = 96, tileH = 48, cols = 28, rows = 28;
     this.add.image(0, 0, "sanctuary-ground").setOrigin(0).setDisplaySize(WORLD.width, WORLD.height).setDepth(-1);
     this.add.image(0, 0, "sanctuary-dressing").setOrigin(0).setDisplaySize(WORLD.width, WORLD.height).setDepth(-0.5);
+    this.add.image(0, 0, "sanctuary-atmosphere").setOrigin(0).setDisplaySize(WORLD.width, WORLD.height).setDepth(-0.25);
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
         const x = 90 + (col - row) * tileW / 2 + WORLD.width / 2 - cols * tileW / 4;
@@ -204,6 +207,8 @@ class SanctuaryScene extends Phaser.Scene {
 
   private drawPortal(x: number, y: number) {
     const portal = this.add.image(x, y, "grand-portal").setDisplaySize(250, 250).setDepth(100).setAlpha(0.92);
+    const runeCrown = this.add.image(x, y, "portal-rune-crown").setDisplaySize(282, 282).setDepth(101).setAlpha(0.82);
+    this.tweens.add({ targets: runeCrown, angle: { from: -1.5, to: 1.5 }, alpha: { from: 0.68, to: 0.9 }, duration: 6800, yoyo: true, repeat: -1, ease: "Sine.easeInOut" });
     this.tweens.add({ targets: portal, alpha: { from: 0.78, to: 1 }, scale: { from: 0.97, to: 1.02 }, duration: 2100, yoyo: true, repeat: -1, ease: "Sine.easeInOut" });
 
     const orbit = { angle: 0 };
