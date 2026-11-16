@@ -15,7 +15,7 @@ Official reference: https://docs.phaser.io/phaser/getting-started/installation
 - Controllable wizard with WASD/arrow movement, subtle idle/movement motion, and direction-aware facing.
 - First local spell-casting interaction: Space or the mobile Cast button launches an Arcane Bolt with an impact burst and a short local cast throttle.
 - Aimed Arcane Bolts can damage the three-health Ember Wisp practice target; its health bar updates, it is briefly dispelled at zero health, and it respawns after a short delay.
-- A hostile Frost Wisp now detects the player within its local aggro radius, pursues at a controlled speed, attacks at close range, has four health, and respawns after defeat. Player vitality is displayed in the HUD; taking damage produces a brief hit flash and camera shake, and reaching zero vitality returns the wizard to the sanctuary spawn with full vitality.
+- A hostile Frost Wisp now detects the player within its local aggro radius, pursues at a controlled speed, telegraphs its close-range attack with a visible warning ring, has four health, and respawns after defeat. Player vitality is displayed in the HUD; taking damage produces a brief hit flash and camera shake, and reaching zero vitality returns the wizard to the sanctuary spawn with full vitality.
 - The headless browser smoke test now includes the hostile Wisp combat loop and player damage checks.
 - Ambient floating magic motes around the Sanctuary; touch controls now include both Interact and Cast.
 - NPCs with names, idle bobbing, proximity detection, and E/Enter interaction.
