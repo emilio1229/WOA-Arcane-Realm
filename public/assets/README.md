@@ -62,3 +62,10 @@ npm run assets:validate
 Supported categories: `character`, `familiar`, `creature`, `environment`, `vfx`, `ui`, `building`, and `prop`. The generator rejects duplicate IDs/files and marks generated artwork as `scaffold`; replace the placeholder geometry and visually review it before integration. It never overwrites existing source art.
 
 
+
+
+## Sanctuary visual upgrade — first Asset Forge batch
+
+- `environment.sanctuary-atmosphere` adds a moonlit ceremonial plaza ring, rune wayfinding, crystal garden beds, and layered perimeter groves as a transparent world-space layer.
+- `environment.portal-rune-crown` adds a rotating metallic rune crown and luminous cardinal markers over the Grand Portal.
+- Both are original editable SVG sources, registered in `manifest.json` and loaded by the Sanctuary scene. Their status is prototype-integrated pending in-game visual review.
