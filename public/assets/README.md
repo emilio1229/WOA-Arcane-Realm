@@ -35,7 +35,8 @@ Original, editable SVG source assets for the Arcane Realm prototype.
 | Sanctuary lantern | `environment.prop.lantern` | Path lighting prop |
 | Rune obelisk | `environment.prop.rune-obelisk` | Arcane landmark prop |
 | Crystal cluster | `environment.prop.crystal-cluster` | Magical garden prop |
-| Sanctuary ground | `environment.sanctuary-ground` | Single-layer isometric grass, flowering terrain, engraved plaza stones, and a rune-inlaid sanctuary path |
+| Sanctuary ground | `environment.sanctuary-ground` | Isometric grass, flowering terrain, engraved plaza stones, and rune-inlaid sanctuary path |
+| Sanctuary dressing | `environment.sanctuary-dressing` | Transparent world-space layer with corner groves, glowing mushrooms, flower clusters, rune wayfinding, and soft sanctuary light |
 | Arcane burst sheet | `vfx.arcane-burst-sheet` | Six-frame, transparent spell impact animation (96×96 cells at 15 fps) |
 
 ## Validation workflow
@@ -47,7 +48,7 @@ Original, editable SVG source assets for the Arcane Realm prototype.
 5. Review at the smallest target mobile size.
 6. Keep source and runtime variants linked by stable ID.
 
-The pack is integrated into the Sanctuary prototype: all five building exteriors, lanterns, rune obelisk, crystal cluster, Arcane wizard and walk cycle, Glimmer, Ember Wisp, and Grand Portal are loaded by the scene. Arcane Bolt, Arcane Impact, and Arcane Mote now power the first local spell-casting prototype and ambient magic layer. Sigil remains catalogued for the upcoming HUD/economy pass. Use Space or the mobile Cast control to launch the Arcane Bolt.
+The sanctuary ground and transparent dressing layer are integrated into the Sanctuary prototype. The dressing adds corner groves, low shrubs, glowing mushrooms, flower clusters, stone inlays, and soft pools of light without blocking movement or mobile controls. The pack is integrated into the Sanctuary prototype: all five building exteriors, lanterns, rune obelisk, crystal cluster, Arcane wizard and walk cycle, Glimmer, Ember Wisp, and Grand Portal are loaded by the scene. Arcane Bolt, Arcane Impact, and Arcane Mote now power the first local spell-casting prototype and ambient magic layer. Sigil remains catalogued for the upcoming HUD/economy pass. Use Space or the mobile Cast control to launch the Arcane Bolt.
 
 ## Creating a new asset scaffold
 
