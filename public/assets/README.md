@@ -82,3 +82,8 @@ Supported categories: `character`, `familiar`, `creature`, `environment`, `vfx`,
 - `environment.sanctuary-townlife` adds paired merchant awnings, timber benches, warm street lanterns, pennants, a public noticeboard, a carved wayfinding marker, and small doorstep planters.
 - The transparent 1800×1250 SVG layer is loaded beneath actors and building exteriors. Its props are kept to the outer edges and lower gathering areas so the central plaza and combat lanes remain readable.
 - Original editable SVG source; no third-party artwork or fonts embedded. Integrated in the Phaser Sanctuary scene; visual review at gameplay scale remains pending.
+
+
+## Sanctuary architectural detail overlays
+
+Five original transparent SVG overlays enrich the existing Library, Familiar Sanctuary, Spell Academy, Merchant Hall, and Adventurer's Inn with carved trim, roof detailing, timber/stone framing, window accents, runic motifs, and warm light. The overlays are additive: the original building art and collision footprints are preserved. Each is 512×512 and registered as `building.detail.*`. Status remains `needs-review` until the in-game visual pass and target-scale checks are run.

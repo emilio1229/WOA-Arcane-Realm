@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><defs><linearGradient id="wood" x2="0" y2="1"><stop stop-color="#d2a06b"/><stop offset="1" stop-color="#714a3c"/></linearGradient><radialGradient id="warm"><stop stop-color="#fff1b7" stop-opacity=".9"/><stop offset="1" stop-color="#e9a45d" stop-opacity="0"/></radialGradient></defs>
+<g fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M88 229H424M105 246V432M407 246V432M126 246V432M386 246V432" stroke="url(#wood)" stroke-width="7"/>
+<path d="M105 225 130 98 382 98 407 225" stroke="#d7a775" stroke-width="5"/><path d="M128 117H384M118 164H394M108 207H404" stroke="#f0cf9f" stroke-opacity=".4" stroke-width="3"/>
+<path d="M100 234 145 212 190 234M322 234 367 212 412 234" stroke="#f0c38c" stroke-width="5"/>
+<path d="M128 249V424M160 249V424M352 249V424M384 249V424" stroke="#5b3d35" stroke-width="6"/>
+<path d="M130 250H158M354 250H382M130 424H158M354 424H382" stroke="#f2d3a4" stroke-width="4"/>
+<path d="M214 316Q256 285 298 316V438" stroke="#e3bd8b" stroke-width="5"/><path d="M235 344Q256 325 277 344V438" stroke="#d6a16c" stroke-width="4"/>
+<path d="M256 353 266 367 256 381 246 367Z" fill="#e8c58f" stroke="#fff0c2" stroke-width="2"/>
+<path d="M113 278H170M342 278H399" stroke="#e7bd8a" stroke-width="4"/>
+<path d="M110 290Q140 270 170 290M342 290Q372 270 402 290" stroke="#fff0bd" stroke-opacity=".55" stroke-width="3"/>
+<path d="M90 438H422" stroke="#d9a875" stroke-width="5"/>
+<path d="M145 101 170 68 195 101M317 101 342 68 367 101" stroke="#e9c48e" stroke-width="5"/>
+<path d="M256 88V47" stroke="#e4b77f" stroke-width="5"/><path d="M237 47H275L256 22Z" fill="#a96d58" stroke="#f2d5a6" stroke-width="3"/>
+</g><g><circle cx="150" cy="296" r="40" fill="url(#warm)"/><circle cx="362" cy="296" r="40" fill="url(#warm)"/><path d="M138 304V280Q150 260 162 280V304Z M350 304V280Q362 260 374 280V304Z" fill="#ffdda0" stroke="#8b5940" stroke-width="3"/><path d="M125 344Q150 330 175 344L170 356H130Z M337 344Q362 330 387 344L382 356H342Z" fill="#78a879" stroke="#d4e0ae" stroke-width="2"/></g></svg>

@@ -557,6 +557,91 @@
       ],
       "status": "prototype-integrated",
       "provenance": "Original in-repository SVG artwork; created for the Sanctuary town-life pass."
+    },
+    {
+      "id": "building.detail.library",
+      "path": "/assets/buildings/detail-library.svg",
+      "category": "building-detail",
+      "format": "svg",
+      "source": true,
+      "width": 512,
+      "height": 512,
+      "tags": [
+        "architecture",
+        "detail-overlay",
+        "sanctuary",
+        "original-art"
+      ],
+      "status": "needs-review",
+      "provenance": "Original hand-authored SVG detail overlay; designed to layer over the existing Sanctuary building silhouette without replacing its source art."
+    },
+    {
+      "id": "building.detail.familiar",
+      "path": "/assets/buildings/detail-familiar.svg",
+      "category": "building-detail",
+      "format": "svg",
+      "source": true,
+      "width": 512,
+      "height": 512,
+      "tags": [
+        "architecture",
+        "detail-overlay",
+        "sanctuary",
+        "original-art"
+      ],
+      "status": "needs-review",
+      "provenance": "Original hand-authored SVG detail overlay; designed to layer over the existing Sanctuary building silhouette without replacing its source art."
+    },
+    {
+      "id": "building.detail.academy",
+      "path": "/assets/buildings/detail-academy.svg",
+      "category": "building-detail",
+      "format": "svg",
+      "source": true,
+      "width": 512,
+      "height": 512,
+      "tags": [
+        "architecture",
+        "detail-overlay",
+        "sanctuary",
+        "original-art"
+      ],
+      "status": "needs-review",
+      "provenance": "Original hand-authored SVG detail overlay; designed to layer over the existing Sanctuary building silhouette without replacing its source art."
+    },
+    {
+      "id": "building.detail.merchant",
+      "path": "/assets/buildings/detail-merchant.svg",
+      "category": "building-detail",
+      "format": "svg",
+      "source": true,
+      "width": 512,
+      "height": 512,
+      "tags": [
+        "architecture",
+        "detail-overlay",
+        "sanctuary",
+        "original-art"
+      ],
+      "status": "needs-review",
+      "provenance": "Original hand-authored SVG detail overlay; designed to layer over the existing Sanctuary building silhouette without replacing its source art."
+    },
+    {
+      "id": "building.detail.inn",
+      "path": "/assets/buildings/detail-inn.svg",
+      "category": "building-detail",
+      "format": "svg",
+      "source": true,
+      "width": 512,
+      "height": 512,
+      "tags": [
+        "architecture",
+        "detail-overlay",
+        "sanctuary",
+        "original-art"
+      ],
+      "status": "needs-review",
+      "provenance": "Original hand-authored SVG detail overlay; designed to layer over the existing Sanctuary building silhouette without replacing its source art."
     }
   ]
 }

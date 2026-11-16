@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><defs><linearGradient id="gold" x2="0" y2="1"><stop stop-color="#fff0c4"/><stop offset="1" stop-color="#b98550"/></linearGradient><linearGradient id="glow" x2="0" y2="1"><stop stop-color="#fff4ca" stop-opacity=".8"/><stop offset="1" stop-color="#df9d64" stop-opacity=".05"/></linearGradient><pattern id="tiles" width="24" height="14" patternUnits="userSpaceOnUse"><path d="M0 13 12 1 24 13" fill="none" stroke="#e7c8f3" stroke-opacity=".2" stroke-width="2"/></pattern></defs>
+<g fill="none" stroke-linecap="round" stroke-linejoin="round">
+<path d="M91 229V113L110 89 128 113V225M384 225V113L402 89 421 113V229" stroke="#f1d9ff" stroke-opacity=".65" stroke-width="5"/>
+<path d="M139 225 256 137 373 225" stroke="url(#gold)" stroke-width="5"/><path d="M151 218 256 155 361 218" stroke="#f6e2ff" stroke-opacity=".45" stroke-width="2"/>
+<path d="M75 229H437M91 246H421M91 355H421M91 426H421" stroke="#e4c8f1" stroke-opacity=".32" stroke-width="4"/>
+<path d="M105 244V431M407 244V431M123 244V431M389 244V431" stroke="#e9d4f0" stroke-opacity=".25" stroke-width="4"/>
+<path d="M132 249Q164 234 196 249M316 249Q348 234 380 249" stroke="#fff0c5" stroke-opacity=".65" stroke-width="5"/>
+<path d="M145 274V329M164 255V338M183 274V329M329 274V329M348 255V338M367 274V329" stroke="#68466d" stroke-opacity=".6" stroke-width="3"/>
+<path d="M145 295H183M329 295H367" stroke="#68466d" stroke-opacity=".6" stroke-width="3"/>
+<path d="M224 321Q256 292 288 321V438" stroke="#f4d9ff" stroke-opacity=".35" stroke-width="4"/>
+<path d="M238 345Q256 328 274 345V435" stroke="url(#gold)" stroke-opacity=".65" stroke-width="3"/>
+<path d="M256 352V409M245 380H267M247 366 256 352 265 366" stroke="#f4d9ff" stroke-opacity=".75" stroke-width="3"/>
+<path d="M110 104 128 82 146 104M366 104 384 82 402 104" stroke="url(#gold)" stroke-width="4"/>
+<path d="M246 71 256 51 266 71 256 91Z" fill="#e9c9ff" fill-opacity=".3" stroke="#f3d9ff" stroke-width="3"/>
+<path d="M256 51V91M236 71H276" stroke="#fff2ce" stroke-width="2"/>
+<path d="M82 438H430" stroke="url(#gold)" stroke-width="5"/>
+<path d="M100 260l10 10-10 10M412 260l-10 10 10 10" stroke="#f2d6ff" stroke-width="3"/>
+<path d="M105 235H407V430H105Z" fill="url(#tiles)" opacity=".22"/>
+</g><g fill="#fff0c5"><circle cx="111" cy="248" r="3"/><circle cx="401" cy="248" r="3"/><circle cx="111" cy="426" r="3"/><circle cx="401" cy="426" r="3"/></g></svg>

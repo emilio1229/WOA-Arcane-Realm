@@ -22,6 +22,7 @@ declare global {
       getHitRecoveryMs: () => number;
       getWizardFrame: () => number;
       getWizardTexture: () => string;
+      getBuildingDetailsLoaded: () => boolean;
       performDodge: () => void;
       forcePlayerHit: () => void;
       setPlayerPosition: (x: number, y: number, facingX?: number, facingY?: number) => void;
@@ -96,6 +97,11 @@ class SanctuaryScene extends Phaser.Scene {
     this.load.svg("building-academy", "/assets/buildings/spell-academy.svg", { width: 256, height: 256 });
     this.load.svg("building-merchant", "/assets/buildings/merchant-hall.svg", { width: 256, height: 256 });
     this.load.svg("building-inn", "/assets/buildings/adventurer-inn.svg", { width: 256, height: 256 });
+    this.load.svg("detail-library", "/assets/buildings/detail-library.svg", { width: 512, height: 512 });
+    this.load.svg("detail-familiar", "/assets/buildings/detail-familiar.svg", { width: 512, height: 512 });
+    this.load.svg("detail-academy", "/assets/buildings/detail-academy.svg", { width: 512, height: 512 });
+    this.load.svg("detail-merchant", "/assets/buildings/detail-merchant.svg", { width: 512, height: 512 });
+    this.load.svg("detail-inn", "/assets/buildings/detail-inn.svg", { width: 512, height: 512 });
     this.load.svg("prop-lantern", "/assets/props/sanctuary-lantern.svg", { width: 64, height: 128 });
     this.load.svg("prop-obelisk", "/assets/props/rune-obelisk.svg", { width: 128, height: 128 });
     this.load.svg("prop-crystals", "/assets/props/crystal-cluster.svg", { width: 128, height: 128 });
@@ -164,6 +170,7 @@ class SanctuaryScene extends Phaser.Scene {
         getHitRecoveryMs: () => Math.max(0, this.hitRecoveryUntil - this.time.now),
         getWizardFrame: () => Number(this.wizardSprite.frame.name),
         getWizardTexture: () => this.wizardSprite.texture.key,
+        getBuildingDetailsLoaded: () => ["detail-library","detail-familiar","detail-academy","detail-merchant","detail-inn"].every(key => this.textures.exists(key)),
         performDodge: () => this.dodge(),
         forcePlayerHit: () => this.damagePlayer(),
         setPlayerPosition: (x, y, facingX = 0, facingY = -1) => {
@@ -254,6 +261,15 @@ class SanctuaryScene extends Phaser.Scene {
 
   private building(x: number, y: number, label: string, texture: string) {
     this.add.image(x, y + 22, texture).setDisplaySize(255, 255).setOrigin(0.5, 1).setDepth(y);
+    const detailKey: Record<string, string> = {
+      "building-library": "detail-library",
+      "building-familiar": "detail-familiar",
+      "building-academy": "detail-academy",
+      "building-merchant": "detail-merchant",
+      "building-inn": "detail-inn",
+    };
+    const detail = detailKey[texture];
+    if (detail) this.add.image(x, y + 22, detail).setDisplaySize(255, 255).setOrigin(0.5, 1).setDepth(y + 1);
     this.add.text(x, y + 52, label, { fontFamily: "Cinzel, serif", fontSize: "10px", color: "#f3e3ff", stroke: "#1a1424", strokeThickness: 3, letterSpacing: 1 }).setOrigin(0.5).setDepth(y + 5);
     this.obstacles.push(new Phaser.Geom.Rectangle(x - 75, y - 85, 150, 105));
   }

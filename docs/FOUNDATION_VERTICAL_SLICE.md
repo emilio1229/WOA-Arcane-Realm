@@ -108,3 +108,8 @@ The Asset Forge town-life pass adds a transparent, original SVG layer with marke
 - Walking animation now reflects actual resolved movement, not merely held input; idle frames are selected from the active tradition's sprite-sheet row.
 - Arcane Bolt impact bursts inherit the chosen magic color as well as the projectile.
 - Browser smoke coverage now checks all six idle robe rows and compares cardinal/diagonal travel distance. These tests are authored but not yet run in this environment.
+
+
+## Sanctuary architecture detail pass
+
+Added five original 512×512 transparent SVG overlay assets for the Grand Library, Familiar Sanctuary, Spell Academy, Merchant Hall, and Adventurer's Inn. They add carved stone/wood framing, roof and cornice accents, window mullions, crest/rune work, and localized warm or elemental light. Existing base building SVGs and collision footprints are retained; overlays are layered directly above their matching building textures. Manifest status is `needs-review` pending live browser visual review and mobile-scale inspection.
