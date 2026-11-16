@@ -663,6 +663,40 @@
       ],
       "status": "needs-review",
       "provenance": "Original hand-authored SVG landmark asset; sculpted stone basin, crystal crown, and magical water."
+    },
+    {
+      "id": "environment.town.signpost",
+      "path": "/assets/props/sanctuary-signpost.svg",
+      "category": "prop",
+      "format": "svg",
+      "source": true,
+      "width": 256,
+      "height": 320,
+      "tags": [
+        "sanctuary",
+        "town",
+        "wayfinding",
+        "interactive-landmark"
+      ],
+      "status": "prototype-integrated",
+      "provenance": "Original hand-authored SVG prop, created for the Sanctuary town exploration pass."
+    },
+    {
+      "id": "environment.town.noticeboard",
+      "path": "/assets/props/sanctuary-noticeboard.svg",
+      "category": "prop",
+      "format": "svg",
+      "source": true,
+      "width": 320,
+      "height": 320,
+      "tags": [
+        "sanctuary",
+        "town",
+        "wayfinding",
+        "interactive-landmark"
+      ],
+      "status": "prototype-integrated",
+      "provenance": "Original hand-authored SVG prop, created for the Sanctuary town exploration pass."
     }
   ]
 }

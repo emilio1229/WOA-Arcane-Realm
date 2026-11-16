@@ -126,3 +126,10 @@ Added `environment.sanctuary-fountain`, a 512×512 original SVG landmark with la
 - Connected the Character, Journal, World, and Controls tabs to their matching content panels, including synchronized active and ARIA-selected states.
 - Wired the Compendium's "Return to Your Journey" action to resume the paused Sanctuary scene, matching the close control.
 - The existing desktop browser playtest exercises Journal/Controls navigation and resume behavior.
+
+
+## Town interaction and analog movement follow-up
+- Added contextual interaction points at the Grand Library, Familiar Sanctuary, Spell Academy, Merchant Hall, and Adventurer's Inn. Each location has a distinct action prompt and authored lore text; nearby named residents still take priority for dialogue.
+- The contextual interaction is proximity-based and uses the existing E/Interact control and dialogue panel. No fake inventory, shop purchase, training reward, or interior transition is presented as implemented.
+- Corrected the virtual joystick's analog response. The projected isometric direction is normalized, then the original input magnitude is restored, so gentle stick movement no longer snaps to full walking speed.
+- Added browser regression assertions for half-stick speed and the Grand Library interaction. Tests are authored but have not yet run in a browser in this session.

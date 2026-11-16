@@ -84,6 +84,16 @@ try {
   assert.ok(Math.abs(cardinalSpeed - diagonalSpeed) < 2,
     "cardinal and diagonal movement should have the same world-space speed");
 
+  // The mobile joystick is analog: half deflection should produce about half speed.
+  await desktop.evaluate(() => { window.arcaneMove = { x: 0, y: -0.5 }; });
+  await desktop.waitForFunction(() => window.arcaneTest.getMovementSpeed() > 85 && window.arcaneTest.getMovementSpeed() < 105,
+    { timeout: 3000, polling: 50 });
+  const halfStickSpeed = await desktop.evaluate(() => window.arcaneTest.getMovementSpeed());
+  assert.ok(Math.abs(halfStickSpeed / cardinalSpeed - 0.5) < 0.08,
+    "half joystick deflection should produce approximately half movement speed");
+  await desktop.evaluate(() => { window.arcaneMove = { x: 0, y: 0 }; });
+  await desktop.waitForFunction(() => window.arcaneTest.getMovementSpeed() < 1, { timeout: 3000, polling: 50 });
+
   await desktop.locator("#pause-game").click();
   await desktop.locator("#pause-overlay").waitFor({ state: "visible" });
   await desktop.locator("[data-menu-tab=journal]").click();
@@ -138,6 +148,15 @@ try {
 
   // Exercise casting from a neutral spot, away from the practice target so
   // this smoke check cannot consume one of its three test health points.
+  // Town landmarks have contextual interactions, not just decorative labels.
+  await desktop.evaluate(() => window.arcaneTest.setPlayerPosition(650, 510));
+  assert.equal(await desktop.evaluate(() => window.arcaneTest.getNearestTownLocation()), "Grand Library");
+  await desktop.locator("#interact").click();
+  await desktop.locator("#dialogue").waitFor({ state: "visible" });
+  assert.equal(await desktop.locator("#npc-name").textContent(), "Grand Library");
+  assert.ok((await desktop.locator("#npc-line").textContent()).includes("sealed atlas room"));
+  await desktop.locator("#close-dialogue").click();
+
   await desktop.evaluate(() => window.arcaneTest.setPlayerPosition(900, 480));
   await desktop.locator("#cast-spell").click();
   await desktop.keyboard.press("Space");

@@ -23,6 +23,7 @@ declare global {
       getWizardFrame: () => number;
       getWizardTexture: () => string;
       getMovementSpeed: () => number;
+      getNearestTownLocation: () => string | null;
       getBuildingDetailsLoaded: () => boolean;
       performDodge: () => void;
       forcePlayerHit: () => void;
@@ -32,6 +33,14 @@ declare global {
 }
 
 type NPC = { name: string; x: number; y: number; line: string; color: number };
+type TownLocation = { name: string; x: number; y: number; line: string; prompt: string }; 
+const TOWN_LOCATIONS: TownLocation[] = [
+  { name: "Grand Library", x: 650, y: 510, prompt: "E  EXPLORE", line: "The Grand Library rises in tiers of old stone and moonlit glass. Its sealed atlas room holds maps of places that no longer appear on ordinary charts. The Archivist may know which volume has begun whispering again." },
+  { name: "Familiar Sanctuary", x: 1160, y: 520, prompt: "E  VISIT", line: "Soft wings stir behind the sanctuary's arched windows. Familiars are not summoned here; they arrive when a bond is ready. Keeper Moth tends the quiet rooms and records every first meeting." },
+  { name: "Spell Academy", x: 560, y: 835, prompt: "E  TRAIN", line: "The academy's practice hall is etched with protective circles. Students learn to shape a spell safely before taking it beyond the Sanctuary walls. The duelling floor is reserved for supervised trials." },
+  { name: "Merchant Hall", x: 1240, y: 895, prompt: "E  BROWSE", line: "Copper bells mark the Merchant Hall's doorway. Shelves are being arranged and the trade ledger is not yet open, but Zia's catalogue already lists curiosities from the outer reaches." },
+  { name: "Adventurer's Inn", x: 900, y: 1080, prompt: "E  REST", line: "The inn smells of cedar, spiced tea, and rain-damp cloaks. Wayfarers leave messages for one another on the common-room board. The rooms are quiet tonight, though the road beyond the portal is not." },
+];
 const WORLD = { width: 1800, height: 1250 };
 const NPCS: NPC[] = [
   { name: "Archmage Elowen", x: 900, y: 480, line: "Welcome, wayfarer. The Sanctuary has been waiting for someone with a spark of curiosity. Wander freely; there is much to discover here.", color: 0xd6a4ff },
@@ -68,6 +77,7 @@ class SanctuaryScene extends Phaser.Scene {
   private keys!: Record<string, Phaser.Input.Keyboard.Key>;
   private obstacles: Phaser.Geom.Rectangle[] = [];
   private npcs: Array<{ data: NPC; art: Phaser.GameObjects.Container }> = [];
+  private townLocations = TOWN_LOCATIONS;
   private prompt!: Phaser.GameObjects.Text;
   private interactHandler = () => this.interact();
 
@@ -106,6 +116,8 @@ class SanctuaryScene extends Phaser.Scene {
     this.load.svg("prop-lantern", "/assets/props/sanctuary-lantern.svg", { width: 64, height: 128 });
     this.load.svg("prop-obelisk", "/assets/props/rune-obelisk.svg", { width: 128, height: 128 });
     this.load.svg("prop-crystals", "/assets/props/crystal-cluster.svg", { width: 128, height: 128 });
+    this.load.svg("prop-noticeboard", "/assets/props/sanctuary-noticeboard.svg", { width: 320, height: 320 });
+    this.load.svg("prop-signpost", "/assets/props/sanctuary-signpost.svg", { width: 256, height: 320 });
     this.load.svg("sanctuary-ground", "/assets/environment/sanctuary-ground.svg", { width: 1800, height: 1250 });
     this.load.svg("sanctuary-dressing", "/assets/environment/sanctuary-dressing.svg", { width: 1800, height: 1250 });
     this.load.svg("sanctuary-atmosphere", "/assets/environment/sanctuary-atmosphere.svg", { width: 1800, height: 1250 });
@@ -173,6 +185,7 @@ class SanctuaryScene extends Phaser.Scene {
         getWizardFrame: () => Number(this.wizardSprite.frame.name),
         getWizardTexture: () => this.wizardSprite.texture.key,
         getMovementSpeed: () => this.movementVelocity.length(),
+        getNearestTownLocation: () => this.nearestTownLocation()?.name ?? null,
         getBuildingDetailsLoaded: () => ["detail-library","detail-familiar","detail-academy","detail-merchant","detail-inn","sanctuary-fountain"].every(key => this.textures.exists(key)),
         performDodge: () => this.dodge(),
         forcePlayerHit: () => this.damagePlayer(),
@@ -310,7 +323,10 @@ class SanctuaryScene extends Phaser.Scene {
       this.tweens.add({ targets: lantern, alpha: { from: 0.82, to: 1 }, duration: 1900, yoyo: true, repeat: -1 });
     }
     const obelisk = this.add.image(760, 670, "prop-obelisk").setDisplaySize(92, 92).setDepth(680);
+    const signpost = this.add.image(410, 550, "prop-signpost").setDisplaySize(92, 115).setDepth(550);
+    const noticeboard = this.add.image(900, 1080, "prop-noticeboard").setDisplaySize(112, 112).setDepth(1080);
     this.add.image(1455, 900, "prop-crystals").setDisplaySize(112, 112).setDepth(910);
+    this.obstacles.push(new Phaser.Geom.Rectangle(390, 540, 40, 28), new Phaser.Geom.Rectangle(875, 1072, 50, 20));
     this.tweens.add({ targets: obelisk, alpha: { from: 0.86, to: 1 }, duration: 2200, yoyo: true, repeat: -1 });
   }
 
@@ -506,7 +522,27 @@ class SanctuaryScene extends Phaser.Scene {
 
   private interact() {
     const nearby = this.nearestNPC();
-    if (nearby) this.showDialogue(nearby.data);
+    if (nearby) { this.showDialogue(nearby.data); return; }
+    const location = this.nearestTownLocation();
+    if (location) this.showLocationDialogue(location);
+  }
+
+  private nearestTownLocation() {
+    let best: { name: string; line: string; distance: number; prompt: string } | undefined;
+    for (const location of this.townLocations) {
+      const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, location.x, location.y);
+      if (distance < 104 && (!best || distance < best.distance)) best = { ...location, distance };
+    }
+    return best;
+  }
+
+  private showLocationDialogue(location: { name: string; line: string }) {
+    const name = document.querySelector("#npc-name");
+    const line = document.querySelector("#npc-line");
+    const panel = document.querySelector("#dialogue");
+    if (name) name.textContent = location.name;
+    if (line) line.textContent = location.line;
+    panel?.classList.remove("hidden");
   }
 
   private nearestNPC() {
@@ -538,10 +574,11 @@ class SanctuaryScene extends Phaser.Scene {
     let y = Number(keyboard.W.isDown || keyboard.UP.isDown) * -1 + Number(keyboard.S.isDown || keyboard.DOWN.isDown);
     x += window.arcaneMove?.x ?? 0;
     y += window.arcaneMove?.y ?? 0;
+    const inputStrength = Phaser.Math.Clamp(Math.hypot(x, y), 0, 1);
     const vector = new Phaser.Math.Vector2((x - y) * 0.7071, (x + y) * 0.5);
-    // Normalize every non-zero input after the isometric projection. Without
-    // this, cardinal directions travel slower than diagonals on the diamond grid.
-    if (vector.lengthSq() > 0.001) vector.normalize();
+    // Normalize direction after projection, then restore analog stick magnitude.
+    // Keyboard input remains full speed; a gently tilted stick stays gently paced.
+    if (vector.lengthSq() > 0.001) vector.normalize().scale(inputStrength);
     const isDodging = this.time.now < this.dodgeUntil;
     const delta = Math.min(this.game.loop.delta, 100) / 1000;
     const speed = isDodging ? 470 : 190;
@@ -612,8 +649,10 @@ class SanctuaryScene extends Phaser.Scene {
     this.familiarArt.setDepth(this.familiarArt.y + 18);
     this.npcs.forEach(n => n.art.setDepth(n.data.y + 10));
     const nearby = this.nearestNPC();
-    this.prompt.setVisible(Boolean(nearby));
-    if (nearby) {
+    const location = nearby ? undefined : this.nearestTownLocation();
+    this.prompt.setVisible(Boolean(nearby || location));
+    if (nearby || location) {
+      this.prompt.setText(nearby ? "E  SPEAK" : location!.prompt);
       this.prompt.setPosition(this.scale.width / 2, this.scale.height - 105);
     }
     if (Phaser.Input.Keyboard.JustDown(keyboard.E) || Phaser.Input.Keyboard.JustDown(keyboard.ENTER)) this.interact();

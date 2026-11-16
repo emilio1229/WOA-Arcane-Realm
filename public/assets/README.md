@@ -92,3 +92,7 @@ Five original transparent SVG overlays enrich the existing Library, Familiar San
 ## Sanctuary Moonwell Fountain
 
 `environment.sanctuary-fountain` is an original 512×512 transparent landmark asset: a sculpted octagonal stone basin, layered water bowls, a faceted crystal crown, carved cardinal runes, and subtle water highlights. It replaces the temporary procedural ellipse stack in the center plaza. The scene adds a small number of low-cost animated glints around the crystal. Status: `needs-review` pending browser-scale art review.
+
+
+## Sanctuary landmark interactions
+The five main buildings now have proximity-based contextual interactions through the existing Interact/E control. Each landmark has its own action prompt and location lore. Nearby residents retain priority for direct conversation. These are exploration/lore interactions only; shops, training rewards, familiar adoption, and building interiors are not yet implemented.
