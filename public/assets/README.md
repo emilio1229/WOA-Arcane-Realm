@@ -100,3 +100,10 @@ The five main buildings now have proximity-based contextual interactions through
 
 ## Town service interactions
 The Spell Academy restores the practice Ember Wisp for repeatable combat training. The Adventurer's Inn restores player vitality as a safe-rest interaction. The Grand Library, Familiar Sanctuary, and Merchant Hall can be recorded as local discoveries; Merchant Hall is explicitly marked as not yet selling items. These local prototype services are not server-persistent.
+
+
+## Sanctuary craftwork detail pass
+
+- `environment.sanctuary-craftwork` is an original transparent 1800×1250 SVG layer with worn paving seams, inset pavers, brass-edged drainage grates, engraved wayfinding seals, sheltered moss, fine stone-joint plants, and subtle mineral flecks.
+- It sits above base dressing but below actors and town-life props, preserving the central plaza and combat lanes. No collision or movement logic changes.
+- Original additive source, registered in the manifest. Prototype-integrated; desktop and phone visual review remains pending.

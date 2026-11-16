@@ -150,3 +150,10 @@ Added `environment.sanctuary-fountain`, a 512×512 original SVG landmark with la
 - Raised base movement speed from 190 to 240 world units/second and dodge speed from 470 to 560, with slightly quicker acceleration while preserving analog stick scaling and collision substeps.
 - Added iOS safe-area and dynamic viewport handling, larger 48px+ touch targets, coarse-pointer controls for touch tablets, and a compact landscape-phone layout.
 - Extended mobile browser coverage to verify camera zoom, projected screen movement, viewport overflow, and touch target dimensions in addition to joystick, cast, dodge, and interaction.
+
+
+## Sanctuary material-detail pass
+
+- Added the transparent `sanctuary-craftwork` world layer: weathered paving joints, inset stone pavers, brass drainage grates, carved rune wayfinding seals, moss pockets, and fine plants growing through sheltered cracks.
+- The layer sits beneath town props and actors, preserves the open plaza and combat lanes, and does not alter collision or movement.
+- Registered as `environment.sanctuary-craftwork`; visual browser review remains required before final-art approval.

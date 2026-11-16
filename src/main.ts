@@ -130,6 +130,7 @@ class SanctuaryScene extends Phaser.Scene {
     this.load.svg("prop-signpost", "/assets/props/sanctuary-signpost.svg", { width: 256, height: 320 });
     this.load.svg("sanctuary-ground", "/assets/environment/sanctuary-ground.svg", { width: 1800, height: 1250 });
     this.load.svg("sanctuary-dressing", "/assets/environment/sanctuary-dressing.svg", { width: 1800, height: 1250 });
+    this.load.svg("sanctuary-craftwork", "/assets/environment/sanctuary-craftwork.svg", { width: 1800, height: 1250 });
     this.load.svg("sanctuary-atmosphere", "/assets/environment/sanctuary-atmosphere.svg", { width: 1800, height: 1250 });
     this.load.svg("sanctuary-townlife", "/assets/environment/sanctuary-townlife.svg", { width: 1800, height: 1250 });
     this.load.svg("sanctuary-fountain", "/assets/environment/sanctuary-fountain.svg", { width: 512, height: 512 });
@@ -199,7 +200,7 @@ class SanctuaryScene extends Phaser.Scene {
         getScreenMovementSpeed: () => this.movementVelocity.length() * this.cameras.main.zoom,
         getCameraZoom: () => this.cameras.main.zoom,
         getNearestTownLocation: () => this.nearestTownLocation()?.name ?? null,
-        getBuildingDetailsLoaded: () => ["detail-library","detail-familiar","detail-academy","detail-merchant","detail-inn","sanctuary-fountain"].every(key => this.textures.exists(key)),
+        getBuildingDetailsLoaded: () => ["detail-library","detail-familiar","detail-academy","detail-merchant","detail-inn","sanctuary-fountain","sanctuary-craftwork"].every(key => this.textures.exists(key)),
         getTownPropsLoaded: () => ["prop-noticeboard","prop-signpost"].every(key => this.textures.exists(key)),
         performDodge: () => this.dodge(),
         forcePlayerHit: () => this.damagePlayer(),
@@ -229,6 +230,7 @@ class SanctuaryScene extends Phaser.Scene {
     const tileW = 96, tileH = 48, cols = 28, rows = 28;
     this.add.image(0, 0, "sanctuary-ground").setOrigin(0).setDisplaySize(WORLD.width, WORLD.height).setDepth(-1);
     this.add.image(0, 0, "sanctuary-dressing").setOrigin(0).setDisplaySize(WORLD.width, WORLD.height).setDepth(-0.5);
+    this.add.image(0, 0, "sanctuary-craftwork").setOrigin(0).setDisplaySize(WORLD.width, WORLD.height).setDepth(0);
     this.add.image(0, 0, "sanctuary-atmosphere").setOrigin(0).setDisplaySize(WORLD.width, WORLD.height).setDepth(-0.25);
     this.add.image(0, 0, "sanctuary-townlife").setOrigin(0).setDisplaySize(WORLD.width, WORLD.height).setDepth(0.5);
     for (let row = 0; row < rows; row++) {

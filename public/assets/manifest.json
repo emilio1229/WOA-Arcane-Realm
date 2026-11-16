@@ -697,6 +697,24 @@
       ],
       "status": "prototype-integrated",
       "provenance": "Original hand-authored SVG prop, created for the Sanctuary town exploration pass."
+    },
+    {
+      "id": "environment.sanctuary-craftwork",
+      "path": "/assets/environment/sanctuary-craftwork.svg",
+      "category": "environment",
+      "format": "svg",
+      "source": true,
+      "width": 1800,
+      "height": 1250,
+      "tags": [
+        "sanctuary",
+        "ground-detail",
+        "paving",
+        "moss",
+        "runes",
+        "wayfinding"
+      ],
+      "status": "prototype-integrated"
     }
   ]
 }
