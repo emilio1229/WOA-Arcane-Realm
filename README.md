@@ -14,7 +14,7 @@ Arcane Realm is intended to become a mobile-friendly, browser-playable, higher-a
 - `docs/PROTOTYPE_BRIEF.md` — confirmed context, prototype seeds, and unresolved choices.
 - `docs/FOUNDATION_VERTICAL_SLICE.md` — current playable foundation and honest implementation status.
 - `docs/ENGINEERING_SKILLS_BLUEPRINT.md` — internal engineering playbook.
-- `docs/ARCANE_ARTIFICER_ASSET_PIPELINE.md` — internal asset production workflow.
+- `docs/ARCANE_ARTIFICER_ASSET_PIPELINE.md` — internal asset production workflow.\n- `.claude/skills/arcane-realm-asset-forge/SKILL.md` — reusable Claude skill for end-to-end asset creation, enhancement, animation, integration, and QA.
 - `docs/ARCHITECTURE_SECURITY_BLUEPRINT.md` — target-state security and operations.
 
 ## Run locally
