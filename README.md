@@ -36,7 +36,7 @@ npm run preview
 
 ## Current foundation
 
-The playable foundation now includes an isometric-style sanctuary, camera follow, keyboard and mobile movement, building collision, NPC interaction, Glimmer following, Arcane Bolt casting, a practice Ember Wisp, and a hostile Frost Wisp with proximity pursuit, contact damage, player vitality, defeat, and respawn. This remains a local prototype: health is not persistent and no rewards are granted. The latest hostile-combat changes have not yet been executed in a browser in this environment; see `docs/FOUNDATION_VERTICAL_SLICE.md` for limitations and next validation steps.
+The playable foundation now includes an isometric-style sanctuary, keyboard and mobile movement, NPC interaction, Glimmer following, Arcane Bolt casting, a practice Ember Wisp, a pursuing Frost Wisp, a ranged Ember Sentry with aimed fire orbs, and a player dodge with a short invulnerability window and cooldown. Combat remains local prototype logic: health, enemy state, and cooldowns are not persistent or server-authoritative, and no valuable rewards are granted. The latest dodge and Sentry changes require a fresh build/browser run; see `docs/FOUNDATION_VERTICAL_SLICE.md` for limitations and validation steps.
 
 ## Repository boundaries
 
