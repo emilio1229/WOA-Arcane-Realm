@@ -105,3 +105,43 @@ kbd{box-shadow:inset 0 1px #fff2,0 2px 0 #171021}
 .creator-color{display:flex;align-items:center;gap:10px;color:#d5c4df;font-size:9px;letter-spacing:1px}.creator-color input{width:38px;height:34px;padding:2px;border:1px solid #d9b77b88;border-radius:5px;background:#171326;cursor:pointer}
 .creator-bottom button{min-height:44px;padding:0 18px;border:1px solid #e5c58e;background:linear-gradient(110deg,#5c3e78,#91639d);color:#fff2dc;font:600 9px Cinzel,serif;letter-spacing:1px;cursor:pointer}
 @media(max-width:620px){.creator-screen{padding:8px}.creator-card{padding:17px 13px}.creator-card h2{font-size:20px}.tradition-grid{grid-template-columns:repeat(2,1fr);gap:6px}.tradition-choice{min-height:61px;padding:7px}.creator-bottom{align-items:stretch;flex-direction:column}.creator-bottom button{width:100%;min-height:48px}.creator-options.three{gap:5px}.creator-choice{font-size:8px}}
+
+
+/* Mobile-first viewport, safe-area and touch-target refinements. */
+html,body{min-height:100%;overscroll-behavior:none}
+body{touch-action:pan-x pan-y}
+#app{min-height:100svh;height:100dvh}
+#game,#game canvas{touch-action:none;-webkit-user-select:none;user-select:none}
+button,.stick{ -webkit-tap-highlight-color:transparent}
+@media(max-width:700px){
+  #app{padding-left:max(8px,env(safe-area-inset-left));padding-right:max(8px,env(safe-area-inset-right));padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+  .mobile-controls{inset:auto 14px calc(14px + env(safe-area-inset-bottom));}
+  .stick{width:124px;height:124px}
+  .stick-knob{left:40px;top:40px;width:42px;height:42px}
+  .touch-action{width:76px;height:76px;min-width:48px;min-height:48px;bottom:14px}
+  .touch-spell{width:62px;height:62px;min-width:48px;min-height:48px;right:90px;bottom:20px}
+  .touch-dodge{width:62px;height:62px;min-width:48px;min-height:48px;right:160px;bottom:20px}
+  .dialogue{bottom:148px}
+}
+@media(pointer:coarse){
+  .mobile-controls{display:block}
+  .controls-hint{display:none}
+  .stick,.touch-action,.touch-spell,.touch-dodge{touch-action:none}
+}
+@media(orientation:landscape) and (max-height:520px){
+  #app{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+  .topbar{height:42px}
+  .game-shell{margin:4px 0}
+  .location-tag{top:6px;left:8px;padding:6px}
+  .quest-card{top:6px;right:8px;width:158px;padding:7px}
+  .quest-card p{display:none}
+  .mobile-controls{inset:auto 10px calc(8px + env(safe-area-inset-bottom))}
+  .stick{width:96px;height:96px}
+  .stick-knob{left:30px;top:30px}
+  .touch-action{width:64px;height:64px;bottom:10px}
+  .touch-spell{right:76px;bottom:12px;width:54px;height:54px}
+  .touch-dodge{right:138px;bottom:12px;width:54px;height:54px}
+  .dialogue{bottom:112px}
+  footer{height:18px}
+}
+@media(prefers-reduced-motion:reduce){.mobile-controls *{transition:none!important;animation:none!important}}

@@ -288,6 +288,28 @@ try {
   mobile.on("pageerror", error => mobileErrors.push(error.message));
   await waitForGame(mobile);
   await mobile.locator("#stick").waitFor({ state: "visible" });
+  const mobilePresentation = await mobile.evaluate(() => ({
+    zoom: window.arcaneTest.getCameraZoom(),
+    screenSpeed: window.arcaneTest.getScreenMovementSpeed(),
+    viewportHeight: document.querySelector("#app").getBoundingClientRect().height,
+    documentHeight: document.documentElement.clientHeight,
+    stick: document.querySelector("#stick").getBoundingClientRect().toJSON(),
+    interact: document.querySelector("#interact").getBoundingClientRect().toJSON(),
+    cast: document.querySelector("#cast").getBoundingClientRect().toJSON(),
+    dodge: document.querySelector("#dodge").getBoundingClientRect().toJSON(),
+  }));
+  assert.ok(mobilePresentation.zoom >= 0.8, "iPhone camera should keep the wizard at a readable scale");
+  assert.ok(mobilePresentation.viewportHeight <= mobilePresentation.documentHeight + 1,
+    "mobile layout should fit the visible viewport without page overflow");
+  for (const [name, rect] of Object.entries({
+    stick: mobilePresentation.stick, interact: mobilePresentation.interact,
+    cast: mobilePresentation.cast, dodge: mobilePresentation.dodge,
+  })) {
+    assert.ok(rect.width >= 48 && rect.height >= 48, `${name} should meet the minimum touch target size`);
+  }
+  await mobile.evaluate(() => { window.arcaneMove = { x: 0, y: -1 }; });
+  await mobile.waitForFunction(() => window.arcaneTest.getScreenMovementSpeed() > 160, { timeout: 3000, polling: 50 });
+  await mobile.evaluate(() => { window.arcaneMove = { x: 0, y: 0 }; });
   await mobile.locator("#cast").click();
   await mobile.locator("#dodge").waitFor({ state: "visible" });
   await mobile.locator("#dodge").click();

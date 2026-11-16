@@ -24,6 +24,8 @@ declare global {
       getWizardFrame: () => number;
       getWizardTexture: () => string;
       getMovementSpeed: () => number;
+      getScreenMovementSpeed: () => number;
+      getCameraZoom: () => number;
       getNearestTownLocation: () => string | null;
       getBuildingDetailsLoaded: () => boolean;
       getTownPropsLoaded: () => boolean;
@@ -44,6 +46,12 @@ const TOWN_LOCATIONS: TownLocation[] = [
   { name: "Adventurer's Inn", x: 900, y: 1080, prompt: "E  REST", line: "The inn smells of cedar, spiced tea, and rain-damp cloaks. Wayfarers leave messages for one another on the common-room board. The rooms are quiet tonight, though the road beyond the portal is not." },
 ];
 const WORLD = { width: 1800, height: 1250 };
+
+// Phone-sized viewports need a closer camera, not a zoom proportional to CSS
+// width. The old width/1100 rule made the player tiny and reduced apparent
+// movement to roughly one third speed on a typical iPhone.
+const cameraZoomForWidth = (width: number) => width <= 600 ? 0.82 : width <= 900 ? 0.9 : 1;
+
 const NPCS: NPC[] = [
   { name: "Archmage Elowen", x: 900, y: 480, line: "Welcome, wayfarer. The Sanctuary has been waiting for someone with a spark of curiosity. Wander freely; there is much to discover here.", color: 0xd6a4ff },
   { name: "Archivist Quill", x: 650, y: 310, line: "Every stone in this square remembers something. The Grand Library keeps the stories that the world has almost forgotten.", color: 0x9fd8ee },
@@ -158,7 +166,7 @@ class SanctuaryScene extends Phaser.Scene {
     );
     this.cameras.main.setBounds(0, 0, WORLD.width, WORLD.height);
     this.cameras.main.startFollow(this.player, true, 0.08, 0.08);
-    this.cameras.main.setZoom(Math.min(1, this.scale.width / 1100));
+    this.cameras.main.setZoom(cameraZoomForWidth(this.scale.width));
     this.physics.world.setBounds(70, 70, WORLD.width - 140, WORLD.height - 140);
 
     this.keys = this.input.keyboard!.addKeys("W,A,S,D,UP,DOWN,LEFT,RIGHT,E,ENTER,SPACE,SHIFT,ONE") as Record<string, Phaser.Input.Keyboard.Key>;
@@ -188,6 +196,8 @@ class SanctuaryScene extends Phaser.Scene {
         getWizardFrame: () => Number(this.wizardSprite.frame.name),
         getWizardTexture: () => this.wizardSprite.texture.key,
         getMovementSpeed: () => this.movementVelocity.length(),
+        getScreenMovementSpeed: () => this.movementVelocity.length() * this.cameras.main.zoom,
+        getCameraZoom: () => this.cameras.main.zoom,
         getNearestTownLocation: () => this.nearestTownLocation()?.name ?? null,
         getBuildingDetailsLoaded: () => ["detail-library","detail-familiar","detail-academy","detail-merchant","detail-inn","sanctuary-fountain"].every(key => this.textures.exists(key)),
         getTownPropsLoaded: () => ["prop-noticeboard","prop-signpost"].every(key => this.textures.exists(key)),
@@ -210,7 +220,7 @@ class SanctuaryScene extends Phaser.Scene {
       window.arcaneSetCharacter = undefined;
       window.arcaneTest = undefined;
     });
-    this.scale.on("resize", (size: Phaser.Structs.Size) => this.cameras.main.setZoom(Math.min(1, size.width / 1100)));
+    this.scale.on("resize", (size: Phaser.Structs.Size) => this.cameras.main.setZoom(cameraZoomForWidth(size.width)));
     this.game.events.emit("arcane:ready");
   }
 
@@ -608,13 +618,14 @@ class SanctuaryScene extends Phaser.Scene {
     if (vector.lengthSq() > 0.001) vector.normalize().scale(inputStrength);
     const isDodging = this.time.now < this.dodgeUntil;
     const delta = Math.min(this.game.loop.delta, 100) / 1000;
-    const speed = isDodging ? 470 : 190;
+    // Faster baseline travel keeps exploration lively on touchscreens and desktop.
+    const speed = isDodging ? 560 : 240;
     const desiredVelocity = isDodging
       ? this.dodgeVector.clone().scale(speed)
       : vector.clone().scale(speed);
     // Exponential acceleration/deceleration is frame-rate independent and
     // makes keyboard and touch movement feel less abrupt without adding drift.
-    const response = 1 - Math.exp(-delta * (vector.lengthSq() > 0.001 ? 16 : 20));
+    const response = 1 - Math.exp(-delta * (vector.lengthSq() > 0.001 ? 18 : 22));
     if (isDodging) this.movementVelocity.copy(desiredVelocity);
     else this.movementVelocity.lerp(desiredVelocity, response);
     const radius = 9;

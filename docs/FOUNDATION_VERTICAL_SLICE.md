@@ -143,3 +143,10 @@ Added `environment.sanctuary-fountain`, a 512×512 original SVG landmark with la
 - Browser smoke tests cover Academy target restoration and Inn healing. These tests are part of CI and await a passing run.
 
 - The Frost Wisp browser test now waits for the enemy's actual telegraphed hit instead of assuming a fixed elapsed frame count, making the combat assertion robust under slower headless frame rates.
+
+
+## Mobile and cross-platform movement pass
+- Replaced viewport-width-proportional camera zoom with responsive breakpoints: 0.82 on phone widths, 0.90 on tablet widths, and 1.0 on desktop. This directly fixes the tiny character/apparently slow travel caused by the old width/1100 zoom rule on iPhone.
+- Raised base movement speed from 190 to 240 world units/second and dodge speed from 470 to 560, with slightly quicker acceleration while preserving analog stick scaling and collision substeps.
+- Added iOS safe-area and dynamic viewport handling, larger 48px+ touch targets, coarse-pointer controls for touch tablets, and a compact landscape-phone layout.
+- Extended mobile browser coverage to verify camera zoom, projected screen movement, viewport overflow, and touch target dimensions in addition to joystick, cast, dodge, and interaction.
