@@ -171,7 +171,7 @@ class SanctuaryScene extends Phaser.Scene {
         getHitRecoveryMs: () => Math.max(0, this.hitRecoveryUntil - this.time.now),
         getWizardFrame: () => Number(this.wizardSprite.frame.name),
         getWizardTexture: () => this.wizardSprite.texture.key,
-        getBuildingDetailsLoaded: () => ["detail-library","detail-familiar","detail-academy","detail-merchant","detail-inn"].every(key => this.textures.exists(key)),
+        getBuildingDetailsLoaded: () => ["detail-library","detail-familiar","detail-academy","detail-merchant","detail-inn","sanctuary-fountain"].every(key => this.textures.exists(key)),
         performDodge: () => this.dodge(),
         forcePlayerHit: () => this.damagePlayer(),
         setPlayerPosition: (x, y, facingX = 0, facingY = -1) => {

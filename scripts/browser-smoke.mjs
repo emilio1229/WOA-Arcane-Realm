@@ -26,7 +26,7 @@ async function waitForGame(page) {
   await page.waitForSelector("#game canvas", { state: "visible", timeout: 15000 });
   await page.waitForFunction(() => Boolean(window.arcaneTest), { timeout: 15000 });
   await page.locator("#realm-intro").waitFor({ state: "visible" });
-  await page.locator("#enter-realm").waitFor({ state: "enabled", timeout: 15000 });
+  await page.waitForFunction(() => document.querySelector("#enter-realm")?.disabled === false, { timeout: 15000 });
   await page.locator("#enter-realm").click();
   await page.locator("#creator-screen").waitFor({ state: "visible" });
   await page.locator("#character-name").fill("Playtester");
@@ -49,7 +49,7 @@ try {
   }));
   assert.ok(canvasSize.width > 0 && canvasSize.height > 0, "game canvas should have a real drawing surface");
   assert.equal(await desktop.evaluate(() => window.arcaneTest.getBuildingDetailsLoaded()), true,
-    "all five detailed architectural overlays should be loaded into the Sanctuary scene");
+    "all detailed building overlays and the Moonwell fountain should be loaded into the Sanctuary scene");
 
   // Every tradition must retain its own robe palette while idle. A previous
   // regression reset every idle wizard to the first sprite-sheet row.
