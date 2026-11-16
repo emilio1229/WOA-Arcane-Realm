@@ -126,6 +126,28 @@ try {
   const playerHealthAfterEncounter = await desktop.evaluate(() => window.arcaneTest.getPlayerHealth());
   assert.ok(playerHealthAfterEncounter < 5, "the hostile Wisp should be able to damage the player");
 
+  // The dodge burst should move the wizard, grant a cooldown, and avoid the Sentry's aimed fire orb.
+  await desktop.evaluate(() => window.arcaneTest.setPlayerPosition(340, 900, 0, 1));
+  const healthBeforeFireOrb = await desktop.evaluate(() => window.arcaneTest.getPlayerHealth());
+  await delay(760); // 620ms telegraph plus a short projectile travel window.
+  await desktop.evaluate(() => window.arcaneTest.performDodge());
+  const dodgeCooldown = await desktop.evaluate(() => window.arcaneTest.getDodgeCooldownMs());
+  assert.ok(dodgeCooldown > 900, "dodge should start a meaningful cooldown");
+  await delay(620);
+  const healthAfterFireOrb = await desktop.evaluate(() => window.arcaneTest.getPlayerHealth());
+  assert.equal(healthAfterFireOrb, healthBeforeFireOrb, "a correctly timed dodge should evade the Ember Sentry fire orb");
+
+  // The ranged Ember Sentry should also be a valid Arcane Bolt target.
+  await desktop.evaluate(() => window.arcaneTest.setPlayerPosition(340, 900, 0, -1));
+  for (let hit = 0; hit < 5; hit++) {
+    await desktop.keyboard.down("Space");
+    await delay(120);
+    await desktop.keyboard.up("Space");
+    await delay(650);
+  }
+  const sentryHealthAfter = await desktop.evaluate(() => window.arcaneTest.getEmberSentryHealth());
+  assert.equal(sentryHealthAfter, 0, "five aimed Arcane Bolts should dispel the Ember Sentry");
+
   assert.deepEqual(pageErrors, [], "desktop play session should not throw browser errors");
 
   const mobile = await browser.newPage({
@@ -139,6 +161,10 @@ try {
   await waitForGame(mobile);
   await mobile.locator("#stick").waitFor({ state: "visible" });
   await mobile.locator("#cast").click();
+  await mobile.locator("#dodge").waitFor({ state: "visible" });
+  await mobile.locator("#dodge").click();
+  const mobileDodgeCooldown = await mobile.evaluate(() => window.arcaneTest.getDodgeCooldownMs());
+  assert.ok(mobileDodgeCooldown > 0, "mobile dodge button should activate the dodge cooldown");
   await mobile.evaluate(() => window.arcaneTest.setPlayerPosition(900, 480));
   await mobile.locator("#interact").click();
   await mobile.locator("#dialogue").waitFor({ state: "visible" });
