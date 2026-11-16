@@ -99,6 +99,7 @@ class SanctuaryScene extends Phaser.Scene {
     this.load.svg("sanctuary-ground", "/assets/environment/sanctuary-ground.svg", { width: 1800, height: 1250 });
     this.load.svg("sanctuary-dressing", "/assets/environment/sanctuary-dressing.svg", { width: 1800, height: 1250 });
     this.load.svg("sanctuary-atmosphere", "/assets/environment/sanctuary-atmosphere.svg", { width: 1800, height: 1250 });
+    this.load.svg("sanctuary-townlife", "/assets/environment/sanctuary-townlife.svg", { width: 1800, height: 1250 });
     this.load.svg("portal-rune-crown", "/assets/environment/portal-rune-crown.svg", { width: 512, height: 512 });
     this.load.spritesheet("arcane-burst", "/assets/vfx/arcane-burst-sheet.svg", { frameWidth: 96, frameHeight: 96 });
   }
@@ -186,6 +187,7 @@ class SanctuaryScene extends Phaser.Scene {
     this.add.image(0, 0, "sanctuary-ground").setOrigin(0).setDisplaySize(WORLD.width, WORLD.height).setDepth(-1);
     this.add.image(0, 0, "sanctuary-dressing").setOrigin(0).setDisplaySize(WORLD.width, WORLD.height).setDepth(-0.5);
     this.add.image(0, 0, "sanctuary-atmosphere").setOrigin(0).setDisplaySize(WORLD.width, WORLD.height).setDepth(-0.25);
+    this.add.image(0, 0, "sanctuary-townlife").setOrigin(0).setDisplaySize(WORLD.width, WORLD.height).setDepth(0.5);
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
         const x = 90 + (col - row) * tileW / 2 + WORLD.width / 2 - cols * tileW / 4;

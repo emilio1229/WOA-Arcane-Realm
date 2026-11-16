@@ -94,3 +94,8 @@ The first `arcane-realm-asset-forge` implementation batch adds two original SVG 
 - Added six recolored wizard walk cycles and matching cast poses in shared sprite sheets. Tradition selection changes the robe palette and matching walk/cast artwork while preserving the existing wizard silhouette; magic color separately tints the spell projectile.
 - Choices persist locally in this browser. This is not yet account-backed or synchronized with Discord, and the current Sanctuary scene remains a development scene rather than the canonical Gloamwick story opening.
 - Gender presentation is captured as a character-creation choice, but distinct male/female body and hair artwork is still outstanding. The opening village and Matthias encounter are also not yet restored in this build.
+
+
+## Sanctuary town-life pass
+
+The Asset Forge town-life pass adds a transparent, original SVG layer with market awnings, benches, warm street lanterns, pennants, a public noticeboard, wayfinding, and doorstep planters. The layer is registered in the asset manifest and loaded beneath actors/building exteriors. Placement favors the outer edges and lower gathering spaces to preserve the central plaza and existing combat lanes. This is an additive environmental dressing pass; the current map remains the Sanctuary prototype rather than the canonical Gloamwick story opening. Visual review in a running browser remains pending.

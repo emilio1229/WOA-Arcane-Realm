@@ -538,6 +538,25 @@
       ],
       "status": "prototype-integrated",
       "provenance": "Original project Arcane wizard cast pose, recolored by robe tradition while preserving shared silhouette; CC0-1.0"
+    },
+    {
+      "id": "environment.sanctuary-townlife",
+      "path": "/assets/environment/sanctuary-townlife.svg",
+      "category": "environment",
+      "format": "svg",
+      "source": true,
+      "width": 1800,
+      "height": 1250,
+      "tags": [
+        "sanctuary",
+        "town",
+        "market",
+        "street-furniture",
+        "lanterns",
+        "wayfinding"
+      ],
+      "status": "prototype-integrated",
+      "provenance": "Original in-repository SVG artwork; created for the Sanctuary town-life pass."
     }
   ]
 }

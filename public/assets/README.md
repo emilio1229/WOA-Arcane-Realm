@@ -75,3 +75,10 @@ Supported categories: `character`, `familiar`, `creature`, `environment`, `vfx`,
 - `ui.realm-title-backdrop` is the original 1600×900 SVG title-screen landscape, registered in the manifest.
 - The title screen reports Phaser's real asset-loader progress and unlocks entry only after the Sanctuary scene finishes creating.
 - The pause overlay is a player-facing control; asset workflows and developer tools remain backstage.
+
+
+## Sanctuary town-life upgrade — Asset Forge batch
+
+- `environment.sanctuary-townlife` adds paired merchant awnings, timber benches, warm street lanterns, pennants, a public noticeboard, a carved wayfinding marker, and small doorstep planters.
+- The transparent 1800×1250 SVG layer is loaded beneath actors and building exteriors. Its props are kept to the outer edges and lower gathering areas so the central plaza and combat lanes remain readable.
+- Original editable SVG source; no third-party artwork or fonts embedded. Integrated in the Phaser Sanctuary scene; visual review at gameplay scale remains pending.

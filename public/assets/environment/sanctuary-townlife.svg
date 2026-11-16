@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1250" viewBox="0 0 1800 1250">
+<defs>
+ <linearGradient id="oak" x1="0" y1="0" x2="0.8" y2="1"><stop stop-color="#9a7052"/><stop offset=".55" stop-color="#604536"/><stop offset="1" stop-color="#332a32"/></linearGradient>
+ <linearGradient id="cloth" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#e6c5a0"/><stop offset="1" stop-color="#a96e72"/></linearGradient>
+ <linearGradient id="cloth2" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#a9d3c2"/><stop offset="1" stop-color="#46796f"/></linearGradient>
+ <linearGradient id="brass" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff0bd"/><stop offset=".45" stop-color="#c99c5b"/><stop offset="1" stop-color="#76502f"/></linearGradient>
+ <radialGradient id="lantern"><stop stop-color="#fff2b9" stop-opacity=".9"/><stop offset="1" stop-color="#f1a65a" stop-opacity="0"/></radialGradient>
+ <filter id="shadow" x="-40%" y="-40%" width="180%" height="190%"><feGaussianBlur stdDeviation="8"/></filter>
+ <g id="stall">
+  <ellipse cx="0" cy="74" rx="108" ry="28" fill="#08131a" opacity=".42" filter="url(#shadow)"/>
+  <path d="M-82 9V72M82 9V72M-93 13H93V24H-93Z" fill="url(#oak)" stroke="#d2a36e" stroke-width="3"/>
+  <path d="M-103 7 0-43 103 7 91 18H-91Z" fill="#433044" stroke="#d4b2a1" stroke-width="3"/>
+  <path d="M-95 5 0-39 0-5-95 28Z" fill="url(#cloth)" stroke="#f1d6bd" stroke-width="2"/>
+  <path d="M0-39 95 5 95 28 0-5Z" fill="url(#cloth2)" stroke="#d3e5ce" stroke-width="2"/>
+  <path d="M-95 28Q-72 42-48 28Q-24 42 0 28Q24 42 48 28Q72 42 95 28" fill="none" stroke="#f5dcb8" stroke-width="4"/>
+  <path d="M-65 30V70M65 30V70" stroke="#d0a274" stroke-width="4"/>
+  <path d="M-70 49H70V70H-70Z" fill="#76533d" stroke="#c99a6b" stroke-width="2"/>
+  <path d="M-58 47 0 37 58 47" fill="none" stroke="#f3d8a8" stroke-opacity=".6" stroke-width="3"/>
+  <g fill="#e7c17f" stroke="#684936" stroke-width="2"><circle cx="-39" cy="60" r="8"/><circle cx="-14" cy="57" r="10"/><circle cx="20" cy="59" r="8/><circle cx="47" cy="58" r="9"/></g>
+  <path d="M0-45V-66" stroke="#b98b5b" stroke-width="3"/><path d="M-10-65H10L0-83Z" fill="url(#brass)"/>
+ </g>
+ <g id="bench">
+  <ellipse cy="24" rx="58" ry="12" fill="#0b1720" opacity=".35"/>
+  <path d="M-48-6H48V8H-48Z" fill="#936849" stroke="#d2a16d" stroke-width="3"/>
+  <path d="M-43-20H43V-7H-43Z" fill="#684632" stroke="#d2a16d" stroke-width="3"/>
+  <path d="M-36 8V22M36 8V22" stroke="#5c4538" stroke-width="6"/>
+  <path d="M-44-17H44" stroke="#f0c48c" stroke-opacity=".55" stroke-width="2"/>
+ </g>
+ <g id="streetlamp">
+  <ellipse cy="60" rx="22" ry="8" fill="#101a22" opacity=".4"/>
+  <path d="M0 58V-45" stroke="#5d4a42" stroke-width="8"/>
+  <path d="M-19-45H19L15-65H-15Z" fill="#6d5545" stroke="#d6b37d" stroke-width="3"/>
+  <path d="M-12-63 0-84 12-63Z" fill="#443347" stroke="#d6b37d" stroke-width="3"/>
+  <path d="M-10-44V-63H10V-44Z" fill="#f5d99b" stroke="#c18d59" stroke-width="2"/>
+  <circle cy="-54" r="30" fill="url(#lantern)"/>
+ </g>
+</defs>
+<!-- Hand-laid stone ribbons make the routes between the town's districts legible. -->
+<g fill="none" stroke-linecap="round" stroke-linejoin="round">
+ <path d="M330 575Q505 520 650 540T900 565T1160 540T1480 575" stroke="#172b31" stroke-width="28" opacity=".2"/>
+ <path d="M330 575Q505 520 650 540T900 565T1160 540T1480 575" stroke="#b4a2a5" stroke-width="13" opacity=".18"/>
+ <path d="M900 820Q900 920 900 1060" stroke="#d4b8a3" stroke-width="15" opacity=".18"/>
+ <path d="M650 850Q770 900 900 900T1150 850" stroke="#d4b8a3" stroke-width="10" opacity=".14"/>
+ <path d="M330 575Q505 520 650 540T900 565T1160 540T1480 575" stroke="#f2d6b2" stroke-width="2" stroke-dasharray="2 14" opacity=".36"/>
+</g>
+<!-- Merchant awnings sit on the outer edge of the square, leaving the central lanes open. -->
+<use href="#stall" transform="translate(250 610) scale(.78)"/>
+<use href="#stall" transform="translate(1550 610) scale(.78)"/>
+<!-- A little gathering furniture, set back from the main walking line. -->
+<use href="#bench" transform="translate(700 850) rotate(-8)"/>
+<use href="#bench" transform="translate(1100 850) rotate(8)"/>
+<use href="#bench" transform="translate(420 1040) rotate(-12) scale(.82)"/>
+<use href="#bench" transform="translate(1380 1040) rotate(12) scale(.82)"/>
+<!-- Lanterns and hanging pennants mark the approach to the civic square. -->
+<use href="#streetlamp" transform="translate(330 440) scale(.88)"/>
+<use href="#streetlamp" transform="translate(1470 440) scale(.88)"/>
+<use href="#streetlamp" transform="translate(520 960) scale(.78)"/>
+<use href="#streetlamp" transform="translate(1280 960) scale(.78)"/>
+<g stroke="#755b4b" stroke-width="5" fill="none"><path d="M410 365V285M410 290H500M1390 365V285M1390 290H1300"/></g>
+<path d="M500 290 478 303V277Z" fill="#d49c75" stroke="#f0d6b2" stroke-width="2"/>
+<path d="M1300 290 1322 303V277Z" fill="#83b9a1" stroke="#d5e8ca" stroke-width="2"/>
+<g fill="none" stroke="#f1d8a6" stroke-width="2" opacity=".72"><path d="M488 290 478 290M1312 290 1322 290"/></g>
+<!-- A public noticeboard and carved direction marker make the town feel inhabited. -->
+<g transform="translate(900 1075)">
+ <ellipse cy="56" rx="58" ry="15" fill="#0a141b" opacity=".38"/>
+ <path d="M-35 46V-42M35 46V-42" stroke="#654631" stroke-width="9"/>
+ <rect x="-55" y="-83" width="110" height="82" rx="8" fill="#684a3c" stroke="url(#brass)" stroke-width="5"/>
+ <rect x="-43" y="-70" width="86" height="55" rx="3" fill="#d8c39c" stroke="#463345" stroke-width="3"/>
+ <path d="M-30-54H26M-30-42H18M-30-30H7" stroke="#9c7152" stroke-width="4" stroke-linecap="round"/>
+ <path d="M0-100 8-84H-8Z" fill="#f1d69b"/>
+ <circle cy="-58" r="4" fill="#bd7b61"/>
+</g>
+<g transform="translate(520 420)">
+ <path d="M0 42V-38" stroke="#76563f" stroke-width="9"/>
+ <path d="M-3-34 92-52 92-19-3-3Z" fill="#8b684b" stroke="#e0b77d" stroke-width="4"/>
+ <path d="M9-25 78-38" stroke="#f6d9a2" stroke-width="3"/>
+ <path d="M3 4 76-10 76 22 3 36Z" fill="#567b6c" stroke="#d2c39b" stroke-width="3"/>
+ <path d="M15 15 62 6" stroke="#f4dfb2" stroke-width="3"/>
+</g>
+<!-- Flower pots and small doorstep details. -->
+<g>
+ <path d="M360 720H390L384 748H366Z" fill="#8e594e" stroke="#d8a27b" stroke-width="2"/>
+ <path d="M375 720Q350 694 356 684Q376 692 375 720M376 720Q384 687 402 688Q404 706 376 720" fill="#679a77"/>
+ <circle cx="356" cy="684" r="5" fill="#e6c08b"/>
+ <path d="M1440 720H1470L1464 748H1446Z" fill="#8e594e" stroke="#d8a27b" stroke-width="2"/>
+ <path d="M1455 720Q1430 694 1436 684Q1456 692 1455 720M1456 720Q1464 687 1482 688Q1484 706 1456 720" fill="#679a77"/>
+ <circle cx="1436" cy="684" r="5" fill="#e6c08b"/>
+</g>
+<!-- Fine inlaid brass markers and paving flecks. -->
+<g fill="#e8c88f" opacity=".44"><circle cx="620" cy="900" r="3"/><circle cx="1180" cy="900" r="3"/><circle cx="420" cy="580" r="2"/><circle cx="1380" cy="580" r="2"/><path d="m900 930 7 12-7 12-7-12Z"/></g>
+</svg>
