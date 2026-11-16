@@ -67,3 +67,4 @@ Maintain searchable asset IDs, categories, tags, source files, derivatives, prev
 ## Future integration
 
 The toolchain can eventually be connected to an asset manifest, preview gallery, automated validators, and engine import scripts. Those are developer workflows and must remain outside the player-facing game.
+\n\n## Reusable Claude skill\n\nThe executable workflow is packaged as `.claude/skills/arcane-realm-asset-forge/SKILL.md`, with its art direction, production checklist, and brief templates in the adjacent `references/` directory. Invoke that skill for asset creation, enhancement, animation, visual audits, and technical integration. This skill operationalizes this document; it does not replace the repository's existing manifest or asset scripts.\n
