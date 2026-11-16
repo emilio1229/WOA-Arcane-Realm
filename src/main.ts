@@ -25,6 +25,7 @@ declare global {
       getMovementSpeed: () => number;
       getNearestTownLocation: () => string | null;
       getBuildingDetailsLoaded: () => boolean;
+      getTownPropsLoaded: () => boolean;
       performDodge: () => void;
       forcePlayerHit: () => void;
       setPlayerPosition: (x: number, y: number, facingX?: number, facingY?: number) => void;
@@ -187,6 +188,7 @@ class SanctuaryScene extends Phaser.Scene {
         getMovementSpeed: () => this.movementVelocity.length(),
         getNearestTownLocation: () => this.nearestTownLocation()?.name ?? null,
         getBuildingDetailsLoaded: () => ["detail-library","detail-familiar","detail-academy","detail-merchant","detail-inn","sanctuary-fountain"].every(key => this.textures.exists(key)),
+        getTownPropsLoaded: () => ["prop-noticeboard","prop-signpost"].every(key => this.textures.exists(key)),
         performDodge: () => this.dodge(),
         forcePlayerHit: () => this.damagePlayer(),
         setPlayerPosition: (x, y, facingX = 0, facingY = -1) => {

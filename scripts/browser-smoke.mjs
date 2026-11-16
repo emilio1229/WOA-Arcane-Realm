@@ -54,6 +54,8 @@ try {
   assert.ok(canvasSize.width > 0 && canvasSize.height > 0, "game canvas should have a real drawing surface");
   assert.equal(await desktop.evaluate(() => window.arcaneTest.getBuildingDetailsLoaded()), true,
     "all detailed building overlays and the Moonwell fountain should be loaded into the Sanctuary scene");
+  assert.equal(await desktop.evaluate(() => window.arcaneTest.getTownPropsLoaded()), true,
+    "the noticeboard and signpost props should be loaded into the Sanctuary scene");
 
   // Every tradition must retain its own robe palette while idle. A previous
   // regression reset every idle wizard to the first sprite-sheet row.
@@ -153,7 +155,7 @@ try {
   // Town landmarks have contextual interactions, not just decorative labels.
   await desktop.evaluate(() => window.arcaneTest.setPlayerPosition(650, 510));
   assert.equal(await desktop.evaluate(() => window.arcaneTest.getNearestTownLocation()), "Grand Library");
-  await desktop.locator("#interact").click();
+  await desktop.keyboard.press("e");
   await desktop.locator("#dialogue").waitFor({ state: "visible" });
   assert.equal(await desktop.locator("#npc-name").textContent(), "Grand Library");
   assert.ok((await desktop.locator("#npc-line").textContent()).includes("sealed atlas room"));
