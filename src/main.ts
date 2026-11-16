@@ -323,8 +323,8 @@ class SanctuaryScene extends Phaser.Scene {
       this.tweens.add({ targets: lantern, alpha: { from: 0.82, to: 1 }, duration: 1900, yoyo: true, repeat: -1 });
     }
     const obelisk = this.add.image(760, 670, "prop-obelisk").setDisplaySize(92, 92).setDepth(680);
-    const signpost = this.add.image(410, 550, "prop-signpost").setDisplaySize(92, 115).setDepth(550);
-    const noticeboard = this.add.image(900, 1080, "prop-noticeboard").setDisplaySize(112, 112).setDepth(1080);
+    this.add.image(410, 550, "prop-signpost").setDisplaySize(92, 115).setDepth(550);
+    this.add.image(900, 1080, "prop-noticeboard").setDisplaySize(112, 112).setDepth(1080);
     this.add.image(1455, 900, "prop-crystals").setDisplaySize(112, 112).setDepth(910);
     this.obstacles.push(new Phaser.Geom.Rectangle(390, 540, 40, 28), new Phaser.Geom.Rectangle(875, 1072, 50, 20));
     this.tweens.add({ targets: obelisk, alpha: { from: 0.86, to: 1 }, duration: 2200, yoyo: true, repeat: -1 });

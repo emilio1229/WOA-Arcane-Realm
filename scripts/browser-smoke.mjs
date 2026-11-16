@@ -97,9 +97,11 @@ try {
   await desktop.locator("#pause-game").click();
   await desktop.locator("#pause-overlay").waitFor({ state: "visible" });
   await desktop.locator("[data-menu-tab=journal]").click();
-  await desktop.locator("[data-menu-page=journal]").waitFor({ state: "visible" });
+  await desktop.waitForFunction(() => document.querySelector("[data-menu-page=journal]")?.classList.contains("hidden") === false);
+  assert.equal(await desktop.locator("[data-menu-tab=journal]").getAttribute("aria-selected"), "true");
   await desktop.locator("[data-menu-tab=controls]").click();
-  await desktop.locator("[data-menu-page=controls]").waitFor({ state: "visible" });
+  await desktop.waitForFunction(() => document.querySelector("[data-menu-page=controls]")?.classList.contains("hidden") === false);
+  assert.equal(await desktop.locator("[data-menu-tab=controls]").getAttribute("aria-selected"), "true");
   await desktop.locator("#resume-journey").click();
   await desktop.locator("#pause-overlay").waitFor({ state: "hidden" });
   await desktop.setViewportSize({ width: 980, height: 720 });
