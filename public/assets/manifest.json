@@ -644,6 +644,25 @@
       ],
       "status": "needs-review",
       "provenance": "Original hand-authored SVG detail overlay; designed to layer over the existing Sanctuary building silhouette without replacing its source art."
+    },
+    {
+      "id": "environment.sanctuary-fountain",
+      "path": "/assets/environment/sanctuary-fountain.svg",
+      "category": "environment-landmark",
+      "format": "svg",
+      "source": true,
+      "width": 512,
+      "height": 512,
+      "tags": [
+        "sanctuary",
+        "fountain",
+        "moonwell",
+        "landmark",
+        "crystal",
+        "water"
+      ],
+      "status": "needs-review",
+      "provenance": "Original hand-authored SVG landmark asset; sculpted stone basin, crystal crown, and magical water."
     }
   ]
 }

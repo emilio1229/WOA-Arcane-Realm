@@ -87,3 +87,8 @@ Supported categories: `character`, `familiar`, `creature`, `environment`, `vfx`,
 ## Sanctuary architectural detail overlays
 
 Five original transparent SVG overlays enrich the existing Library, Familiar Sanctuary, Spell Academy, Merchant Hall, and Adventurer's Inn with carved trim, roof detailing, timber/stone framing, window accents, runic motifs, and warm light. The overlays are additive: the original building art and collision footprints are preserved. Each is 512×512 and registered as `building.detail.*`. Status remains `needs-review` until the in-game visual pass and target-scale checks are run.
+
+
+## Sanctuary Moonwell Fountain
+
+`environment.sanctuary-fountain` is an original 512×512 transparent landmark asset: a sculpted octagonal stone basin, layered water bowls, a faceted crystal crown, carved cardinal runes, and subtle water highlights. It replaces the temporary procedural ellipse stack in the center plaza. The scene adds a small number of low-cost animated glints around the crystal. Status: `needs-review` pending browser-scale art review.

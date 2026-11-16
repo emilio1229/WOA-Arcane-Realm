@@ -113,3 +113,8 @@ The Asset Forge town-life pass adds a transparent, original SVG layer with marke
 ## Sanctuary architecture detail pass
 
 Added five original 512×512 transparent SVG overlay assets for the Grand Library, Familiar Sanctuary, Spell Academy, Merchant Hall, and Adventurer's Inn. They add carved stone/wood framing, roof and cornice accents, window mullions, crest/rune work, and localized warm or elemental light. Existing base building SVGs and collision footprints are retained; overlays are layered directly above their matching building textures. Manifest status is `needs-review` pending live browser visual review and mobile-scale inspection.
+
+
+## Sanctuary Moonwell landmark
+
+Added `environment.sanctuary-fountain`, a 512×512 original SVG landmark with layered carved stonework, a reflective water basin, a faceted crystal crown, and engraved runes. The previous procedural fountain ellipse stack is replaced with the asset, with a restrained pulse and five small ambient glints. Manifest status is `needs-review` pending visual inspection in a running game and mobile viewports.

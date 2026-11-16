@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<defs>
+ <linearGradient id="stone" x1="0" y1="0" x2=".9" y2="1"><stop stop-color="#d5c7d8"/><stop offset=".35" stop-color="#82758f"/><stop offset=".72" stop-color="#494258"/><stop offset="1" stop-color="#29283c"/></linearGradient>
+ <linearGradient id="edge" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff0d0"/><stop offset=".38" stop-color="#c6a8c6"/><stop offset="1" stop-color="#594a69"/></linearGradient>
+ <linearGradient id="water" x1="0" y1="0" x2=".2" y2="1"><stop stop-color="#e5ffff"/><stop offset=".25" stop-color="#84dce4"/><stop offset=".62" stop-color="#3b91b1"/><stop offset="1" stop-color="#25486e"/></linearGradient>
+ <linearGradient id="crystal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff8ff"/><stop offset=".25" stop-color="#bdefff"/><stop offset=".55" stop-color="#9b83dc"/><stop offset="1" stop-color="#4c3b80"/></linearGradient>
+ <radialGradient id="aura"><stop stop-color="#9cefff" stop-opacity=".45"/><stop offset="1" stop-color="#9cefff" stop-opacity="0"/></radialGradient>
+ <filter id="blur"><feGaussianBlur stdDeviation="9"/></filter>
+ <filter id="shadow"><feGaussianBlur stdDeviation="12"/></filter>
+</defs>
+<ellipse cx="256" cy="453" rx="194" ry="34" fill="#09141f" opacity=".56" filter="url(#shadow)"/>
+<ellipse cx="256" cy="425" rx="176" ry="42" fill="#b4e9f2" opacity=".12" filter="url(#blur)"/>
+<!-- carved lower plinth -->
+<path d="M95 388 130 359 382 359 417 388 393 432 119 432Z" fill="url(#stone)" stroke="#e5d3e4" stroke-width="5"/>
+<path d="M117 390 145 372H367L395 390 379 414H133Z" fill="#38354c" stroke="#bcaacb" stroke-width="4"/>
+<path d="M132 401H380M148 416H364" stroke="#f0dcb9" stroke-opacity=".42" stroke-width="4"/>
+<g fill="#d7c2db" stroke="#5e526e" stroke-width="3"><path d="M145 384 160 375 175 384 160 393Z"/><path d="M337 384 352 375 367 384 352 393Z"/><path d="M239 408 256 398 273 408 256 418Z"/></g>
+<!-- broad octagonal basin -->
+<path d="M72 330 108 299 404 299 440 330 410 389Q256 447 102 389Z" fill="url(#stone)" stroke="#ead8e8" stroke-width="7"/>
+<path d="M92 329 122 310H390L420 329 394 371Q256 421 118 371Z" fill="#34364e" stroke="#b7a4c5" stroke-width="5"/>
+<path d="M101 329Q256 370 411 329" fill="none" stroke="#f5e2d4" stroke-width="6"/>
+<path d="M116 346Q256 389 396 346" fill="none" stroke="#a8e9f0" stroke-opacity=".55" stroke-width="4"/>
+<path d="M132 367Q256 402 380 367" fill="none" stroke="#f4dcb8" stroke-opacity=".5" stroke-width="3"/>
+<ellipse cx="256" cy="329" rx="143" ry="33" fill="url(#water)" stroke="#e4e1f2" stroke-width="5"/>
+<ellipse cx="256" cy="324" rx="115" ry="21" fill="#a8f5ef" opacity=".18"/>
+<path d="M159 327Q190 314 219 326T279 326T350 326" fill="none" stroke="#e7ffff" stroke-opacity=".8" stroke-width="3" stroke-linecap="round"/>
+<path d="M198 338Q224 328 247 338T294 338T328 338" fill="none" stroke="#d4ffff" stroke-opacity=".5" stroke-width="2" stroke-linecap="round"/>
+<!-- sculpted central pedestal -->
+<path d="M214 304 224 262 288 262 298 304Z" fill="url(#stone)" stroke="#e8d9e8" stroke-width="4"/>
+<path d="M226 269H286M220 292H292" stroke="#f1dfc6" stroke-opacity=".55" stroke-width="3"/>
+<path d="M237 278 256 266 275 278 256 290Z" fill="#3b3b59" stroke="#d9c3e7" stroke-width="3"/>
+<path d="M256 272V286M246 279H266" stroke="#bdeff3" stroke-width="2"/>
+<!-- upper bowl and falling magical water -->
+<path d="M173 251Q256 290 339 251L322 273Q256 301 190 273Z" fill="url(#stone)" stroke="#e7d6e5" stroke-width="5"/>
+<ellipse cx="256" cy="251" rx="83" ry="23" fill="url(#water)" stroke="#e8e4f1" stroke-width="5"/>
+<ellipse cx="256" cy="248" rx="60" ry="13" fill="#b9ffff" opacity=".35"/>
+<path d="M199 256Q256 278 313 256" fill="none" stroke="#efffff" stroke-width="3" stroke-opacity=".7"/>
+<path d="M220 271Q211 292 222 310M292 271Q301 292 290 310" fill="none" stroke="#8de8f0" stroke-opacity=".62" stroke-width="7" stroke-linecap="round"/>
+<!-- crystal crown, faceted and luminous -->
+<ellipse cx="256" cy="186" rx="90" ry="90" fill="url(#aura)" filter="url(#blur)"/>
+<path d="M256 64 282 117 275 184 256 211 237 184 230 117Z" fill="url(#crystal)" stroke="#f1f2ff" stroke-width="4"/>
+<path d="M256 64 258 139 275 184M230 117 258 139 237 184" fill="none" stroke="#ffffff" stroke-opacity=".72" stroke-width="3"/>
+<path d="M256 79 244 124 256 139 268 124Z" fill="#f4ffff" fill-opacity=".5"/>
+<path d="M205 124 230 140 237 184 218 169Z" fill="#91dff0" stroke="#dffaff" stroke-width="3"/>
+<path d="M307 124 282 140 275 184 294 169Z" fill="#aa91e4" stroke="#e9e2ff" stroke-width="3"/>
+<path d="M256 211 238 184 256 192 274 184Z" fill="#6c60a3" stroke="#d9d6f5" stroke-width="3"/>
+<!-- four carved cardinal runes -->
+<g fill="#f3e0bd" stroke="#5d506b" stroke-width="2"><path d="M112 345 124 338 136 345 124 352Z"/><path d="M376 345 388 338 400 345 388 352Z"/><path d="M194 392 206 385 218 392 206 399Z"/><path d="M294 392 306 385 318 392 306 399Z"/></g>
+<g fill="none" stroke="#f2d5a7" stroke-width="2" opacity=".85"><path d="M124 341V349M120 345H128M388 341V349M384 345H392M206 388V396M202 392H210M306 388V396M302 392H310"/></g>
+<!-- little water sparks -->
+<g fill="#edffff"><circle cx="175" cy="316" r="3"/><circle cx="337" cy="316" r="3"/><circle cx="230" cy="238" r="2.5"/><circle cx="285" cy="232" r="2.5"/></g>
+</svg>

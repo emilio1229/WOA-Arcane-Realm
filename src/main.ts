@@ -109,6 +109,7 @@ class SanctuaryScene extends Phaser.Scene {
     this.load.svg("sanctuary-dressing", "/assets/environment/sanctuary-dressing.svg", { width: 1800, height: 1250 });
     this.load.svg("sanctuary-atmosphere", "/assets/environment/sanctuary-atmosphere.svg", { width: 1800, height: 1250 });
     this.load.svg("sanctuary-townlife", "/assets/environment/sanctuary-townlife.svg", { width: 1800, height: 1250 });
+    this.load.svg("sanctuary-fountain", "/assets/environment/sanctuary-fountain.svg", { width: 512, height: 512 });
     this.load.svg("portal-rune-crown", "/assets/environment/portal-rune-crown.svg", { width: 512, height: 512 });
     this.load.spritesheet("arcane-burst", "/assets/vfx/arcane-burst-sheet.svg", { frameWidth: 96, frameHeight: 96 });
   }
@@ -220,13 +221,14 @@ class SanctuaryScene extends Phaser.Scene {
     }
     this.add.circle(900, 600, 130, 0x302444, 0.35).setDepth(1);
     this.add.circle(900, 600, 96, 0x9d73c9, 0.08).setDepth(1);
-    // Central fountain.
-    g.fillStyle(0x28243c); g.fillEllipse(900, 620, 170, 82);
-    g.fillStyle(0xb9a4d4); g.fillEllipse(900, 610, 132, 60);
-    g.fillStyle(0x5799ad); g.fillEllipse(900, 604, 112, 46);
-    g.fillStyle(0xc7b4dc); g.fillEllipse(900, 585, 35, 20);
-    g.fillStyle(0x8fe6e7, 0.8); g.fillCircle(900, 573, 8);
-    this.add.circle(900, 573, 25, 0x7edce8, 0.12).setDepth(2);
+    // Sculpted moonwell fountain replaces the temporary flat ellipse stack.
+    const fountain = this.add.image(900, 620, "sanctuary-fountain")
+      .setDisplaySize(220, 220).setOrigin(0.5, 0.9).setDepth(620);
+    this.tweens.add({ targets: fountain, alpha: { from: 0.94, to: 1 }, duration: 2600, yoyo: true, repeat: -1, ease: "Sine.easeInOut" });
+    for (const [x, y] of [[850, 566], [900, 548], [950, 566], [875, 590], [925, 590]]) {
+      const glint = this.add.image(x, y, "arcane-mote").setDisplaySize(12, 12).setAlpha(0.5).setDepth(645);
+      this.tweens.add({ targets: glint, y: y - 12, alpha: 0.08, duration: 1300 + (x % 3) * 170, yoyo: true, repeat: -1, ease: "Sine.easeInOut" });
+    }
     // Grand portal.
     this.drawPortal(900, 270);
   }
