@@ -600,11 +600,6 @@ game.events.once("arcane:ready", () => {
   if (loadingNote) loadingNote.textContent = "Your path is ready. The Sanctuary awaits.";
   if (enterRealm) enterRealm.disabled = false;
 });
-enterRealm?.addEventListener("click", () => {
-  if (enterRealm.disabled) return;
-  intro?.classList.add("dismissed");
-  intro?.setAttribute("aria-hidden", "true");
-});
 const pauseButton = document.querySelector<HTMLButtonElement>("#pause-game");
 const pauseOverlay = document.querySelector<HTMLElement>("#pause-overlay");
 const setPaused = (paused: boolean) => {
